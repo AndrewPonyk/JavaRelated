@@ -1,0 +1,8 @@
+#{extends 'main.html' /}
+#{if post}
+	#{set title:post.title /}
+	#{display post:post, as:'full' /}
+#{/if}
+#{else}
+	<h3>No such post</h3>
+#{/else}
