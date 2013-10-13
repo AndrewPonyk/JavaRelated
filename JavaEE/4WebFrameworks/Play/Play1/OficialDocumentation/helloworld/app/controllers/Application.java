@@ -6,7 +6,7 @@ import play.mvc.*;
 
 import java.util.*;
 
-import models.*;
+
 
 public class Application extends Controller {
 
@@ -14,13 +14,13 @@ public class Application extends Controller {
         render();
     }
     
-    public static void sayHello(@Required String m){
+    public static void sayHello(@Required String m,String surname){
     	if(validation.hasErrors()){
     		flash.error("Oops, please enter your name!");
     		index();
     	}
-    	
-    	render(m);
+
+    	render(m,surname);
     }
 
 }
