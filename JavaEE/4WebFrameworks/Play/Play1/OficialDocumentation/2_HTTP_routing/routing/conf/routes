@@ -1,0 +1,26 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       Application.index
+#-------------------------------------------------
+#Routines
+
+GET 	/show/{<[0-9]+>id}/{name} 		Application.show
+
+#set 'default values to http parameters' 
+GET	/show					Application.show(id:'0',name:'Default')
+
+GET 	/showXML				Application.showXML(format:'xml')
+#-------------------------------------------------
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+GET     /test/                                  staticDir:test
+
+# Catch all 
+# comment this , because we want make requests as in routes , and not like in Java classes
+#*       /{controller}/{action}                  {controller}.{action}

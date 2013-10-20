@@ -1,0 +1,426 @@
+20 Oct 2013 14:28:10,191 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/3_Controllers/controllers
+20 Oct 2013 14:28:11,731 WARN  ~ You're running Play! in DEV mode
+20 Oct 2013 14:28:11,932 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+20 Oct 2013 14:28:29,184 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+20 Oct 2013 14:28:29,257 INFO  ~ Application 'controllers' is now started !
+20 Oct 2013 15:04:22,985 ERROR ~ 
+
+@6g2f73b8j
+Internal Server Error (500) for request GET /Application/show
+
+Template not found (In /app/controllers/Application.java around line 17)
+The template Application/show.html does not exist.
+
+play.exceptions.TemplateNotFoundException: Template not found : Application/show.html
+	at play.mvc.Controller.renderTemplate(Controller.java:671)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.show(Application.java:17)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+20 Oct 2013 15:04:34,870 ERROR ~ 
+
+@6g2f73b8l
+Internal Server Error (500) for request GET /Application/show
+
+Template not found (In /app/controllers/Application.java around line 18)
+The template index.html does not exist.
+
+play.exceptions.TemplateNotFoundException: Template not found : index.html
+	at play.mvc.Controller.renderTemplate(Controller.java:671)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.show(Application.java:18)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+20 Oct 2013 15:12:43,685 ERROR ~ 
+
+@6g2f73b8n
+Internal Server Error (500) for request GET /Application/show
+
+Template not found (In /app/views/Application/show.html around line 1)
+The template index.html does not exist.
+
+play.exceptions.TemplateNotFoundException: Template not found : index.html
+	at play.templates.FastTags._extends(FastTags.java:335)
+	at play.templates.FastTags$_extends.call(Unknown Source)
+	at /app/views/Application/show.html.(line:1)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.show(Application.java:17)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+20 Oct 2013 15:18:34,173 ERROR ~ 
+
+@6g2f73b8o
+Application.show action not found
+
+Action not found
+Action Application.show could not be found. Error raised is No method public static void show() was found in class controllers.Application
+
+play.exceptions.ActionNotFoundException: Action Application.show not found
+	at play.mvc.ActionInvoker.getActionMethod(ActionInvoker.java:610)
+	at play.mvc.ActionInvoker.resolve(ActionInvoker.java:85)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.Exception: No method public static void show() was found in class controllers.Application
+	... 3 more
+20 Oct 2013 15:22:12,405 ERROR ~ 
+
+@6g2f73b8p
+Internal Server Error (500) for request GET /Application/showParams?id=10
+
+Compilation error (In /app/controllers/Application.java around line 17)
+The file /app/controllers/Application.java could not be compiled. Error raised is : Duplicate local variable id
+
+play.exceptions.CompilationException: Duplicate local variable id
+	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
+	at org.eclipse.jdt.internal.compiler.Compiler.handleInternalException(Compiler.java:676)
+	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:520)
+	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
+	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
+	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
+	at play.Play.detectChanges(Play.java:632)
+	at play.Invoker$Invocation.init(Invoker.java:198)
+	at Invocation.HTTP Request(Play!)
+20 Oct 2013 16:05:18,792 ERROR ~ 
+
+@6g2f73b90
+Internal Server Error (500) for request GET /showParams/10?id=9999?id=333333333
+
+Template execution error (In /app/views/Application/showParams.html around line 8)
+Execution error occured in template /app/views/Application/showParams.html. Exception raised was IndexOutOfBoundsException : Index: 1, Size: 1.
+
+play.exceptions.TemplateExecutionException: Index: 1, Size: 1
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.showParams(Application.java:24)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IndexOutOfBoundsException: Index: 1, Size: 1
+	at java.util.ArrayList.rangeCheck(ArrayList.java:635)
+	at java.util.ArrayList.get(ArrayList.java:411)
+	at /app/views/Application/showParams.html.(line:8)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+20 Oct 2013 16:05:42,211 ERROR ~ 
+
+@6g2f73b91
+Internal Server Error (500) for request GET /showParams/10?id=9999?iddf=333333333
+
+Template execution error (In /app/views/Application/showParams.html around line 8)
+Execution error occured in template /app/views/Application/showParams.html. Exception raised was IndexOutOfBoundsException : Index: 1, Size: 1.
+
+play.exceptions.TemplateExecutionException: Index: 1, Size: 1
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.showParams(Application.java:24)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IndexOutOfBoundsException: Index: 1, Size: 1
+	at java.util.ArrayList.rangeCheck(ArrayList.java:635)
+	at java.util.ArrayList.get(ArrayList.java:411)
+	at /app/views/Application/showParams.html.(line:8)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+20 Oct 2013 16:38:16,440 ERROR ~ 
+
+@6g2f73b92
+Application.getDate3 action not found
+
+Action not found
+Action Application.getDate3 could not be found. Error raised is No method public static void getDate3() was found in class controllers.Application
+
+play.exceptions.ActionNotFoundException: Action Application.getDate3 not found
+	at play.mvc.ActionInvoker.getActionMethod(ActionInvoker.java:610)
+	at play.mvc.ActionInvoker.resolve(ActionInvoker.java:85)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.Exception: No method public static void getDate3() was found in class controllers.Application
+	... 3 more
+20 Oct 2013 16:57:33,644 ERROR ~ 
+
+@6g2f73b93
+Internal Server Error (500) for request GET /Application/getDate
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:57:55,117 ERROR ~ 
+
+@6g2f73b94
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22/10/2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:57:59,370 ERROR ~ 
+
+@6g2f73b95
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22/10/2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:58:05,719 ERROR ~ 
+
+@6g2f73b96
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22/10/2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:58:23,864 ERROR ~ 
+
+@6g2f73b97
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:58:25,895 ERROR ~ 
+
+@6g2f73b98
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:58:32,029 ERROR ~ 
+
+@6g2f73b99
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 32)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:59:36,485 ERROR ~ 
+
+@6g2f73b9a
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 33)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:33)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 16:59:47,193 ERROR ~ 
+
+@6g2f73b9b
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 33)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at java.util.Calendar.setTime(Calendar.java:1106)
+	at controllers.Application.getDate(Application.java:33)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 17:02:25,940 ERROR ~ 
+
+@6g2f73b9c
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012
+
+Execution exception (In /app/controllers/Application.java around line 34)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.getDate(Application.java:34)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 17:06:38,215 ERROR ~ 
+
+@6g2f73b9d
+Internal Server Error (500) for request GET /Application/getDate?originalDate=22-10-2012&addDays=
+
+Execution exception (In /app/controllers/Application.java around line 34)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.getDate(Application.java:34)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 18:17:06,859 ERROR ~ 
+
+@6g2f73b9e
+Internal Server Error (500) for request POST /saveFile
+
+Execution exception (In /app/controllers/Application.java around line 68)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.saveFile(Application.java:68)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+20 Oct 2013 18:27:42,119 ERROR ~ 
+
+@6g2f73b9f
+Clients.saveClientd action not found
+
+Action not found
+Action Clients.saveClientd could not be found. Error raised is No method public static void saveClientd() was found in class controllers.Clients
+
+play.exceptions.ActionNotFoundException: Action Clients.saveClientd not found
+	at play.mvc.ActionInvoker.getActionMethod(ActionInvoker.java:610)
+	at play.mvc.ActionInvoker.resolve(ActionInvoker.java:85)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.Exception: No method public static void saveClientd() was found in class controllers.Clients
+	... 3 more

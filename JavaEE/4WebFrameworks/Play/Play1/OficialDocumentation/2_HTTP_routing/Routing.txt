@@ -1,0 +1,127 @@
+1)To make some routes in your application you need file 'routes' in directory 'conf'
+
+-----------------------------------------------------------
+2)<b>The URI Pattern </b>
+The URI pattern defines the route’s request path. Some parts of the request path can be dynamic. 
+
+
+!!!!!!!!!!!! Any dynamic part must be specified within braces {…}.
+
+/clients/all
+exactly matches:
+
+/clients/all
+but…
+ 
+
+/clients/{id}
+matches both:
+
+/clients/12121
+/clients/toto
+
+-----------------------------------------------------------------------
+3)
+!!!!!!!!!!!!!!! Ahtung
+'GET 	/show Application.show' will handle  'http://localhost:9000/show' , but NOT 'http://localhost:9000/show/'
+
+---------------------------------------------------------------
+#Routes hello world
+routes :
+GET 	/show/{id}/{name}					Application.show
+
+Create file show.html in folder views
+
+Application.java
+...
+    public static void show(String id,String name){
+	System.out.println("Id :"+id);
+        System.out.println("Name :"+name);
+      render();
+    }
+..
+
+Andrew now we can make    :      http://localhost:9000/show/10/Andrew 
+and will have <b>id</b> and <b>name</b> VARIABLES IN METHOD <b>show</b>
+
+----------------------------------------------------------------------
+4)
+RegExp in routes
+
+GET 		/show/{<[0-9]+>id}/{name} 	Application.sho
+
+so we have such request : http://localhost:9000/show/10/Petro   - 200 ok method <b> show</b> will be invoked
+and now we have another request : http://localhost:9000/10z/Petro - 404 not found , because <b>10z</b> doesnt match pattern <b>[0-9]+</b>
+
+--------------------------------------------------------------------------
+5)
+Static(default) args
+
+GET    /home              Application.page(id:'home')
+GET    /pages/{id}        Application.page
+
+if we make http://localhost:9000/show  - then ${id} on this page will be 'home'
+if we make http://localhost:9000/show/myHome - thid ${id} will be 'myHome'
+------------------------------------------------------------------------------------
+6)
+Variables and scripts
+You can also use the ${…} syntax for variables, and the %{…} syntax for scripts in the routes file, as you can in templates. For example:
+
+%{ context = play.configuration.getProperty('context', '') }%
+ 
+# Home page
+GET    ${context}         Secure.login
+GET    ${context}/        Secure.login
+Another example is the CRUD module’s routes file, which uses the crud.types tag to loop over model types to generate controller route definitions for each type.
+
+----------------------------------------------------------------------------------------
+7)
+<b>Routes PRIORIRY</b>
+Many routes can match the same request. If there is any conflict, the first route (following the declaration order) is used.
+
+------------------------------------------------------------------------------------------------------------
+8)!!!!!!!!!
+Publishing as a static resources 
+TO publish some folder as static resource you need special action <b>staticDir</b>
+
+For example , with this line we can 'open' public directory :
+ GET     /public/                                staticDir:public
+
+With this GET     /test/                                staticDir:test  , we open test folder
+so if we make http://localhost:9000/test/BasicTest.java - we will see code of this test
+
+
+! staticFile: mapping
+You can also directly map a URL path to a static file rendering.
+
+# Serve index.html static file for home requests
+GET     /home                   staticFile:/public/html/index.html
+------------------------------------------------------------------------
+9)
+Play has built-in support for a few formats: html, txt, json and xml. 
+Rendering XML :
+
+* create file showXML.xml in 'views' folder 
+	<?xml version="1.0" encoding="UTF-8" ?>
+	<showXML>
+		<defaultId id="${id}" />
+	</showXML>
+
+* create method showXML in Application.java
+	public static void showXML(){
+		
+			String id="8888";
+			render(id);	
+	 	}
+
+* In 'routes' file 
+GET 	/showXML				Application.showXML(format:'xml')
+
+
+and if you make request http://localhost:9000/showXML
+you will recieve 
+	<?xml version="1.0" encoding="UTF-8" ?>
+	<showXML>
+		<defaultId id="8888" />
+	</showXML>
+-------------------------------------------------------------------------------------------

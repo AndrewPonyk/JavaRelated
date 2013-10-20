@@ -1,0 +1,368 @@
+1) What is cotroller ?
+
+Business logic is managed in the domain model layer. As a client (typically a web browser) cannot directly invoke this code, the functionality of a domain object is exposed as resources represented by URIs.
+
+A client uses the uniform API provided by the HTTP protocol to manipulate these resources, and by implication the underlying business logic.
+However, this mapping of resources to domain objects is not a bijection: the granularity can be expressed at different levels, some resources may be virtual, for some resources aliases may be defined…
+
+This is precisely the role played by the Controller layer: providing a glue between the domain model objects and transport layer events. As the Model layer, controllers are written in pure Java, making it easy to access or modify Model objects. Like the HTTP interface, Controllers are procedural and Request/Response oriented.
+
+!!!!The Controller layer reduces the impedance mismatch between HTTP and the Domain Model.
+
+<b>
+There are different architectural models with different strategies. Some protocols give you direct access to the domain model objects. This is typically what EJB or Corba protocols do. In these cases, the architectural style used is RPC (Remote Procedure Call). These communication styles are hardly compatible with web architecture.
+
+Some technologies like SOAP try to give access to the model object domain through the Web. However, SOAP is just another RPC-style protocol, in this case using HTTP as a transport protocol. It is not an application protocol.
+
+</b>
+The web’s principles are not fundamentally object-oriented. So a layer is needed to adapt HTTP to your favorite language.
+
+---------------------------------------------------------------------------------------------
+2) Controllers overview :
+A Controller is a Java class, hosted by the controllers package, and subclassing play.mvc.Controller.
+	package controllers;
+	 
+	import models.Client;
+	import play.mvc.Controller;
+	 
+	public class Clients extends Controller {
+	 
+	    public static void show(Long id) {
+		Client client = Client.findById(id);
+		render(client);
+	    }
+	 
+	    public static void delete(Long id) {
+		Client client = Client.findById(id);
+		client.delete();
+	    }
+	 
+	}
+
+	<b>
+	Each public, static method in a Controller is called an action. The signature for an action method is always:
+	public static void action_name(params...); 	
+	</b>
+
+	 You can <b>define parameters </b> in the action method signature. These parameters will be <b>automatically</b> resolved by the 	  framework from 	the 	corresponding HTTP parameters.
+
+
+	<b>
+	Usually, an action method doesn’t include a return statement. The method exit is done by the invocation of a result method. In 			this example, <b> render(…) </b> is a result method that executes and displays a template
+	</b>
+
+-------------------------------------------------------------------------
+!!! 3)Retrieving HTTP parameters
+
+	An HTTP request contains data. This data can be extracted from:
+
+	*The URI path: in /clients/1541, 1541 is the dynamic part of the URI Pattern.
+	*The Query String: /clients?id=1541.
+	*The request body: if the request was sent from an HTML form, the request body contains the form data encoded as x-www-urlform-encoded.
+
+	In all cases, Play extracts this data and builds a Map<String, String[]> <b>params</b> which contains all the HTTP parameters. The key 		is the parameter name. The parameter name is derived from:
+	    String id = params.get("id");
+	    String[] names = params.getAll("names");
+
+
+!BUUTTTTTTTTTT ,there is easier way to retrieve parameters 
+
+	public static void showArguments(Long id){
+		// and you have id from url 
+		//play try to cast it , if we pass wrong value then id will be null (default value)
+		
+		redner(id);
+
+	}
+	
+-------------------------------------------------------------------------------
+4)  Advanced HTTP to Java binding
+	All the native and common Java types are automatically bound:
+
+	int, long, boolean, char, byte, float, double, Integer, Long, Boolean, Char, String, Byte, Float, Double.
+	<B>	
+	Note that if the parameter is missing in the HTTP Request, or if automatic conversion fails, Object types will be set to null and native types will be set to their default values.
+	</B>
+
+
+	!! Passing <b>date</b> to controller :
+	finally we have request 
+
+	<b>http://localhost:9000/Application/getDate?originalDate=21-10-2012&addDays=6</b>
+	and response 
+
+	<b>The date after 6 days will be 27/10/2012</b>
+
+
+	Java code in controller (@As annotation is interesting) : 
+
+	    public static void getDate(@As("dd-MM-yyyy")GregorianCalendar originalDate,Long addDays){
+	    	
+	    	originalDate.add(Calendar.DAY_OF_WEEK, addDays.intValue());
+	    	
+	    	Date result=originalDate.getTime();
+	    	String resultDate=new SimpleDateFormat("dd/MM/yyyy").format(result);
+	    		    	
+	    	render(resultDate,addDays);
+	    }
+	
+	
+	
+	On the page getDate.html
+
+	#{extends 'main.html' /}
+	#{set title:'Get Date' /}
+
+	The date after <b>${addDays} days</b>  will be <b>${resultDate.toString()}</b>
+
+-----------------------------------------------------------------------------------
+5) Save file with Play framework
+
+	Java code :
+
+	   public static void saveFile(File file) throws IOException{
+	    	String message="something wrong";
+	    	if(file!=null){
+	    		
+	    		
+	    		 	FileChannel sourceChannel = null;
+	    		    FileChannel destChannel = null;
+	    		    try {
+	    		    	String mimeType = MimeTypes.getContentType(file.getName());
+	    		        sourceChannel = new FileInputStream(file).getChannel();
+	    		        destChannel = new FileOutputStream("/home/andrew/temp.jpg").getChannel();
+	    		        destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+	    		        message="ok";
+	    		    }finally{
+	    		           sourceChannel.close();
+	    		           destChannel.close();
+	    		       }
+	    	}
+	    	render(message);
+	    }
+
+	index.html :
+	<div style="margin:20px;widht:500px;border:1px solid gray">
+		<form action="@{Application.saveFile}" method="post" enctype="multipart/form-data">
+			<input type="file" name="file" /><br>
+			<input type="submit" value="Save file to home dir"/> 
+		</form>
+	</div>
+
+	save.html :
+
+	#{extends 'main.html' /}
+	#{set title:'saving' /}
+
+	${message}
+------------------------------------------------------------------------------------------
+6)  <b>POJO object binding</b> - important and very easy
+
+	For example we have object Client
+	package models;
+
+	public class Client {
+	
+		public String name="";
+		public String secondName="";
+	
+		@Override
+		public String toString() {
+			return this.name+" "+this.secondName;
+		}
+	}
+
+	And we have request 
+	http://localhost:9000/Clients/saveClient?client.name=Ivan&client.secondName=Ivanenko
+	
+
+	And java code : 
+		public static void saveClient(Client client){
+			System.out.println(client);
+			// client is automatically generated from request url , it is very cool =)
+			render();
+		}
+-----------------------------------------------------------------------------------------------------
+7) <b>Custom binding in Play </b>
+
+	<b>@play.data.binding.As</b>
+
+	public static void update(@As("dd/MM/yyyy") Date updatedAt) {
+    		…
+	}
+	
+	The @As annotation also has internationalisation support, which means that you can provide a specific annotation for each locale:
+
+	public static void update(
+	        @As(
+	            lang={"fr,de","en","*"},
+	            value={"dd/MM/yyyy","dd-MM-yyyy","MM-dd-yy"}
+	        )
+	        Date updatedAt
+	    ) {
+	    …
+	}
+
+
+	<b>@play.data.binding.NoBinding</b>
+
+	The new @play.data.binding.NoBinding annotation allows yous to mark non-bindable fields, resolving potential security issues. For 		example:
+	
+	public class User extends Model {
+	    @NoBinding("profile") public boolean isAdmin;
+	    @As("dd, MM yyyy") Date birthDate;
+	    public String name;
+	}
+	 
+	public static void editProfile(@As("profile") User user) {
+	    …
+	}
+
+
+
+	@play.data.binding.Global
+
+	Alternatively, you can define a global custom binder that will apply for the corresponding type. For example, you define a binder for the java.awt.Point class like this:
+
+	@Global
+	public class PointBinder implements TypeBinder<Point> {
+	 
+	    public Object bind(String name, Annotation[] anns, String value, 
+	    Class class) {
+		String[] values = value.split(",");
+		return new Point(
+		    Integer.parseInt(values[0]),
+		    Integer.parseInt(values[1])
+		);
+	    }
+	}
+
+
+
+
+
+
+
+--------------------------------------------------------------------------
+8) 
+	<b>Result types</b>
+
+	An action method has to generate an HTTP response. The easiest way to do this is to emit a Result object. When a Result object is 		emitted, the normal execution flow is interrupted and the method returns.
+
+	For example:
+
+	For example:
+
+	public static void show(Long id) {
+	    Client client = Client.findById(id);
+	    render(client);
+	    System.out.println("This message will never be displayed !");
+	}
+
+	<b>The render(…) method emits a Result object and stops further method execution.</b>
+
+	Return some <b>textual</b> content
+
+	The renderText(…) method emits a simple Result event which writes some text directly to the underlying HTTP Response.
+
+	Example:
+
+	// here we dont need countUnreadMessages.html file  
+	public static void countUnreadMessages() {
+	    Integer unreadMessages = MessagesBox.countUnreadMessages();
+	    renderText(unreadMessages);
+	}
+
+	 renderXml("<unreadmessages>"+unreadMessages+"</unreadmessages>"); - render xml 
+	
+	also there is renderJson method
+
+
+---------------------------------------------------------------------------------------------------
+
+9) Return binary content from action 
+
+	public static void userPhoto(long id) { 
+	   final User user = User.findById(id); 
+	   response.setContentTypeIfNotSet(user.photo.type());
+	   java.io.InputStream binaryData = user.photo.get();
+	   renderBinary(binaryData);
+	} 
+
+	or other <b>example</b>
+	  public static void downloadFile(Long id){
+	    		   response.setContentTypeIfNotSet("pdf");
+	    		   java.io.InputStream binaryData;
+				try {
+					binaryData = new FileInputStream("/media/88D4CBF1D4CBDF94/pro_html5_and_css3_design_patterns.pdf");
+					renderBinary(binaryData);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					renderText("Error");
+					}
+	    		   
+	    }
+
+
+---------------------------------------------------------------------------------------------------------
+10) 
+	!!!Execute a template
+
+	If the generated content is complex, you should use a template to generate the response content.
+
+	
+	public class Clients extends Controller {
+	    
+		// we need index.html file 	 
+	    public static void index() {
+		render();    
+	    }
+	}
+
+
+	!!! Add data to the template scope
+
+	renderArgs.put("client", client);
+        render();    
+
+	!!!! A simpler way to add data to the template scope
+		   String name ="Some name";
+		   render(name);    
+
+	on the page we can access to 'name' with ${name} - syntax
+--------------------------------------------------------------------------
+11)
+	!!!Specify another template
+
+		If you don’t want to use the default template, you can specify your own template file using the renderTemplate(…) method, by 			passing the template name as the first parameter:
+
+		Example:
+
+		public static void show(Long id) {
+		    Client client = Client.findById(id);
+		    renderTemplate("Clients/showClient.html", id, client);    
+		}
+	
+		public static void anotherIndex(){
+		    	renderTemplate("Application/index.html");
+		}
+
+---------------------------------------------------------------------------------------
+12) Redirect to another URL
+     redirect("http://www.zenexity.fr");
+	or 
+	for example from one action go to index action 
+
+	public class Application extends Controller {
+	...
+	    public static void index() {
+		...
+	    }
+	
+	    public static void someAction(){
+	    
+		index() ;  // <BBBBBBBBBBB> will redirect us to index page of out application, we can also pass arguments </BBBBBBBBBBBBB> 
+            }
+
+

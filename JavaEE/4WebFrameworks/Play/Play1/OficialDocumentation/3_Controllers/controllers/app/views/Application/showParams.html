@@ -1,0 +1,37 @@
+#{extends 'main.html' /}
+#{set title:'Show' /}
+<p>Application.show</p>
+
+	<div style="border:1px solid black;width:700px">
+		
+		<div>id: ${rederArgsId} - get from params HashMap </div>
+		<div>id: ${id} - get from action arguments , if we pass wrong value , Play  cant cast it , so it will be null </div>
+		
+	</div>
+	
+	<div style="border:1px solid black;margin-top:30px; width:700px">
+		If we make 'routes' : <br> 
+		GET 	/showParams/{id}	Application.showParams <br><br>
+		
+		make action in controller<br>
+		public static void showParams(Long id ){..}<br><br>
+		
+		and make request http://localhost:9000/showParams/10<br>
+		
+		we will have 'id' in 'params' hashmap , and in method argument <br>
+	</div>
+	
+	<div style="border:1px solid black;margin-top:30px; width:700px">
+		<h4>We can pass multiple values for a single URL parameter</h4>
+		http://localhost:9000/showParams/10?id=100&id=1000 <br><br>
+		
+		in 'routes' <br>
+		GET 	/showParams		Application.showParams<br><br>
+		
+		in action in Controller
+		public static void showParams(List&lt;Long> id){...}<br><br>
+		
+		and on page we can get $ {id.get(0)}  - it will be 10<br>
+							   $ {id.get(1)} - it will be 100<br>
+							   $ {id.get(2)} - it will be 1000<br>
+	</div>

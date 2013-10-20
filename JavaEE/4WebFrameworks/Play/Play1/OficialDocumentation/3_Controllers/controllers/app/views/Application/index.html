@@ -1,0 +1,9 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<div style="margin:20px;widht:500px;border:1px solid gray">
+<form action="@{Application.saveFile}" method="post" enctype="multipart/form-data">
+	<input type="file" name="file" /><br>
+	<input type="submit" value="Save file to home dir"/> 
+</form>
+</div>

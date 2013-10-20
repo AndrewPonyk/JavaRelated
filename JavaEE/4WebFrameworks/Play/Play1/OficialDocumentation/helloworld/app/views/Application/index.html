@@ -2,8 +2,9 @@
 #{set title:'Home' /}
 
 	<h2> 
-		%{ content= play.configuration.getProperty("application.name")  }%
+		%{content= play.configuration.getProperty("name","doestnt in myconf mode" ) }%
 		${content}
+		<p>play run --%myconf - to see this variable</p>
 	</h2>
 #{if flash.error}
 	<p style="color:red">
