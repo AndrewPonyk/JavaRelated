@@ -1,0 +1,14 @@
+#{extends 'main.html' /}
+#{set title:'Sending email' /}
+
+
+<html>
+
+	<form action="@{Application.sendMail}" method="post">
+		<label>To: </label><br>
+		<input type="text" name="to"><br> 
+		<label>Message</label><br>
+		<textarea rows="15" cols="40" name="message"></textarea><br>
+		<input  type ="submit" value= "Send" /> 
+	</form>
+</html>
