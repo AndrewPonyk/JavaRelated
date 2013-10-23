@@ -11,4 +11,22 @@
 		<textarea rows="15" cols="40" name="message"></textarea><br>
 		<input  type ="submit" value= "Send" /> 
 	</form>
+
+
+	<hr>
+	<div style="margin:20px;font-size:1.5em">
+	Send using  <i>play.mvc.Mailer</i> (using template welcome.html , look in documentation )
+	<br>
+	<a href="@{Application.sendMailUsingTemplate('andrew9999@ukr.net')}">Send email </a>
+	</div>
+	
+	
+	
+	
+	<div style="border:1px solid gray;margin:20px" >
+		!!! You can't directly call a Java method from Javascript. You have to 
+		make an HTTP call that will then invoke the corresponding action 
+		method. (we can also make AJAX HTTP request to invoke java code)	
+	</div>
+	
 </html>

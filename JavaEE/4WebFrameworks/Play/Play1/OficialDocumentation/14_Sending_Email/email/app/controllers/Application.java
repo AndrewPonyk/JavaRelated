@@ -6,11 +6,12 @@ import play.mvc.*;
 
 import java.util.*;
 
+import notifiers.Mails;
+
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
 
-import models.*;
 
 public class Application extends Controller {
 
@@ -21,7 +22,6 @@ public class Application extends Controller {
     public static void sendMail(String to,String message){
     	System.out.println(to);
     	System.out.println(message);
-    	
     	
     	// there is also SimpleEmail class , but if you want to send html content we will use HtmlEmail
     	HtmlEmail email=new HtmlEmail();
@@ -47,6 +47,11 @@ public class Application extends Controller {
 		}
     	
     	renderText("OK");
+    }
+    
+    public static void sendMailUsingTemplate(String to){
+    	Mails.welcome(to);
+    	index();	
     }
 
 }

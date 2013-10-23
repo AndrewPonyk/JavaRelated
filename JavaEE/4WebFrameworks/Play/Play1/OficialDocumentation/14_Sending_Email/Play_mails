@@ -1,13 +1,120 @@
+----------------------------------------------------------------
 1) Send simple email
 
+    public static void sendMail(String to,String message){
+    	System.out.println(to);
+    	System.out.println(message);
+    	
+    	// there is also SimpleEmail class , but if you want to send html content we will use HtmlEmail
+    	SimpleEmail email=new SimpleEmail();
+    	try {
+		email.setFrom("andrew9999@gmail.com");
+    		email.setSubject("ss");
+    		email.setMsg(message);
+    		email.addTo(to);
+    		
+		Mail.send(email); 	
+		} catch (EmailException e) {
+			e.printStackTrace();
+		}
+    	renderText("OK");
+    }
 
+	//application.conf
+	mail.smtp.host=smtp.gmail.com
+	mail.smtp.user=andrew.ponuk9999@gmail.com	
+	mail.smtp.pass=E*****2
+	mail.smtp.channel=ssl
 
+	// and we need to comment
+	mail.smtp=mock
+	// if we make play test , we need comment this line
+	%test.mail.smtp=mock
 --------------------------------------------
 
 2) Send HTML
 
+    public static void sendMail(String to,String message){
+    	System.out.println(to);
+    	System.out.println(message);
+    	
+    	// there is also SimpleEmail class , but if you want to send html content we will use HtmlEmail
+    	HtmlEmail email=new HtmlEmail();
+    	try {
+			email.setFrom("andrew.ponuk9999@gmail.com");
+			email.addTo(to);
+			email.setSubject("subject");
+			
+			email.setHtmlMsg("<html><h3>Message header</h3>  <div>"+message+"</div></html>");
+			
+			email.setTextMsg(message); // simple plain
+			
+			
+			// set the alternative message
+			//email.setMsg("Your email client does not support HTML, too bad :(");
+			
+			
+			Mail.send(email); 
+			
+		} catch (EmailException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	renderText("OK");
+    }
 
 
 -----------------------------------------------------------
 
-3) Mail and MVC ( render emails from templates)
+3) !!! Mail and MVC ( render emails from templates)
+
+
+	* Create package notifiers 
+	* Create class in package notifiers , which extends <b>Mailer</b>
+		package notifiers;
+
+		import play.mvc.Mailer;
+
+		public class Mails  extends Mailer{
+			public Mails() {
+				// TODO Auto-generated constructor stub
+			}
+			public static void welcome(String to ){
+				System.out.println("Sending email..");
+				setSubject("Welcome"+to);
+				addRecipient(to);
+				setFrom("Me <me@me.com>");
+				String user="andrew9999";
+				send(user);
+			}
+		}
+
+	*Create file <b>/Mails/welcome.html</b> (it will be html template for email , here method send(user) make 'rendering')
+
+	<!DOCTYPE html>
+	<html>
+		<head>
+		<meta charset="UTF-8">
+		<title>Welcome to our app</title>
+		</head>
+		<body>
+			<div style="border:1ps solid black; width:400px;padding:14px;height:400px;background:gray">
+				Hello ${user}  and Welcome =)
+			</div>
+		</body>	
+	</html>
+
+	* Invoke method Mails.welcome('andrew9999@ukr.net')  
+	I invoke it by creating link on index page 
+		<a href="@{Application.sendMailUsingTemplate('andrew9999@ukr.net')}">Send email </a>
+
+	and add method to Application class 
+ 		public static void sendMailUsingTemplate(String to){
+    			Mails.welcome(to);
+    			index();	
+   		 }
+-------------------------------------------------------
+
+!!!! tip 
+!!! You can't directly call a Java method from Javascript. You have to make an HTTP call that will then invoke the corresponding action method. (we can also make AJAX HTTP request to invoke java code)
