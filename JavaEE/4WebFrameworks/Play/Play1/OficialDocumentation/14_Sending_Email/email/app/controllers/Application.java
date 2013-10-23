@@ -30,8 +30,6 @@ public class Application extends Controller {
 			email.addTo(to);
 			email.setSubject("subject");
 			
-			
-			
 			email.setHtmlMsg("<html><h3>Message header</h3>  <div>"+message+"</div></html>");
 			
 			email.setTextMsg(message); // simple plain
