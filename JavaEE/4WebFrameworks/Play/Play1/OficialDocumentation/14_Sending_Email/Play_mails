@@ -58,13 +58,9 @@
 			email.setSubject("subject");
 			
 			email.setHtmlMsg("<html><h3>Message header</h3>  <div>"+message+"</div></html>");
-			
-			email.setTextMsg(message); // simple plain
-			
-			
+
 			// set the alternative message
-			//email.setMsg("Your email client does not support HTML, too bad :(");
-			
+			email.setMsg("Your email client does not support HTML, too bad :(");
 			
 			Mail.send(email); 
 			

@@ -350,8 +350,8 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 
 ---------------------------------------------------------------------------------------
 12) Redirect to another URL
-     redirect("http://www.zenexity.fr");
-	or 
+     	redirect("http://www.zenexity.fr");
+		or 
 	for example from one action go to index action 
 
 	public class Application extends Controller {
@@ -365,4 +365,127 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 		index() ;  // <BBBBBBBBBBB> will redirect us to index page of out application, we can also pass arguments </BBBBBBBBBBBBB> 
             }
 
+----------------------------------------------------------------------------------------------
+13) !!! Interceptions 
+	package controllers;
+	
+	main Interceptors : @Before , @After , @Catch , @Finally , @With
 
+
+	import play.mvc.Before;
+	import play.mvc.Controller;
+
+	public class Interceptor1 extends Controller {
+		
+		//this method will be invoked before invoking actions of Interceptor1 class
+		@Before
+		public static void beforeInterceptor1(){
+			System.out.println("Before Interceptor1");
+		}
+		
+		public static void index(){
+			renderText("Interceptor1.index");
+		}
+	}
+
+	!!! Interceptors for only some methods : 
+		*  @Before(unless="login")..method. -   'method' will be invoked for all actions , but not for login action
+		*  @Before(only={"login","logout"})...mehtod... - 'method' will be invoked only for login and logout actions
+		*
+	<b>The unless and only parameters are available for the @After, @Before and @Finally annotations.</b>
+
+--------------
+	@Catch
+	Methods annotated with @Catch are called if another action method throws the specified exception. The thrown exception is passed as a 		parameter to the @Catch method. (@Catch aren't invoked if exception is inside try..catch block)
+		
+	...
+	public static void throwNullPointer(){
+
+			String nul=null;
+			//System.out.println(nul.toString());
+			int a=nul.length();
+			renderText("Throwing null pointer");
+		}
+
+	@Catch({NullPointerException.class})
+	public static void catchNullPointer(Throwable throwable){
+			System.out.println("Catch null pointer interceptor in Interceptor1");
+	}
+	...
+
+	As with normal Java exception handling, you can catch a super-class to catch more exception types. If you have more than one catch 		method, you can specify their priority so that they are executed in order of priority (priority 1 is executed first).
+
+
+---------
+	@Finally
+	Methods annotated with the @Finally annotation are always executed after each action call to this Controller.
+	@Finally-methods are called both after successful action calls and if an error occurred.
+
+	    public class Admin extends Controller {
+ 
+	    @Finally
+	    static void log(Throwable e) {
+		if( e == null ){
+		    Logger.info("action call was successful");
+		} else{
+		    Logger.info("action call failed", e);
+		}
+	    }
+	 
+	    public static void index() {
+		List<User> users = User.findAll();
+		render(users);
+	    }
+	    …
+	}
+
+------------!!!!
+		@With interceptor 
+
+		Adding more interceptors using the @With annotation
+		Because Java does not allow multiple inheritance, it can be very limiting to rely on the Controller hierarchy to apply 			interceptors. But you can define some interceptors in a totally different class, and <b>link</b> them with any controller using 		the @With annotation.
+	
+		public class Secure extends Controller {
+		    
+		@Before
+		    static void checkAuthenticated() {
+			if(!session.containsKey("user")) {
+			    unAuthorized();
+			}
+		    }
+		}    
+		And on another Controller:
+
+		@With(Secure.class)  // before all actions in class Admin , method 'checkAutenticated' will be invoked
+		public class Admin extends Controller {
+		    
+		    …
+		}
+----------------------------------------------------------------------------------------------------------
+14)  !!!!!  Session and Flash scopes
+	
+	If you have to keep data across multiple HTTP Requests, you can save them in the Session or the Flash scope. Data stored in the Session 	are available during the whole user session, and data stored in the flash scope are available to the next request only.
+
+	It’s important to understand that Session and Flash data are not stored in the server but are added to each subsequent HTTP Request, 		<b>using the Cookie mechanism </b>. So the data size is very limited (up to 4 KB) and you can only store String values.			
+		
+	
+	Of course, cookies are signed with a secret key so the client can’t modify the cookie data (or it will be invalidated). The Play 		session is not aimed to be used as a cache. If you need to cache some data related to a specific session, you can use the Play built-in 	cache mechanism and use the session.getId() key to keep them related to a specific user session.
+
+		public static void index() {
+		    List messages = Cache.get(session.getId() + "-messages", List.class);
+		    if(messages == null) {
+			// Cache miss
+			messages = Message.findByUser(session.get("user"));
+			Cache.set(session.getId() + "-messages", messages, "30mn");
+		    }
+		    render(messages);
+		}
+
+
+	=) so 'flash' is scope visible only in NEXT request (useful thing)
+
+
+	P.S.
+	The session expires when you close your web browser, unless you configure <b>application.session.maxAge </b>.
+
+	The cache has different semantics to the classic Servlet HTTP session object. You can’t assume that these objects will be always in the 	cache. So it forces you to handle the cache miss cases, and keeps your application fully stateless.
