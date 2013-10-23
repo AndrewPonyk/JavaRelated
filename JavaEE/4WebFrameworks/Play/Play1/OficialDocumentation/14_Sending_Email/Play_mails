@@ -20,16 +20,28 @@
     	renderText("OK");
     }
 
-	//application.conf
+	* add  to application.conf :
 	mail.smtp.host=smtp.gmail.com
 	mail.smtp.user=andrew.ponuk9999@gmail.com	
 	mail.smtp.pass=E*****2
 	mail.smtp.channel=ssl
-
 	// and we need to comment
 	mail.smtp=mock
 	// if we make play test , we need comment this line
 	%test.mail.smtp=mock
+
+	
+	* add line to routes
+		POST 			/	Application.sendMail
+	
+	* add Form to index page 
+		<form action="@{Application.sendMail}" method="post">
+			<label>To: </label><br>
+			<input type="text" name="to"><br> 
+			<label>Message</label><br>
+			<textarea rows="15" cols="40" name="message"></textarea><br>
+			<input  type ="submit" value= "Send" /> 
+		</form>	
 --------------------------------------------
 
 2) Send HTML
