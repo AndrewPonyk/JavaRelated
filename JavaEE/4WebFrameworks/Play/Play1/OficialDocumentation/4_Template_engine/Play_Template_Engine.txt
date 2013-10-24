@@ -1,0 +1,9 @@
+1)
+	Play has an efficient templating system which allows to dynamically generate HTML, XML, JSON or any text-based formatted document. The 		template engine uses Groovy as an expression language. A tag system allows you to create reusable functions.
+
+	Templates are stored in the <b> app/views </b> directory.
+
+	A template file is a text file, some parts of which have placeholders for dynamically generated content. The template’s dynamic 	  elements are written using the Groovy language. Groovy’s syntax is very close to Java’s.
+-------------------------------------------------------------------------
+
+2)
