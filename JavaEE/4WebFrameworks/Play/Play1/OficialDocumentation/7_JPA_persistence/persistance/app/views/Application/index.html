@@ -1,0 +1,20 @@
+#{extends 'main.html' /}
+#{set title:'Persistance Index' /}
+
+
+<div>
+	All items in DB
+</div>
+<ul>
+#{list items:Items, as:'item'}
+	<li>${item.name}, Count=${item.count}</li>
+#{/list}
+</ul>
+
+<hr>
+<div>
+	Items with count <10
+	#{list items:itemsWithCountLessThan10, as:'item'}
+		<li>${item.name}</li>
+	#{/list}
+</div>

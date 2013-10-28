@@ -1,0 +1,29 @@
+1) 	Play libs list 
+	
+	Most of these libraries are simple helpers that are really straightforward to use:
+
+    Codec: Utilities to encode and decode data.
+    Crypto: Cryptographics utilities.
+    Expression: Evaluate dynamic expressions.
+    F: Functional programming with Java.
+    Files: File system manipulation helpers.
+    I18N: Internationalization helpers.
+    IO: Stream manipulation helpers.
+    Images: Image manipulation utilities.
+    Mail: E-mail functions.
+    MimeTypes: Dealing with MIME types.
+    OAuth: OAuth client protocol.
+    OAuth2: OAuth2 client protocol.
+    OpenID: OpenID client protocol.
+    Time: Time and duration utilities.
+    WS: Powerful Web Service client.
+    XML: Loading XML structures.
+    XPath: Parsing XML using XPath.
+
+---------------------------------------------------------------------------
+2) 	Parsing XML using XPath (in Play1)
+
+	XPath is probably the easiest way to parse an XML document without having to use code generation tools.
+	The play.libs.XPath library offers all the needed primitives to efficiently achieve this task.
+
+	

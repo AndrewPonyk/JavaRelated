@@ -1,5 +1,5 @@
-19 Oct 2013 21:52:34,532 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/helloworld
-19 Oct 2013 21:52:36,099 WARN  ~ You're running Play! in DEV mode
-19 Oct 2013 21:52:36,364 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-19 Oct 2013 21:52:42,646 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-19 Oct 2013 21:52:42,726 INFO  ~ Application 'helloworld' is now started !
+27 Oct 2013 18:01:37,913 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\helloworld
+27 Oct 2013 18:01:39,131 WARN  ~ You're running Play! in DEV mode
+27 Oct 2013 18:01:39,475 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+27 Oct 2013 18:01:47,085 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+27 Oct 2013 18:01:47,133 INFO  ~ Application 'helloworld' is now started !

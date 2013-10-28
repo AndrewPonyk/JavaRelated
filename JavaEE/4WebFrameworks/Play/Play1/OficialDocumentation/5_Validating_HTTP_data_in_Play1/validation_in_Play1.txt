@@ -1,0 +1,454 @@
+
+1) How validation works in Play
+
+	You can use validation to verify that your models are correct before saving them to the database,
+	or use them directly on HTTP parameters to validate a simple form.
+
+	Each request has it own <b> Validation </b> object which collects errors. There are three ways to define validations.
+
+	1.In a controller method, call methods on the controller’s <b>validation</b> field directly. You can also access a subset of the API using the play.data.validation.Validation class’ static methods.
+	2.Add validation annotations to the controller method’s parameter declarations.
+	3.Add the @Valid annotation to action methods’ POJO parameters, and add validation annotations to the POJO properties.
+
+
+
+
+	<b> The validation object maintains a collection of play.data.validation.Error objects. </b>
+	Each error has two properties: 'key' and 'message'
+
+
+
+
+		Using the first approach, let’s see how to validate a simple HTTP parameter:
+		public static void hello(String name) {
+			 validation.required(name);
+			 …
+		}
+
+
+
+		At the end of the validation you can check if any errors have been created and display them:
+		public static void hello(String name, Integer age) {
+			 validation.required(name);
+			 validation.required(age);
+			 validation.min(age, 0);
+
+			 if(validation.hasErrors()) {
+				 for(Error error : validation.errors()) {
+					 System.out.println(error.message());
+				 }
+			 }
+		}
+
+		Assuming that name and age are null, this would display:
+		Required
+		Required
+
+		This is because the default message, defined in $PLAY_HOME/resources/messages, is:
+		validation.required=Required
+
+---------------------------------------------------------------------------------
+
+2) 	    Validation error messages
+
+
+		<b>
+
+		There are three ways to customise the validation message.
+				1.	Override the default message, by redefining the message in your application’s messages file.
+						Localised validation messages
+
+							The simplest way to override these messages is to use the same message key for a message in your application’s conf/messages file. For example:
+							validation.required = Please enter a value
+
+							You can also provide localisations in other languages, as described in Internationalization.
+
+				2.Provide a custom message as an additional validation parameter.
+						Custom localised validation messages
+
+						The validation messages in $PLAY_HOME/resources/messages use the default message key for each of Play’s built-in validations.
+						You can specify a different message key. For example:
+						validation.required.em = You must enter the %s!
+
+						Use this new message key for the message, for manual validation in the action method:
+						validation.required(manualKey).message("validation.required.em");
+
+						Alternatively, use the key in the annotation’s message parameter:
+						public static void hello(@Required(message="validation.required.em") String name) {
+						   …
+						}
+
+				3.Provide a message key for a localised message as an additional validation parameter.
+
+		</b>
+
+		Custom literal (non-localised) validation messages
+		The Play message look-up just returns the message key if there is no message defined for the key, which means you can also just use a literal message instead of the message key if you prefer. Using the same examples as above, for manual validation:
+		validation.required(manualKey).message("Give us a name!");
+
+		For action method parameter annotations:
+		public static void save(@Required(message = "Give us a name!") String name) {
+		   …
+		}
+------------------------------------------------------------------------------------------------------
+3) Validation message parameters
+
+			You can use a <b>placeholder</b> in the message for the error key:
+			validation.required=%s is required
+
+			This changes the output to:
+			name is required
+			age is required
+
+			Limitation: Play cannot determine the correct parameter name when more than one required-field validation using the validation.required(age) syntax fails. In this case, you must specify the field name directly, i.e. validation.required("age", age).
+
+			This error key defaults to the parameter name, and is itself used to look up a message. For example, the name parameter in the hello action method above could be localised with:
+			name = Customer name                // in messages.en  !!!!!!!!!!!!!!! (it is importang)
+
+			This would result in the output:
+			Customer name is required
+			age is required
+
+			You can also override the error key using the error.message(String key) method. For example:
+			Error error = validation.required(name).error;
+			if(error != null) {
+				System.out.println(error.message("Customer name"));
+			}
+
+			Several of the built-in validations define additional message parameters that correspond to the validation parameters. For example, the ‘match’ validation defines a second String parameter for the specified regular expression, which differs from the %s placeholder above in that it specifies the parameter index ‘2’:
+			validation.match=Must match %2$s
+
+			Similarly, the ‘range’ validation defines two additional numeric parameters, with indices 2 and 3:
+			validation.range=Not in the range %2$d through %3$d
+
+			Look in the file $PLAY_HOME/resources/messages to see which other validations have parameters.
+
+
+------------------------------------------------------------------------------------------------------
+4)		Displaying validation errors in the <b> template </b>
+
+		Example :
+		Application.java :
+			...
+			public static void validate (String name,Integer age){
+
+				render(name,age);
+			}
+
+			public static void process(String name, Integer age){
+
+				validation.required(name);
+				validation.required(age);
+				validation.min(age, 10);  // !!!!!!!!!!! we can use annotations INSTEAD
+
+				if(validation.hasErrors()){
+					   params.flash(); // add http parameters to the flash scope
+					   validation.keep(); // keep the errors for the next request
+					   validate(name,age);
+				}
+				renderText("Ok , everything is OK");
+			}
+			...
+
+			validate.html :
+			#{ifErrors}
+			<div class="errors">
+				&{'validation.hasErrors'}
+				<!-- #{errors}
+					<li>${error}</li>
+				#{/errors} - simply list with errors
+				 -->
+			</div>
+
+		#{/ifErrors}
+
+			#{form action:@@Application.process() , method:'GET' }
+				<div>
+					<label>&{'name'}</label>
+					<input type="text" name="name" value="${flash.name}"/><span>#{error 'name' /}</span>
+				</div>
+				<div>
+					<label>&{'age'}</label>
+					<input type="text" name="age" value="${flash.age}"  /><span>#{error 'age' /}</span>
+				</div>
+				<div>
+					<label>&{'password'}</label>
+					<input type="text" name="password" value="${flash.password}"  /> #{error 'password' /}
+				</div>
+				<input  type="submit" value="&{'submit'}"/>
+			#{/form}
+
+
+			and messages :
+				/conf/messages.en:
+				name= Name
+				age=Age
+				password = Password
+				submit= Save
+
+				validation.hasErrors= There are errors
+				validation.min = %1$s must be more than  %2$d
+				validation.password = Password length > %2$s and contains at least 1 number
+
+				/conf/messages.uk
+					name= ²ì’ÿ
+					age=Â³ê
+					password = Ïàðîëü
+					submit = Çáåðåãòè
+
+					validation.hasErrors= Âèïðàâòå ïîìèëêè
+					validation.required=Îáîâ’ÿçêîâî ââåä³òü %1$s
+					validation.min = %1$s ìóñèòü áóòè á³ëüøå  %2$d
+					validation.password = Äîâæèíà ïàðîëÿ > %2$s ³ ïàðîëü ìàº ìàòè õî÷ îäíó öèôðó
+
+				simple =)
+
+--------------------------------------------------------------------------------------------------------
+5)		Validation annotations
+
+		The annotations in the play.data.validation package provide an alternative and more concise way to specify validation constraints,
+		with an annotation that corresponds to each Validation object method.
+		To use the validation annotations, just annotate the controller method parameters:
+
+
+
+		public static void hello(@Required String name, @Required @Min(0) Integer age) {
+			if(validation.hasErrors()) {
+					params.flash(); // add http parameters to the flash scope
+					validation.keep(); // keep the errors for the next request
+					index();
+			}
+			render(name, age);
+		}
+
+----------------------------------------------------------------------------
+6) Validating complex objects
+
+	You can also use the validation annotations to easily add constraints to your model object’s properties, and then in the controller specify that all properties must be valid.
+	Let’s rewrite the previous example using a User class.
+
+	package models;
+
+		public class User {
+
+			@Required
+			public String name;
+
+			@Required
+			@Min(0)
+			public Integer age;
+		}
+
+		public static void hello(@Valid User user) {
+			if(validation.hasErrors()) {
+				params.flash(); // add http parameters to the flash scope
+				validation.keep(); // keep the errors for the next request
+				index();
+			}
+			render(name, age);
+		}
+
+		And finally the modified form:
+			#{ifErrors}
+			   <h1>Oops…</h1>
+			#{/ifErrors}
+
+			#{form @Application.hello()}
+			   <div>
+				  Name: <input type="text" name="user.name" value="${flash['user.name']}" />
+				  <span class="error">#{error 'user.name' /}</span>
+			   </div>
+			   <div>
+				  Age: <input type="text" name="user.age" value="${flash['user.age']}" />
+				  <span class="error">#{error 'user.age' /}</span>
+			   </div>
+			   <div>
+				  <input type="submit" value="Say hello" />
+			   </div>
+			#{/form}
+
+------------------------------------------------------------------------
+6) Built-in validations
+
+	Special validators with defined behaviour(for example min has one argument , range -has two arguments) and message in /app/conf/messages :
+
+		email
+		equals
+		future
+		ipv4Address
+		ipv6Address
+		isTrue
+		match
+		max
+		maxSize
+		min
+		minSize
+		past
+		phone
+		range
+		required
+		unique
+		url
+
+	Several of the built-in validations define additional message parameters that correspond to the validation parameters. For example, the ‘match’ validation defines a second String parameter for the specified regular expression, which differs from the %s placeholder above in that it specifies the parameter index ‘2’:
+		validation.match=Must match %2$s
+
+	, the ‘range’ validation defines two additional numeric parameters, with indices 2 and 3:
+		validation.range=Not in the range %2$d through %3$d
+
+		Look in the file $PLAY_HOME/resources/messages to see which other validations have parameters.
+
+-----------------------------------------------------------------------------------------------------------------------
+7)		Custom validation using <b> @CheckWith </b>
+
+	Can’t find the validator you need in the play.data.validation package? Write your own.
+	You can use the generic @CheckWith annotation to bind your own Check implementation.
+
+	Example : Custom password check
+		* Application.java:
+		...
+		    public static void validate (String name,Integer age,String password){
+				render(name,age);
+			}
+
+			public static void process(@Required String name, @Required @Min(10) Integer age ,
+										@Required @CheckWith(MyPasswordCheck.class) String password){
+
+				//validation.required(name);
+				//validation.required(age);
+				//validation.min(age, 10); // we can use Annotations , or these methods
+
+				if(validation.hasErrors()){
+					   params.flash(); // add http parameters to the flash scope
+					   validation.keep(); // keep the errors for the next request
+					   validate(name,age,password);
+				}
+				renderText("Ok , everything is OK");
+			}
+
+			static class MyPasswordCheck extends Check {
+				@Override
+				public boolean isSatisfied(Object validatedObject, Object value) {
+					setMessage("validation.password","8");
+					if(value==null) return false;
+
+					return (value.toString().length()>=8) && value.toString().matches(".*[0-9].*");
+				}
+
+			}
+		...
+
+
+		*on the page validate.html
+		...
+		#{ifErrors}
+			<div class="errors">
+				&{'validation.hasErrors'}
+				<!-- #{errors}
+					<li>${error}</li>
+				#{/errors} - simply list with errors
+				 -->
+			</div>
+
+		#{/ifErrors}
+
+		#{form action:@@Application.process() , method:'GET' }
+
+			<div>
+				<label>Name</label>
+				<input type="text" name="name" value="${flash.name}"/><span>#{error 'name' /}</span>
+			</div>
+			<div>
+				<label>Age</label>
+				<input type="text" name="age" value="${flash.age}"  /><span>#{error 'age' /}</span>
+			</div>
+			<div>
+				<label>Password</label>
+				<input type="text" name="password" value="${flash.password}"  /> #{error 'password' /}
+			</div>
+			<input  type="submit" value="Submit query"/>
+		#{/form}
+
+
+		* in messages.en and messages.uk
+			validation.hasErrors= There are errors
+			validation.min = Must be more than  %2$d
+			validation.password = Password length > %2$s and contains at least 1 number
+
+		(be careful with  %2$s - with this we can pass parameters to message
+
+-----------------------------------------------------------------------------------------------
+8)		Custom annotations for validation
+
+		/*		i didnt study this		*/
+
+		You can also write your own annotation validations, which is more complex but makes your model code cleaner and allows you to introduce validator parameters.
+
+		For example, suppose we want a less restrictive version of the @URL validation, so we can allow URLs with any scheme such as a file:// URL, and with a parameter that lets us specify exactly which schemes are allowed.
+
+		First, we write a custom validation annotation, with a parameter for overriding the default message:
+
+		import net.sf.oval.configuration.annotation.Constraint;
+		import java.lang.annotation.*;
+
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target({ElementType.FIELD, ElementType.PARAMETER})
+		@Constraint(checkWith = URICheck.class)
+		public @interface URI {
+			String message() default URICheck.message;
+		}
+
+		This annotation refers to an implementation of net.sf.oval.configuration.annotation.AbstractAnnotationCheck.
+		public class URICheck extends AbstractAnnotationCheck<URI> {
+
+			/** Error message key. */
+			public final static String message = "validation.uri";
+
+			/** URI schemes allowed by validation. */
+			private List<String> schemes;
+
+			@Override
+			public void configure(URI uri) {
+				setMessage(uri.message());
+				this.schemes = Arrays.asList(uri.schemes());
+			}
+
+			/**
+			 * Add the URI schemes to the message variables so they can be included
+			 * in the error message.
+			 */
+			@Override
+			public Map<String, String> createMessageVariables() {
+				final Map<String, String> variables = new TreeMap<String, String>();
+				variables.put("2", JavaExtensions.join(schemes, ", "));
+				return variables;
+			}
+
+			@Override
+			public boolean isSatisfied(Object validatedObject, Object value,
+				OValContext context, Validator validator) throws OValException {
+
+				requireMessageVariablesRecreation();
+				try {
+					final java.net.URI uri = new java.net.URI(value.toString());
+					final boolean schemeValid = schemes.contains(uri.getScheme());
+					return schemes.size() == 0 || schemeValid;
+				} catch (URISyntaxException e) {
+					return false;
+				}
+			}
+		}
+
+		The isSatisfied method calls requireMessageVariablesRecreation() to instruct OVal to call createMessageVariables() before rendering the message. This returns an ordered map of variables that are passed to the message formatter. The map keys are not used; the "2" in this example indicates the message parameter index. As before, the first parameter is the field name.
+
+		To use this use the annotation on a model property.
+		public class User {
+
+			@URI(message = "validation.uri.schemes", schemes = {"http", "https"})
+			public String profile;
+		}
+
+		We can define the messages like this:
+		validation.uri = Not a valid URI
+		validation.uri.schemes = &{%1$s} is not a valid URI - allowed schemes are %2$s
+------------------------------------------------------------------------------------------------------------------------------------------------

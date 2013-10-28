@@ -1,0 +1,5 @@
+27 Oct 2013 13:12:40,091 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\6_The_domain_object_model\domainobjectmodel
+27 Oct 2013 13:12:41,819 WARN  ~ You're running Play! in DEV mode
+27 Oct 2013 13:12:42,003 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+27 Oct 2013 13:12:47,306 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+27 Oct 2013 13:12:47,353 INFO  ~ Application 'domainobjectmodel' is now started !

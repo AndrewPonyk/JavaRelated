@@ -1,0 +1,176 @@
+27 Oct 2013 16:20:59,814 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\7_JPA_persistence\persistance
+27 Oct 2013 16:21:02,164 WARN  ~ You're running Play! in DEV mode
+27 Oct 2013 16:21:02,454 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+27 Oct 2013 16:23:09,377 INFO  ~ Connected to jdbc:mysql://localhost/play1?useUnicode=yes&characterEncoding=UTF-8&connectionCollation=utf8_general_ci
+27 Oct 2013 16:23:11,596 INFO  ~ Application 'persistance' is now started !
+27 Oct 2013 16:23:12,458 ERROR ~ line 1:30: expecting OPEN, found '='
+27 Oct 2013 16:23:12,459 WARN  ~ processEqualityExpression() : No expression to process!
+27 Oct 2013 16:23:15,043 ERROR ~ 
+
+@6g4emlpdi
+Internal Server Error (500) for request GET /
+
+Execution exception (In /app/controllers/Application.java around line 26)
+IllegalArgumentException occured : org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count = '10']
+
+play.exceptions.JavaExecutionException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count = '10']
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IllegalArgumentException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count = '10']
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1376)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1317)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:280)
+	at play.db.jpa.JPQL.find(JPQL.java:46)
+	at models.Item.find(Item.java)
+	at controllers.Application.index(Application.java:26)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count = '10']
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:54)
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:47)
+	at org.hibernate.hql.ast.ErrorCounter.throwQueryException(ErrorCounter.java:82)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.parse(QueryTranslatorImpl.java:286)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.doCompile(QueryTranslatorImpl.java:184)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.compile(QueryTranslatorImpl.java:138)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:101)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:80)
+	at org.hibernate.engine.query.QueryPlanCache.getHQLQueryPlan(QueryPlanCache.java:124)
+	at org.hibernate.impl.AbstractSessionImpl.getHQLQueryPlan(AbstractSessionImpl.java:156)
+	at org.hibernate.impl.AbstractSessionImpl.createQuery(AbstractSessionImpl.java:135)
+	at org.hibernate.impl.SessionImpl.createQuery(SessionImpl.java:1770)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:277)
+	... 9 more
+27 Oct 2013 16:23:43,758 ERROR ~ line 1:30: expecting OPEN, found '='
+27 Oct 2013 16:23:43,759 WARN  ~ processEqualityExpression() : No expression to process!
+27 Oct 2013 16:23:43,915 ERROR ~ 
+
+@6g4emlpdj
+Internal Server Error (500) for request GET /
+
+Execution exception (In /app/controllers/Application.java around line 26)
+IllegalArgumentException occured : org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?]
+
+play.exceptions.JavaExecutionException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?]
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IllegalArgumentException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?]
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1376)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1317)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:280)
+	at play.db.jpa.JPQL.find(JPQL.java:46)
+	at models.Item.find(Item.java)
+	at controllers.Application.index(Application.java:26)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?]
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:54)
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:47)
+	at org.hibernate.hql.ast.ErrorCounter.throwQueryException(ErrorCounter.java:82)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.parse(QueryTranslatorImpl.java:286)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.doCompile(QueryTranslatorImpl.java:184)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.compile(QueryTranslatorImpl.java:138)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:101)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:80)
+	at org.hibernate.engine.query.QueryPlanCache.getHQLQueryPlan(QueryPlanCache.java:124)
+	at org.hibernate.impl.AbstractSessionImpl.getHQLQueryPlan(AbstractSessionImpl.java:156)
+	at org.hibernate.impl.AbstractSessionImpl.createQuery(AbstractSessionImpl.java:135)
+	at org.hibernate.impl.SessionImpl.createQuery(SessionImpl.java:1770)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:277)
+	... 9 more
+27 Oct 2013 16:28:07,058 ERROR ~ line 1:30: expecting OPEN, found '='
+27 Oct 2013 16:28:07,059 WARN  ~ processEqualityExpression() : No expression to process!
+27 Oct 2013 16:28:07,123 ERROR ~ 
+
+@6g4emlpdk
+Internal Server Error (500) for request GET /
+
+Execution exception (In /app/controllers/Application.java around line 26)
+IllegalArgumentException occured : org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?1]
+
+play.exceptions.JavaExecutionException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?1]
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IllegalArgumentException: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?1]
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1376)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1317)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:280)
+	at play.db.jpa.JPQL.find(JPQL.java:46)
+	at models.Item.find(Item.java)
+	at controllers.Application.index(Application.java:26)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: org.hibernate.hql.ast.QuerySyntaxException: expecting OPEN, found '=' near line 1, column 30 [from models.Item where count =?1]
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:54)
+	at org.hibernate.hql.ast.QuerySyntaxException.convert(QuerySyntaxException.java:47)
+	at org.hibernate.hql.ast.ErrorCounter.throwQueryException(ErrorCounter.java:82)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.parse(QueryTranslatorImpl.java:286)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.doCompile(QueryTranslatorImpl.java:184)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.compile(QueryTranslatorImpl.java:138)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:101)
+	at org.hibernate.engine.query.HQLQueryPlan.<init>(HQLQueryPlan.java:80)
+	at org.hibernate.engine.query.QueryPlanCache.getHQLQueryPlan(QueryPlanCache.java:124)
+	at org.hibernate.impl.AbstractSessionImpl.getHQLQueryPlan(AbstractSessionImpl.java:156)
+	at org.hibernate.impl.AbstractSessionImpl.createQuery(AbstractSessionImpl.java:135)
+	at org.hibernate.impl.SessionImpl.createQuery(SessionImpl.java:1770)
+	at org.hibernate.ejb.AbstractEntityManagerImpl.createQuery(AbstractEntityManagerImpl.java:277)
+	... 9 more
+27 Oct 2013 16:39:05,337 WARN  ~ SQL Error: 1054, SQLState: 42S22
+27 Oct 2013 16:39:05,338 ERROR ~ Unknown column 'title' in 'where clause'
+27 Oct 2013 16:39:05,481 ERROR ~ 
+
+@6g4emlpdl
+Internal Server Error (500) for request GET /
+
+Execution exception (In /app/controllers/Application.java around line 30)
+JPAQueryException occured : Error while executing query from models.Item where title < ?1: Unknown column 'title' in 'where clause'
+
+play.exceptions.JavaExecutionException: Error while executing query <strong>from models.Item where title < ?1</strong>: Unknown column 'title' in 'where clause'
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: play.db.jpa.JPABase$JPAQueryException: Error while executing query <strong>from models.Item where title < ?1</strong>: Unknown column 'title' in 'where clause'
+	at play.db.jpa.GenericModel$JPAQuery.fetch(GenericModel.java:391)
+	at controllers.Application.index(Application.java:30)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'title' in 'where clause'
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1052)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4096)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4028)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2490)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2651)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2683)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2144)
+	at com.mysql.jdbc.PreparedStatement.executeQuery(PreparedStatement.java:2310)
+	at org.hibernate.jdbc.AbstractBatcher.getResultSet(AbstractBatcher.java:208)
+	at org.hibernate.loader.Loader.getResultSet(Loader.java:1953)
+	at org.hibernate.loader.Loader.doQuery(Loader.java:802)
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:274)
+	at org.hibernate.loader.Loader.doList(Loader.java:2542)
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2276)
+	at org.hibernate.loader.Loader.list(Loader.java:2271)
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:459)
+	at org.hibernate.hql.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:365)
+	at org.hibernate.engine.query.HQLQueryPlan.performList(HQLQueryPlan.java:196)
+	at org.hibernate.impl.SessionImpl.list(SessionImpl.java:1268)
+	at org.hibernate.impl.QueryImpl.list(QueryImpl.java:102)
+	at org.hibernate.ejb.QueryImpl.getResultList(QueryImpl.java:246)
+	at play.db.jpa.GenericModel$JPAQuery.fetch(GenericModel.java:389)
+	... 7 more

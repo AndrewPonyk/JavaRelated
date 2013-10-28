@@ -1,4 +1,30 @@
 #{extends 'main.html' /}
 #{set title:'Template engine' /}
 
-${play}
+#{set pagename:'index.html' /}
+
+
+${108+25} - display 133<br>
+${user?.name} - display user name
+<hr>
+Users (displaying using 'list' tag) : <br>
+<ul>
+	#{list items:users , as:'item' }
+		<li>${item.name}</li>
+	#{/list}
+</ul>
+
+<hr>
+Display users using scripts  % {...} %
+	<ul>
+		%{ for(item in  users){    }%
+			${item.name} <br>
+		%{ }  }%
+	</ul>
+	
+<hr>
+%{
+	String temp="some text in variable";
+	
+	out.println(temp);
+}%	

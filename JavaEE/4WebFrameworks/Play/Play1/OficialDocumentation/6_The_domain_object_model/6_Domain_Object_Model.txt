@@ -1,0 +1,142 @@
+1)	The domain object model
+	
+
+	The model has a central position in a Play application. It’s the domain-specific representation of the information on which the application operates.
+
+	 
+
+	Martin Fowler defines it as:
+
+	Responsible for representing concepts of the business, information about the business situation, and business rules. 
+	State that reflects the business situation is controlled and used here, even though the technical details of storing it are delegated to the infrastructure. 
+	This layer is the heart of business software.
+	
+	
+	
+---------------------------------------------------------------------------------------------------
+2) Properties simulation(something about get/set about access modifiers in Java and in Play1)
+
+
+
+		If you take a look at Play sample applications, you will often see that classes declare public variables.
+		 Now if you’re a Java developer with any experience at all, warning sirens are probably clanging like mad at the sight of a public variable. 
+		 In Java (as in other object-oriented languages), best practice says to make all fields private and provide accessors and mutators. 
+		 This is to promote encapsulation, a concept critical to object oriented design.
+
+		Java has no truly built-in property definition system. 
+		It uses a convention named Java Beans: a property on a Java object is defined by a couple of getXxx/setXxx methods. 
+		If the property is read-only there is only a getter.
+		
+		<b>
+			The Model portion of the Play framework automatically generates this pattern while keeping your code clean. 
+			Effectively, all public variables become instance properties. 
+			The convention is that any public, non-static, non-final field of a class is seen as a property.
+		</b>
+		
+		For example, when you define a class like this:
+		
+		public class Product {
+	 
+			public String name;
+			public Integer price;
+		}
+		
+				The loaded class will be:
+					public class Product {
+					 
+						public String name;
+						public Integer price;
+					 
+						public String getName() {
+							return name;
+						}
+					 
+						public void setName(String name) {
+							this.name = name;
+						}
+					 
+						public Integer getPrice() {
+							return price;
+						}
+					 
+						public void setPrice(Integer price) {
+							this.price = price;
+						}
+					}
+
+		Then when you want to access a property you can just write:
+		product.name = "My product";
+		product.price = 58;
+
+		Which is translated at load time to:
+		product.setName("My product");
+		product.setPrice(58);
+		
+		Warning           !!!!!!!!!!!!!!!
+		You can’t directly use getter and setter methods to access properties if you rely on automatic generation. These methods are generated at runtime.
+		So if you reference them in code you write, the compiler won’t find the methods and will generate an error.
+		
+		((Of course you can define the getter and setter methods yourself. If a method exists Play will use the existing accessors.))
+-----------------------------------------------------------------------------------------------------------------------------------------
+	
+3)	Set-up a database to persist your model objects
+
+	Most of the time you will need to save the model object data permanently. The most natural way is to save this data into a database.
+	
+	During <b>development</b>, you can quickly set up an embedded database either in-memory or save it in a sub-directory within your application using the db configuration.
+
+	The Play distribution includes JDBC drivers for H2 and MySQL in the $PLAY_HOME/framework/lib/ directory.
+	If you are using a PostgreSQL or Oracle database, for example, 
+	then you should add the JDBC driver library there, or in your application’s lib/ directory.
+	
+	<b>
+		To connect to <b> any JDBC </b> compliant database. Just <b>add the driver library to</b> and <b>define the JDBC properties db.url, db.driver, db.user and db.pass </b> :
+		db.url=jdbc:mysql://localhost/test
+		db.driver=com.mysql.jdbc.Driver
+		db.user=root
+		db.pass=
+	</b>
+	
+	You can also configure a JPA dialect with jpa.dialect.
+	From your code, you can then obtain a java.sql.Connection from the play.db.DB and use it in the standard way.
+		Connection conn = DB.getConnection();
+		conn.createStatement().execute("select * from products");
+		
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+4) Persist your object model with Hibernate
+
+	
+		You can use Hibernate (through JPA) to persist your Java objects in the Database automatically.
+
+		When you define JPA entities by adding @javax.persistence.Entity annotations to any Java object, Play will automatically start a JPA entity manager.
+		@Entity
+		public class Product {
+		 
+			public String name;
+			public Integer price;
+		}
+		
+		<b>
+			Warning!!!!
+			A common mistake is to use the Hibernate @Entity annotation instead of the JPA one. Remember that Play uses Hibernate through the JPA API.
+		</b>
+		
+		You can then obtain the EntityManager from the play.db.jpa.JPA object:
+		EntityManager em = JPA.em();
+		em.persist(product);
+		em.createQuery("from Product where price > 50").getResultList();
+		
+		
+		Play provides a nice support class to help you to deal with JPA. Just extend <b> play.db.jpa.Model </b>.
+		@Entity
+		public class Product extends Model {
+		 
+			public String name;
+			public Integer price;
+		}
+
+		And then manipulate the Product object using simple methods on the Product instances:
+		Product.find("price > ?", 50).fetch();
+		Product product = Product.findById(2L);
+		product.save();
+		product.delete();
