@@ -8,5 +8,7 @@ import play.db.jpa.Model;
 public class Item  extends Model{
 	
 	public String name;
-	public int count;
+	public Long count;
+	
+	
 }

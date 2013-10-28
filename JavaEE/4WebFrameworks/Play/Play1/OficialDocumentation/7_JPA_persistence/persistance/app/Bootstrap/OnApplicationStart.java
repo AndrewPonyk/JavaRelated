@@ -17,19 +17,19 @@ public class OnApplicationStart  extends Job{
 		//create two items and save them in db
 		Item i1=new Item();
 		i1.name="item1";
-		i1.count=10;
+		i1.count=10L;
 		
 		Item i2=new Item();
 		i2.name="item2";
-		i2.count=4;
+		i2.count=4L;
 		
 		Item i3=new Item();
 		i3.name="Product3";
-		i3.count=2;
+		i3.count=2L;
 		
 		Item i4=new Item();
 		i4.name="Product4";
-		i4.count=55;
+		i4.count=55L;
 		
 		
 		
