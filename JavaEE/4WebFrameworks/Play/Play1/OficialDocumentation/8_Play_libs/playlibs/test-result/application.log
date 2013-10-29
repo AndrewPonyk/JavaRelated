@@ -1,5 +1,350 @@
-27 Oct 2013 20:31:15,839 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs
-27 Oct 2013 20:31:17,692 WARN  ~ You're running Play! in DEV mode
-27 Oct 2013 20:31:18,275 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-27 Oct 2013 20:31:29,389 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-27 Oct 2013 20:31:29,481 INFO  ~ Application 'playlibs' is now started !
+28 Oct 2013 23:22:12,600 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs
+28 Oct 2013 23:22:15,934 WARN  ~ You're running Play! in DEV mode
+28 Oct 2013 23:22:17,353 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+28 Oct 2013 23:27:23,837 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+28 Oct 2013 23:27:23,966 INFO  ~ Application 'playlibs' is now started !
+28 Oct 2013 23:42:37,296 ERROR ~ 
+
+@6g4o9fi9n
+Internal Server Error (500) for request GET /
+
+Template compilation error (In /app/views/Application/index.html around line 4)
+The template /app/views/Application/index.html does not compile : #{set} is not closed.
+
+play.exceptions.TemplateCompilationException: #{set} is not closed.
+	at play.templates.TemplateCompiler.generate(TemplateCompiler.java:104)
+	at play.templates.TemplateCompiler.compile(TemplateCompiler.java:15)
+	at play.templates.GroovyTemplateCompiler.compile(GroovyTemplateCompiler.java:41)
+	at play.templates.TemplateCompiler.compile(TemplateCompiler.java:28)
+	at play.templates.TemplateLoader.load(TemplateLoader.java:87)
+	at play.templates.TemplateLoader.load(TemplateLoader.java:172)
+	at play.mvc.Controller.renderTemplate(Controller.java:661)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:20)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+28 Oct 2013 23:42:43,415 ERROR ~ 
+
+@6g4o9fi9o
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 4)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@b2e71] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@b2e71]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:20)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@b2e71]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:4)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+28 Oct 2013 23:43:11,686 ERROR ~ 
+
+@6g4o9fi9p
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 4)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@dace6e] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@dace6e]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:20)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@dace6e]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:4)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+28 Oct 2013 23:43:35,158 ERROR ~ 
+
+@6g4o9fia0
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 4)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@543a1f] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@543a1f]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:20)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@543a1f]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:4)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+28 Oct 2013 23:51:57,487 ERROR ~ 
+
+@6g4o9fia1
+Internal Server Error (500) for request GET /Application/readXMLWithXpath
+
+Execution exception (In /app/controllers/Application.java around line 32)
+FileNotFoundException occured : D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+
+play.exceptions.JavaExecutionException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.io.FileNotFoundException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:97)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:629)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:189)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:799)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:764)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:123)
+	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:240)
+	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:300)
+	at javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:205)
+	at controllers.Application.readXMLWithXPath(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+28 Oct 2013 23:52:16,540 ERROR ~ 
+
+@6g4o9fia2
+Internal Server Error (500) for request GET /Application/readXMLWithXpath
+
+Execution exception (In /app/controllers/Application.java around line 32)
+FileNotFoundException occured : D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+
+play.exceptions.JavaExecutionException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.io.FileNotFoundException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:97)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:629)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:189)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:799)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:764)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:123)
+	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:240)
+	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:300)
+	at javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:205)
+	at controllers.Application.readXMLWithXPath(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+28 Oct 2013 23:52:24,894 ERROR ~ 
+
+@6g4o9fia3
+Internal Server Error (500) for request GET /Application/readXMLWithXpath
+
+Execution exception (In /app/controllers/Application.java around line 32)
+FileNotFoundException occured : D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+
+play.exceptions.JavaExecutionException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.io.FileNotFoundException: D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\8_Play_libs\playlibs\doc1.xml (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at java.io.FileInputStream.<init>(FileInputStream.java:97)
+	at sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:90)
+	at sun.net.www.protocol.file.FileURLConnection.getInputStream(FileURLConnection.java:188)
+	at com.sun.org.apache.xerces.internal.impl.XMLEntityManager.setupCurrentEntity(XMLEntityManager.java:629)
+	at com.sun.org.apache.xerces.internal.impl.XMLVersionDetector.determineDocVersion(XMLVersionDetector.java:189)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:799)
+	at com.sun.org.apache.xerces.internal.parsers.XML11Configuration.parse(XML11Configuration.java:764)
+	at com.sun.org.apache.xerces.internal.parsers.XMLParser.parse(XMLParser.java:123)
+	at com.sun.org.apache.xerces.internal.parsers.DOMParser.parse(DOMParser.java:240)
+	at com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl.parse(DocumentBuilderImpl.java:300)
+	at javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:205)
+	at controllers.Application.readXMLWithXPath(Application.java:32)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+28 Oct 2013 23:59:40,994 ERROR ~ 
+
+@6g4o9fia4
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 2)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@2e0260] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@2e0260]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:54)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@2e0260]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:2)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+29 Oct 2013 00:00:05,607 ERROR ~ 
+
+@6g4o9fia5
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 2)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@124f829] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@124f829]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:54)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@124f829]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:2)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+29 Oct 2013 00:00:08,096 ERROR ~ 
+
+@6g4o9fia6
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 2)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@181bcf2] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@181bcf2]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:54)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@181bcf2]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:2)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+29 Oct 2013 00:00:16,199 ERROR ~ 
+
+@6g4o9fia7
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 2)
+Execution error occured in template /app/views/Application/index.html. Exception raised was MissingMethodException : No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@d364fd] Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String).
+
+play.exceptions.TemplateExecutionException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@d364fd]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:54)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: groovy.lang.MissingMethodException: No signature of method: Template_1000.$() is applicable for argument types: (Template_1000$_run_closure1_closure2) values: [Template_1000$_run_closure1_closure2@d364fd]
+Possible solutions: _(java.lang.String), is(java.lang.Object), run(), run(), any(), get(java.lang.String)
+	at /app/views/Application/index.html.(line:2)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more
+29 Oct 2013 00:06:15,366 ERROR ~ 
+
+@6g4o9fia8
+Application.WebServiceClient action not found
+
+Action not found
+Action Application.WebServiceClient could not be found. Error raised is No method public static void WebServiceClient() was found in class controllers.Application
+
+play.exceptions.ActionNotFoundException: Action Application.WebServiceClient not found
+	at play.mvc.ActionInvoker.getActionMethod(ActionInvoker.java:610)
+	at play.mvc.ActionInvoker.resolve(ActionInvoker.java:85)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.Exception: No method public static void WebServiceClient() was found in class controllers.Application
+	... 3 more

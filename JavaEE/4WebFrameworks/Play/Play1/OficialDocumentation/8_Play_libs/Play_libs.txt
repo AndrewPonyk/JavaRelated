@@ -26,4 +26,53 @@
 	XPath is probably the easiest way to parse an XML document without having to use code generation tools.
 	The play.libs.XPath library offers all the needed primitives to efficiently achieve this task.
 
+	!!! Play1 getting Application root  :   <b> Play.applicationPath.toString() </b>
 	
+	So we will read file doc.xml in application root folder 
+		* create file doc.xml
+			<?xml version="1.0" encoding="UTF-8"?>
+			<events>
+				<event id="1">
+				</event>
+				<event id="2">
+				</event>
+				<event id="3">
+				</event>
+			</events>
+			
+		* in controller
+				public static void readXMLWithXPath() throws SAXException, IOException, ParserConfigurationException{
+				
+				File fXmlFile = new File(Play.applicationPath.toString()+"/"+"doc.xml");
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+				Document doc = dBuilder.parse(fXmlFile);
+					
+				for(Node event: XPath.selectNodes("events//event", doc)) {
+					  String id = XPath.selectText("@id", event);
+					
+					  System.out.println(id); //display id 
+				}
+				
+					renderArgs.put("ApplicationPath", Play.applicationPath.toString());
+					render();
+				}
+
+				
+	P.S  Class <b>play.libs.XPath</b> : http://www.playframework.com/documentation/1.2.7/api/index.html
+-------------------------------------------------------------------------------------------------
+3)		Web Service client
+		
+		The play.libs.WS provides a powerful HTTP client. Under the hood it uses Async HTTP client.
+		
+		HttpResponse res = WS.url("http://www.google.com").get();
+		
+		Example :
+		Getting google.com content
+		 * in Application.java
+			
+				HttpResponse res = WS.url("http://www.google.com").get();
+		
+				renderArgs.put("googleContent", res.getString());
+				
+--------------------------------------------------------------------------------------------------------------------
