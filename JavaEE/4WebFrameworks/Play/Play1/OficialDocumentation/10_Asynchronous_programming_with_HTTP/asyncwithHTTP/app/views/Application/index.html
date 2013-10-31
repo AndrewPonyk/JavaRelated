@@ -1,5 +1,28 @@
 #{extends 'main.html' /}
 #{set title:'Async programming with Play 1' /}
 
+<hr>
+<h3>Request suspending</h3>
+<div style="margin:10px;border:1px solid gray ; width:600px;">
+	<b>Performing long running task :</b><br>
+		<div>
+			1-st solution , perform computing in action : <br>
+			<a href="@{Application.generatePDF}">perform computation</a>
+		</div>
+		<div>
+			2-n solution , using request suspending : <br>
+			<a href="@{Application.generatePDFWithRequestSuspending}">perform computation</a>
+		</div>
+</div>
 
-фіва
+<hr>
+<h3>Asynchronously executing more than 1 job :</h3>
+<div style="margin:10px;border:1px solid gray ; width:600px;">
+	<a href="@{Application.moreThanOneJobsAsync}">Execute </a>
+</div>
+
+<hr>
+<h3>Work with Sockets:</h3>
+<div style="margin:10px;border:1px solid gray ; width:600px;">
+	
+</div>

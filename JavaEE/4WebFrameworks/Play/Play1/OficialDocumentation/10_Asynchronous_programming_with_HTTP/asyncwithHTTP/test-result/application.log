@@ -1,17 +1,17 @@
-30 Oct 2013 00:07:01,301 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\10_Asynchronous_programming_with_HTTP\asyncwithHTTP
-30 Oct 2013 00:07:02,865 WARN  ~ You're running Play! in DEV mode
-30 Oct 2013 00:07:03,146 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-30 Oct 2013 00:07:10,698 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-30 Oct 2013 00:07:10,750 INFO  ~ Application 'asyncwithHTTP' is now started !
-30 Oct 2013 00:09:24,959 ERROR ~ 
+30 Oct 2013 23:57:09,096 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/10_Asynchronous_programming_with_HTTP/asyncwithHTTP
+30 Oct 2013 23:57:10,919 WARN  ~ You're running Play! in DEV mode
+30 Oct 2013 23:57:11,140 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+31 Oct 2013 00:01:27,979 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+31 Oct 2013 00:01:28,147 INFO  ~ Application 'asyncwithHTTP' is now started !
+31 Oct 2013 21:04:45,211 ERROR ~ 
 
-@6g55k51h2
-Internal Server Error (500) for request GET /Application/generatepdf
+@6g5d18keh
+Internal Server Error (500) for request GET /
 
-Compilation error (In /app/controllers/Application.java around line 43)
-The file /app/controllers/Application.java could not be compiled. Error raised is : result cannot be resolved to a variable
+Compilation error (In /app/controllers/Application.java around line 73)
+The file /app/controllers/Application.java could not be compiled. Error raised is : amazoneSource cannot be resolved to a variable
 
-play.exceptions.CompilationException: result cannot be resolved to a variable
+play.exceptions.CompilationException: amazoneSource cannot be resolved to a variable
 	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
 	at org.eclipse.jdt.internal.compiler.Compiler.handleInternalException(Compiler.java:676)
 	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:520)
