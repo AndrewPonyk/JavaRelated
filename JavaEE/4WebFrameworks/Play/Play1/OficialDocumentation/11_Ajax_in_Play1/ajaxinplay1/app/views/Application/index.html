@@ -1,4 +1,20 @@
 #{extends 'main.html' /}
-#{set title:'Home' /}
+#{set title:'Ajax in Play1' /}
 
-#{welcome /}
+
+
+<h3> Using #&#123;jsAction}  to construct URL</h3>
+<div style="border :1 px solid gray; margin:10px; width:700px">
+	<a href=''>load device by id</a>
+	<div id="result">
+	</div>
+	
+	<script type="text/javascript">
+		var devicesAction= #{jsAction @@Application.devices(':id') /};
+	
+		$("#result").load(
+			devicesAction({id:'2'})		
+		);
+	</script>
+</div>
+<hr>

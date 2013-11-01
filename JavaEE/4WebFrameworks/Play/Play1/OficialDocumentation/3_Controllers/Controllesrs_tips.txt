@@ -249,7 +249,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 
 	An action method has to generate an HTTP response. The easiest way to do this is to emit a Result object. When a Result object is 		emitted, the normal execution flow is interrupted and the method returns.
 
-	For example:
+
 
 	For example:
 

@@ -1,0 +1,5 @@
+<devices>
+	<device id="${result.get('id')}" name="${result.get('name')}" >
+		some text in device
+	</device>
+</devices>
