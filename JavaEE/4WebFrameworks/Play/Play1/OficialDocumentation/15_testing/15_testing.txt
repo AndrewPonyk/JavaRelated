@@ -1,1 +1,46 @@
-""
+1)	Few words about testing in Play1
+	Creating automatic test suites for your application is a good way 
+	to make it robust. It allows you to work in a very agile way.
+
+	Play tests are built using JUnit 4 or Selenium depending what you want to test.
+
+	Writing tests
+	The tests must be created in the test/ directory.
+	This folder will only be added to the sources path when the application is run in test mode. 
+	You can write 3 different kinds of tests:
+	 * Junit
+	 * Functional(which are also Junit)
+	 * Selenium
+	
+----------------------------------------------------------------------------------
+2) Unit testing
+	Unit test
+	A unit test is written using JUnit. 
+	In this kind of test you can test the model of your application (including some utilities).
+
+	Here is an example of a Unit test:
+	
+	import play.test.*;
+	import org.junit.*;
+	 
+	public class MyTest extends UnitTest {
+	     
+	    @Test
+	    public void aTest() {
+		assertEquals(2, 1 + 1); // A really important thing to test
+	    }
+	 
+	    @Test
+	    public void testUsers() {
+		assertEquals(3, Users.count()); 
+	    }
+	}
+	
+	There are a lot of junit annotations , and methods (need to consider this topic in details)
+------------------------------------------------------------------------------------------
+3) Functional testing
+	
+-------------------------------------------------------------------------------------------
+4) Selenium tests
+	
+---------------------------------------------------------------------------------------------------
