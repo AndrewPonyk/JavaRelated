@@ -1,0 +1,8 @@
+# You can specialize this file for each language.
+# For example, for French create a messages.fr file
+#
+
+welcome = Welcome
+user = User
+messageWithArguments = First argument %s, and second argument %s
+messageWithArgumentFromMessages = Hello &{%s} <-

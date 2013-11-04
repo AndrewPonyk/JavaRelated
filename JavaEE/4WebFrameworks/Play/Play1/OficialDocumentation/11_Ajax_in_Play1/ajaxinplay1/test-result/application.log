@@ -1,5 +1,175 @@
-01 Nov 2013 00:06:48,479 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/11_Ajax_in_Play1/ajaxinplay1
-01 Nov 2013 00:06:50,592 WARN  ~ You're running Play! in DEV mode
-01 Nov 2013 00:06:51,037 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-01 Nov 2013 00:06:58,158 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-01 Nov 2013 00:06:58,266 INFO  ~ Application 'ajaxinplay1' is now started !
+03 Nov 2013 11:42:15,372 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\11_Ajax_in_Play1\ajaxinplay1
+03 Nov 2013 11:42:17,983 WARN  ~ You're running Play! in DEV mode
+03 Nov 2013 11:42:18,807 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+03 Nov 2013 11:42:47,433 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+03 Nov 2013 11:42:48,237 INFO  ~ Application 'ajaxinplay1' is now started !
+03 Nov 2013 12:01:24,854 ERROR ~ 
+
+@6g6cbokin
+Internal Server Error (500) for request GET /devices?id=[object
+
+Execution exception (In /app/controllers/Application.java around line 28)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.devices(Application.java:28)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:01:47,060 ERROR ~ 
+
+@6g6cbokio
+Internal Server Error (500) for request GET /devices?id=
+
+Execution exception (In /app/controllers/Application.java around line 28)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.devices(Application.java:28)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:10:06,106 ERROR ~ 
+
+@6g6cbokip
+Internal Server Error (500) for request GET /devices?id=22
+
+Execution exception (In /app/controllers/Application.java around line 28)
+IndexOutOfBoundsException occured : Index: 22, Size: 3
+
+play.exceptions.JavaExecutionException: Index: 22, Size: 3
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IndexOutOfBoundsException: Index: 22, Size: 3
+	at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+	at java.util.ArrayList.get(ArrayList.java:322)
+	at controllers.Application.devices(Application.java:28)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:10:25,701 ERROR ~ 
+
+@6g6cbokj0
+Internal Server Error (500) for request GET /devices?id=22
+
+Execution exception (In /app/controllers/Application.java around line 28)
+IndexOutOfBoundsException occured : Index: 22, Size: 3
+
+play.exceptions.JavaExecutionException: Index: 22, Size: 3
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.IndexOutOfBoundsException: Index: 22, Size: 3
+	at java.util.ArrayList.RangeCheck(ArrayList.java:547)
+	at java.util.ArrayList.get(ArrayList.java:322)
+	at controllers.Application.devices(Application.java:28)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:18:06,862 ERROR ~ 
+
+@6g6cbokj1
+Internal Server Error (500) for request GET /devices?id=-1
+
+Execution exception (In /app/controllers/Application.java around line 29)
+ArrayIndexOutOfBoundsException occured : -1
+
+play.exceptions.JavaExecutionException: -1
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.ArrayIndexOutOfBoundsException: -1
+	at java.util.ArrayList.get(ArrayList.java:324)
+	at controllers.Application.devices(Application.java:29)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:18:43,254 ERROR ~ 
+
+@6g6cbokj2
+Internal Server Error (500) for request GET /devices?id=sdf
+
+Execution exception (In /app/controllers/Application.java around line 28)
+NullPointerException occured : null
+
+play.exceptions.JavaExecutionException
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:237)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException
+	at controllers.Application.devices(Application.java:28)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	... 1 more
+03 Nov 2013 12:19:21,045 ERROR ~ 
+
+@6g6cbokj3
+Internal Server Error (500) for request GET /devices?id=sdf
+
+Compilation error (In /app/controllers/Application.java around line 28)
+The file /app/controllers/Application.java could not be compiled. Error raised is : Syntax error on token "null", new expected
+
+play.exceptions.CompilationException: Syntax error on token "null", new expected
+	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
+	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:478)
+	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
+	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
+	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
+	at play.Play.detectChanges(Play.java:632)
+	at play.Invoker$Invocation.init(Invoker.java:198)
+	at Invocation.HTTP Request(Play!)
+03 Nov 2013 12:19:38,025 ERROR ~ 
+
+@6g6cbokj4
+Internal Server Error (500) for request GET /devices?id=sdf
+
+Compilation error (In /app/controllers/Application.java around line 28)
+The file /app/controllers/Application.java could not be compiled. Error raised is : Syntax error on token "null", new expected
+
+play.exceptions.CompilationException: Syntax error on token "null", new expected
+	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
+	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:478)
+	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
+	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
+	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
+	at play.Play.detectChanges(Play.java:632)
+	at play.Invoker$Invocation.init(Invoker.java:198)
+	at Invocation.HTTP Request(Play!)
+03 Nov 2013 12:19:44,001 ERROR ~ 
+
+@6g6cbokj5
+Internal Server Error (500) for request GET /devices?id=1
+
+Compilation error (In /app/controllers/Application.java around line 28)
+The file /app/controllers/Application.java could not be compiled. Error raised is : Syntax error on token "null", new expected
+
+play.exceptions.CompilationException: Syntax error on token "null", new expected
+	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
+	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:478)
+	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
+	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
+	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
+	at play.Play.detectChanges(Play.java:632)
+	at play.Invoker$Invocation.init(Invoker.java:198)
+	at Invocation.HTTP Request(Play!)

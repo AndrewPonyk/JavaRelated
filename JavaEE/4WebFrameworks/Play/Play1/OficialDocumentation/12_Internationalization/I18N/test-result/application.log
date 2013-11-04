@@ -1,0 +1,103 @@
+03 Nov 2013 16:05:06,596 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\12_Internationalization\I18N
+03 Nov 2013 16:05:09,409 WARN  ~ You're running Play! in DEV mode
+03 Nov 2013 16:05:09,814 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+03 Nov 2013 16:05:21,877 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+03 Nov 2013 16:05:22,000 WARN  ~ Messages file missing for locale en
+03 Nov 2013 16:05:22,004 WARN  ~ Messages file missing for locale ja
+03 Nov 2013 16:05:22,008 INFO  ~ Application 'I18N' is now started !
+03 Nov 2013 16:06:45,911 ERROR ~ 
+
+@6g6di45md
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/main.html around line 16)
+Execution error occured in template /app/views/main.html. Exception raised was NullPointerException : Cannot invoke method format() on null object.
+
+play.exceptions.TemplateExecutionException: Cannot invoke method format() on null object
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:282)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:13)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException: Cannot invoke method format() on null object
+	at /app/views/main.html.(line:16)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 14 more
+03 Nov 2013 16:07:24,266 WARN  ~ Messages file missing for locale en
+03 Nov 2013 16:07:24,270 WARN  ~ Messages file missing for locale ja
+03 Nov 2013 19:03:22,334 WARN  ~ Messages file missing for locale en
+03 Nov 2013 19:03:22,340 WARN  ~ Messages file missing for locale ja
+03 Nov 2013 19:03:23,464 ERROR ~ 
+
+@6g6di45me
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/main.html around line 18)
+Execution error occured in template /app/views/main.html. Exception raised was MissingFormatArgumentException : Format specifier 's'.
+
+play.exceptions.TemplateExecutionException: Format specifier 's'
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:282)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:13)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.util.MissingFormatArgumentException: Format specifier 's'
+	at java.util.Formatter.format(Formatter.java:2432)
+	at java.util.Formatter.format(Formatter.java:2367)
+	at java.lang.String.format(String.java:2769)
+	at play.i18n.Messages.formatString(Messages.java:107)
+	at play.i18n.Messages.getMessage(Messages.java:103)
+	at play.i18n.Messages.get(Messages.java:46)
+	at play.templates.GroovyTemplate$ExecutableTemplate.__getMessage(GroovyTemplate.java:441)
+	at /app/views/main.html.(line:18)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 14 more
+03 Nov 2013 19:04:29,618 ERROR ~ 
+
+@6g6di45mf
+Internal Server Error (500) for request GET /
+
+Template compilation error (In /app/views/main.html around line 18)
+The template /app/views/main.html does not compile : unexpected token: & 
+
+play.exceptions.TemplateCompilationException: unexpected token: & 
+	at play.templates.GroovyTemplate.compile(GroovyTemplate.java:189)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:210)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:282)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:13)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+03 Nov 2013 19:09:46,565 WARN  ~ Messages file missing for locale en
+03 Nov 2013 19:09:46,570 WARN  ~ Messages file missing for locale ja
