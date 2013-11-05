@@ -1,0 +1,15 @@
+#{selenium}
+	clearSession()
+	open('/')
+	type('login','dev')
+	type('password','dev')
+	clickAndWait('submit')
+
+	<!-- test if element with id='info' with some text is on the page -->
+	<!-- another way to get element is xpath assertText('xpath=//div[@id="info"]','OK, you are autorized as dev') -->
+	assertText('info','OK, you are autorized as dev')
+	
+	
+	<!-- just test if text 'OK' is on the page -->
+	assertTextPresent('OK')  
+#{/selenium}
