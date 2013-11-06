@@ -1,0 +1,50 @@
+1)	What is a module?
+	A module is <b>just another Play application</b> however some differences 
+	exist in the way resources are loaded for an application module:
+
+	* A module does not have a conf/application.conf file.
+	* A module can have a conf/routes file, but these routes will not be loaded automatically.
+	* All files are first searched for in the main application path, then in all loaded modules.
+	* A module can contain plain Java code packaged as a JAR file in the module/lib directory.
+	* A module can include a documentation page.
+	* Everything in a module is optional.
+	* You can create a module with the  <b> play new-module </b> command.
+
+	Modules are automatically loaded <b>from the /modules directory</b> of the application. 
+	You can use the dependency management system to automatically manage your application modules.
+	
+---------------------------------------------------------------------
+2)	Load default routes from modules
+	
+	A module can provide a default routes file. You can load 
+	it in the main application routes file, using a special route declaration:
+
+	# Import the default CRUD routes(crud is good modul , need to study it)
+	GET     /admin	     module:crud
+
+	You can even load routes from all available modules:
+
+	GET     /	     module:*
+-----------------------------------------------------------------------------
+3)	Using the module repository
+	
+	The module repository identifies all modules contributed by the community. 
+	A module can have several versions. You have to check the module’s documentation
+	for which version you need to use for your framework version.
+
+	
+	You can also browse the module repository using the <b> play list-modules</b> command.
+	
+	For example, to install Scala support in the framework, use:
+
+	play install scala-head
+
+	
+	Modules installed this way are downloaded to the /modules directory of your framework installation.
+
+	You can change the installation path using the --path option:
+
+	play install gwt --path=my-project
+
+	
+--------------------------------------------------------------------------------
