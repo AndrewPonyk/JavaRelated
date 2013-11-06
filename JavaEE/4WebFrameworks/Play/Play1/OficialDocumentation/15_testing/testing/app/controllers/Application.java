@@ -22,6 +22,5 @@ public class Application extends Controller {
     		renderArgs.put("autorizationMessage", "Wrong credentials");
     		index();
     	}
-    	
     }
 }
