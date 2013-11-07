@@ -1,0 +1,67 @@
+	'one of most important chapters '
+
+1)	Two words about dependencies
+	
+	Play’s dependency management system allows you to express your application’s 
+	external dependencies in a single dependencies.yml file.
+
+	A Play application can have <b>three kinds</b> of dependencies:
+
+	* The Play framework itself, since a Play application always depends on the Play framework.
+	* Any Java library, provided as JAR file installed in your application’s lib/ directory.
+	* A Play module (in fact an application fragment) installed in your application’s modules/ directory.
+	
+	Once you have expressed these dependencies in your application’s 
+	conf/dependencies.yml file, Play will resolve, download and install all required dependencies.
+---------------------------------------------------------------------------------------------------
+2)	Dependency format
+
+	A dependency is described by an organisation a name a revision number
+	and optionally a classifier. In the dependencies.yml file you will write it like this:
+
+		organisation -> name revision [classifier]
+	
+	
+	So, for instance version 1.0 of the Play PDF module is expressed like this:
+		play -> pdf 1.0
+
+	Sometimes the organisation name exactly matches the dependency name, as is the case for commons-lang:
+		commons-lang -> commons-lang 2.5
+	In this case, you can omit the organisation from the dependency declaration:
+		commons-lang 2.5
+	
+	When your dependency has a classifier, you can use this:
+		net.sf.json-lib -> json-lib 2.4 jdk15
+	
+	
+	----
+	commands : play deps(or play dependencies) - download dependencies
+		   play deps --sync  - syncronize dependencies with dependencies.yml content  (so if we remove something from 			   dependencies.yml , this command will remove it from modules )
+	----
+
+
+	<b>Dynamic revisions</b>
+	The revision can be fixed (1.2, for instance) or dynamic. A dynamic revision expresses a range of allowed revisions.
+
+	For example:
+
+	[1.0,2.0] matches all versions greater or equal to 1.0 and lower or equal to 2.0
+	[1.0,2.0[ matches all versions greater or equal to 1.0 and lower than 2.0
+	]1.0,2.0] matches all versions greater than 1.0 and lower or equal to 2.0
+	]1.0,2.0[ matches all versions greater than 1.0 and lower than 2.0
+	[1.0,) matches all versions greater or equal to 1.0
+	]1.0,) matches all versions greater than 1.0
+	(,2.0] matches all versions lower or equal to 2.0
+	(,2.0[ matches all versions lower than 2.0
+-------------------------------------------------------------------------------------------------------
+3)	dependencies.yml
+
+
+	
+-------------------------------------------------------------------------------------------------------
+4)
+	
+-----------------------------------------------------------------------------------------------------------
+5)	
+
+----------------------------------------------------------------------------------------------------------
