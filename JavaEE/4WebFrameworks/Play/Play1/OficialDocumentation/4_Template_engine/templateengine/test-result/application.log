@@ -1,6 +1,7 @@
-26 Oct 2013 21:20:59,522 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\4_Template_engine\templateengine
-26 Oct 2013 21:21:01,354 WARN  ~ You're running Play! in DEV mode
-26 Oct 2013 21:21:01,544 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-26 Oct 2013 21:21:18,749 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-26 Oct 2013 21:21:18,790 WARN  ~ Messages file missing for locale en
-26 Oct 2013 21:21:18,792 INFO  ~ Application 'templateengine' is now started !
+11 Nov 2013 23:35:41,763 INFO  ~ Starting D:\GitRepositories\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\4_Template_engine\templateengine
+11 Nov 2013 23:35:56,217 WARN  ~ You're running Play! in DEV mode
+11 Nov 2013 23:36:02,333 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+11 Nov 2013 23:37:32,718 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+11 Nov 2013 23:37:35,193 WARN  ~ Messages file missing for locale en
+11 Nov 2013 23:37:35,195 INFO  ~ Application 'templateengine' is now started !
+11 Nov 2013 23:42:31,776 WARN  ~ Messages file missing for locale en

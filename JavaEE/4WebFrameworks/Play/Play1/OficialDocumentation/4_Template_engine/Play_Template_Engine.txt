@@ -334,3 +334,11 @@
 				#{/set} 
 				
 ----------------------------------------------------------------------------------
+16)	Pass element from messages to tag
+		*create tag search_form.tag
+			<form method="get" action="http://google.com" >
+			<input type="text" value=${_val} />
+			<input type="submit" value="submit" />
+		</form>
+		*use this tag on the page
+			#{search_form  val:messages.get('search') /}
