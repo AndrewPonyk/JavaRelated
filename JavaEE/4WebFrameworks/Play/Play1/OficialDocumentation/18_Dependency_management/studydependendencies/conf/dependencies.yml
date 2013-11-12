@@ -2,4 +2,14 @@
 
 require:
     - play
+    #- com.google.guava -> guava r07
+    - play -> mongo 1.3
+    - jfree -> jfreereport 0.8.6
+    - mymodule -> mymodule
 
+repositories:
+    - My modules:
+        type:       chain
+        artifact:   ${application.path}/../
+        contains: 
+               - mymodule

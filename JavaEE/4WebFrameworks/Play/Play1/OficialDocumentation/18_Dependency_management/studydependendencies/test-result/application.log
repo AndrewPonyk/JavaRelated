@@ -1,5 +1,51 @@
-06 Nov 2013 23:16:54,913 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/18_Dependency_management/studydependendencies
-06 Nov 2013 23:16:59,894 WARN  ~ You're running Play! in DEV mode
-06 Nov 2013 23:17:00,774 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-06 Nov 2013 23:17:21,397 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-06 Nov 2013 23:17:21,539 INFO  ~ Application 'studydependendencies' is now started !
+12 Nov 2013 19:31:07,403 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/18_Dependency_management/studydependendencies
+12 Nov 2013 19:31:09,939 WARN  ~ You're running Play! in DEV mode
+12 Nov 2013 19:31:10,366 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+12 Nov 2013 19:32:54,517 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+12 Nov 2013 19:32:54,642 INFO  ~ Application 'studydependendencies' is now started !
+12 Nov 2013 19:56:48,776 ERROR ~ 
+
+@6g927pk66
+Internal Server Error (500) for request GET /
+
+Compilation error (In /app/controllers/Application.java around line 13)
+The file /app/controllers/Application.java could not be compiled. Error raised is : MongoCursor cannot be resolved to a type
+
+play.exceptions.CompilationException: MongoCursor cannot be resolved to a type
+	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
+	at org.eclipse.jdt.internal.compiler.Compiler.handleInternalException(Compiler.java:676)
+	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:520)
+	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
+	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
+	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
+	at play.Play.detectChanges(Play.java:632)
+	at play.Invoker$Invocation.init(Invoker.java:198)
+	at Invocation.HTTP Request(Play!)
+12 Nov 2013 21:16:11,757 ERROR ~ 
+
+@6g927pk67
+Internal Server Error (500) for request GET /
+
+Template execution error (In /app/views/Application/index.html around line 3)
+Execution error occured in template /app/views/Application/index.html. Exception raised was NullPointerException : Cannot get property 'path' on null object.
+
+play.exceptions.TemplateExecutionException: Cannot get property 'path' on null object
+	at play.templates.BaseTemplate.throwException(BaseTemplate.java:86)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:272)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:12)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.NullPointerException: Cannot get property 'path' on null object
+	at /app/views/Application/index.html.(line:3)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:247)
+	... 13 more

@@ -1,0 +1,55 @@
+#{extends 'main.html' /}
+#{set title:'Ajax in Play1' /}
+
+
+	<h3> Using #&#123;jsAction}  to construct URL</h3>
+	<p><i>Here we load devices using AJAX and jQuery <b>load</b> method</i></p>
+	<div style="border :1 px solid gray; margin:10px; width:700px">
+		<input type="text"  name="id" />
+		<a href='' id="load">Load device by id</a>		
+		<div id="result" style="border: 1px solid aqua">
+		</div>
+	</div>	
+	<hr>
+
+	<p><i>Here we load devices using AJAX and jQuery <b>$.get</b> method</i> and then 
+		parse xml
+	</p>
+	<div style="border :1 px solid gray; margin:10px; width:700px">
+		<input type="text"  name="id" id="deviceId" />
+		<a href='' id="get">Get device by id</a>
+		
+		<div id="parsedXML" style="border: 1px solid aqua">
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+	 devicesAction= #{jsAction @@Application.devices(':id') /};	
+	
+		$("#load").click(function(e){
+			e.preventDefault();
+			
+			var deviceId=$("input[name='id']").val();
+			alert("getting device with id= "+deviceId);
+			
+			// jQuery load method - insert response into #result element
+			$("#result").load(
+					devicesAction({id:deviceId})		
+			);	
+		});
+		
+		$("#get").click(function(e){
+			e.preventDefault();
+			var deviceId=$("#deviceId").val();
+			$.get(devicesAction({id:deviceId}),
+					function(data){
+				//parse xml with jQuery , Chrome debugger is very useful ( watch expresseion )
+				var resultDevice=$(data).find("device");
+				$("#parsedXML").text("");
+				$("#parsedXML").append("<p>"+"id:"+$(resultDevice.get(0)).attr("id")+"</p>");
+				$("#parsedXML").append("<p>"+"name:"+$(resultDevice.get(0)).attr("name")+"</p>");
+				$("#parsedXML").append("<p>"+"details:"+$(resultDevice.get(0)).text()+"</p>");
+				
+			});
+		});
+	</script>

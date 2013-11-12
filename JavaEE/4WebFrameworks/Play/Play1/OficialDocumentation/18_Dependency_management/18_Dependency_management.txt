@@ -56,12 +56,178 @@
 -------------------------------------------------------------------------------------------------------
 3)	dependencies.yml
 
+	!!!! Dont use <b>tab</b> in dependencies.yml
+
+	To see available modules use <b>play list-modules</b> !!!!!!!!!!!!
+
+	When you create a new Play application, a dependencies.yml descriptor is 
+	automatically created in the conf/ directory:
+		# Application dependencies
+			require:
+			    - play 1.2
+	The require section list all dependencies needed by your application. 
+	Here the new application only depends on Play version 1.2.
 
 	
--------------------------------------------------------------------------------------------------------
-4)
+	But let’s say your application needs Google Guava; you would have:
+	# Application dependencies
+	require:
+	    - play 1.2
+	    - com.google.guava -> guava r07	
 	
+	!!!
+	And for example we need to install <b>Mongo</b> module
+	*dependencies.yml:
+		require:
+		    - play
+		    - play -> mongo 1.3
+	* in command line execute play deps
+	* in application.conf enable module
+		module.mongo=modules/mongo-1.3 #path to module
+	*execute 
+		play eclipsify
+	*And module is installed , classes , controllers .. , are available
+		
+
+	!!!!The ‘play dependencies’ command
+	To ask Play to resolve, download and install the new dependencies, run play dependencies:
+		'play dependencies' or 'play deps' 
+
+
+	
+	!!!!!!!!!! <b>Transitive dependencies</b>
+		By default, any transitive dependencies are automatically retrieved. 
+		But there are several ways to exclude them if needed.
+
+	Ways to exclude transitive dependencies:
+		* disable transitive dependencies for a particular dependency:
+		    require:
+		    - play 1.2
+		    - com.google.guava -> guava r07:
+			transitive: false
+		* disable transitive dependencies for the whole project:
+			transitiveDependencies: false        
+			require:
+			    - play 1.2
+			    - com.google.guava -> guava r07	
+		* exclude any specific dependency explicitely:
+			require:
+			    - play 1.2
+			    - com.google.guava -> guava r07:
+				exclude:
+				    - com.google.code.findbugs -> *	
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+	Keep lib/ and modules/ directory in sync
+		To keep the lib/ and modules/ directory synced with the dependency management 
+		system, you can specify the --sync command to the dependencies command:
+			play dependencies --sync
+	
+	When you deploy an application in production, you can reduce the size of 
+	its modules by removing module source code and documentation. 
+	You can do this by adding the <b> --forProd </b> option to the command:
+		
+		play dependencies --forProd
+-------------------------------------------------------------------------------------------------------
+4) 	Conflict resolution
+
+	Whenever two components need different revisions of the same dependency,
+	the conflicts manager will choose one. The default is to keep the 
+	<b>latest</b> revision and to evict the others.
+
+	!!
+	But there is an exception. When a core dependency of Play framework itself 
+	is involved in a conflict, the version available in $PLAY/framework/lib is preferred.
+	For instance, Play depends on commons-lang 2.5. If your application requires commons-lang 3.0:
+
+	require:
+	    - play 1.2
+	    - com.google.guava -> guava r07:
+		transitive: false
+	    - commons-lang 3.0
+	Running play dependencies will evict commons-lang 3.0 even if this version is newer:
+
+
+	!!!	
+	Sometimes you want to force a specific dependency version, either to
+	override a core dependency or to choose another revision that 
+	the latest version available.
+
+	So you can specify the force option on any dependency:
+
+	# Application dependencies
+	    
+	require:
+	    - play 1.2
+	    - com.google.guava -> guava r07:
+		transitive: false
+	    - commons-lang 3.0:
+		force: true
 -----------------------------------------------------------------------------------------------------------
-5)	
+5)	Adding new repositories
+		
+	!By default, Play will search for JAR dependencies in the <b>central Maven repository</b>, 
+	and will search for Play <b>modules in the central Play modules repository</b>.		
+	
+	
+	To install some library from maven central (mvnrepository.com) we need :
+		* to know organization name , library name , version we need 
+			for example installation jfreereport
+				   - jfree -> jfreereport 0.8.6
+		(jfree - name of organization , we can get this name in maven repo  "home » jfree » jfreereport")
+		(jfreereport - is the name of library)
+
+
+	!!!We can specify new custom repositories in the repositories section:
+
+		require:
+		    - play 1.2
+		    - com.google.guava -> guava r07:
+			transitive: false
+		    - commons-lang 3.0:
+			force: true
+		    - com.zenexity -> sso 1.0
+		
+		# My custom repositories
+		repositories:
+		    
+		    - zenexity:
+			type:       http
+			artifact:   "http://www.zenexity.com/repo/[module]-[revision].zip"
+			contains:
+			    - com.zenexity -> *
+	Using this configuration all dependencies of the com.zenexity organisation will be 
+	retrieved and downloaded from a remote HTTP server.
+
+
+	
+	!!! We can also add maven2-compatible repositories using the <b>iBiblio</b> type, like this :
+		require:
+		    - play
+		    - play -> scala 0.8
+		    - org.jbpm -> jbpm-persistence-jpa 5.0.0:
+			exclude:
+			    - javassist -> javassist *
+			    - org.hibernate -> hibernate-annotations *
+			    - javax.persistence -> persistence-api *
+		repositories:
+		    - jboss:
+			type: iBiblio
+			root: "http://repository.jboss.org/nexus/content/groups/public-jboss/"
+			contains:
+			    - org.jbpm -> *
+			    - org.drools -> *
+		
+	
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	Local repositories
+	Finally and probably foremost, you may want to define a repository that references 
+	local modules. With this scenario, dependencies work very much like application.conf’s 
+	module resolution (now deprecated).
+
+	So given the following folder structure:
+		myplayapp/
+		myfirstmodule/
+		mysecondmodule/
 
 ----------------------------------------------------------------------------------------------------------
