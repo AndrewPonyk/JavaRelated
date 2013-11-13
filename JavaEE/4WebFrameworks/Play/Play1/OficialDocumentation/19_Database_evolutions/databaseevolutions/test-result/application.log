@@ -1,0 +1,5 @@
+14 Nov 2013 00:28:29,507 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/19_Database_evolutions/databaseevolutions
+14 Nov 2013 00:28:31,846 WARN  ~ You're running Play! in DEV mode
+14 Nov 2013 00:28:32,517 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+14 Nov 2013 00:28:57,590 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+14 Nov 2013 00:28:57,704 INFO  ~ Application 'databaseevolutions' is now started !
