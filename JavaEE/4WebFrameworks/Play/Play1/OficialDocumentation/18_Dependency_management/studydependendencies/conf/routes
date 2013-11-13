@@ -5,6 +5,9 @@
 # Home page
 GET     /                                       Application.index
 
+#mymodule
+GET     /mymodule     							module:mymodule
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 

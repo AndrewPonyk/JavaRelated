@@ -220,14 +220,58 @@
 		
 	
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	Local repositories
 	Finally and probably foremost, you may want to define a repository that references 
 	local modules. With this scenario, dependencies work very much like application.conf’s 
 	module resolution (now deprecated).
 
-	So given the following folder structure:
-		myplayapp/
-		myfirstmodule/
-		mysecondmodule/
+	Create own module(with views ,controllers , ...) and connect it to application
+	*create own module =)
+		*make command play new-module mymodule 
+			play new-module mymodule
+		*add some controllers to module
+			module has structure: 
+				app/controllers/mymodule
+				app/models/mymodule
+				app/views/mymodule
+				app/views/tags/mymodule
+				build.xml
+				commands.py
+				conf/messages
+				conf/routes
+				lib
+				src/play/modules/firstmodule/MyPlugin.java
+				src/play.plugins
+		* add route to module : GET     /            mymodule.Application.index		
 
-----------------------------------------------------------------------------------------------------------
+		*build module with command
+			play build-module
+		
+	* So given the following folder structure:
+		studydependendencies/  <- it is main project
+		mymodule/   <- it is my module (if you build it , you have folder 'dist' with mymodule-[revision].zip file )
+  	* add dependency (dont use 'tab' key in dependency !!!!!!)
+		require:
+		    - play
+		    #- com.google.guava -> guava r07
+		    - play -> mongo 1.3
+		    - jfree -> jfreereport 0.8.6
+		    - mymodule -> mymodule 0.1 
+
+		repositories:
+		    - My modules:
+			type:       local
+			artifact:   ${application.path}/../mymodule/dist/[module]-[revision].zip
+			contains: 
+			       - mymodule -> *
+	* add routes to application
+		#mymodule
+		GET     /mymodule     		module:mymodule
+	
+	*exec http://localhost:9000/mymodule/ <- this will redirect us to module controller 
+	HAPPY END =)
+	
+
+
+-------------------------------------------------------------------------------------------------------------------

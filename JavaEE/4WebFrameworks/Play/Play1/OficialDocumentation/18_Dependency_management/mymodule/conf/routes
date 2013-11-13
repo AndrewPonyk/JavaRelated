@@ -5,4 +5,5 @@
 #
 # ~~~~
 
-GET     /?                      Module.index
+#GET     /?                      Module.index
+GET     /                        mymodule.Application.index

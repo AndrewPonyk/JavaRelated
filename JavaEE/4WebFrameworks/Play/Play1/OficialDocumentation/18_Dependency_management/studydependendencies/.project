@@ -16,5 +16,7 @@
 		<nature>org.playframework.playclipse.playNature</nature>
 	</natures>
 	<linkedResources><link><name>mongo-1.3</name><type>2</type><location>/media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/18_Dependency_management/studydependendencies/modules/mongo-1.3/app</location></link>
+<link><name>mymodule-0.1</name><type>2</type><location>/media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/18_Dependency_management/studydependendencies/modules/mymodule-0.1/app</location></link>
+<link><name>conf/mymodule-0.1</name><type>2</type><location>/media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/18_Dependency_management/studydependendencies/modules/mymodule-0.1/conf</location></link>
 </linkedResources>
 </projectDescription>
