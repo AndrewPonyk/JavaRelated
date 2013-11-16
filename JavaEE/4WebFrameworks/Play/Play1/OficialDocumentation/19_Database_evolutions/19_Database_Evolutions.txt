@@ -1,1 +1,97 @@
+1)	Evolutions scripts
+		
+	When you use a relational database, you need a way to track
+	and organize your database schema evolutions. Typically there are 
+	several situation where you need a more sophisticated way to track your database schema changes:
+		* When you work within a team of developers, each person needs to know about any schema change.	
+		* When you deploy on a production server, you need to have a robust way to upgrade your database schema.
+		* If you work on several machines, you need to keep all database schemas synchronized.
 
+	<b>
+	If you work with JPA, Hibernate can handle database evolutions for you automatically. 
+	Evolutions are useful if you don’t use JPA or if you prefer to manually take care 
+	of your database schema for finer tuning.
+	</b>
+
+	
+	Play tracks your database evolutions using several evolutions script.
+	These scripts are written in plain old SQL and should be located in the db/evolutions directory of your application.
+	
+
+	Play tracks your database evolutions using several evolutions script.
+	These scripts are written in plain old SQL and should be located in the <b>db/evolutions</b> directory of your application.
+
+	The first script is named 1.sql, the second script 2.sql, and so on…
+
+	Each script contains <b>two<b> parts:
+		*The Ups part the describe the required transformations.
+		*The Downs part that describe how to revert them.
+
+	For example, take a look at this first evolution script that bootstrap a basic application:
+		# Users schema
+		 
+		# --- !Ups
+		 
+		CREATE TABLE User (
+		    id bigint(20) NOT NULL AUTO_INCREMENT,
+		    email varchar(255) NOT NULL,
+		    password varchar(255) NOT NULL,
+		    fullname varchar(255) NOT NULL,
+		    isAdmin boolean NOT NULL,
+		    PRIMARY KEY (id)
+		);
+		 
+		# --- !Downs
+		 
+		DROP TABLE User; 
+
+
+	As you see you have to delimitate the both Ups and Downs section by using 
+	comments in your SQL script.
+
+	Evolutions are automatically activated if a database is configured
+	in application.conf and evolution scripts are present. You can disable
+	them by setting 'evolutions.enabled' to false. For example when tests set up
+	their own database you can disable evolutions for the test environment.
+
+	When evolutions are activated, Play will check your database schema state before
+	each request in DEV mode, or before starting the application in PROD mode. In DEV mode, 
+	if your database schema is not up to date, an error page will suggest that you 
+	synchronise your database schema by running the appropriate SQL script.
+
+
+
+	!!!!
+	Inconsistent states
+
+	Sometimes you will make a mistake in your evolution scripts, and they will fail. In this case,
+	Play will mark your database schema as being in an inconsistent state and will ask you to manually
+	resolve the problem before continuing.
+
+
+	!!!!!!!!!!!
+	How play define is evolutions applied or no ?
+	There is a table 'play_evolutions' , and for example when you first time apply evolutions this 
+	table is created . After this , you can for example delete this table , and play think : 'db is changed ' ,and make evolutions
+	(it is stupid , so if you change structure of DB  play doestn see it , it see only 'play_evolutions' table =) )
+---------------------------------------------------------------------------------
+2)	Evolutions commands 
+	
+
+	The evolutions run interactively in DEV mode. However in PROD mode you will
+	have to use the 'evolutions' command to fix your database schema before running your application.
+
+	
+	!!
+		'play evolutions'  - just create table play_evolutions in DB , to apply evolutions use : 'play evolutions:apply'
+
+	If you want Play to automatically run this evolution for you, then run:
+		$ play evolutions:apply
+
+	If you prefer running this script manually on your production database, you need
+	to tell Play that you database is up-to-date by running:
+		$ play evolutions:markApplied
+
+	If there are any errors while automatically running the evolutions scripts, as in DEV mode, 
+	you need to manually resolve them, and mark your database schema a fixed by running:
+		$ play evolutions:resolve

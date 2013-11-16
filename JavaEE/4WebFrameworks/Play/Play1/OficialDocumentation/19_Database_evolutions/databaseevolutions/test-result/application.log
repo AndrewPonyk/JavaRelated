@@ -1,5 +1,67 @@
-14 Nov 2013 00:28:29,507 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/19_Database_evolutions/databaseevolutions
-14 Nov 2013 00:28:31,846 WARN  ~ You're running Play! in DEV mode
-14 Nov 2013 00:28:32,517 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-14 Nov 2013 00:28:57,590 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-14 Nov 2013 00:28:57,704 INFO  ~ Application 'databaseevolutions' is now started !
+16 Nov 2013 21:33:02,697 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/19_Database_evolutions/databaseevolutions
+16 Nov 2013 21:33:05,179 WARN  ~ You're running Play! in DEV mode
+16 Nov 2013 21:33:05,480 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+16 Nov 2013 21:34:31,139 INFO  ~ Connected to jdbc:mysql://localhost/play_db_evolutions?useUnicode=yes&characterEncoding=UTF-8&connectionCollation=utf8_general_ci
+16 Nov 2013 21:34:31,285 INFO  ~ Application 'databaseevolutions' is now started !
+16 Nov 2013 21:34:36,339 ERROR ~ 
+
+@6ga5n2gkj
+Internal Server Error (500) for request GET /
+
+Your database needs evolution!
+An SQL script will be run on your database.
+
+play.db.Evolutions$InvalidDatabaseRevision
+	at play.db.Evolutions.checkEvolutionsState(Evolutions.java:346)
+	at play.db.Evolutions.beforeInvocation(Evolutions.java:197)
+	at play.plugins.PluginCollection.beforeInvocation(PluginCollection.java:473)
+	at play.Invoker$Invocation.before(Invoker.java:217)
+	at play.Invoker$Invocation.run(Invoker.java:277)
+	at Invocation.HTTP Request(Play!)
+16 Nov 2013 21:37:14,835 ERROR ~ Can't apply evolution
+com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'user' already exists
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1052)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4096)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4028)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2490)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2651)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2677)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2627)
+	at com.mysql.jdbc.StatementImpl.execute(StatementImpl.java:841)
+	at com.mysql.jdbc.StatementImpl.execute(StatementImpl.java:681)
+	at play.db.Evolutions.applyScript(Evolutions.java:267)
+	at play.db.Evolutions.rawInvocation(Evolutions.java:184)
+	at play.plugins.PluginCollection.rawInvocation(PluginCollection.java:675)
+	at Invocation.Message Received(Play!)
+16 Nov 2013 21:37:14,961 ERROR ~ 
+
+@6ga5n2gkk
+Internal Server Error (500) for request GET /
+
+Your database is an inconsistent state!
+An evolution has not been applied properly. Please check the problem and resolve it manually before making it as resolved.
+
+play.db.Evolutions$InconsistentDatabase
+	at play.db.Evolutions.checkEvolutionsState(Evolutions.java:337)
+	at play.db.Evolutions.beforeInvocation(Evolutions.java:197)
+	at play.plugins.PluginCollection.beforeInvocation(PluginCollection.java:473)
+	at play.Invoker$Invocation.before(Invoker.java:217)
+	at play.Invoker$Invocation.run(Invoker.java:277)
+	at Invocation.HTTP Request(Play!)
+16 Nov 2013 21:37:19,254 ERROR ~ 
+
+@6ga5n2gkl
+Internal Server Error (500) for request GET /
+
+Your database needs evolution!
+An SQL script will be run on your database.
+
+play.db.Evolutions$InvalidDatabaseRevision
+	at play.db.Evolutions.checkEvolutionsState(Evolutions.java:346)
+	at play.db.Evolutions.beforeInvocation(Evolutions.java:197)
+	at play.plugins.PluginCollection.beforeInvocation(PluginCollection.java:473)
+	at play.Invoker$Invocation.before(Invoker.java:217)
+	at play.Invoker$Invocation.run(Invoker.java:277)
+	at Invocation.HTTP Request(Play!)
