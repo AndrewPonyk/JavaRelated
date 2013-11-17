@@ -1,0 +1,9 @@
+18 Nov 2013 23:59:37,717 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/20_Logging/logging
+18 Nov 2013 23:59:39,282 WARN  ~ You're running Play! in DEV mode
+18 Nov 2013 23:59:39,441 INFO  ~ Listening for HTTP on port 9001 (Waiting a first request to start) ...
+18 Nov 2013 23:59:45,596 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+18 Nov 2013 23:59:45,653 INFO  ~ Application 'logging' is now started !
+18 Nov 2013 23:59:45,844 ERROR ~ 1111
+18 Nov 2013 23:59:45,845 INFO  ~ 222
+19 Nov 2013 00:00:06,536 ERROR ~ 1111
+19 Nov 2013 00:00:06,539 INFO  ~ 222
