@@ -1,0 +1,23 @@
+00:00:06,536 ERROR ~1111
+00:00:06,539 INFO  ~222
+23:16:26,240 INFO  ~Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/20_Logging/logging
+23:16:39,010 WARN  ~You're running Play! in DEV mode
+23:16:40,885 INFO  ~Listening for HTTP on port 9000 (Waiting a first request to start) ...
+23:18:21,369 INFO  ~Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+23:18:22,056 INFO  ~Application 'logging' is now started !
+23:18:24,209 ERROR ~1111
+23:18:24,213 INFO  ~222
+2013-Nov-22 23:21:04 INFO  ~Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/20_Logging/logging
+2013-Nov-22 23:21:22 WARN  ~You're running Play! in DEV mode
+2013-Nov-22 23:21:24 INFO  ~Listening for HTTP on port 9000 (Waiting a first request to start) ...
+2013-Nov-22 23:27:19 INFO  ~Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/20_Logging/logging
+2013-Nov-22 23:27:22 WARN  ~You're running Play! in DEV mode
+2013-Nov-22 23:27:22 INFO  ~Listening for HTTP on port 9000 (Waiting a first request to start) ...
+2013-Nov-22 23:36:55 INFO  ~Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+2013-Nov-22 23:36:55 INFO  ~Application 'logging' is now started !
+2013-Nov-22 23:42:24 ERROR ~1111
+2013-Nov-22 23:42:24 INFO  ~222
+2013-Nov-22 23:53:29 ERROR ~1111
+2013-Nov-22 23:53:29 INFO  ~222
+2013-Nov-22 23:53:47 ERROR ~1111
+2013-Nov-22 23:53:47 INFO  ~222
