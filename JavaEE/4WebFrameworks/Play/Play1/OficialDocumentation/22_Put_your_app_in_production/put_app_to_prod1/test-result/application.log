@@ -1,0 +1,5 @@
+23 Nov 2013 20:41:46,672 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/22_Put_your_app_in_production/put_app_to_prod
+23 Nov 2013 20:41:49,277 WARN  ~ You're running Play! in DEV mode
+23 Nov 2013 20:41:49,614 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+23 Nov 2013 20:42:01,009 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+23 Nov 2013 20:42:01,119 INFO  ~ Application 'put_app_to_prod' is now started !

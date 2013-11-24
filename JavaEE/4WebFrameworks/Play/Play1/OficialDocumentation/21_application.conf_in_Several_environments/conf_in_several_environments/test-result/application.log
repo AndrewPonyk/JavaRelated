@@ -1,5 +1,5 @@
-23 Nov 2013 19:52:49,131 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/21_application.conf_in_Several_environments/conf_in_several_environments
-23 Nov 2013 19:52:51,695 WARN  ~ You're running Play! in DEV mode
-23 Nov 2013 19:52:52,029 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-23 Nov 2013 19:53:58,727 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-23 Nov 2013 19:53:58,878 INFO  ~ Application 'conf_in_several_environments' is now started !
+23 Nov 2013 20:18:40,617 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/21_application.conf_in_Several_environments/conf_in_several_environments
+23 Nov 2013 20:18:43,280 WARN  ~ You're running Play! in DEV mode
+23 Nov 2013 20:18:43,636 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+23 Nov 2013 20:19:39,131 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+23 Nov 2013 20:19:39,273 INFO  ~ Application 'conf_in_several_environments' is now started !

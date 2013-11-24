@@ -1,0 +1,1158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<!--
+	generated in 0.395 seconds
+	69148 bytes batcached for 300 seconds
+-->
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Ubuntu &#8211; where is the apache error log ?  | FuzzyBlog</title>
+<link rel="pingback" href="http://fuzzyblog.wordpress.com/xmlrpc.php" />
+<link rel="alternate" type="application/rss+xml" title="FuzzyBlog &raquo; Feed" href="http://fuzzyblog.wordpress.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="FuzzyBlog &raquo; Comments Feed" href="http://fuzzyblog.wordpress.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="FuzzyBlog &raquo; Ubuntu &#8211; where is the apache error log&nbsp;? Comments Feed" href="http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/feed/" />
+<script type="text/javascript">
+/* <![CDATA[ */
+function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!='function'){window.onload=func;}else{window.onload=function(){oldonload();func();}}}
+/* ]]> */
+</script>
+<link rel='stylesheet' id='all-css-0' href='http://s0.wp.com/_static/??-eJx9z9EOgjAMBdAfclYjIi/GbxmslkFHF7qF+Pcu+KAJhrc2Oc29hSWaTqaEU4KQTeRMflIIsTa97caf6dipHuA/Zz+iwoApFmnWbcNbFvoeCBE6yck8hVkWWLwjTHsZUbRotn4GTS/GjU09htIi5rZY4X3VV0AsreW9yE8phUKARNyM1q2PPcL9fGmq5lZf69PwBgs7eAU=' type='text/css' media='all' />
+<link rel='stylesheet' id='print-css-0' href='http://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1335386953g' type='text/css' media='print' />
+<script type='text/javascript'>
+/* <![CDATA[ */
+var LoggedOutFollow = {"invalid_email":"Your subscription did not succeed, please try again with a valid email address."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s2.wp.com/_static/??-eJyFkN0KwjAMRl/Irsx5sV2Iz7KfrKS2TW1ay3x6O5igONhVQnLI4YvMXozkIrgoNUtLAxoQiSH0qswEupkqzSdZOHSjSRPwCupHgrBs5RAQFlXoI1QW3Qf+snriaIG5KHe2vyp0T4R8iGmIvh/vIgDj6+/qYEgJb5JCx7L0CiZKUcxkDGWZcVIQ90KNZO36lQDeLFuYm73WTXs5N3XbdfoNqIB9hw=='></script>
+<link rel='stylesheet' id='all-css-0' href='http://s2.wp.com/wp-content/mu-plugins/highlander-comments/style.css?m=1377793621g' type='text/css' media='all' />
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='highlander-comments-ie7-css'  href='http://s2.wp.com/wp-content/mu-plugins/highlander-comments/style-ie7.css?m=1351637563g&#038;ver=20110606' type='text/css' media='all' />
+<![endif]-->
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://fuzzyblog.wordpress.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://fuzzyblog.wordpress.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Ubuntu &#8211; how do you restart apache&nbsp;?' href='http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-how-do-you-restart-apache/' />
+<link rel='next' title='Ubuntu &#8212; where is the apache root&nbsp;?' href='http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-root/' />
+<meta name="generator" content="WordPress.com" />
+<link rel='canonical' href='http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/' />
+<link rel='shortlink' href='http://wp.me/p3BW-1O' />
+<link rel="alternate" type="application/json+oembed" href="http://public-api.wordpress.com/oembed/1.0/?format=json&amp;url=http%3A%2F%2Ffuzzyblog.wordpress.com%2F2005%2F12%2F08%2Fubuntu-where-is-the-apache-error-log%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="http://public-api.wordpress.com/oembed/1.0/?format=xml&amp;url=http%3A%2F%2Ffuzzyblog.wordpress.com%2F2005%2F12%2F08%2Fubuntu-where-is-the-apache-error-log%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Ubuntu - where is the apache error log ? " />
+<meta property="og:url" content="http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/" />
+<meta property="og:description" content="tail -f  /var/log/apache2/error.log" />
+<meta property="og:site_name" content="FuzzyBlog" />
+<meta property="og:image" content="http://wordpress.com/i/blank.jpg?m=1383295312g" />
+<meta name="twitter:site" content="@wordpressdotcom" />
+<meta name="twitter:card" content="summary" />
+<meta property="fb:app_id" content="249643311490" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<link rel="shortcut icon" type="image/x-icon" href="http://s2.wp.com/i/favicon.ico?m=1311975824g" sizes="16x16 24x24 32x32 48x48" />
+<link rel="icon" type="image/x-icon" href="http://s2.wp.com/i/favicon.ico?m=1311975824g" sizes="16x16 24x24 32x32 48x48" />
+<link rel="apple-touch-icon-precomposed" href="http://s0.wp.com/i/webclip.png?m=1355642671g" />
+<link rel='openid.server' href='http://fuzzyblog.wordpress.com/?openidserver=1' />
+<link rel='openid.delegate' href='http://fuzzyblog.wordpress.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="http://fuzzyblog.wordpress.com/osd.xml" title="FuzzyBlog" />
+<link rel="search" type="application/opensearchdescription+xml" href="http://wordpress.com/opensearch.xml" title="WordPress.com" />
+		<style>
+		/* <![CDATA[ */
+		/* Block: reblog */
+		
+		.reblog-from img                   { margin: 0 10px 0 0; vertical-align: middle; padding: 0; border: 0; }
+		.reblogger-note img.avatar         { float: left; padding: 0; border: 0; }
+		.reblogger-note-content            { margin: 0 0 20px; }
+		.reblog-post .wpcom-enhanced-excerpt-content { border-left: 3px solid #eee; padding-left: 15px; }
+		.reblog-post ul.thumb-list         { display: block; list-style: none; margin: 2px 0; padding: 0; clear: both; }
+		.reblog-post ul.thumb-list li      { display: inline; margin: 0; padding: 0 1px; border: 0; }
+		.reblog-post ul.thumb-list li a    { margin: 0; padding: 0; border: 0; }
+		.reblog-post ul.thumb-list li img  { margin: 0; padding: 0; border: 0; }
+		
+		.reblog-post .wpcom-enhanced-excerpt { clear: both; }
+		
+		.reblog-post .wpcom-enhanced-excerpt address,
+		.reblog-post .wpcom-enhanced-excerpt li,
+		.reblog-post .wpcom-enhanced-excerpt h1,
+		.reblog-post .wpcom-enhanced-excerpt h2,
+		.reblog-post .wpcom-enhanced-excerpt h3,
+		.reblog-post .wpcom-enhanced-excerpt h4,
+		.reblog-post .wpcom-enhanced-excerpt h5,
+		.reblog-post .wpcom-enhanced-excerpt h6,
+		.reblog-post .wpcom-enhanced-excerpt p { font-size: 100% !important; }
+		
+		.reblog-post .wpcom-enhanced-excerpt blockquote,
+		.reblog-post .wpcom-enhanced-excerpt pre,
+		.reblog-post .wpcom-enhanced-excerpt code,
+		.reblog-post .wpcom-enhanced-excerpt q { font-size: 98% !important; }
+		
+		.wpcom-reblog-snapshot .reblogged-content { max-height: 400px; overflow-y: scroll; }
+		.wpcom-reblog-snapshot .reblogger-note { margin-top: 15px; margin-bottom: 15px; border-top: 1px solid #eee; }
+		.wpcom-reblog-snapshot .reblogger-headline { margin-top: 15px; }
+		.wpcom-reblog-snapshot .reblogger-headline img.avatar { float: none; margin: 0 15px; vertical-align: middle; padding: 0; }
+		
+
+		/* ]]> */
+		</style>
+		<meta name="application-name" content="FuzzyBlog" /><meta name="msapplication-window" content="width=device-width;height=device-height" /><meta name="msapplication-tooltip" content="Just another WordPress.com weblog" /><meta name="msapplication-task" content="name=Subscribe;action-uri=http://fuzzyblog.wordpress.com/feed/;icon-uri=http://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=Sign up for a free blog;action-uri=http://wordpress.com/signup/;icon-uri=http://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Support;action-uri=http://support.wordpress.com/;icon-uri=http://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Forums;action-uri=http://forums.wordpress.com/;icon-uri=http://s2.wp.com/i/favicon.ico" /><meta name="title" content="Ubuntu &#8211; where is the apache error log&nbsp;? | FuzzyBlog on WordPress.com" />
+<meta name="description" content="tail -f  /var/log/apache2/error.log" />
+	<style type="text/css">
+		#header {
+			background: #8EBAFD url(http://s2.wp.com/wp-content/themes/pub/pool/images/logo.gif) left repeat-y;
+		}
+				#header h1 a,
+		#header h1 a:hover,
+		#header #desc {
+			color: #FFFFFF;
+		}
+			</style>
+
+<script type='text/javascript' src='http://partner.googleadservices.com/gampad/google_service.js'>
+</script>
+<script type='text/javascript'>
+if ( typeof GS_googleAddAdSenseService == 'function' ) { GS_googleAddAdSenseService("ca-pub-3443918307802676"); }
+if ( typeof GS_googleEnableAllServices == 'function' ) { GS_googleEnableAllServices() };
+</script>
+<script type='text/javascript'>
+if ( typeof GA_googleAddSlot == 'function' ) { GA_googleAddSlot("ca-pub-3443918307802676", "wpcom_below_post"); }
+</script>
+<script type='text/javascript'>
+if ( typeof GA_googleFetchAds == 'function' ) { GA_googleFetchAds(); }
+</script>
+
+<script type="text/javascript">
+var wpcom_ads = { bid: 13884, pt: 'permalink', wa: 0, as: 0, domain: 'fuzzyblog.wordpress.com', url: 'http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/', gid: '', };
+</script>
+<style id="syntaxhighlighteranchor"></style>
+<script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script>
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_setDomainName', 'wordpress.com']);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script>
+</head>
+
+<body class="single single-post postid-112 single-format-standard mp6 highlander-enabled highlander-light">
+<div id="content">
+
+	<div id="header" onclick="location.href='http://fuzzyblog.wordpress.com/';" style="cursor: pointer;">
+		<h1><a href="http://fuzzyblog.wordpress.com/">FuzzyBlog</a></h1>
+	</div>
+
+	<div id="pagesnav">
+		<div class="alignleft">
+				<ul>
+		<li><a href="http://fuzzyblog.wordpress.com/">Blog</a></li>
+		<li class="page_item page-item-2"><a href="http://fuzzyblog.wordpress.com/about/">About</a></li>
+<li class="page_item page-item-21"><a href="http://fuzzyblog.wordpress.com/contact/">Contact</a></li>
+<li class="page_item page-item-125"><a href="http://fuzzyblog.wordpress.com/hire-me/">Hire&nbsp;Me</a></li>
+<li class="page_item page-item-92"><a href="http://fuzzyblog.wordpress.com/photos/">Photos</a></li>
+<li class="page_item page-item-30"><a href="http://fuzzyblog.wordpress.com/travel/">Travel</a></li>
+<li class="page_item page-item-115"><a href="http://fuzzyblog.wordpress.com/tutorial/">Tutorials</a></li>
+	</ul>
+		</div>
+
+		<div id="search">
+			<form id="searchform" method="get" action="http://fuzzyblog.wordpress.com/">
+				<input type="text" id="s" name="s" onblur="this.value=(this.value=='') ? 'Search this Blog' : this.value;" onfocus="this.value=(this.value=='Search this Blog') ? '' : this.value;" id="supports" name="s" value="Search this Blog" />
+			</form>
+		</div>
+	</div><!-- #pagesnav -->
+<!-- end header -->
+
+	<div id="bloque">
+
+		<div id="noticias">
+
+				
+			<div class="post-112 post type-post status-publish format-standard hentry category-ubuntu category-uncategorized entrada">
+				<h2 id="post-112">
+											Ubuntu &#8211; where is the apache error log&nbsp;?									</h2>
+				<small>December 8, 2005 at 5:16 am | Posted in <a href="http://fuzzyblog.wordpress.com/category/ubuntu/" title="View all posts in ubuntu" rel="category tag">ubuntu</a>, <a href="http://fuzzyblog.wordpress.com/category/uncategorized/" title="View all posts in Uncategorized" rel="category tag">Uncategorized</a>  |  <a href="http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/#comments" title="Comment on Ubuntu &#8211; where is the apache error log&nbsp;?">13 Comments</a> <br /></small>
+
+				<p>tail -f  /var/log/apache2/error.log</p>
+
+<div class="wpa" style="position: relative; width:300px; text-align: center; padding: 0; margin: 10px auto; overflow: hidden; clear: both;">
+<a style="position: absolute; text-align: left; display: block; font: 9px/1 sans-serif; text-decoration: underline;" href="http://en.wordpress.com/about-these-ads/" rel="nofollow">About these ads</a>
+<script type="text/javascript">
+		var wpcom_adclk_hovering = false;
+		var wpcom_adclk_recorded = false;
+		var wpcom_adclk_theme = "Pool";
+		var wpcom_adclk_slot = "wpcom_below_post";
+		var wpcom_adclk_network = ( typeof wpcom_adclk_network === "undefined" ) ? "" : wpcom_adclk_network ;
+
+		jQuery(document).ready( function() {
+			function wpcom_adclk_hover_yes() { wpcom_adclk_hovering = true; }
+			function wpcom_adclk_hover_no() { wpcom_adclk_hovering = false; }
+			jQuery(".wpa").click(wpcom_adclk_click);
+			jQuery(".wpa iframe").hover( wpcom_adclk_hover_yes, wpcom_adclk_hover_no );
+			jQuery(".wpa object").hover( wpcom_adclk_hover_yes, wpcom_adclk_hover_no );
+
+			jQuery(window).blur( function() {
+				if ( wpcom_adclk_hovering ) { wpcom_adclk_click(); }
+			});
+		});
+
+		function wpcom_adclk_impression() {
+			var stat_gif = document.location.protocol + "//stats.wordpress.com/g.gif?v=wpcom-no-pv";
+			stat_gif += "&x_ads_imp_theme=" + wpcom_adclk_theme;
+			stat_gif += "&x_ads_imp_placement="+wpcom_adclk_slot;
+			stat_gif += "&x_ads_imp_network=" + wpcom_adclk_network;
+			stat_gif += "&x_ads_imp_theme_network="+wpcom_adclk_theme+"_"+wpcom_adclk_network;
+			new Image().src = stat_gif + "&baba=" + Math.random();
+			return true;
+		}
+
+		function wpcom_adclk_click() {
+			if (wpcom_adclk_recorded) { return true; } // no double counting
+			var stat_gif = document.location.protocol + "//stats.wordpress.com/g.gif?v=wpcom-no-pv";
+			stat_gif += "&x_ads_click_theme=" + wpcom_adclk_theme;
+			stat_gif += "&x_ads_click_placement="+wpcom_adclk_slot;
+			stat_gif += "&x_ads_click_network=" + wpcom_adclk_network;
+			stat_gif += "&x_ads_click_theme_network="+wpcom_adclk_theme+"_"+wpcom_adclk_network;
+
+			new Image().src = stat_gif + "&baba=" + Math.random();
+			wpcom_adclk_recorded = true;
+			var now=new Date(); var end=now.getTime()+250;
+			while(true){now=new Date();if(now.getTime()>end){break;}}
+			return true;
+		}
+	
+if ( typeof GA_googleAddAttr == 'function' ) {
+GA_googleAddAttr("AdOpt", "1");
+GA_googleAddAttr("Origin", "other");
+GA_googleAddAttr("LangId", "");
+GA_googleAddAttr("Domain", "fuzzyblog.wordpress.com");
+GA_googleAddAttr("BlogId", "13884");
+GA_googleAddAttr("STR", "1");
+GA_googleAddAttr("Tag", "ubuntu");
+GA_googleAddAttr("theme_bg", "ffffff");
+GA_googleAddAttr("theme_text", "333333");
+GA_googleAddAttr("theme_link", "0b76ae");
+GA_googleAddAttr("theme_border", "b8d4ff");
+GA_googleAddAttr("theme_url", "0090da");
+GA_googleAddAdSensePageAttr("google_page_url", "http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/");
+GA_googleFillSlot("wpcom_below_post");
+}
+</script>
+</div>
+<style type="text/css">
+div.wpa>div { margin-top: 1em; } #google_ads_div_wpcom_below_post_adsafe_ad_container { display: block !important; }
+</style>
+<script type="text/javascript">
+jQuery( window ).load( function() {
+    if ( jQuery(".wpa script[src*='shareth.ru']").length > 0 || jQuery(".wpa iframe[src*='boomvideo.tv']").length > 0 || jQuery(".wpa iframe[src*='viewablemedia.net']").length > 0 || jQuery(".wpa .sharethrough-placement").length > 0 ) {
+        jQuery( '.wpa' ).css( 'width', '400px' );
+    }
+setTimeout(function(){if(typeof GS_googleAddAdSenseService !== 'function'){new Image().src=document.location.protocol+"//stats.wordpress.com/g.gif?v=wpcom-no-pv&x_noads=adblock&baba="+Math.random()}},100);
+} );
+</script>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled"><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-13884-112-52910dccc1984' data-src='//widgets.wp.com/likes/#blog_id=13884&amp;post_id=112&amp;origin=fuzzyblog.wordpress.com&amp;obj_id=13884-112-52910dccc1984' data-name='like-post-frame-13884-112-52910dccc1984'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height:55px'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>
+				<div class="feedback"></div>
+			</div><!-- .entrada -->
+
+			<h2 id="comments">
+	13 Comments	<a href="#postcomment" title="Leave a comment">&raquo;</a>
+</h2>
+
+<p>
+	<a href='http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/feed/'><abbr title="Really Simple Syndication">RSS</abbr> feed for comments on this post.</a>
+	<a href="http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/trackback/" rel="trackback">TrackBack <abbr title="Uniform Resource Identifier">URI</abbr></a>
+</p>
+
+	<ol id="commentlist">
+			<li class="comment byuser comment-author-wsrhtrytui even thread-even depth-1 highlander-comment" id="comment-2146">
+		<div id="div-comment-2146" class="vcard">
+					<p><a href='http://167.cedor.at/' rel="nofollow">Here</a> are some links that I believe will be interested</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Comment by <span class="fn">wsrhtrytui</span>&#8212; August 9, 2006 <a href="#comment-2146">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=2146#respond' onclick='return addComment.moveForm("div-comment-2146", "2146", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-21964">
+		<div id="div-comment-21964" class="vcard">
+					<p><strong>health insurance family affordable</strong></p>
+<p>fruitful amen revile ledgers legions:</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.healthjen.com/health-insurance-family-affordable.html' rel='external nofollow' class='url'>health insurance family affordable</a></span>&#8212; May 28, 2007 <a href="#comment-21964">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=21964#respond' onclick='return addComment.moveForm("div-comment-21964", "21964", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-34479">
+		<div id="div-comment-34479" class="vcard">
+					<p><strong>credit cards for peoplw with no credit</strong></p>
+<p>symbolizing tanker,Nordic?ages </p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.intocreditcard.com/best-miles-credit-cards-compare.html' rel='external nofollow' class='url'>credit cards for peoplw with no credit</a></span>&#8212; October 4, 2007 <a href="#comment-34479">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=34479#respond' onclick='return addComment.moveForm("div-comment-34479", "34479", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-37597">
+		<div id="div-comment-37597" class="vcard">
+					<p><strong>geldspielautomat download</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t4.html' rel='external nofollow' class='url'>geldspielautomat download</a></span>&#8212; November 23, 2007 <a href="#comment-37597">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37597#respond' onclick='return addComment.moveForm("div-comment-37597", "37597", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-37648">
+		<div id="div-comment-37648" class="vcard">
+					<p><strong>geldspielautomat downloaden</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t18.html' rel='external nofollow' class='url'>geldspielautomat downloaden</a></span>&#8212; November 23, 2007 <a href="#comment-37648">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37648#respond' onclick='return addComment.moveForm("div-comment-37648", "37648", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-37747">
+		<div id="div-comment-37747" class="vcard">
+					<p><strong>geldspielautomaten verkauf</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t8.html' rel='external nofollow' class='url'>geldspielautomaten verkauf</a></span>&#8212; November 23, 2007 <a href="#comment-37747">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37747#respond' onclick='return addComment.moveForm("div-comment-37747", "37747", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-37793">
+		<div id="div-comment-37793" class="vcard">
+					<p><strong>umsutze geldspielautomaten</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t22.html' rel='external nofollow' class='url'>umsutze geldspielautomaten</a></span>&#8212; November 23, 2007 <a href="#comment-37793">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37793#respond' onclick='return addComment.moveForm("div-comment-37793", "37793", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-37836">
+		<div id="div-comment-37836" class="vcard">
+					<p><strong>geldspielautomaten hundler</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t36.html' rel='external nofollow' class='url'>geldspielautomaten hundler</a></span>&#8212; November 23, 2007 <a href="#comment-37836">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37836#respond' onclick='return addComment.moveForm("div-comment-37836", "37836", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-37886">
+		<div id="div-comment-37886" class="vcard">
+					<p><strong>geldspielautomaten de</strong></p>
+<p>good article</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.forumprofi4.de/forum11586/geldspielautomaten-t12.html' rel='external nofollow' class='url'>geldspielautomaten de</a></span>&#8212; November 23, 2007 <a href="#comment-37886">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=37886#respond' onclick='return addComment.moveForm("div-comment-37886", "37886", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-43338">
+		<div id="div-comment-43338" class="vcard">
+					<p><strong>bingo hall in columbia missouri</strong></p>
+<p>procedurally gaps Julio:clapping soundly,careers </p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.tointernetbingo.com/net-gamebingo/' rel='external nofollow' class='url'>bingo hall in columbia missouri</a></span>&#8212; February 28, 2008 <a href="#comment-43338">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=43338#respond' onclick='return addComment.moveForm("div-comment-43338", "43338", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-43425">
+		<div id="div-comment-43425" class="vcard">
+					<p><strong>seven stud hi lo</strong></p>
+<p>operative?headroom Xerxes spanked </p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.leruleta.com/bonusjuego-internet.php' rel='external nofollow' class='url'>seven stud hi lo</a></span>&#8212; March 26, 2008 <a href="#comment-43425">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=43425#respond' onclick='return addComment.moveForm("div-comment-43425", "43425", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback odd alt thread-odd thread-alt depth-1 highlander-comment" id="comment-43538">
+		<div id="div-comment-43538" class="vcard">
+					<p><strong>louisana citizens property insurance corporation&#8230;</strong></p>
+<p>military?dad percutaneous April touched cerebellum &#8230;</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.bighouseinsure.com/louisana-citizens-property-insurance-corporation.html' rel='external nofollow' class='url'>louisana citizens property insurance corporation</a></span>&#8212; May 5, 2008 <a href="#comment-43538">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=43538#respond' onclick='return addComment.moveForm("div-comment-43538", "43538", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	<li class="trackback even thread-even depth-1 highlander-comment" id="comment-43640">
+		<div id="div-comment-43640" class="vcard">
+					<p><strong>slot gratis nerladdning&#8230;</strong></p>
+<p>captivation!officio binuclear conducted revises!feature &#8230;</p>
+			<p class="alignright"><small class="comment-meta commentmetadata">Trackback by <span class="fn"><a href='http://www.justgrattiskasino.com/slot_gratis_nerladdning/' rel='external nofollow' class='url'>slot gratis nerladdning</a></span>&#8212; July 20, 2008 <a href="#comment-43640">#</a></small></p>
+			<div class="reply">
+				<a class='comment-reply-link' href='/2005/12/08/ubuntu-where-is-the-apache-error-log/?replytocom=43640#respond' onclick='return addComment.moveForm("div-comment-43640", "43640", "respond", "112")'>Reply</a>			</div>
+		</div>
+</li><!-- #comment-## -->
+	</ol>
+	<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+	<br />
+
+
+
+								<div id="respond" class="comment-respond">
+				<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2005/12/08/ubuntu-where-is-the-apache-error-log/#respond" style="display:none;">Cancel reply</a></small></h3>
+									<form action="http://fuzzyblog.wordpress.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+																										
+
+
+												<input type="hidden" id="highlander_comment_nonce" name="highlander_comment_nonce" value="dd935e3a8a" /><input type="hidden" name="_wp_http_referer" value="/2005/12/08/ubuntu-where-is-the-apache-error-log/" />
+<input type="hidden" name="hc_post_as" id="hc_post_as" value="guest" />
+
+<div class="comment-form-field comment-textarea">
+	<label for="comment">Enter your comment here...</label>
+	<div id="comment-form-comment"><textarea id="comment" name="comment" title="Enter your comment here..."></textarea></div>
+</div>
+
+<div id="comment-form-identity">
+
+	<div id="comment-form-nascar">
+		<p>Fill in your details below or click an icon to log in:</p>
+		<ul>
+			<li class="selected" style="display:none;">
+				<a href="#comment-form-guest" id="postas-guest" title="Guest">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:WordPress.com" id="postas-wordpress" title="WordPress.com">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:Twitter" id="postas-twitter" title="Twitter">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:Facebook" id="postas-facebook" title="Facebook">
+					<span></span>
+				</a>
+			</li>
+			<li>
+			<iframe id="googleplus-sign-in" name="googleplus-sign-in" src="https://public-api.wordpress.com/connect/?googleplus-sign-in=1" width="24" height="24" scrolling="no" allowtransparency="true" seamless="seamless" frameborder="0"></iframe>
+			</li>
+		</ul>
+	</div>
+
+	<div id="comment-form-guest" class="comment-form-service selected">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+<a href="https://gravatar.com/site/signup/" target="_blank">				<img src="" alt="Gravatar" width="25" class="no-grav" />
+</a>			</div>
+
+				<div class="comment-form-fields">
+				<div class="comment-form-field comment-form-email">
+					<label for="email">Email <span class="required">(required)</span> <span class="nopublish">(Address never made public)</span></label>
+					<div class="comment-form-input"><input id="email" name="email" type="email" value="" /></div>
+				</div>
+				<div class="comment-form-field comment-form-author">
+					<label for="author">Name <span class="required">(required)</span></label>
+					<div class="comment-form-input"><input id="author" name="author" type="text" value="" /></div>
+				</div>
+				<div class="comment-form-field comment-form-url">
+					<label for="url">Website</label>
+					<div class="comment-form-input"><input id="url" name="url" type="text" value="" /></div>
+				</div>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-wordpress" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="http://s2.wp.com/wp-content/mu-plugins/highlander-comments/images/wplogo.png?m=1289230950g" alt="WordPress.com Logo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="wp_avatar" id="wordpress-avatar" class="comment-meta-wordpress" value="" />
+				<input type="hidden" name="wp_user_id" id="wordpress-user_id" class="comment-meta-wordpress" value="" />
+				<input type="hidden" name="wp_access_token" id="wordpress-access_token" class="comment-meta-wordpress" value="" />
+				<p class="comment-form-posting-as pa-wordpress"><strong></strong> You are commenting using your WordPress.com account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'wordpress' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-twitter" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="" alt="Twitter picture" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="twitter_avatar" id="twitter-avatar" class="comment-meta-twitter" value="" />
+				<input type="hidden" name="twitter_user_id" id="twitter-user_id" class="comment-meta-twitter" value="" />
+				<input type="hidden" name="twitter_access_token" id="twitter-access_token" class="comment-meta-twitter" value="" />
+				<p class="comment-form-posting-as pa-twitter"><strong></strong> You are commenting using your Twitter account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'twitter' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-facebook" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="" alt="Facebook photo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="fb_avatar" id="facebook-avatar" class="comment-meta-facebook" value="" />
+				<input type="hidden" name="fb_user_id" id="facebook-user_id" class="comment-meta-facebook" value="" />
+				<input type="hidden" name="fb_access_token" id="facebook-access_token" class="comment-meta-facebook" value="" />
+				<p class="comment-form-posting-as pa-facebook"><strong></strong> You are commenting using your Facebook account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'facebook' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-googleplus" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="" alt="Google+ photo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="googleplus_avatar" id="googleplus-avatar" class="comment-meta-googleplus" value="" />
+				<input type="hidden" name="googleplus_user_id" id="googleplus-user_id" class="comment-meta-googleplus" value="" />
+				<input type="hidden" name="googleplus_access_token" id="googleplus-access_token" class="comment-meta-googleplus" value="" />
+				<p class="comment-form-posting-as pa-googleplus"><strong></strong> You are commenting using your Google+ account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'googleplus' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+
+	<div id="comment-form-load-service" class="comment-form-service">
+		<div class="comment-form-posting-as-cancel"><a href="javascript:HighlanderComments.cancelExternalWindow();">Cancel</a></div>
+		<p>Connecting to %s</p>
+	</div>
+
+	
+</div>
+
+<script type="text/javascript">
+var highlander_expando_javascript = function(){
+	var input = document.createElement( 'input' ),
+	    comment = jQuery( '#comment' );
+
+	if ( 'placeholder' in input ) {
+		comment.attr( 'placeholder', jQuery( '.comment-textarea label' ).remove().text() );
+	}
+
+	// Expando Mode: start small, then auto-resize on first click + text length
+	jQuery( '#comment-form-identity' ).hide();
+	jQuery( '#comment-form-subscribe' ).hide();
+	jQuery( '#commentform .form-submit' ).hide();
+
+	comment.css( { 'height':'10px' } ).one( 'focus', function() {
+		var timer = setInterval( HighlanderComments.resizeCallback, 10 )
+		jQuery( this ).animate( { 'height': HighlanderComments.initialHeight } ).delay( 100 ).queue( function(n) { clearInterval( timer ); HighlanderComments.resizeCallback(); n(); } );
+		jQuery( '#comment-form-identity' ).slideDown();
+		jQuery( '#comment-form-subscribe' ).slideDown();
+		jQuery( '#commentform .form-submit' ).slideDown();
+	});
+}
+jQuery(document).ready( highlander_expando_javascript );
+</script>
+
+<div id="comment-form-subscribe">
+	<p class="comment-subscription-form"><input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" tabindex="6"/> <label class="subscribe-label" id="subscribe-label" for="subscribe" style="display: inline;">Notify me of follow-up comments via email.</label></p></div>
+
+<style type="text/css">
+#respond .comment-form-avatar { display: none !important; }
+#respond .comment-form-fields { margin-left: 0 !important; }
+</style>
+
+												<p class="form-submit">
+							<input name="submit" type="submit" id="comment-submit" value="Post Comment" />
+							<input type='hidden' name='comment_post_ID' value='112' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+						</p>
+						
+<input type="hidden" name="genseq" value="1385237964" />
+<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="d2a457dbbc" /></p><script type='text/javascript' src='http://s2.wp.com/wp-content/mu-plugins/akismet-2.5/form.js?m=1308783962g'></script>
+<p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="41"/></p>					</form>
+							</div><!-- #respond -->
+			<div style="clear: both"></div>
+		
+		
+		</div><!-- #noticias -->
+
+<!-- begin footer -->
+
+<!-- begin sidebar -->
+	<div id="sidebar">
+				<ul>
+					<div id="categories">
+				<h3>Categories:</h3>
+				<ul>
+						<li class="cat-item cat-item-141"><a href="http://fuzzyblog.wordpress.com/category/ajax/" title="View all posts filed under ajax">ajax</a> (<a href="http://fuzzyblog.wordpress.com/category/ajax/feed/" title="rss">rss</a>) (1)
+</li>
+	<li class="cat-item cat-item-91"><a href="http://fuzzyblog.wordpress.com/category/blogging/" title="View all posts filed under blogging">blogging</a> (<a href="http://fuzzyblog.wordpress.com/category/blogging/feed/" title="rss">rss</a>) (1)
+</li>
+	<li class="cat-item cat-item-18059"><a href="http://fuzzyblog.wordpress.com/category/computing-tips/" title="View all posts filed under Computing Tips">Computing Tips</a> (<a href="http://fuzzyblog.wordpress.com/category/computing-tips/feed/" title="rss">rss</a>) (5)
+</li>
+	<li class="cat-item cat-item-8287"><a href="http://fuzzyblog.wordpress.com/category/feedster/" title="View all posts filed under feedster">feedster</a> (<a href="http://fuzzyblog.wordpress.com/category/feedster/feed/" title="rss">rss</a>) (8)
+</li>
+	<li class="cat-item cat-item-376"><a href="http://fuzzyblog.wordpress.com/category/humor/" title="View all posts filed under Humor">Humor</a> (<a href="http://fuzzyblog.wordpress.com/category/humor/feed/" title="rss">rss</a>) (11)
+</li>
+	<li class="cat-item cat-item-12090"><a href="http://fuzzyblog.wordpress.com/category/linkblog/" title="View all posts filed under linkblog">linkblog</a> (<a href="http://fuzzyblog.wordpress.com/category/linkblog/feed/" title="rss">rss</a>) (2)
+</li>
+	<li class="cat-item cat-item-458"><a href="http://fuzzyblog.wordpress.com/category/php/" title="View all posts filed under php">php</a> (<a href="http://fuzzyblog.wordpress.com/category/php/feed/" title="rss">rss</a>) (3)
+</li>
+	<li class="cat-item cat-item-92"><a href="http://fuzzyblog.wordpress.com/category/podcasting/" title="View all posts filed under podcasting">podcasting</a> (<a href="http://fuzzyblog.wordpress.com/category/podcasting/feed/" title="rss">rss</a>) (5)
+</li>
+	<li class="cat-item cat-item-832"><a href="http://fuzzyblog.wordpress.com/category/python/" title="View all posts filed under python">python</a> (<a href="http://fuzzyblog.wordpress.com/category/python/feed/" title="rss">rss</a>) (6)
+<ul class='children'>
+	<li class="cat-item cat-item-15988"><a href="http://fuzzyblog.wordpress.com/category/python/django/" title="View all posts filed under django">django</a> (<a href="http://fuzzyblog.wordpress.com/category/python/django/feed/" title="rss">rss</a>) (1)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-287"><a href="http://fuzzyblog.wordpress.com/category/rant/" title="View all posts filed under rant">rant</a> (<a href="http://fuzzyblog.wordpress.com/category/rant/feed/" title="rss">rss</a>) (3)
+</li>
+	<li class="cat-item cat-item-2373"><a href="http://fuzzyblog.wordpress.com/category/search/" title="
+">search</a> (<a href="http://fuzzyblog.wordpress.com/category/search/feed/" title="rss">rss</a>) (2)
+</li>
+	<li class="cat-item cat-item-11176"><a href="http://fuzzyblog.wordpress.com/category/software-engineering/" title="View all posts filed under Software Engineering">Software Engineering</a> (<a href="http://fuzzyblog.wordpress.com/category/software-engineering/feed/" title="rss">rss</a>) (5)
+</li>
+	<li class="cat-item cat-item-4621"><a href="http://fuzzyblog.wordpress.com/category/startup/" title="View all posts filed under Startup">Startup</a> (<a href="http://fuzzyblog.wordpress.com/category/startup/feed/" title="rss">rss</a>) (6)
+</li>
+	<li class="cat-item cat-item-255"><a href="http://fuzzyblog.wordpress.com/category/ubuntu/" title="View all posts filed under ubuntu">ubuntu</a> (<a href="http://fuzzyblog.wordpress.com/category/ubuntu/feed/" title="rss">rss</a>) (5)
+</li>
+	<li class="cat-item cat-item-1"><a href="http://fuzzyblog.wordpress.com/category/uncategorized/" title="View all posts filed under Uncategorized">Uncategorized</a> (<a href="http://fuzzyblog.wordpress.com/category/uncategorized/feed/" title="rss">rss</a>) (65)
+</li>
+	<li class="cat-item cat-item-20858"><a href="http://fuzzyblog.wordpress.com/category/unix-shell-commands/" title="
+">unix shell commands</a> (<a href="http://fuzzyblog.wordpress.com/category/unix-shell-commands/feed/" title="rss">rss</a>) (1)
+</li>
+	<li class="cat-item cat-item-753"><a href="http://fuzzyblog.wordpress.com/category/usability/" title="View all posts filed under usability">usability</a> (<a href="http://fuzzyblog.wordpress.com/category/usability/feed/" title="rss">rss</a>) (2)
+</li>
+	<li class="cat-item cat-item-18060"><a href="http://fuzzyblog.wordpress.com/category/vim/" title="
+">VIM</a> (<a href="http://fuzzyblog.wordpress.com/category/vim/feed/" title="rss">rss</a>) (1)
+</li>
+	<li class="cat-item cat-item-800"><a href="http://fuzzyblog.wordpress.com/category/windows/" title="
+">windows</a> (<a href="http://fuzzyblog.wordpress.com/category/windows/feed/" title="rss">rss</a>) (2)
+</li>
+				</ul>
+			</div><!-- #categories -->
+
+			<div id="archives">
+				<h3>Archives:</h3>
+				<ul>
+						<li><a href='http://fuzzyblog.wordpress.com/2005/12/'>December 2005</a>&nbsp;(39)</li>
+	<li><a href='http://fuzzyblog.wordpress.com/2005/11/'>November 2005</a>&nbsp;(52)</li>
+	<li><a href='http://fuzzyblog.wordpress.com/2005/10/'>October 2005</a>&nbsp;(3)</li>
+				</ul>
+			</div><!-- #archives -->
+
+			<div id="blogroll">
+				<h3>Blogroll</h3>
+				<ul>
+					<li><a href="http://cori.wordpress.com">(parenthetical)</a></li>
+<li><a href="http://www.manageability.org">.: Manageability :.</a></li>
+<li><a href="http://decafbad.com/blog">0xDECAFBAD</a></li>
+<li><a href="http://www.absoblogginlutely.net/">Absoblogginlutely!</a></li>
+<li><a href="http://www.accidentalhedonist.com/index.php">Accidental Hedonist</a></li>
+<li><a href="http://kalsey.com/blog/">Adam Kalsey</a></li>
+<li><a href="http://blogs.msdn.com/mglehman/default.aspx">Adventures In SoftwareLand</a></li>
+<li><a href="http://airhead.typepad.com/airhead/">AirHead</a></li>
+<li><a href="http://allensblog.typepad.com/allens_blog/">Allen&#8217;s Blog</a></li>
+<li><a href="http://www.dashes.com/anil/">Anil Dash</a></li>
+<li><a href="http://newsblog.seo-pr.com/public/blog/84032">Best Blogs | SEO-PR</a></li>
+<li><a href="http://blogs.zdnet.com/BTL">Between the Lines</a></li>
+<li><a href="http://www.bitsplitter.net/blog">Bitsplitter Blog</a></li>
+<li><a href="http://www.blogbridge.com/">BlogBridge</a></li>
+<li><a href="http://amandawatlington.typepad.com/blogs_and_feeds/">Blogs and  Feeds</a></li>
+<li><a href="http://bnoopy.typepad.com/bnoopy/">Bnoopy</a></li>
+<li><a href="http://www.boingboing.net/">Boing Boing</a></li>
+<li><a href="http://bokardo.com">Bokardo</a></li>
+<li><a href="http://www.burningdoor.com/feedburner/">Burn This! &#8211; The FeedBurner Weblog</a></li>
+<li><a href="http://billburnham.blogs.com/burnhamsbeat/">Burnham&#8217;s Beat</a></li>
+<li><a href="http://www.buzzmachine.com">BuzzMachine</a></li>
+<li><a href="http://spaces.msn.com/members/carnage4life/">Carnage4Life&#8217;s Space</a></li>
+<li><a href="http://chris.pirillo.com/">Chris Pirillo</a></li>
+<li><a href="http://www.crunchnotes.com">CrunchNotes</a></li>
+<li><a href="http://www.dynamicobjects.com/d2r/">d2r</a></li>
+<li><a href="http://bayosphere.com/blog/dangillmor">Dan Gillmor&#8217;s blog</a></li>
+<li><a href="http://daringfireball.net/">Daring Fireball</a></li>
+<li><a href="http://www.dsandbox.com/">Designing for the Sandbox</a></li>
+<li><a href="http://devhawk.net/">DevHawk</a></li>
+<li><a href="http://www.edbrill.com/ebrill/edbrill.nsf/">Ed Brill</a></li>
+<li><a href="http://www.emergencemarketing.com/">Emergence Marketing</a></li>
+<li><a href="http://epeus.blogspot.com">Epeus&#8217; epigone</a></li>
+<li><a href="http://evhead.com/">evhead</a></li>
+<li><a href="http://www.eweek.com">eWEEK.com Messaging and Collaboration</a></li>
+<li><a href="http://feedlounge.com">FeedLounge</a></li>
+<li><a href="http://blog.feedmarker.com">Feedmarker Blog</a></li>
+<li><a href="http://blog.feedtagger.com">FeedTagger</a></li>
+<li><a href="http://www.feld.com/blog/">Feld Thoughts</a></li>
+<li><a href="http://www.genuinevc.com/">Genuine VC</a></li>
+<li><a href="http://us.gizmodo.com/">Gizmodo</a></li>
+<li><a href="http://blog.outer-court.com">Google Blogoscoped</a></li>
+<li><a href="http://www.ibm.com/developerworks/blogs/dw_blog.jspa?blog=317&#038;ca=drs-bl">Grady Booch&#8217;s   weblog</a></li>
+<li><a href="http://www.rassoc.com/gregr/weblog">Greg Reinacker&#8217;s Weblog</a></li>
+<li><a href="http://halleyscomment.blogspot.com">Halley&#8217;s Comment</a></li>
+<li><a href="#">http://frassle.rura.org/Directory/?feed=1</a></li>
+<li><a href="http://www.idlewords.com/">Idle Words</a></li>
+<li><a href="http://google.blognewschannel.com">InsideGoogle</a></li>
+<li><a href="http://instapundit.com/">Instapundit.com</a></li>
+<li><a href="http://www.ionrss.com/">ION RSS</a></li>
+<li><a href="http://www.jensense.com/">JenSense &#8211; Making Sense of Contextual Advertising</a></li>
+<li><a href="http://jeremy.zawodny.com/blog/">Jeremy Zawodny&#8217;s blog</a></li>
+<li><a href="http://jeremy.zawodny.com/linkblog/">Jeremy Zawodny&#8217;s linkblog</a></li>
+<li><a href="http://www.joelonsoftware.com">Joel on Software</a></li>
+<li><a href="http://battellemedia.com/">John Battelle&#8217;s Searchblog</a></li>
+<li><a href="http://www.hyperorg.com/blogger/">Joho the Blog</a></li>
+<li><a href="http://joi.ito.com/">Joi Ito&#8217;s Web</a></li>
+<li><a href="http://weblog.infoworld.com/udell/">Jon&#8217;s Radio</a></li>
+<li><a href="http://www.flickr.com/photos/jzawodn/">jzawodn&#8217;s Photos</a></li>
+<li><a href="http://keithdevens.com/weblog">Keith&#8217;s Weblog</a></li>
+<li><a href="http://www.feedblog.org/">Kevin Burton&#8217;s Feed Blog</a></li>
+<li><a href="http://www.cadence90.com/wp">Learning The Lessons of Nixon</a></li>
+<li><a href="http://www.lessig.org/blog/">Lessig Blog</a></li>
+<li><a href="http://mamamusings.net/">mamamusings</a></li>
+<li><a href="http://www.jrothman.com/weblog/blogger.html">Managing Product Development</a></li>
+<li><a href="http://marc.blogs.it/">Marc&#8217;s Voice</a></li>
+<li><a href="http://martinfowler.com/bliki">Martin Fowler&#8217;s Bliki</a></li>
+<li><a href="http://500hats.typepad.com/500blogs/">Master of 500 Hats</a></li>
+<li><a href="http://www.memeorandum.com/">memeorandum</a></li>
+<li><a href="http://blogs.osafoundation.org/mitch/">Mitch Kapor&#8217;s Weblog</a></li>
+<li><a href="http://www.niallkennedy.com/blog/index.xml">Niall Kennedy</a></li>
+<li><a href="http://mena.typepad.com/dollarshort/">Not A Dollarshort</a></li>
+<li><a href="http://radar.oreilly.com/">O&#8217;Reilly Radar</a></li>
+<li><a href="http://mgoldberg.typepad.com/occams_razor/">Occam&#8217;s Razor</a></li>
+<li><a href="http://googleblog.blogspot.com">Official Google Blog</a></li>
+<li><a href="http://gigaom.com">Om Malik&#8217;s Broadband Blog</a></li>
+<li><a href="http://www.toprankblog.com">Online Marketing Blog</a></li>
+<li><a href="http://www.paidcontent.org/">PaidContent.org</a></li>
+<li><a href="http://paolo.evectors.it/">Paolo Valdemarin: Paolo&#8217;s Weblog</a></li>
+<li><a href="http://paul.kedrosky.com/">Paul Kedrosky&#8217;s Infectious Greed</a></li>
+<li><a href="http://www.windley.com/">Phil Windley&#8217;s Technometria</a></li>
+<li><a href="http://photomatt.net">Photo Matt</a></li>
+<li><a href="http://www.salas.com/">Pito&#8217;s Blog</a></li>
+<li><a href="http://planetweb20.com/">Planet Web 2.0</a></li>
+<li><a href="http://ponzarelli.com/blog">Ponzi&#8217;s Schemes</a></li>
+<li><a href="http://billives.typepad.com/portals_and_km/">Portals and KM</a></li>
+<li><a href="http://postsecret.blogspot.com">PostSecret</a></li>
+<li><a href="http://practicalmysql.wordpress.com/">Practical MySQL</a></li>
+<li><a href="http://www.raelity.org">raelity bytes</a></li>
+<li><a href="http://ranchero.com/">ranchero.com</a></li>
+<li><a href="http://dannyayers.com">Raw</a></li>
+<li><a href="http://www.readwriteweb.com/">Read/WriteWeb</a></li>
+<li><a href="http://www.researchbuzz.org/">ResearchBuzz</a></li>
+<li><a href="http://rodrigo.typepad.com/english/">Rodrigo A. Sepúlveda Schulz</a></li>
+<li><a href="http://ross.typepad.com/blog/">Ross Mayfield&#8217;s Weblog</a></li>
+<li><a href="http://www.russellbeattie.com/notebook">Russell Beattie Notebook</a></li>
+<li><a href="http://scobleizer.wordpress.com">Scobleizer &#8211; Microsoft Geek Blogger</a></li>
+<li><a href="http://www.scripting.com/">Scripting News</a></li>
+<li><a href="http://www.scripting.com/">Scripting News</a></li>
+<li><a href="http://www.searchenginejournal.com">Search Engine Journal</a></li>
+<li><a href="http://www.searchenginelowdown.com">Search Engine Lowdown :: News</a></li>
+<li><a href="http://www.seroundtable.com/">Search Engine Roundtable</a></li>
+<li><a href="http://blog.searchenginewatch.com/blog/">Search Engine Watch Blog</a></li>
+<li><a href="http://blog.searchenginewatch.com/blog/">Search Engine Watch Blog</a></li>
+<li><a href="http://bostonvcblog.typepad.com/vc/">Seeing Both Sides</a></li>
+<li><a href="http://www.seobook.com/">SEO Book.com</a></li>
+<li><a href="http://www.shellen.com">shellen dot com</a></li>
+<li><a href="http://frassle.rura.org/Directory/?feed=1">shimonolog: Shimon Rura&#8217;s Blog</a></li>
+<li><a href="http://www.sifry.com/alerts/">Sifry&#8217;s Alerts</a></li>
+<li><a href="http://simon.incutio.com/">Simon Willison&#8217;s Weblog</a></li>
+<li><a href="http://blog.socklabs.com/feed" title="Nick from Feedster">SockLabs</a></li>
+<li><a href="http://blog.softtechvc.com/">Software Only</a></li>
+<li><a href="http://www.stuntdubl.com">Stuntdubl &#8211; Search Engine Optimization Consulting</a></li>
+<li><a href="http://sugarbank.com">SugarBank</a></li>
+<li><a href="http://www.techcrunch.com">TechCrunch</a></li>
+<li><a href="http://www.technosailor.com">Technosailor</a></li>
+<li><a href="http://demitriousk.blogspot.com">Tetigisti acu &#8211; You have hit the nail on the head</a></li>
+<li><a href="http://accordionguy.blogware.com/blog">The Adventures of Accordion Guy in the 21st Century :: Joey deVilla&#8217;s Weblog</a></li>
+<li><a href="http://css.weblogsinc.com/">The CSS Weblog</a></li>
+<li><a href="http://www.newestindustry.org/index.php">The Newest Industry</a></li>
+<li><a href="http://www.tnl.net/blog">The TNL.net weblog</a></li>
+<li><a href="http://www.ventureblog.com/">VentureBlog</a></li>
+<li><a href="http://blogs.zdnet.com/web2explorer">Web 2.0 Explorer</a></li>
+<li><a href="http://whohastimeforthis.blogspot.com">Who Has Time For This?</a></li>
+<li><a href="http://willprice.blogspot.com">Will Price</a></li>
+<li><a href="http://wordpress.com/?ref=footer" rel="generator">Blog at WordPress.com</a>.</li>
+<li><a href="http://wordpress.com/?ref=footer" rel="generator">Blog at WordPress.com</a>.</li>
+				</ul>
+			</div><!-- #blogroll -->
+
+			<div id="meta">
+				<h3>Meta:</h3>
+				<ul>
+					<li><a href="http://wordpress.com/signup/?ref=wplogin">Register</a></li>					<li><a href="http://fuzzyblog.wordpress.com/wp-login.php">Log in</a></li>
+					<li><a href="http://gmpg.org/xfn/"><abbr title="XHTML Friends Network">XFN</abbr></a></li>
+					<li><a href="http://wordpress.com/?ref=footer" rel="generator">Blog at WordPress.com</a>.</li>
+									</ul>
+			</div><!-- #meta -->
+				</ul>
+	</div><!-- #sidebar -->
+
+	<div class="both"></div>
+
+</div><!-- #bloque -->
+<!-- end sidebar -->
+		<p id="credits">
+			<a href="http://wordpress.com/?ref=footer" rel="generator">Blog at WordPress.com</a>. | <a href="http://theme.wordpress.com/themes/pool/" title="Learn more about this theme">The Pool Theme</a>. <br />
+			<a href="http://fuzzyblog.wordpress.com/feed/">Entries</a> and <a href="http://fuzzyblog.wordpress.com/comments/feed/">comments</a> feeds.		</p>
+
+	</div><!-- #bloque -->
+
+
+<script type="text/javascript">
+var _qevents = _qevents || [], wpcomQuantcastData = {"qacct":"p-18-mFEk4J448M","labels":"language.en,type.wpcom,wp.loggedout,as"};
+function wpcomQuantcastPixel( labels, options ) {
+	var i, defaults = wpcomQuantcastData, data = { event: 'ajax' };
+
+	labels  = labels  || '';
+	options = options || {};
+
+	if ( typeof labels != 'string' )
+		options = labels;
+
+	for ( i in defaults ) {
+		data[i] = defaults[i];
+	}
+
+	for ( i in options ) {
+		data[i] = options[i];
+	}
+
+	if ( data.labels ) {
+		data.labels += ',' + labels;
+	} else {
+		data.labels = labels;
+	}
+
+	_qevents.push( data );
+};
+(function() {var elem = document.createElement('script');elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";elem.async = true;elem.type = "text/javascript";var scpt = document.getElementsByTagName('script')[0];scpt.parentNode.insertBefore(elem, scpt);  })();
+_qevents.push( wpcomQuantcastData );
+</script>
+<noscript><div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-18-mFEk4J448M.gif?labels=language.en%2Ctype.wpcom%2Cwp.loggedout%2Cas" height="1" width="1" alt="" /></div></noscript>
+
+	<div style="display:none">
+	</div>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var HighlanderComments = {"loggingInText":"Logging In\u2026","submittingText":"Posting Comment\u2026","postCommentText":"Post Comment","connectingToText":"Connecting to %s","commentingAsText":"%1$s: You are commenting using your %2$s account.","logoutText":"Log Out","loginText":"Log In","connectURL":"http:\/\/fuzzyblog.wordpress.com\/public.api\/connect\/?action=request","logoutURL":"http:\/\/fuzzyblog.wordpress.com\/wp-login.php?action=logout&_wpnonce=0b3d8339a6","homeURL":"http:\/\/fuzzyblog.wordpress.com\/","postID":"112","gravDefault":"mystery","enterACommentError":"Please enter a comment","enterEmailError":"Please enter your email address here","invalidEmailError":"Invalid email address","enterAuthorError":"Please enter your name here","gravatarFromEmail":"This picture will show whenever you leave a comment. Click to customize it.","logInToExternalAccount":"Log in to use details from one of these accounts.","change":"Change","changeAccount":"Change Account","comment_registration":"","userIsLoggedIn":"","isJetpack":"0"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://s1.wp.com/_static/??/wp-content/js/jquery/jquery.autoresize.js,/wp-content/mu-plugins/highlander-comments/script.js?m=1383163422j'></script>
+
+	<div id="bit" class="loggedout-follow-normal">
+		<a class="bsub" href="javascript:void(0)"><span id='bsub-text'>Follow</span></a>
+		<div id="bitsubscribe">
+
+					<h3><label for="loggedout-follow-field">Follow &ldquo;FuzzyBlog&rdquo;</label></h3>
+
+			<form action="https://subscribe.wordpress.com" method="post" accept-charset="utf-8" id="loggedout-follow">
+			<p>Get every new post delivered to your Inbox.</p>
+
+			<p id="loggedout-follow-error" style="display: none;"></p>
+
+			
+			<p><input type="email" name="email" value="Enter your email address" onfocus='this.value=(this.value=="Enter your email address") ? "" : this.value;' onblur='this.value=(this.value=="") ? "Enter email address" : this.value;'  id="loggedout-follow-field"/></p>
+
+			<input type="hidden" name="action" value="subscribe"/>
+			<input type="hidden" name="blog_id" value="13884"/>
+			<input type="hidden" name="source" value="http://fuzzyblog.wordpress.com/2005/12/08/ubuntu-where-is-the-apache-error-log/"/>
+			<input type="hidden" name="sub-type" value="loggedout-follow"/>
+
+			<input type="hidden" id="_wpnonce" name="_wpnonce" value="ba66a0048a" /><input type="hidden" name="_wp_http_referer" value="/2005/12/08/ubuntu-where-is-the-apache-error-log/" />
+			<p id='bsub-subscribe-button'><input type="submit" value="Sign me up" /></p>
+			</form>
+					<div id='bsub-credit'><a href="http://wordpress.com/signup/?ref=lof">Powered by WordPress.com</a></div>
+		</div><!-- #bitsubscribe -->
+	</div><!-- #bit -->
+	<script type="text/javascript">
+	var skimlinks_pub_id = "725X584219"
+	var skimlinks_sitename = "58pfl9955.wordpress.com";
+	</script>
+	<script type="text/javascript" src="http://s.skimresources.com/js/725X1342.skimlinks.js"></script>		<iframe src='http://widgets.wp.com/likes/master.html?ver=20131104#ver=20131104&amp;mp6=1' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+		<div id='likes-other-gravatars'><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+		<script type="text/javascript">
+		//<![CDATA[
+			var jetpackLikesWidgetQueue = [];
+			var jetpackLikesWidgetBatch = [];
+			var jetpackLikesMasterReady = false;
+
+			function JetpackLikespostMessage( message, target ) {
+				if ( "string" === typeof message ){
+					try{
+						message = JSON.parse( message );
+					}
+					catch(e) {
+						return;
+					}
+				}
+
+				pm( {
+					target: target,
+					type: 'likesMessage',
+					data: message,
+					origin: '*'
+				} );
+			}
+
+			function JetpackLikesBatchHandler() {
+				var requests = [];
+				jQuery( 'div.jetpack-likes-widget-unloaded' ).each( function( i ) {
+					if ( jetpackLikesWidgetBatch.indexOf( this.id ) > -1 )
+						return;
+					jetpackLikesWidgetBatch.push( this.id );
+					var regex = /like-(post|comment)-wrapper-(\d+)-(\d+)-(\w+)/;
+					var match = regex.exec( this.id );
+					if ( ! match || match.length != 5 )
+						return;
+
+					var info = {
+						blog_id: match[2],
+						width:   this.width
+					};
+
+					if ( 'post' == match[1] ) {
+						info.post_id = match[3];
+					} else if ( 'comment' == match[1] ) {
+						info.comment_id = match[3];
+					}
+
+					info.obj_id = match[4];
+
+					requests.push( info );
+				});
+
+				if ( requests.length > 0 ) {
+					JetpackLikespostMessage( { event: 'initialBatch', requests: requests }, window.frames['likes-master'] );
+				}
+			}
+
+			function JetpackLikesMessageListener( event ) {
+				if ( "undefined" == typeof event.event )
+					return;
+
+				if ( 'masterReady' == event.event ) {
+					jQuery( document ).ready( function() {
+						jetpackLikesMasterReady = true;
+
+						var stylesData = {
+								event: 'injectStyles'
+						};
+
+						if ( jQuery( 'iframe.admin-bar-likes-widget' ).length > 0 ) {
+							JetpackLikespostMessage( { event: 'adminBarEnabled' }, window.frames[ 'likes-master' ] );
+
+							stylesData.adminBarStyles = {
+								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' )
+							};
+						}
+
+						if ( !window.addEventListener )
+							jQuery( '#wp-admin-bar-admin-bar-likes-widget' ).hide();
+
+						stylesData.textStyles = {
+							color: jQuery( '.sd-text-color').css( 'color' ),
+							fontFamily: jQuery( '.sd-text-color' ).css( 'font-family' ),
+							fontSize: jQuery( '.sd-text-color' ).css( 'font-size' ),
+							direction: jQuery( '.sd-text-color' ).css( 'direction' ),
+							fontWeight: jQuery( '.sd-text-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-text-color' ).css( 'font-style' ),
+							textDecoration: jQuery( '.sd-text-color' ).css('text-decoration')
+						};
+
+						stylesData.linkStyles = {
+							color: jQuery( '.sd-link-color' ).css('color'),
+							fontFamily: jQuery( '.sd-link-color' ).css('font-family'),
+							fontSize: jQuery( '.sd-link-color' ).css('font-size'),
+							textDecoration: jQuery( '.sd-link-color' ).css('text-decoration'),
+							fontWeight: jQuery( '.sd-link-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-link-color' ).css( 'font-style' )
+						};
+
+						JetpackLikespostMessage( stylesData, window.frames[ 'likes-master' ] );
+
+						JetpackLikesBatchHandler();
+
+						jQuery( document ).on( 'inview', 'div.jetpack-likes-widget-unloaded', function() {
+							jetpackLikesWidgetQueue.push( this.id );
+						});
+					});
+				}
+
+				if ( 'showLikeWidget' == event.event ) {
+					jQuery( '#' + event.id + ' .post-likes-widget-placeholder'  ).fadeOut( 'fast', function() {
+						jQuery( '#' + event.id + ' .post-likes-widget' ).fadeIn( 'fast', function() {
+							JetpackLikespostMessage( { event: 'likeWidgetDisplayed', blog_id: event.blog_id, post_id: event.post_id, obj_id: event.obj_id }, window.frames['likes-master'] );
+						});
+					});
+				}
+
+				if ( 'showOtherGravatars' == event.event ) {
+					var $container = jQuery( '#likes-other-gravatars' );
+					var $list = $container.find( 'ul' );
+
+					$container.hide();
+					$list.html( '' );
+
+					$container.find( '.likes-text span' ).text( event.total );
+
+					jQuery.each( event.likers, function( i, liker ) {
+						$list.append( '<li class="' + liker.css_class + '"><a href="' + liker.profile_URL + '" class="wpl-liker" rel="nofollow" target="_parent"><img src="' + liker.avatar_URL + '" alt="' + liker.name + '" width="30" height="30" style="padding-right: 3px;" /></a></li>');
+					} );
+
+					var offset = jQuery( "[name='" + event.parent + "']" ).offset();
+
+					$container.css( 'left', offset.left + event.position.left - 10 + 'px' );
+					$container.css( 'top', offset.top + event.position.top - 33 + 'px' );
+
+					var rowLength = Math.floor( event.width / 37 );
+					var height = ( Math.ceil( event.likers.length / rowLength ) * 37 ) + 13;
+					if ( height > 204 ) {
+						height = 204;
+					}
+
+					$container.css( 'height', height + 'px' );
+					$container.css( 'width', rowLength * 37 - 7 + 'px' );
+
+					$list.css( 'width', rowLength * 37 + 'px' );
+
+					$container.fadeIn( 'slow' );
+
+					var scrollbarWidth = $list[0].offsetWidth - $list[0].clientWidth;
+					if ( scrollbarWidth > 0 ) {
+						$container.width( $container.width() + scrollbarWidth );
+						$list.width( $list.width() + scrollbarWidth );
+					}
+				}
+			}
+
+			pm.bind( 'likesMessage', function(e) { JetpackLikesMessageListener(e); } );
+
+			jQuery( document ).click( function( e ) {
+				var $container = jQuery( '#likes-other-gravatars' );
+
+				if ( $container.has( e.target ).length === 0 ) {
+					$container.fadeOut( 'slow' );
+				}
+			});
+
+			function JetpackLikesWidgetQueueHandler() {
+				var wrapperID;
+				if ( ! jetpackLikesMasterReady ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				if ( jetpackLikesWidgetQueue.length > 0 ) {
+					// We may have a widget that needs creating now
+					var found = false;
+					while( jetpackLikesWidgetQueue.length > 0 ) {
+						// Grab the first member of the queue that isn't already loading.
+						wrapperID = jetpackLikesWidgetQueue.splice( 0, 1 )[0];
+						if ( jQuery( '#' + wrapperID ).hasClass( 'jetpack-likes-widget-unloaded' ) ) {
+							found = true;
+							break;
+						}
+					}
+					if ( ! found ) {
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				} else if ( jQuery( 'div.jetpack-likes-widget-unloaded' ).length > 0 ) {
+					// Grab any unloaded widgets for a batch request
+					JetpackLikesBatchHandler();
+
+					// Get the next unloaded widget
+					wrapperID = jQuery( 'div.jetpack-likes-widget-unloaded' ).first()[0].id;
+					if ( ! wrapperID ) {
+						// Everything is currently loaded
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				}
+
+				if ( 'undefined' === typeof wrapperID ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				var $wrapper = jQuery( '#' + wrapperID );
+				$wrapper.find( 'iframe' ).remove();
+
+				if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='22px' width='68px' frameBorder='0' scrolling='no' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				} else {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='55px' width='100%' frameBorder='0' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				}
+
+				$wrapper.removeClass( 'jetpack-likes-widget-unloaded' ).addClass( 'jetpack-likes-widget-loading' );
+
+				$wrapper.find( 'iframe' ).load( function( e ) {
+					var $iframe = jQuery( e.target );
+					$wrapper.removeClass( 'jetpack-likes-widget-loading' ).addClass( 'jetpack-likes-widget-loaded' );
+
+					JetpackLikespostMessage( { event: 'loadLikeWidget', name: $iframe.attr( 'name' ), width: $iframe.width() }, window.frames[ 'likes-master' ] );
+
+					if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+						$wrapper.find( 'iframe' ).Jetpack( 'resizeable' );
+					}
+				});
+				setTimeout( JetpackLikesWidgetQueueHandler, 250 );
+			}
+			JetpackLikesWidgetQueueHandler();
+		//]]>
+		</script>
+<script type='text/javascript' src='http://s1.wp.com/wp-content/js/devicepx.js?m=1373391538g'></script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script><script src="http://s.stats.wordpress.com/w.js?21" type="text/javascript"></script>
+<script type="text/javascript">
+st_go({'blog':'13884','v':'wpcom','tz':'-8','user_id':'0','post':'112','subd':'fuzzyblog'});
+ex_go({'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdWFnNncxc1tjZG9XVXhRV0JRTjRjdF9qRysrSX4zNz80W1luTGlqVm5GVj8xcyx5MWE1aX5deGtZXTZIRWVERDQma2NhbWdGNkpYUEZScjgmWGZVPXpJZWVRTnVddWRSWEtdSyxXdk1baHpVSVJGZWJwS2syam1wK2taanl0SVpfJmZjdHxJeTVvL041MD1fWj9oNDNXLD9SME9+aFV1c3JmcnVrOXB3P2MxZU0/QXRsYzFuQjEyan5leCx2XVVjRzhZXVh0cVRseXdiZ1oyUW9sP0glOFszLTlNLmNSS0ppQlt3JTlrY0NvUGZ0MkY1Wg=='});
+addLoadEvent(function(){linktracker_init('13884',112);});
+	</script>
+<noscript><img src="http://stats.wordpress.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//stats.wordpress.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script></body>
+</html>
