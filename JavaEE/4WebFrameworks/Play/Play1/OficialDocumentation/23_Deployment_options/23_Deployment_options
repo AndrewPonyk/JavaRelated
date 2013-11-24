@@ -1,0 +1,66 @@
+1)Standalone Play applications
+
+	The simplest and the most robust way is to simply run your Play application without any container.
+	You can use a frontal HTTP server like Lighttpd or Apache if you need more advanced HTTP features like virtual hosting.
+
+	The built-in HTTP server can serve thousands of HTTP requests per second so it will <b>never be the performance bottleneck</b>.
+	Moreover it uses a more efficient threading model (where a Servlet container uses 1 thread per request).
+	Different modules allow you to use different servers (Grizzly, Netty, etc...) as well.
+
+	Those servers support long polling and allow to manage very long requests (waiting for a long task to complete),
+	and direct streaming of File objects (and any InputStream if you specify the Content-Length),
+	without blocking the execution thread.
+
+	You will have fewer problems running your application this way, as you will use the same environment
+	that you used during the development process. A lot of bugs can be discovered only when you deploy
+	to a JEE application server (different home dir, classloader issues, library conflicts, etc...).
+
+	Please refer to the 'Put your application in production' page for more information.
+-----------------------------------------------------------------------------------------------------
+2)	Java EE application servers
+	
+	Your Play application can also run inside your favorite application server.
+	Most application servers are supported out of the box.
+
+	Deploying
+
+	You need to package your application as a WAR file. This is easily done with the following command:
+		play war myapp -o myapp.war
+	
+	!!! Example (Create simple project with one controller and two actions to process form and deploy to TTTTTomcat 7)
+
+		* create simple application (the name of my simple app is 'deployment_options')
+		* make a 'war' by executing 
+			play war deployment_options -o deploy
+		* there will be folder 'deploy' and inside this folder will be 'WEB-INF' folder
+		copy this 'WEB-INF' to tomcat 'webapps' folder
+		* start tomcat 
+		* http://localhost:8080/deploy_options - out simple Play1 app in Tomcat7
+	
+	
+---------------------------------------------------------------------------------------------------------------
+3) Cloud-based hosting
+
+
+      <B>Heroku</B> (first look : 'great' platform)
+	The Heroku cloud application platform has Play-specific application hosting support.
+	To deploy and run your Play application, use the following steps.
+	
+	* Create account on Heroku(set email and pass)
+	* Install 'Heroku ToolBelt' (in Ubuntu :'wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh')
+	* Login in heroku by executing command 'heroku login'     
+	* Create and test local app(use play1.2.4 or higher)
+	* Create 'Procfile' in root directory
+		Use a Procfile, a text file in the root directory of your application,
+		to explicitly declare what command should be executed to start a web dyno.
+		In this case, you was to execute play run, ensuring it listens on a particular port.	
+	* init local git repo in application folder and make commit 
+	* Create application in cloud by executing : 'heroku create'
+	* Push your code to cloud by executing : 'git push heroku master' (you need to agree to create key to auth)
+	* open heroku application in browser by executing : 'heroku open'
+	* on the heroku.com you can rename you application (<yourname>.herokuapp.com)
+	* =)
+
+
+----
+

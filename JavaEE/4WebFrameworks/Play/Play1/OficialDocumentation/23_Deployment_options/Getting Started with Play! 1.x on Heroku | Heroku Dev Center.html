@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html class="no-js" dir="ltr" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Getting Started with Play! 1.x on Heroku | Heroku Dev Center</title>
+<link href="/assets/favicon-ec1c49d2d16026c03484fa43c0d3a237.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+<link rel="alternate" type="application/atom+xml" title="Heroku Recent Articles" href="http://feeds.feedburner.com/herokudevcenterarticles">
+<link rel="alternate" type="application/atom+xml" title="Heroku Changelog" href="http://feeds.feedburner.com/herokuchangelog">
+<link rel="search" type="application/opensearchdescription+xml" title="Heroku Dev Center" href="/opensearch.xml">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta content="authenticity_token" name="csrf-param">
+<meta content="RqGzfSoBW83RacJOwpTr5SRdsQyVtERA/1y0XvS9IKE=" name="csrf-token">
+<meta name="description" content="Creating, configuring and deploying a Play applications on Heroku.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@herokudevcenter">
+<meta name="twitter:title" content="Getting Started with Play! 1.x on Heroku | Heroku Dev Center">
+<meta name="twitter:description" content="Creating, configuring and deploying a Play applications on Heroku.">
+<meta name="google-site-verification" content="V3T3n-QnyNOZlSVZgEfdXaKkJKyfw2yIP55nR00C8ZU">
+<link href="/assets/public-fa2675dfd87fb64aa7674b2dbd413035.css" media="screen" rel="stylesheet" type="text/css">
+<link href="/assets/public/print-87d1eab6baabb6ca7ff6bef3412ff400.css" media="print" rel="stylesheet" type="text/css">
+<!--[if IE 6]>
+    <link href="https://universal-ie6-css.googlecode.com/files/ie6.0.3.css" media="screen" rel="stylesheet" type="text/css" />
+    <![endif]--><script type="text/javascript">
+//<![CDATA[
+
+      var activeNav = false,
+          loggedIn = true,
+          displayNotifications = true;
+
+//]]>
+</script><script src="/assets/public-f94ce706811c39c9a7c905f79d0027b9.js" type="text/javascript"></script><!--[if lt IE 9]>
+    <script src="/assets/public/vendor/selectivizr-1.0.min-239c4cd22e52e883979b4ef49c045989.js" type="text/javascript"></script>
+    <![endif]--><script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script>
+</head>
+<body>
+      <!-- Google Tag Manager -->
+  <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-JD26" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-JD26');</script><!-- End Google Tag Manager --><div class="heroku-header">
+  <div class="heroku-header-container container">
+
+    <div class="heroku-header-hgroup">
+      <a href="/">
+        heroku
+        <strong>dev center</strong>
+      </a>
+    </div>
+
+    <div class="heroku-header-nav">
+      <select class="js-select-nav"><option selected value="https://devcenter.heroku.com">Dev Center</option>
+<option value="https://www.heroku.com/pricing">Pricing</option>
+<option value="https://help.heroku.com/">Support</option>
+<option value="https://www.heroku.com/contact">Contact</option>
+<option value="https://dashboard.heroku.com/apps">My Apps</option>
+<option value="/auth/logout?back_to=%2Farticles%2Fgetting-started-with-play">Logout</option></select><ul>
+<li>
+          <a href="https://www.heroku.com/pricing">Pricing</a>
+        </li>
+        <li>
+          <a href="https://help.heroku.com/">Support</a>
+        </li>
+        <li>
+          <a href="https://www.heroku.com/contact">Contact</a>
+        </li>
+        <li>
+          <a href="https://dashboard.heroku.com/apps">My Apps</a>
+        </li>
+        <li>
+          <a href="/auth/logout?back_to=%2Farticles%2Fgetting-started-with-play">Logout</a>
+        </li>
+      </ul>
+</div>
+  </div>
+</div>
+    <div class="devcenter-header">
+  <div class="devcenter-header-container container">
+    <ul class="main-nav">
+<li><a class="active" href="/articles/quickstart">Get<span class="desktop-only">ting</span> started</a></li>
+      <li><a class="" href="/categories/reference">Reference</a></li>
+      <li><a class="" href="/categories/learning">Learning</a></li>
+    </ul>
+<form class="nav-search" action="/search/raw" id="home-search" method="GET">
+      <input class="js-search" id="query" name="query" placeholder="search" required="required" type="text">
+</form>
+  </div>
+</div>
+    <section class="site-feedback-trigger"><a href="#">Feedback</a>
+</section><div class="site-feedback-dialog">
+  <header><h2>Tell us what do you think about Dev Center</h2>
+  </header><form accept-charset="UTF-8" action="/site_feedbacks" class="new_site_feedback" id="new_site_feedback" method="post">
+<div style="margin:0;padding:0;display:inline">
+<input name="utf8" type="hidden" value="✓"><input name="authenticity_token" type="hidden" value="RqGzfSoBW83RacJOwpTr5SRdsQyVtERA/1y0XvS9IKE=">
+</div>
+    <textarea cols="40" id="site_feedback_text" name="site_feedback[text]" rows="20"></textarea><input class="email" id="email" name="email" type="text" value=""><input id="site_feedback_sent_from_url" name="site_feedback[sent_from_url]" type="hidden" value="https://devcenter.heroku.com/articles/getting-started-with-play"><div class="footer">
+      <span class="support">
+        For support issues, please visit our <a href="https://help.heroku.com/">support channels</a>
+      </span>
+      <span class="actions">
+        <a href="#" class="cancel">Cancel</a>
+        <button name="button" type="submit">Submit</button>
+      </span>
+    </div>
+</form>
+</div>
+
+    <div id="sheet">
+      <div class="sheet-container container">
+        <div class="select-secondary-nav">
+  <select class="js-select-nav"><optgroup label="Getting Started">
+<option class="option" value="/articles/getting-started-with-ruby">
+              Ruby
+            </option>
+<option class="option" value="/articles/getting-started-with-rails4">
+              Rails
+            </option>
+<option class="option" value="/articles/getting-started-with-java">
+              Java
+            </option>
+<option class="option" value="/articles/getting-started-with-spring-mvc-hibernate">
+              Spring
+            </option>
+<option class="option" selected value="/articles/getting-started-with-play">
+              Play
+            </option>
+<option class="option" value="/articles/getting-started-with-python">
+              Python
+            </option>
+<option class="option" value="/articles/getting-started-with-django">
+              Django
+            </option>
+<option class="option" value="/articles/getting-started-with-nodejs">
+              Node.js
+            </option>
+<option class="option" value="/articles/getting-started-with-clojure">
+              Clojure
+            </option>
+<option class="option" value="/articles/getting-started-with-scala">
+              Scala
+            </option>
+</optgroup></select>
+</div>
+
+<ul class="secondary-nav nocontent ">
+<li class="section">
+      <h2>Getting Started</h2>
+        <ul>
+<li class="">
+              <a href="/articles/getting-started-with-ruby">Ruby</a>
+            </li>
+            <li class="">
+              <a href="/articles/getting-started-with-rails4">Rails</a>
+            </li>
+        </ul>
+<ul>
+<li class="">
+              <a href="/articles/getting-started-with-java">Java</a>
+            </li>
+            <li class="">
+              <a href="/articles/getting-started-with-spring-mvc-hibernate">Spring</a>
+            </li>
+            <li class="active">
+              <a href="/articles/getting-started-with-play">Play</a>
+            </li>
+        </ul>
+<ul>
+<li class="">
+              <a href="/articles/getting-started-with-python">Python</a>
+            </li>
+            <li class="">
+              <a href="/articles/getting-started-with-django">Django</a>
+            </li>
+        </ul>
+<ul>
+<li class="">
+              <a href="/articles/getting-started-with-nodejs">Node.js</a>
+            </li>
+        </ul>
+<ul>
+<li class="">
+              <a href="/articles/getting-started-with-clojure">Clojure</a>
+            </li>
+        </ul>
+<ul>
+<li class="">
+              <a href="/articles/getting-started-with-scala">Scala</a>
+            </li>
+        </ul>
+</li>
+</ul>
+<section class="main"><article class="article autolink "><div id="admin-tabs"></div>
+    
+    
+
+    <header><h1 class="doc">Getting Started with Play! 1.x on Heroku</h1>
+    </header><div class="padder">
+
+      <p class="meta">
+        Last Updated: 28 October 2013
+      </p>
+
+      <p class="tags">
+        <a href="/tags/play">play</a>
+      </p>
+
+
+
+        <section id="table-of-contents"><h3>Table of Contents</h3>
+  <ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#local-workstation-setup">Local workstation setup</a></li>
+    <li><a href="#write-your-app">Write your app</a></li>
+    <li><a href="#declare-dependencies">Declare dependencies</a></li>
+    <li><a href="#test-locally">Test locally</a></li>
+    <li><a href="#declare-process-types-with-procfile">Declare process types with Procfile</a></li>
+    <li><a href="#optionally-choose-a-jdk">Optionally Choose a JDK</a></li>
+    <li><a href="#store-your-app-in-git">Store your app in Git</a></li>
+    <li><a href="#deploy-your-application-to-heroku">Deploy your application to Heroku</a></li>
+    <li><a href="#visit-your-application">Visit your application</a></li>
+    <li><a href="#dyno-sleeping-and-scaling">Dyno sleeping and scaling</a></li>
+    <li><a href="#view-the-logs">View the logs</a></li>
+    <li><a href="#next-steps">Next steps</a></li>
+  </ul></section><p>This quickstart will get you going with the <a href="http://playframework.org/">Play! 1.x Framework</a>, deployed to Heroku. For general information on how to develop and architect apps for use on Heroku, see <a href="https://devcenter.heroku.com/articles/architecting-apps">Architecting Applications for Heroku</a>.</p>
+<div class="note">
+
+<p>If you have questions about Java on Heroku, consider discussing them in the <a href="https://discussion.heroku.com/category/java">Java on Heroku forums</a>.</p>
+
+</div>
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+<li>Basic Java knowledge, including an installed version of the JVM.</li>
+
+<li>An installation of <a href="http://www.playframework.org/download">Play Framework</a> version 1.2.3 or later (make sure you have the <code>play</code> command on your path).</li>
+
+<li>Your application must run on the <a href="http://openjdk.java.net/">OpenJDK</a> version 6.</li>
+
+<li>A Heroku user account. <a href="https://api.heroku.com/signup/devcenter">Signup is free and instant.</a>
+</li>
+</ul>
+<h2 id="local-workstation-setup">Local workstation setup</h2>
+
+<p>Install the <a href="https://toolbelt.heroku.com/">Heroku Toolbelt</a> on your local workstation. This ensures that you have access to the <a href="https://devcenter.heroku.com/categories/command-line">Heroku command-line client</a>, Foreman, and the Git revision control system.</p>
+
+<p>Once installed, you can use the <code>heroku</code> command from your command shell. Log in using the email address and password you used when creating your Heroku account:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku login
+</span><span class="string">Enter your Heroku credentials.
+</span><span class="string">Email: adam@example.com
+</span><span class="string">Password:
+</span><span class="string">Could not find an existing public key.
+</span><span class="string">Would you like to generate one? [Yn]
+</span><span class="string">Generating new SSH public key.
+</span><span class="string">Uploading ssh public key /Users/adam/.ssh/id_rsa.pub</span></pre></div>
+</div>
+
+
+<p>Press enter at the prompt to upload your existing <code>ssh</code> key or create a new one, used for pushing code later on.</p>
+
+<h2 id="write-your-app">Write your app</h2>
+
+<p>You can run any Play! application on Heroku. If you don’t already have one, you can create a basic Play! application with:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>$ play new helloworld
+~        _            _
+~  _ __ | | __ _ _  _| |
+~ | '_ \| |/ _' | || |_|
+~ |  __/|_|\____|\__ (_)
+~ |_|            |__/
+~
+~ play! 1.2.4, http://www.playframework.org
+~
+~ The new application will be created in /Users/jjoergensen/dev/tmp/helloworld
+~ What is the application name? [helloworld]
+~
+~ OK, the application is created.
+~ Start it with : play run helloworld
+~ Have fun!
+~</pre></div>
+</div>
+
+
+<p>This creates a project called helloworld with a simple controller class <code>Application.java</code>:</p>
+
+<h3 id="app-controllers-application-java">app/controllers/Application.java</h3>
+
+<div class="CodeRay">
+  <div class="code"><pre>package controllers;
+
+import play.*;
+import play.mvc.*;
+
+import java.util.*;
+
+import models.*;
+
+public class Application extends Controller {
+
+    public static void index() {
+        render();
+    }
+
+}</pre></div>
+</div>
+
+
+<h2 id="declare-dependencies">Declare dependencies</h2>
+<div class="callout">
+
+<p>Previous versions of the Play! framework allowed module dependency declaration in application.conf. This functionality has been deprecated. dependencies.yml should now be used.</p>
+
+</div>
+<p>Play dependencies are declared in <code>conf/dependencies.yml</code>. The first dependency is the framework itself. When the app is generated it will depend on any version of the framework: <code>- play</code>. It’s a best practice to include the optional framework version after this: <code>- play 1.2.4</code>. This is also how Heroku will know which version of the framework you want instead of using the default.</p>
+
+<p>Edit your <code>dependencies.yml</code> to look like this. Substitute <code>1.2.4</code> with the version of the framework you are using:</p>
+
+<h3 id="dependencies-yml">dependencies.yml</h3>
+
+<div class="CodeRay">
+  <div class="code"><pre># Application dependencies
+
+require:
+    - play 1.2.4</pre></div>
+</div>
+
+
+<p>Prevent build artifacts from going into revision control by creating this file:</p>
+
+<h3 id="gitignore">.gitignore</h3>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="string">bin/
+</span><span class="string">data/
+</span><span class="string">db/
+</span><span class="string">dist/
+</span><span class="string">logs/
+</span><span class="string">test-result/
+</span><span class="string">lib/
+</span><span class="string">tmp/
+</span><span class="string">modules/</span></pre></div>
+</div>
+
+
+<h2 id="test-locally">Test locally</h2>
+
+<p>Simply type <code>play run</code> at your terminal and your application will start.</p>
+
+<h2 id="declare-process-types-with-procfile">Declare process types with Procfile</h2>
+<div class="callout">
+
+<p>Note: you can use your Procfile locally with Foreman, but it is not required. <a href="https://devcenter.heroku.com/articles/procfile">Read more about Foreman and procfiles</a>.</p>
+
+</div>
+<p>Use a <a href="https://devcenter.heroku.com/articles/procfile">Procfile</a>, a text file in the root directory of your application, to explicitly declare what command should be executed to start a web <a href="https://devcenter.heroku.com/articles/dynos">dyno</a>. In this case, you was to execute <code>play run</code>, ensuring it listens on a particular port.</p>
+
+<p>Here’s a <code>Procfile</code> for the sample app we’ve been working on:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="string">web:    play run --http.port=$PORT $PLAY_OPTS</span></pre></div>
+</div>
+
+
+<p>This declares a single process type, <code>web</code>, and the command needed to run it. The name “web” is important here. It declares that this process type will be attached to the <a href="https://devcenter.heroku.com/articles/http-routing">HTTP routing</a> stack of Heroku, and receive web traffic when deployed.</p>
+
+<p>The <code>PLAY_OPTS</code> variable is used to set options that change from one environment to another.</p>
+
+<h2 id="optionally-choose-a-jdk">Optionally Choose a JDK</h2>
+
+<p>By default, OpenJDK 1.6 is installed with your app. However, you can choose to use a newer JDK by specifying <code>java.runtime.version=1.7</code> in the <code>system.properties</code> file.</p>
+
+<p>Here’s what a <code>system.properties</code> file looks like:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="string">java.runtime.version=1.7</span></pre></div>
+</div>
+
+
+<p>You can specify 1.6, 1.7, or 1.8 (1.8 is in beta) for Java 6, 7, or 8 (with lambdas), respectively.</p>
+
+<h2 id="store-your-app-in-git">Store your app in Git</h2>
+
+<p>We now have the three major components of our app: dependencies in <code>dependencies.yml</code>, process types in <code>Procfile</code>, and our application source in <code>app/controllers/Application.java</code>. Let’s put it into Git:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> git init
+</span><span class="comment">$</span><span class="function"> git add .
+</span><span class="comment">$</span><span class="function"> git commit -m "init"</span></pre></div>
+</div>
+
+
+<h2 id="deploy-your-application-to-heroku">Deploy your application to Heroku</h2>
+
+<p>Create the app:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku create
+</span><span class="string">Creating afternoon-frost-273... done, stack is cedar
+</span><span class="string">http://afternoon-frost-273.herokuapp.com/ | git@heroku.com:afternoon-frost-273.git
+</span><span class="string">Git remote heroku added</span></pre></div>
+</div>
+
+
+<p>Deploy your code:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> git push heroku master
+</span><span class="string">Counting objects: 33, done.
+</span><span class="string">Delta compression using up to 4 threads.
+</span><span class="string">Compressing objects: 100% (24/24), done.
+</span><span class="string">Writing objects: 100% (33/33), 36.17 KiB, done.
+</span><span class="string">Total 33 (delta 3), reused 0 (delta 0)
+</span><span class="string">
+</span><span class="string">-----&gt; Heroku receiving push
+</span><span class="string">-----&gt; play app detected
+</span><span class="string">-----&gt; Installing Play!..... done
+</span><span class="string">-----&gt; Building Play! application...
+</span><span class="string">       ~        _            _
+</span><span class="string">       ~  _ __ | | __ _ _  _| |
+</span><span class="string">       ~ | '_ \| |/ _' | || |_|
+</span><span class="string">       ~ |  __/|_|\____|\__ (_)
+</span><span class="string">       ~ |_|            |__/
+</span><span class="string">       ~
+</span><span class="string">       ~ play! 1.2.x-bfb715e, http://www.playframework.org
+</span><span class="string">       ~
+</span><span class="string">       1.2.x-bfb715e
+</span><span class="string">       Resolving dependencies: .play/play dependencies ./ --forceCopy --sync --silent -Duser.home=/tmp/build_19mcxvj20b6cu 2&gt;&amp;1
+</span><span class="string">       ~ Resolving dependencies using /tmp/build_19mcxvj20b6cu/conf/dependencies.yml,
+</span><span class="string">       ~
+</span><span class="string">       ~
+</span><span class="string">       ~ No dependencies to install
+</span><span class="string">       ~
+</span><span class="string">       ~ Done!
+</span><span class="string">       ~
+</span><span class="string">       Precompiling: .play/play precompile ./ --silent 2&gt;&amp;1
+</span><span class="string">       Listening for transport dt_socket at address: 8000
+</span><span class="string">       22:50:04,601 INFO  ~ Starting /tmp/build_19mcxvj20b6cu
+</span><span class="string">       22:50:05,265 INFO  ~ Precompiling ...
+</span><span class="string">       22:50:08,635 INFO  ~ Done.
+</span><span class="string">
+</span><span class="string">-----&gt; Built 1 Play! configuration(s).
+</span><span class="string">-----&gt; Discovering process types
+</span><span class="string">       Procfile declares types -&gt; web
+</span><span class="string">-----&gt; Compiled slug size is 26.2MB
+</span><span class="string">-----&gt; Launching... done, v5
+</span><span class="string">       http://afternoon-frost-273.herokuapp.com deployed to Heroku</span></pre></div>
+</div>
+
+
+<h2 id="visit-your-application">Visit your application</h2>
+
+<p>You’ve deployed your code to Heroku, and specified the process types in a <code>Procfile</code>. You can now instruct Heroku to execute a process type. Heroku does this by running the associated command in a <a href="https://devcenter.heroku.com/articles/dynos">dyno</a> - a lightweight container which is the basic unit of composition on Heroku.</p>
+
+<p>Let’s ensure we have one dyno running the <code>web</code> process type:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku ps:scale web=1</span></pre></div>
+</div>
+
+
+<p>You can check the state of the app’s dynos. The <code>heroku ps</code> command lists the running dynos of your application:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku ps
+</span><span class="string">=== web: `play run --http.port=$PORT $PLAY_O..`
+</span><span class="string">web.1: up for 5s</span></pre></div>
+</div>
+
+
+<p>Here, one dyno is running.</p>
+
+<p>We can now visit the app in our browser with <code>heroku open</code>.</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku open
+</span><span class="string">Opening afternoon-frost-273... done</span></pre></div>
+</div>
+
+
+<p>Note that the web page rendered on Heroku is slightly different from what you saw on your local build. That’s because Heroku executes play in production mode by default. Use the <code>$PLAY_OPTS</code> environment variable to control the mode for your local build. You can also change the mode used on Heroku by modifying the <code>PLAY_OPTS</code> config var for your application.</p>
+
+<h2 id="dyno-sleeping-and-scaling">Dyno sleeping and scaling</h2>
+
+<p>Having only a single web dyno running will result in the dyno <a href="https://devcenter.heroku.com/articles/dynos#dyno-sleeping">going to sleep</a> after one hour of inactivity. This causes a delay of a few seconds for the first request upon waking. Subsequent requests will perform normally.</p>
+
+<p>To avoid this, you can scale to more than one web dyno. For example:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku ps:scale web=2</span></pre></div>
+</div>
+
+
+<p>For each application, Heroku provides <a href="https://devcenter.heroku.com/articles/usage-and-billing#750-free-dyno-hours-per-app">750 free dyno-hours</a>. Running your app at 2 dynos would exceed this free, monthly allowance, so let’s scale back:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku ps:scale web=1</span></pre></div>
+</div>
+
+
+<h2 id="view-the-logs">View the logs</h2>
+
+<p>Heroku treats logs as streams of time-ordered events aggregated from the output streams of all the dynos running the components of your application. Heroku’s <a href="https://devcenter.heroku.com/articles/logplex">Logplex</a> provides a single channel for all of these events.</p>
+
+<p>View information about your running app using one of the <a href="https://devcenter.heroku.com/articles/logging">logging commands</a>, <code>heroku logs</code>:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre><span class="comment">$</span><span class="function"> heroku logs
+</span><span class="string">2011-08-20T22:50:14+00:00 heroku[web.1]: State changed from created to starting
+</span><span class="string">2011-08-20T22:50:14+00:00 heroku[slugc]: Slug compilation finished
+</span><span class="string">2011-08-20T22:50:16+00:00 heroku[web.1]: Starting process with command `play run --http.port=10800 --%prod -DusePrecompiled=true`
+</span><span class="string">2011-08-20T22:50:16+00:00 app[web.1]: 22:50:16,953 INFO  ~ Starting /app
+</span><span class="string">2011-08-20T22:50:17+00:00 app[web.1]: 22:50:17,011 INFO  ~ Precompiling ...
+</span><span class="string">2011-08-20T22:50:21+00:00 app[web.1]: 22:50:21,448 WARN  ~ Defaults messsages file missing
+</span><span class="string">2011-08-20T22:50:21+00:00 app[web.1]: 22:50:21,481 INFO  ~ Application 'helloworld' is now started !
+</span><span class="string">2011-08-20T22:50:21+00:00 app[web.1]: 22:50:21,538 INFO  ~ Listening for HTTP on port 10800 ...
+</span><span class="string">2011-08-20T22:50:22+00:00 heroku[web.1]: State changed from starting to up</span></pre></div>
+</div>
+
+
+<h2 id="next-steps">Next steps</h2>
+
+<ul>
+<li>Extend the app by reading <a href="https://devcenter.heroku.com/articles/database-driven-play-apps">Building a Database-backed Play! application for Heroku</a>
+</li>
+
+<li>Check out the technical aspects of <a href="https://devcenter.heroku.com/articles/play-support">Heroku’s Play support</a>
+</li>
+
+<li>See the <a href="http://www.playframework.org/documentation">Play! Framework documentation and tutorials</a>
+</li>
+
+<li>Read <a href="https://devcenter.heroku.com/articles/how-heroku-works">How Heroku Works</a> for a technical overview of the concepts you’ll encounter while writing, configuring, deploying and running applications.</li>
+</ul>
+<section class="js-article-feedback article-feedback nocontent"><div class="step1">
+          <h2 id="feedback"><a href="#feedback">Feedback</a></h2>
+          <p>
+            If this article is incorrect or outdated, or omits critical information, please <a class="open" href="#">let us know</a>.
+            For all other issues, please see our <a href="https://devcenter.heroku.com/articles/support-channels">support channels</a>.
+          </p>
+          <form accept-charset="UTF-8" action="/articles/getting-started-with-play/feedback" autocomplete="off" class="step2" method="post">
+<div style="margin:0;padding:0;display:inline">
+<input name="utf8" type="hidden" value="✓"><input name="authenticity_token" type="hidden" value="RqGzfSoBW83RacJOwpTr5SRdsQyVtERA/1y0XvS9IKE=">
+</div>
+            <input class="email" name="email" type="text" value=""><textarea name="feedback_text"></textarea><p class="record-warning">
+              <span class="js-hide-unless-logged-in">
+                The maintainer of this article will have access to your email address.
+              </span>
+              <span class="js-hide-if-logged-in">
+                <a href="/auth/login?back_to=%2Farticles%2Fgetting-started-with-play&amp;utm_campaign=login&amp;utm_medium=feedback&amp;utm_source=web">Login</a> to record your email address with this feedback.
+              </span>
+            </p>
+            <input type="submit" value="Submit">
+</form>        </div>
+        <p class="step3">
+          Your feedback has been sent to the <a href="mailto:devcenter-feedback@heroku.com">Dev Center</a> team. Thank you.
+        </p>
+      </section>
+</div>
+  </article><section class="nocontent" id="pagination"><a href="/articles/getting-started-with-java" id="previous" rel="prev">« Getting Started with Java on Heroku</a>
+  <a href="/articles/getting-started-with-spring-mvc-hibernate" id="next" rel="next">Getting Started with Spring MVC Hibernate on Heroku »</a>
+</section></section><script type="text/javascript">
+//<![CDATA[
+
+  var activeNav = 2;
+  var referenceId = 564;
+  var feedbackCounter = 1;
+
+//]]>
+</script>
+</div>
+    </div>
+
+    <script type="text/javascript">
+//<![CDATA[
+
+      if (document.cookie.indexOf('heroku_session=') != -1) {
+        $('#heroku-header-link-support').attr('href', 'https://support.heroku.com/');
+        $('#heroku-account-nav-logged_in').show();
+        $('#heroku-header-link-login').hide();
+      }
+
+//]]>
+</script><script type="text/javascript">if (!NREUMQ.f) { NREUMQ.f=function() {
+NREUMQ.push(["load",new Date().getTime()]);
+var e=document.createElement("script");
+e.type="text/javascript";
+e.src=(("http:"===document.location.protocol)?"http:":"https:") + "//" +
+  "js-agent.newrelic.com/nr-100.js";
+document.body.appendChild(e);
+if(NREUMQ.a)NREUMQ.a();
+};
+NREUMQ.a=window.onload;window.onload=NREUMQ.f;
+};
+NREUMQ.push(["nrfj","beacon-3.newrelic.com","ae43571cb3","2057789","dVwNTUMJVV9WR05REUJaAFVUFRZAW1oW",8,361,new Date().getTime(),"","","","",""]);</script>
+</body>
+</html>
