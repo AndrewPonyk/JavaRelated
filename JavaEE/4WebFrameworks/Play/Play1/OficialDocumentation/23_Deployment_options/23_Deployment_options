@@ -61,6 +61,15 @@
 	* on the heroku.com you can rename you application (<yourname>.herokuapp.com)
 	* =)
 
+	To view the logs run:
+		heroku logs
 
+	To scale the application to multiple ‘dynos’ run:
+		heroku scale web=2
+
+	To use the Heroku Shared Database in production add the following to your conf/application.conf file:
+		%prod.db=${DATABASE_URL}
+		%prod.jpa.dialect=org.hibernate.dialect.PostgreSQLDialect
+		%prod.jpa.ddl=update
 ----
 
