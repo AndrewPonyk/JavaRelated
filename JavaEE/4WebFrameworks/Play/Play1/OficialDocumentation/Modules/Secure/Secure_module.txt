@@ -1,0 +1,63 @@
+1) Module set-up
+
+	The simple Secure module helps you to set-up <b>basic authentication and authorization management </b>
+	in your application. It provides a simple controllers.Secure controller that defines a set of interceptors
+	that you can easily add to your own controllers using the <b>@With</b> annotation.
+
+	
+	Enable the Secure module for the application
+
+	In the /conf/dependencies.yml file, enable the Secure module by adding a line after require:
+		require:
+		    - play -> secure
+
+	Then run the 'play dependencies' command to add the module to your application.
+
+	
+
+	Import default Secure routes
+
+	In the conf/routes file, import the default module routes by adding this line:
+		# Import Secure routes
+		*      /                module:secure
+
+	Note that it’s not required to use the default routes file. You can also define your own routes, or mix the two.
+	
+------------------------------------------------------------------------------------
+2) Protecting a controller
+	
+	To protect a controller you just have to annotate it using @With. For example:
+	
+	@With(Secure.class)
+	public class Application extends Controller {
+	    
+	    public static void index() {
+		render();
+	    }
+	}
+
+	This controller will be automatically protected with the default authentication page.
+				
+------------------------------------------------------------------------------------
+3) Customizing the authentication mechanism
+
+	By default, the login page will accept any login/password. To customize it your application
+	has to provide a Security provider. Just create a class in the controllers package that extends
+	the controllers.Secure.Security class. Then you can override the authenticate(String username, String password) method.
+		package controllers;
+		 
+		public class Security extends Secure.Security {
+		    
+		    static boolean authenticate(String username, String password) {
+			User user = User.find("byEmail", username).first();
+			return user != null && user.password.equals(password);
+		    }
+		}
+
+
+	Note that you can also override other methods to customize how the application
+	should react to authentication events (onAuthenticated, onDisconnected).
+
+
+
+------------------------------------------------------------------------------------
