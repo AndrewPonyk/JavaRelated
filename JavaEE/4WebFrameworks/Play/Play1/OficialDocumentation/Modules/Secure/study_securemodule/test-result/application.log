@@ -1,24 +1,6 @@
-24 Nov 2013 20:54:47,529 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/Modules/Secure/study_securemodule
-24 Nov 2013 20:54:50,564 WARN  ~ You're running Play! in DEV mode
-24 Nov 2013 20:54:50,927 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-24 Nov 2013 20:55:05,926 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-24 Nov 2013 20:55:06,156 INFO  ~ Application 'study_securemodule' is now started !
-24 Nov 2013 21:49:02,414 ERROR ~ Cannot include routes for module secure (not found)
-24 Nov 2013 21:49:06,726 ERROR ~ 
-
-@6gcc3eebo
-Internal Server Error (500) for request GET /
-
-Compilation error (In /app/controllers/Application.java around line 13)
-The file /app/controllers/Application.java could not be compiled. Error raised is : Secure cannot be resolved to a type
-
-play.exceptions.CompilationException: Secure cannot be resolved to a type
-	at play.classloading.ApplicationCompiler$2.acceptResult(ApplicationCompiler.java:246)
-	at org.eclipse.jdt.internal.compiler.Compiler.handleInternalException(Compiler.java:676)
-	at org.eclipse.jdt.internal.compiler.Compiler.compile(Compiler.java:520)
-	at play.classloading.ApplicationCompiler.compile(ApplicationCompiler.java:282)
-	at play.classloading.ApplicationClasses$ApplicationClass.compile(ApplicationClasses.java:281)
-	at play.classloading.ApplicationClassloader.detectChanges(ApplicationClassloader.java:324)
-	at play.Play.detectChanges(Play.java:632)
-	at play.Invoker$Invocation.init(Invoker.java:198)
-	at Invocation.HTTP Request(Play!)
+26 Nov 2013 10:54:14,873 INFO  ~ Starting /home/andrew/git/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/Modules/Secure/study_securemodule
+26 Nov 2013 10:54:14,881 INFO  ~ Module secure is available (/home/andrew/Programs/play-1.2.6-wds-v6/modules/secure)
+26 Nov 2013 10:54:15,704 WARN  ~ You're running Play! in DEV mode
+26 Nov 2013 10:54:15,791 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+26 Nov 2013 10:55:06,930 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+26 Nov 2013 10:55:06,963 INFO  ~ Application 'study_securemodule' is now started !

@@ -1,4 +1,4 @@
-1) Module set-up
+1) Module set-up and Configuration
 
 	The simple Secure module helps you to set-up <b>basic authentication and authorization management </b>
 	in your application. It provides a simple controllers.Secure controller that defines a set of interceptors
@@ -22,7 +22,22 @@
 		*      /                module:secure
 
 	Note that it’s not required to use the default routes file. You can also define your own routes, or mix the two.
+
+
+	!!!Possible 'issue': eclipse cant see classes from module
+	Solution: make 'play ec' after editing dependencies.xml
 	
+
+
+	Configuration
+	You can override default settings by adding them to your applications application.conf.
+
+	secure.rememberme.duration
+	The expiration duration of the secure rememberme cookie.
+
+	Default: 30d
+
+	secure.rememberme.duration=30d 
 ------------------------------------------------------------------------------------
 2) Protecting a controller
 	
@@ -37,9 +52,12 @@
 	}
 
 	This controller will be automatically protected with the <b> default authentication page</b>. !!!!!!!!!!!!!!!!!!!!
+
+
+	
 				
 ------------------------------------------------------------------------------------
-3) Customizing the authentication mechanism
+3) Customizing the authentication mechanism and full Example of authorization
 
 	By default, the login page will accept any login/password. To customize it your application
 	has to provide a Security provider. Just create a class in the controllers package that extends
@@ -59,5 +77,251 @@
 	should react to authentication events (onAuthenticated, onDisconnected).
 
 
+	Example : adding autherization to application
+		* set up secure module
+			  - play -> secure // in dependencies
+			*      /                module:secure  // in routes
+			
+		* extend  Security class
+			package controllers;
 
-------------------------------------------------------------------------------------
+			import org.apache.commons.codec.digest.DigestUtils;
+
+			import models.User;
+
+			public class Security  extends Secure.Security{
+	
+				static boolean authenticate(String username, String password) {
+					User user = User.find("byUsername", username).first();
+					String passHash=DigestUtils.md5Hex(password);
+			
+					System.out.println("Trying to login");
+					if( user != null && user.username.equals(username) && user.password.equals(passHash)){
+						return true;
+					};
+		
+					return false; 
+				}
+				
+				//this method check user 'roles' like admin, user , ...
+				 static boolean check(String profile) {
+					User user = User.find("byUsername", connected()).first(); // getting user from  'db'
+											//Security.connected() -returns connect username
+					 	
+					if ("administrator".equals(profile)) {
+					    return user.profile.equals("administrator");
+					}
+			
+					if ("user".equals(profile)) {
+					    return user.profile.equals("user");
+					}
+					return false;
+				 }    
+			}
+
+		* create initial-data.yml - initial users  (! DONT USE 'TAB' in play applications )
+			/conf/initial-data.yml
+
+		    User(ivan):
+		    username:       ivan
+		    password:       2c42e5cf1cdbafea04ed267018ef1511
+		    profile:        administrator
+		    User(demo):
+		    username:       demo
+		    password:       fe01ce2a7fbac8fafaed7c982a04e229
+		    profile:        user
+			
+		*load users on application start		
+			import play.*;
+			import play.jobs.*;
+			import play.test.*;
+
+			import models.*;
+			 
+			@OnApplicationStart
+			public class ApplicationStart extends Job {
+			 
+			    public void doJob() {
+			    	System.out.println("Load data from initial-data.yml");
+				// Check if the database is empty
+				if(User.count() == 0) {
+				    Fixtures.loadModels("initial-data.yml");
+				}
+		
+				System.out.println(User.count());
+			    }
+			 
+			}
+
+		* create Entity 'User'
+			package models;
+
+			import javax.persistence.Entity;
+
+			import play.db.jpa.Model;
+
+			@Entity
+			public class User extends Model{
+				public String username;
+				public String password;
+				public String profile="user";
+			}
+
+
+		* create Application controller
+			package controllers;
+
+			import play.*;
+			import play.mvc.*;
+
+			import java.util.*;
+
+			import models.*;
+
+			@With(Secure.class)
+			public class Application extends Controller {
+
+			    public static void index() {
+			    	System.out.println(Secure.class);
+			    	String user = Security.connected();
+				System.out.println(user);
+				render();
+			    }
+			    
+			    
+			    public static void logout(){
+			    	try {
+						Secure.logout();
+					} catch (Throwable e) {
+						e.printStackTrace();
+					}
+			    	index();
+			    }
+			}
+
+		* index.html 
+			#{extends 'main.html' /}
+			#{set title:'Home' /}
+
+			<div id="logout" style="position:absolute;top:0px;right:0px">
+				<a href="@{Application.logout}">Logout</a>
+			</div>
+
+
+			#{secure.check "administrator"}
+				Admin area : <br>
+			    <a href="http://google.com">Private zone</a>
+			#{/secure.check}
+
+
+			#{secure.check "user"}
+				User area: <br>
+				<a href="http://vk.com">user zone</a>
+			#{/secure.check}	
+		*
+		*
+		*
+		*
+		*
+		*
+		*
+----------------------------------------------------------------------------------------------------------------------
+4)  Retrieving the connected user
+	From your application code, you can reuse the Security helper that you’ve just created to retrieve the connected user.
+
+	@With(Secure.class)
+	public class Application extends Controller {
+	    
+	    public static void index() {
+		String user = Security.connected();  // retrieve usernane 
+		render(user);
+	    }
+	}
+
+-------------------------------------------------------------------------------------------------------------------
+5) Adding authorization checks (roles like 'admin' , 'user' ) !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	Controller annotation
+	You can use the @Check annotation either on controller classes or action methods
+	to tell the Secure module to check that the connected user has the required authorization to call this action.
+
+	For example, to restrict an action method to authorized users:
+
+	@With(Secure.class)
+	public class Application extends Controller { 
+	   …
+	   
+	   @Check("administrator")
+	   public static void delete(Long id) {
+	       …
+	   }
+	}
+	To restrict all of the action methods in one controller, use the @Check annotation either on the controller class:
+
+	@With(Secure.class)
+	@Check("administrator")
+	public class Application extends Controller { 
+	   …
+	   
+	   public static void delete(Long id) {
+	       …
+	   }
+	   
+	   public static void edit(Long id) {
+	       …
+	   }
+	}
+	By default the secure module will always authorize all checks.
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (IMPORTANT)
+	You have to customize by overriding one more method in your Security class.
+
+	package controllers;
+	 
+	public class Security extends Secure.Security {
+	    …
+	    
+	    static boolean check(String profile) {
+		User user = User.find("byEmail", connected()).first();
+		if ("administrator".equals(profile)) {
+		    return user.admin;
+		}
+		else {
+		    return false;
+		}
+	    }    
+	}
+
+
+	Template tag                                                   !!!!!!!!!!!!!!!!!!!!!!!!!!
+	You can also use the secure.check tag for authorization checks in templates.
+	This is useful to conditionally display user-interface controls for operations that
+	are protected by controller annotations. For example:
+
+	#{secure.check "administrator"}
+	    <a href="@{delete(item.id)}">Delete</a>
+	#{/secure.check}
+	The tag only renders its body for <B>authorised</B> users, so the ‘Delete’ link is only
+	displayed when the user is authorised to execute the delete controller action.
+--------------------------------------------------------------------------------------------------
+6) Commands for overriding standard views and css
+	The Secure module provides a play secure:override that you can use to override the log in page,
+	so you can customize it for your application. This works by copying the corresponding file from
+	the module to a file in your application that will be used instead.
+
+	You can abbreviate play secure:override to play secure:ov.
+
+	CSS override
+	Use the play secure:override --css command to copy a CSS file to your application
+	that you can edit to customise the log in page look and feel.
+
+	Log in template override
+	Use the play secure:override --login command to copy a log in page view template to your application 
+	that overrides the default log in page template.
+
+	Main layout override
+	Use the play secure:override --layout command to copy a main layout template to your application that 
+	overrides the layout used by the log in page.
+
+

@@ -17,19 +17,13 @@ public class Application extends Controller {
         render();
     }
     
-    public static void privatePage(){
-    	renderText("private zone");
-    }
     
     public static void logout(){
     	try {
 			Secure.logout();
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	index();
     }
-
-
 }
