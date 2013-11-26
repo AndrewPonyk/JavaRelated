@@ -7,7 +7,7 @@ import java.util.*;
 
 import models.*;
 
-@With(Security.class)
+@With(Secure.class)
 public class Application extends Controller {
 
     public static void index() {
@@ -20,9 +20,16 @@ public class Application extends Controller {
     public static void privatePage(){
     	renderText("private zone");
     }
-
-    public static void auth(String login,String password){
-    	Boolean logged=Security.authenticate(login, password);
-    	renderTemplate("Application/index.html",logged);
+    
+    public static void logout(){
+    	try {
+			Secure.logout();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	index();
     }
+
+
 }

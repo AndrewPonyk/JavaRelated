@@ -1,16 +1,12 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-<div style="border:1px solid grey;position:absolute;right:0px;top:0px">
-	${logged}
+<div id="logout" style="position:absolute;top:0px;right:0px">
+	<a href="@{Application.logout}">Logout</a>
 </div>
-<form action="@{Application.auth}" method="post">
-	<input type="text" name ="login"/><br>
-	<input type="password" name="password" /><br> 
-	<input type="submit" value="login"/>
-</form>
 
 
-#{secure.check "user"}
+#{secure.check "administrator"}
+	Admin area : <br>
     <a href="http://google.com">Private zone</a>
 #{/secure.check}
