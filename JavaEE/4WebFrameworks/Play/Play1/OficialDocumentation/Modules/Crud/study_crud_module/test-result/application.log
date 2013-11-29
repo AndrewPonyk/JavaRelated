@@ -1,6 +1,6 @@
-28 Nov 2013 16:15:22,124 INFO  ~ Starting /home/andrew/git/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/Modules/Crud/study_crud_module
-28 Nov 2013 16:15:22,129 INFO  ~ Module crud is available (/home/andrew/Programs/play-1.2.6-wds-v6/modules/crud)
-28 Nov 2013 16:15:22,968 WARN  ~ You're running Play! in DEV mode
-28 Nov 2013 16:15:23,084 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-28 Nov 2013 16:15:33,059 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-28 Nov 2013 16:15:33,882 INFO  ~ Application 'study_crud_module' is now started !
+29 Nov 2013 00:06:40,621 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/Modules/Crud/study_crud_module
+29 Nov 2013 00:06:40,680 INFO  ~ Module crud is available (/home/andrew/play-1.2.7/modules/crud)
+29 Nov 2013 00:06:43,731 WARN  ~ You're running Play! in DEV mode
+29 Nov 2013 00:06:44,390 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+29 Nov 2013 00:07:12,515 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+29 Nov 2013 00:07:17,456 INFO  ~ Application 'study_crud_module' is now started !

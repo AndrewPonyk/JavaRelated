@@ -15,6 +15,6 @@
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="play.server.Server"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="study_crud_module"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value=" -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id= -Dapplication.path=&quot;${project_loc:study_crud_module}&quot; -Djava.endorsed.dirs=&quot;/home/andrew/Programs/play-1.2.6-wds-v6/framework/endorsed&quot; -javaagent:&quot;/home/andrew/Programs/play-1.2.6-wds-v6/framework/play-1.2.6-wds-v6.jar&quot;"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value=" -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id= -Dapplication.path=&quot;${project_loc:study_crud_module}&quot; -Djava.endorsed.dirs=&quot;/home/andrew/play-1.2.7/framework/endorsed&quot; -javaagent:&quot;/home/andrew/play-1.2.7/framework/play-1.2.7.jar&quot;"/>
 </launchConfiguration>
 

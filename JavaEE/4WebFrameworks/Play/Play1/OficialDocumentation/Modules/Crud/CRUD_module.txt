@@ -1,3 +1,23 @@
-1)
+1) CRUD module setup
+	Let’s see a simple example of using the CRUD module to manage user data.
+	Enable the CRUD module for the application
+
+
+	In the /conf/dependencies.yml file, enable the CRUD module by adding a line after require:
+	require:
+	    - play -> crud
+
+	Now run the play dependencies command to resolve the new module dependency.
+	Import default CRUD routes
+
+	In the conf/routes file, import the default module routes by adding this line:
+		# Import CRUD routes
+		*     /admin           module:crud
+
+	This adds several routes for each of your CRUD controllers, which you will add below.
+
+	Note that using the default routes file is not required. You can also define your own routes, or mix the two.
 --------------------------------------------------------------------
+2)
+-------------------------------------------
 
