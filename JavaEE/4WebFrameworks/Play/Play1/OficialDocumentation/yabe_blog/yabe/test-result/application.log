@@ -1,3 +1,5 @@
-01 Dec 2013 13:33:17,562 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\yabe_blog\yabe
-01 Dec 2013 13:33:22,174 WARN  ~ You're running Play! in DEV mode
-01 Dec 2013 13:33:22,987 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+01 Dec 2013 15:34:05,420 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\yabe_blog\yabe
+01 Dec 2013 15:34:08,839 WARN  ~ You're running Play! in DEV mode
+01 Dec 2013 15:34:09,326 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+01 Dec 2013 15:34:29,855 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+01 Dec 2013 15:34:37,528 INFO  ~ Application 'yabe' is now started !
