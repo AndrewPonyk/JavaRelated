@@ -1,6 +1,45 @@
-29 Nov 2013 00:06:40,621 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/Modules/Crud/study_crud_module
-29 Nov 2013 00:06:40,680 INFO  ~ Module crud is available (/home/andrew/play-1.2.7/modules/crud)
-29 Nov 2013 00:06:43,731 WARN  ~ You're running Play! in DEV mode
-29 Nov 2013 00:06:44,390 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-29 Nov 2013 00:07:12,515 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-29 Nov 2013 00:07:17,456 INFO  ~ Application 'study_crud_module' is now started !
+30 Nov 2013 23:28:52,725 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\Modules\Crud\study_crud_module
+30 Nov 2013 23:28:52,783 INFO  ~ Module crud is available (D:\andrewPrograms\play-1.2.6\modules\crud)
+30 Nov 2013 23:28:59,791 WARN  ~ You're running Play! in DEV mode
+30 Nov 2013 23:29:01,047 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+30 Nov 2013 23:30:30,801 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+30 Nov 2013 23:30:44,855 INFO  ~ Application 'study_crud_module' is now started !
+30 Nov 2013 23:32:20,649 ERROR ~ 
+
+@6ge479mp6
+Internal Server Error (500) for request GET /
+
+Template compilation error (In /app/views/Application/index.html around line 4)
+The template /app/views/Application/index.html does not compile : illegal colon after argument expression;    solution: a complex label expression before a colon must be parenthesized 
+
+play.exceptions.TemplateCompilationException: illegal colon after argument expression;
+   solution: a complex label expression before a colon must be parenthesized 
+	at play.templates.GroovyTemplate.compile(GroovyTemplate.java:189)
+	at play.templates.GroovyTemplate.internalRender(GroovyTemplate.java:210)
+	at play.templates.Template.render(Template.java:26)
+	at play.templates.GroovyTemplate.render(GroovyTemplate.java:202)
+	at play.mvc.results.RenderTemplate.<init>(RenderTemplate.java:24)
+	at play.mvc.Controller.renderTemplate(Controller.java:662)
+	at play.mvc.Controller.renderTemplate(Controller.java:642)
+	at play.mvc.Controller.render(Controller.java:699)
+	at controllers.Application.index(Application.java:13)
+	at play.mvc.ActionInvoker.invokeWithContinuation(ActionInvoker.java:557)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:508)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:484)
+	at play.mvc.ActionInvoker.invokeControllerMethod(ActionInvoker.java:479)
+	at play.mvc.ActionInvoker.invoke(ActionInvoker.java:161)
+	at Invocation.HTTP Request(Play!)
+30 Nov 2013 23:43:40,889 ERROR ~ 
+
+@6ge479mpn
+crud.hel action not found
+
+Action not found
+Action crud.hel could not be found. Error raised is No method public static void hel() was found in class controllers.crud
+
+play.exceptions.ActionNotFoundException: Action crud.hel not found
+	at play.mvc.ActionInvoker.getActionMethod(ActionInvoker.java:610)
+	at play.mvc.ActionInvoker.resolve(ActionInvoker.java:85)
+	at Invocation.HTTP Request(Play!)
+Caused by: java.lang.Exception: No method public static void hel() was found in class controllers.crud
+	... 3 more

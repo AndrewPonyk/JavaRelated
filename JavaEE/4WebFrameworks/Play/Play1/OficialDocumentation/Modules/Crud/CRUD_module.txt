@@ -11,13 +11,217 @@
 	Import default CRUD routes
 
 	In the conf/routes file, import the default module routes by adding this line:
+	(add this BEFORE the line : *   /{controller}/{action}   {controller}.{action} , i add this line after and 
+	home link didnt work)
 		# Import CRUD routes
 		*     /admin           module:crud
 
 	This adds several routes for each of your CRUD controllers, which you will add below.
 
 	Note that using the default routes file is not required. You can also define your own routes, or mix the two.
---------------------------------------------------------------------
-2)
--------------------------------------------
+-----------------------------------------------------------------------------------------------
+2) Example : using CRUD module (manage users Entities)
+	
+		* setup CRUD module(routes: *     /admin           module:crud , dependencies : - play -> crud)
+		* create Model (here User entity)
+			package models;
+	
+			import play.*;
+			import play.db.jpa.*;
+			 
+			import javax.persistence.*;
+			import java.util.*;
+			 
+			@Entity
+			public class User extends Model {
+				
+				public String name;
+				public String email;
+				public String address;				
+			}
+		
+		*Create the Users controller
+
+			Next, we create a simple controller that just inherits the CRUD controller.
+			This is a kind of ‘marker’ that the CRUD module uses for generating routes.
+
+			package controllers;
+		 
+			public class Users extends CRUD {
+			
+			}
+		* and now http://localhost:9000/admin - you have nice UI to manage your User entities
+		
+		
+		
+		We can add validation to Entity
+			package models;
+ 
+			import play.*;
+			import play.db.jpa.*;
+			 
+			import javax.persistence.*;
+			import java.util.*;
+			 
+			import play.data.validation.*;
+			 
+			@Entity
+			public class User extends Model {
+				
+			   @Required
+			   @MinSize(8)
+			   public String name;
+				
+			   @Required
+			   @Email
+			   public String email;
+				
+			   @Required
+			   @MaxSize(1000)
+			   public String address;
+			 
+			   public String toString() {
+				  return email;
+			   }
+				
+			}
+					
+			CRUD internationalization
+			Change the form label
+
+		Add these lines to the conf/messages file in your application:
+
+		name=Name
+		email=Email address
+		address=Postal address
+		
+		(list of all properties you can see in messages.en in crud module)
+-----------------------------------------------------------------------------------------------
+3) Create a User and customize the list view
+
+	!!!
+	We can override css using : 'play crud:ov --css'
+	To override layout : 'play crud:ov --layout'
+
+	
+	The default list view uses only one column containing the result of the object’s toString() method.
+	
+	To customize this view, we need to create the /app/views/Users/list.html template in the application
+	Open a shell, go the application directory and type:
+		play crud:ov --template Users/list
+	
+	Edit the template like this:
+
+	#{extends 'CRUD/layout.html' /}
+	 
+	<div id="crudList" class="${type.name}">
+		
+		<h2 id="crudListTitle">&{'crud.list.title', type.name}</h2>
+	 
+		<div id="crudListSearch">
+			#{crud.search /}
+		</div>
+	 
+		<div id="crudListTable">
+			#{crud.table fields:['email', 'name'] /}
+		</div>
+		
+		<div id="crudListPagination">
+			#{crud.pagination /}
+		</div>
+		
+		<p id="crudListAdd">
+			<a href="@{blank()}">&{'crud.add', type.modelName}</a>
+		</p>
+	</div>
+
+	!!!!!
+	Custom <B>field</B> rendering: the crud.custom tag
+
+	You can go a bit further by customizing the way each field of your User entity is displayed in the list and form views.
+
+	To customize a field, use the #{crud.custom} tag:
+
+	#{crud.table fields:['name', 'company']}
+	 
+	   #{crud.custom 'company'}
+		 <a href="@{Companies.show(object.company.id)}">
+			 ${object.company.name}
+		 </a>
+	   #{/crud.custom}
+	 
+	#{/crud.table}
+	
+	
+	
+	!!!!!!
+	You can also display additional columns or form inputs by defining custom handlers:
+
+	#{crud.table fields:['name', 'company', 'edit']}
+	 
+	   #{crud.custom 'company'}
+		  <a href="@{Companies.show(object.company.id)}">${object.company.name}</a>
+	   #{/crud.custom}
+	 
+	   #{crud.custom 'edit'}
+		  <a href="@{Users.edit(object.id)}">Edit</a>
+	   #{/crud.custom}
+	 
+	#{/crud.table}
+	
+-----------------------------------------------------------------------------------------------
+4) Customize the show and blank views in a generic way
+
+A central influence on the behavior of CRUD views is the ObjectType for each field. So if you want to 
+change the CRUD module’s behaviour in a generic way, for example to hide fields with the @Version annotation, you can create you own ObjectType class. You must also declare a static method in your controller or a superclass of your controller.
+
+protected static ObjectType createObjectType(Class<? extends Model> type) {
+   return new VersionObjectType(type);
+} 
+Here is a complete example:
+
+public class CustomAdminCompany extends CRUD {
+   protected static ObjectType createObjectType(Class<? extends Model> type) {
+      return new VersionObjectType(type);
+   }
+   
+   public static class VersionObjectType extends ObjectType {
+      
+      private final String versionColumn;
+      
+      public VersionObjectType(Class<? extends Model> modelClass) {
+         super(modelClass);
+         versionColumn = getVersionColumnName(modelClass);
+      }
+      private String getVersionColumnName(Class modelClass) {
+         Class c = modelClass;
+         try {
+            while (!c.equals(Object.class)) {
+               for (Field field : c.getDeclaredFields()) {
+                  if (field.isAnnotationPresent(Version.class)) {
+                     return field.getName();
+                  }
+               }
+               c = c.getSuperclass();
+            }
+         } catch (Exception e) {
+            throw new UnexpectedException("Error while determining the "
+               + "object @Version for an object of type " + modelClass);
+         }
+         return null;
+      }
+ 
+      @Override
+      public List<ObjectField> getFields() {
+         List<ObjectField> result = super.getFields();
+         for (ObjectField objectField : result) {
+            if (objectField.name.equals(versionColumn)) {
+               objectField.type = "hidden";
+            }
+         }
+         return result;
+      }
+   }   
+}
+This is not the end; you can also customize findPage and other methods. Have a look at the source code.
 

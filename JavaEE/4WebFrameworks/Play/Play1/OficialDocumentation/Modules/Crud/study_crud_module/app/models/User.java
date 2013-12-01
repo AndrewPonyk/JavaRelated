@@ -14,5 +14,11 @@ public class User extends Model {
 	public String name;
 	public String email;
 	public String address;
+ 	public Date createDate;
  	
+ 	
+ 	@Override
+ 	public String toString() {
+ 		return name;
+ 	}
 }
