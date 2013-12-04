@@ -23,6 +23,7 @@ public class Post extends Model {
     
     @Required
     @ManyToOne
+    @JoinColumn(name="author_id") // in play this line isnt required
     public User author;
     
     @OneToMany(mappedBy="post", cascade=CascadeType.ALL)

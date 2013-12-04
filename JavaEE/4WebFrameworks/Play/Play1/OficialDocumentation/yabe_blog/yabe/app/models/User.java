@@ -1,8 +1,9 @@
 package models;
  
 import java.util.*;
+
 import javax.persistence.*;
- 
+
 import play.db.jpa.*;
 import play.data.validation.*;
  
@@ -19,6 +20,9 @@ public class User extends Model {
     public String fullname;
     
     public boolean isAdmin;
+    
+    @OneToMany(mappedBy="author", fetch=FetchType.LAZY)
+    public Set<Post> posts;
     
     public User(String email, String password, String fullname) {
         this.email = email;
