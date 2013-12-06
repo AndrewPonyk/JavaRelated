@@ -11,6 +11,28 @@
         #{get 'moreScripts' /}
     </head>
     <body>
+         <div id="header">
+            <div id="logo">
+                yabe.
+            </div>
+            <ul id="tools">
+                <li>
+                    <a href="#">Log in to write something</a>
+                </li>
+            </ul>
+            <div id="title">
+                <span class="about">About this blog</span>
+                <h1><a href="#">${blogTitle}</a></h1>
+                <h2>${blogBaseline}</h2>
+            </div>
+        </div>
+        
         #{doLayout /}
+        
+         <p id="footer">
+            Yabe is a (not that) powerful blog engine built with the 
+            <a href="http://www.playframework.org">Play framework</a>
+            as a tutorial application.
+        </p>
     </body>
 </html>
