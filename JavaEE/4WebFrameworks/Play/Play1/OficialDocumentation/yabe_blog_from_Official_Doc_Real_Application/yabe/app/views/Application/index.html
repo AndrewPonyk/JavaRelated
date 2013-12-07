@@ -1,0 +1,33 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<div>List of users (count = ${allUsers.size()})</div>
+	#{list items:allUsers, as:'currUser'}
+		<h4>${currUser.fullname}</h4>
+		<hr>	
+	#{/list}
+	
+	
+#{if frontPost}
+    
+    #{display post:frontPost, as:'home' /}
+    
+    #{if olderPosts.size()}
+    
+        <div class="older-posts">
+            <h3>Older posts <span class="from">from this blog</span></h3>
+        
+            #{list items:olderPosts, as:'oldPost'}
+                #{display post:oldPost, as:'teaser' /}
+            #{/list}
+        </div>
+        
+    #{/if}
+    
+#{/if}
+ 
+#{else}
+    <div class="empty">
+        There is currently nothing to read here.
+    </div>
+#{/else}

@@ -6,8 +6,7 @@
 GET     /                                       Application.index
 
 #Routes
-GET 	/validate/								Application.validate
-GET 	/validate/{name}						Application.validate
+GET 	/validate								Application.validate
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

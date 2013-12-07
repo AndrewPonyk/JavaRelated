@@ -15,6 +15,6 @@
     <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="play.server.Server"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="validation"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value=" -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id= -Dapplication.path=&quot;${project_loc:validation}&quot; -Djava.endorsed.dirs=&quot;D:\play-1.2.6/framework/endorsed&quot; -javaagent:&quot;D:\play-1.2.6/framework/play-1.2.6.jar&quot;"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value=" -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n -Dplay.debug=yes -Dplay.id= -Dapplication.path=&quot;${project_loc:validation}&quot; -Djava.endorsed.dirs=&quot;D:\andrewPrograms\play-1.2.6/framework/endorsed&quot; -javaagent:&quot;D:\andrewPrograms\play-1.2.6/framework/play-1.2.6.jar&quot;"/>
 </launchConfiguration>
 

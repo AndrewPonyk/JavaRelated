@@ -12,6 +12,9 @@ GET     /favicon.ico                            404
 GET     /public/                                staticDir:public
 
 GET     /posts/{id}                             Application.show
+POST 	/posts/{postId}/comments				Application.postComment
+
+GET		/capcha									Application.capcha
 
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
