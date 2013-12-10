@@ -21,7 +21,18 @@ GET     /posts/{tag}                    		Application.listTagged
 
 GET     /posts/{tag}                    		Application.listTagged
 
+
+#Remember that order matters in the routes file; 
+#the first line that matches the incoming HTTP request is used. 
+#This means that the entries that map to the Admin controller must 
+#come before the second line above, which maps all other /admin requests 
+#to CRUD module pages. Otherwise, /admin/ will map to CRUD.index instead 
+#of Admin.index.
+
+GET 	/admin/?								Admin.index
+
 *     	/admin  					            module:crud
 
+*		/										module:secure
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
