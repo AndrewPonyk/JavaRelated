@@ -23,7 +23,7 @@
 				font-size:21px;  
 			}
 			
-	(IT DOESNT WORk,  TO OVERRIDE VALUES FROM CLIENT APPLICATiON)
+	(IT DOESNT WORk,  TO OVERRIDE VALUES FROM CLIENT APPLICATiON  - IT WORKS WITH 'SASS' module , but sass is 12 mb )
 	* And we need 'client' application (like selfcare-wds )  which will use css from selfcare-core and will pass own css variables 
 		(using less)
 		routes :

@@ -1,0 +1,38 @@
+.tags-list .tag {
+    cursor: pointer;
+    padding: 1px 4px;
+}
+.crudField .tags-list .selected {
+    background: #222;
+    color: #fff;
+}
+
+.welcome{
+	clear: both;
+	margin-top: 50px;
+}
+
+#main ul, #adminMenu {
+	display: block;
+}
+
+#main ul li, #adminMenu li{
+
+	color: white;
+	background-color: fuchsia;
+	float: left;
+	list-style-type: none;
+	margin-right: 15px;
+	padding: 0px 10px;
+	border-radius: 5px;
+
+}
+
+#main ul li.selected, #adminMenu li.selected{
+	background-color: #333030;
+}
+
+#main ul li a, #adminMenu li a{
+	text-decoration: none;
+	color: white;
+}
