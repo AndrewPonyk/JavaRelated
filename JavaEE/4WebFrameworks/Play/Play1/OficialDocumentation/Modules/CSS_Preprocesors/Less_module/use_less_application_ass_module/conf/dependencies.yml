@@ -1,0 +1,12 @@
+# Application dependencies
+
+require:
+    - play
+    - less -> less 1
+    - play -> less 0.9.1
+repositories:
+               - My modules:
+                        type:       local
+                        artifact:   ${application.path}/../less/dist/[module]-[revision].zip
+                        contains: 
+                               - less -> *

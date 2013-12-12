@@ -1,0 +1,59 @@
+1) Using less module - example ()
+
+	
+	* You need to setup less module , it is not complicated
+	
+	* Next , we need application which will be module (as selfcare-core)  i call this application 'less'
+
+	 	/less/publis/styleshets/core.less:      				
+			@import url('variable.less');
+
+			body{
+				background-color: @color;
+				border:none;
+			}  
+		 
+		/less/publis/styleshets/variables.less: (default values which we will override in client apps)
+			@color : red;
+			div{
+				background: orange;
+			}
+
+			body{
+				font-size:21px;  
+			}
+			
+	(IT DOESNT WORk,  TO OVERRIDE VALUES FROM CLIENT APPLICATiON)
+	* And we need 'client' application (like selfcare-wds )  which will use css from selfcare-core and will pass own css variables 
+		(using less)
+		routes :
+			...
+		GET 	/useMyLessModule						module:less	
+		
+		dependencies:
+			....
+		    - less -> less 1
+		    - play -> less 0.9.1
+		repositories:
+			       - My modules:
+				        type:       local
+				        artifact:   ${application.path}/../less/dist/[module]-[revision].zip
+				        contains: 
+				               - less -> *
+		
+		and ovverride default values :/use_less_core/publis/styleshets/variables.less
+			@color : green;
+			div{
+				background: orange;
+			}
+	
+	
+
+
+!!!Be careful  if your app and your app has Application class in 'controllers' package it will be error : play dont know which to use =)
+
+!!!!Be careful(you must change less file to recompile it , or it will be getting from cache . I used css : include url('var.less') and have problem)
+Caching
+The less module sets and listens to Last-Modified and ETag headers, so most browsers will retrieve the file only once. At the server, a compiled CSS file is stored in the cache, and automatically invalidated when the less file changes, or when one of the imported files change. So you can change your less files even while Play is running in production mode.
+	
+---------------------------------------------------------------------
