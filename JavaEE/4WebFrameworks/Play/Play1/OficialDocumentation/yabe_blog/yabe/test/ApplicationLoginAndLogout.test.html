@@ -1,0 +1,19 @@
+*{ You can use plain selenium command using the selenium tag }*
+
+ #{selenium}
+	clearSession()
+    open('/login')
+    
+    type('username','bob@gmail.com')
+    type('password','secret')
+    clickAndWait('signin')
+    
+    <!-- just test if text 'OK' is on the page -->
+   	assertTextPresent('Log out')
+   	
+   	<!--  try to logout -->
+    clickAndWait('logout')
+    assertTextPresent('Log in to write something')
+    
+    
+ #{/selenium}

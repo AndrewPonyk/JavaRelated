@@ -23,7 +23,7 @@
                 <li>
 	                #{if session.get('username') }
 					     You are logged in,
-					      <a href="@{Secure.logout()}">Log out</a>
+					      <a href="@{Secure.logout()}" id = "logout">Log out</a>
 					#{/if}
 					#{else}
 					    <a href="@{Admin.index()}">Log in to write something</a>
