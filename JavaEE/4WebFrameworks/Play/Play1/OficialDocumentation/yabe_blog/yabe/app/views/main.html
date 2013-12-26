@@ -15,10 +15,23 @@
             <div id="logo">
                 yabe.
             </div>
+            #{secure.check 'admin'}
+            	<a href="@{CRUD.index()}">administration.</a> 
+            #{/secure.check}
+             
             <ul id="tools">
                 <li>
-                    <a href="@{Admin.index()}">Log in to write something</a>
+	                #{if session.get('username') }
+					     You are logged in,
+					      <a href="@{Secure.logout()}">Log out</a>
+					#{/if}
+					#{else}
+					    <a href="@{Admin.index()}">Log in to write something</a>
+					#{/else}                  
                 </li>
+
+               
+                
             </ul>
             <div id="title">
                 <span class="about">About this blog</span>

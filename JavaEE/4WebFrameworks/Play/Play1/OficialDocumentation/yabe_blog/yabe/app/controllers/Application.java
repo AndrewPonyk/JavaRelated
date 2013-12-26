@@ -6,6 +6,7 @@ import play.data.validation.Required;
 import play.libs.Codec;
 import play.libs.Images;
 import play.mvc.*;
+import play.mvc.Scope.Session;
 
 import java.util.*;
 
@@ -28,7 +29,7 @@ public class Application extends Controller {
     	for(Post item : bob.posts){
     		System.out.println(item.content);
     	}*/
-    	
+    	System.out.println(session.get("username") ); 
     	  Post frontPost = Post.find("order by postedAt desc").first();
           List<Post> olderPosts = Post.find(
               "order by postedAt desc"

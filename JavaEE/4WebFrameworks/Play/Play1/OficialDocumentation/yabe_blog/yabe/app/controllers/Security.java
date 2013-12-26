@@ -1,6 +1,5 @@
 package controllers;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
 
 import models.User;
 
@@ -13,7 +12,8 @@ public class Security  extends Secure.Security{
 	static boolean check(String profile){
 		
 		if("admin".equals(profile)){
-			return User.find("byEmail", connected()).<User>first().isAdmin;
+			boolean isAdmin = User.find("byEmail", connected()).<User>first().isAdmin;
+			return isAdmin;
 		}
 		
 		return false;

@@ -16,7 +16,9 @@
         
         <div id="header">
             <div id="logo">
-                yabe. <span>administration</span>
+                <a href="@{Application.index()}">yabe.</a> 
+                <a href="@{CRUD.index()}">administration.</a> 
+              
             </div>
             <ul id="tools">
                 <li>
@@ -32,6 +34,7 @@
             <a href="@{Admin.index()}">My posts</a>
         </li>
         #{secure.check 'admin'}
+        
             <li class="${request.controller == 'Posts' ? 'selected' : ''}">
                 <a href="@{Posts.list()}">Posts</a>
             </li>
