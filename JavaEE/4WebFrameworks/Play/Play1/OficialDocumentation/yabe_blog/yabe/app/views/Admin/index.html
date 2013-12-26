@@ -1,5 +1,21 @@
 #{extends 'admin.html' /}
+#{set title: 'List of posts' /}
  
 <div class="welcome">
 	Welcome ${user}!
+	
+	<div>
+		you have written ${posts.size() ?: 'no'} 
+		${posts.pluralize('post', 'posts')} so far
+	</div>
+
+#{list items:posts, as:'post'}
+    <p class="post ${post_parity}">
+        <a href="@{Admin.form(post.id)}">${post.title}</a>
+    </p>
+#{/list} 
+ 
+<p id="newPost" >
+    <a href="@{Admin.form()}"><span>+</span> write a new post</a>
+</p>
 </div>
