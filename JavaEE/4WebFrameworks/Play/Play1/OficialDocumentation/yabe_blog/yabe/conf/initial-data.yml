@@ -2,18 +2,18 @@
 
 User(bob):
     email:          bob@gmail.com
-    password:       secret
+    password:       5ebe2294ecd0e0f08eab7690d2a6ee69
     fullname:       Bob
     isAdmin:        true
     
 User(jeff):
     email:          jeff@gmail.com
-    password:       secret
+    password:       5ebe2294ecd0e0f08eab7690d2a6ee69
     fullname:       Jeff    
     
 User(paul):
     email:          paul@gmail.com
-    password:       secret
+    password:       5ebe2294ecd0e0f08eab7690d2a6ee69
     fullname:       Paul    
     
 Tag(play):
