@@ -1,0 +1,80 @@
+1) Few words about play framework 1 ?
+
+A Play application follows the MVC architectural pattern applied to the web architecture.
+This pattern splits the application into separate layers: the Presentation layer and the Model layer. The Presentation layer is further split into a View and a Controller layer.
+
+The Model is the domain-specific representation of the information on which the application operates. 
+Domain logic adds 'meaning' to raw data (e.g., calculating if today is the user's birthday, or the 
+totals, taxes, and shipping charges for a shopping cart). Most applications use a persistent storage 
+mechanism such as a database to store data. MVC does not specifically mention the data access layer 
+because it is understood to be underneath, or encapsulated by, the Model.
+
+The View renders the model into a form suitable for interactions, typically a user interface. 
+Multiple views can exist for a single model, for different purposes. In a Web application the view 
+is usually rendered in a 'web format' like HTML, XML or JSON. However there are some cases where the 
+view can be expressed in a binary form, e.g. dynamically rendered chart diagrams.
+
+The Controller responds to events (typically user actions) and processes them, and may also invoke 
+changes on the model. In a Web application, events are typically HTTP requests: a Controller listens for 
+HTTP requests, extracts relevant data from the 'event', such as query string parameters, request headers… 
+and applies changes to the underlying model objects.
+
+
+Folders 
+app/controllers
+A Controller is a Java class where each public, static, method is an action. 
+An action is a Java entry point invoked when an HTTP Request is received. The Java code from 
+the Controller class isn't really object oriented: it's mainly procedural code. 
+The action method extracts relevant data from the HTTP Request, reads or updates the model objects,
+ and sends back a result which is wrapped into an HTTP Response.
+
+
+app/models
+The domain model object layer is a set of Java classes using all the object-oriented features 
+available from the Java language. It contains data structures and operations on which the application 
+operates. Whenever model objects need to be saved to persistent storage, they may contain some glue 
+artifacts like JPA annotations or SQL statements.
+
+
+
+app/views
+Most of the application views are generated using an efficient templating system provided by Play.
+The Controller gets some interesting data from the model layer, and then applies a template to decorate
+these objects. This package contains HTML, XML, JSON or other template files with special directives used to 
+dynamically generate the model representation.
+
+
+The public directory
+Resources stored in the public directory are static assets and are served directly 
+by the Web server.
+This directory is split into three standard sub-directories: for images, 
+CSS stylesheets and JavaScript files. You should try to organize your static 
+assets like this to keep all Play applications consistent.
+
+By default the /public directory is mapped to the /public URL path, but you can easily change that, 
+or even use several directories for your static assets.
+
+
+
+The 'conf' directory
+The conf directory contains all configuration files for the application.
+There are two required configuration files:
+
+application.conf, the main configuration file for the application. 
+It contains standard configuration parameters.
+routes, the routes definition file.
+
+
+The lib directory
+This directory contains all standard Java libraries needed by your application.
+They are automatically added to the Java classpath.
+
+
+!!!About DEV/PROD modes
+
+You can run an application either in a DEV or PROD mode. 
+You toggle this mode using the application.mode configuration.
+When run in DEV mode, Play will check for file changes and will handle hot reloading if necessary. 
+
+The PROD mode is fully optimized for production: Java sources and templates are compiled
+once and cached for multiple uses.

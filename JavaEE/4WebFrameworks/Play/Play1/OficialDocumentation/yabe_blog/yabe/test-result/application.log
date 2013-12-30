@@ -1,7 +1,7 @@
-26 Dec 2013 22:42:31,997 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/yabe_blog/yabe
-26 Dec 2013 22:42:32,014 INFO  ~ Module crud is available (/home/andrew/play-1.2.7/modules/crud)
-26 Dec 2013 22:42:32,016 INFO  ~ Module secure is available (/home/andrew/play-1.2.7/modules/secure)
-26 Dec 2013 22:42:35,709 WARN  ~ You're running Play! in DEV mode
-26 Dec 2013 22:42:36,277 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-26 Dec 2013 22:42:58,292 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL
-26 Dec 2013 22:43:04,710 INFO  ~ Application 'yabe' is now started !
+26 Dec 2013 23:06:50,944 INFO  ~ Starting D:\git\JavaRelated\JavaEE\4WebFrameworks\Play\Play1\OficialDocumentation\yabe_blog\yabe
+26 Dec 2013 23:06:50,982 INFO  ~ Module crud is available (D:\andrewPrograms\play-1.2.6\modules\crud)
+26 Dec 2013 23:06:50,991 INFO  ~ Module secure is available (D:\andrewPrograms\play-1.2.6\modules\secure)
+26 Dec 2013 23:06:53,564 WARN  ~ You're running Play! in DEV mode
+26 Dec 2013 23:06:53,968 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+26 Dec 2013 23:07:29,247 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL
+26 Dec 2013 23:07:37,031 INFO  ~ Application 'yabe' is now started !

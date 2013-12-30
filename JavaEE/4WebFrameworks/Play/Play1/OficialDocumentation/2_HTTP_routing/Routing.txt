@@ -1,24 +1,25 @@
-1)To make some routes in your application you need file 'routes' in directory 'conf'
+﻿1) In which place we put routes definition ?
+	To make some routes in your application you need file 'routes' in directory 'conf'
 
 -----------------------------------------------------------
 2)<b>The URI Pattern </b>
-The URI pattern defines the route’s request path. Some parts of the request path can be dynamic. 
+	The URI pattern defines the route’s request path. Some parts of the request path can be dynamic. 
 
 
-!!!!!!!!!!!! Any dynamic part must be specified within braces {…}.
+	!!!!!!!!!!!! Any dynamic part must be specified within braces {…}.
 
-/clients/all
-exactly matches:
+	/clients/all
+	exactly matches:
 
-/clients/all
-but…
- 
+	/clients/all
+	but…
+	 
 
-/clients/{id}
-matches both:
+	/clients/{id}
+	matches both:
 
-/clients/12121
-/clients/toto
+	/clients/12121
+	/clients/toto
 
 -----------------------------------------------------------------------
 3)
@@ -63,16 +64,16 @@ GET    /pages/{id}        Application.page
 if we make http://localhost:9000/show  - then ${id} on this page will be 'home'
 if we make http://localhost:9000/show/myHome - thid ${id} will be 'myHome'
 ------------------------------------------------------------------------------------
-6)
-Variables and scripts
-You can also use the ${…} syntax for variables, and the %{…} syntax for scripts in the routes file, as you can in templates. For example:
+6) Variables and scripts in 'routes' file
+ You can also use the ${…} syntax for variables, and the %{…}% syntax for scripts in the routes file, as you can in templates. For example:
 
 %{ context = play.configuration.getProperty('context', '') }%
  
 # Home page
 GET    ${context}         Secure.login
 GET    ${context}/        Secure.login
-Another example is the CRUD module’s routes file, which uses the crud.types tag to loop over model types to generate controller route definitions for each type.
+Another example is the CRUD module’s routes file, which uses the crud.types tag to loop over 
+model types to generate controller route definitions for each type.
 
 ----------------------------------------------------------------------------------------
 7)
@@ -80,8 +81,7 @@ Another example is the CRUD module’s routes file, which uses the crud.types ta
 Many routes can match the same request. If there is any conflict, the first route (following the declaration order) is used.
 
 ------------------------------------------------------------------------------------------------------------
-8)!!!!!!!!!
-Publishing as a static resources 
+8) Publishing as a static resources 
 TO publish some folder as static resource you need special action <b>staticDir</b>
 
 For example , with this line we can 'open' public directory :
@@ -97,8 +97,7 @@ You can also directly map a URL path to a static file rendering.
 # Serve index.html static file for home requests
 GET     /home                   staticFile:/public/html/index.html
 ------------------------------------------------------------------------
-9)
-Play has built-in support for a few formats: html, txt, json and xml. 
+9) Rendering different types of data Play has built-in support for a few formats: html, txt, json and xml. 
 Rendering XML :
 
 * create file showXML.xml in 'views' folder 

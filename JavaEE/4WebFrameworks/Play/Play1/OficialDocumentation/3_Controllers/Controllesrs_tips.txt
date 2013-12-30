@@ -3,7 +3,7 @@
 Business logic is managed in the domain model layer. As a client (typically a web browser) cannot directly invoke this code, the functionality of a domain object is exposed as resources represented by URIs.
 
 A client uses the uniform API provided by the HTTP protocol to manipulate these resources, and by implication the underlying business logic.
-However, this mapping of resources to domain objects is not a bijection: the granularity can be expressed at different levels, some resources may be virtual, for some resources aliases may be defined…
+However, this mapping of resources to domain objects is not a bijection: the granularity can be expressed at different levels, some resources may be virtual, for some resources aliases may be defined...
 
 This is precisely the role played by the Controller layer: providing a glue between the domain model objects and transport layer events. As the Model layer, controllers are written in pure Java, making it easy to access or modify Model objects. Like the HTTP interface, Controllers are procedural and Request/Response oriented.
 
@@ -48,7 +48,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 
 
 	<b>
-	Usually, an action method doesn’t include a return statement. The method exit is done by the invocation of a result method. In 			this example, <b> render(…) </b> is a result method that executes and displays a template
+	Usually, an action method doesn’t include a return statement. The method exit is done by the invocation of a result method. In 			this example, <b> render(...) </b> is a result method that executes and displays a template
 	</b>
 
 -------------------------------------------------------------------------
@@ -188,7 +188,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 	<b>@play.data.binding.As</b>
 
 	public static void update(@As("dd/MM/yyyy") Date updatedAt) {
-    		…
+    		...
 	}
 	
 	The @As annotation also has internationalisation support, which means that you can provide a specific annotation for each locale:
@@ -200,7 +200,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 	        )
 	        Date updatedAt
 	    ) {
-	    …
+	    ...
 	}
 
 
@@ -215,7 +215,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 	}
 	 
 	public static void editProfile(@As("profile") User user) {
-	    …
+	    ...
 	}
 
 
@@ -247,7 +247,9 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 8) 
 	<b>Result types</b>
 
-	An action method has to generate an HTTP response. The easiest way to do this is to emit a Result object. When a Result object is 		emitted, the normal execution flow is interrupted and the method returns.
+	An action method has to generate an HTTP response. The easiest way to do this is to emit a Result object. 
+	When a Result object is 		
+	emitted, the normal execution flow is interrupted and the method returns.
 
 
 
@@ -259,11 +261,11 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 	    System.out.println("This message will never be displayed !");
 	}
 
-	<b>The render(…) method emits a Result object and stops further method execution.</b>
+	<b>The render(...) method emits a Result object and stops further method execution.</b>
 
 	Return some <b>textual</b> content
 
-	The renderText(…) method emits a simple Result event which writes some text directly to the underlying HTTP Response.
+	The renderText(...) method emits a simple Result event which writes some text directly to the underlying HTTP Response.
 
 	Example:
 
@@ -335,7 +337,8 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 11)
 	!!!Specify another template
 
-		If you don’t want to use the default template, you can specify your own template file using the renderTemplate(…) method, by 			passing the template name as the first parameter:
+		If you don’t want to use the default template, you can specify your own template file using the 
+		renderTemplate(...) method, by 			passing the template name as the first parameter:
 
 		Example:
 
@@ -436,7 +439,7 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 		List<User> users = User.findAll();
 		render(users);
 	    }
-	    …
+	    ...
 	}
 
 ------------!!!!
@@ -459,17 +462,24 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 		@With(Secure.class)  // before all actions in class Admin , method 'checkAutenticated' will be invoked
 		public class Admin extends Controller {
 		    
-		    …
+		    ...
 		}
 ----------------------------------------------------------------------------------------------------------
 14)  !!!!!  Session and Flash scopes
 	
-	If you have to keep data across multiple HTTP Requests, you can save them in the Session or the Flash scope. Data stored in the Session 	are available during the whole user session, and data stored in the flash scope are available to the next request only.
+	If you have to keep data across multiple HTTP Requests, you can save them in the Session
+	or the Flash scope. Data stored in the Session 	are available during the whole user session,
+	and data stored in the flash scope are available to the next request only.
 
-	It’s important to understand that Session and Flash data are not stored in the server but are added to each subsequent HTTP Request, 		<b>using the Cookie mechanism </b>. So the data size is very limited (up to 4 KB) and you can only store String values.			
+	It’s important to understand that Session and Flash data are not stored in the server but are 
+	added to each subsequent HTTP Request, 		<b>using the Cookie mechanism </b>. So the data size
+	is very limited (up to 4 KB) and you can only store String values.			
 		
 	
-	Of course, cookies are signed with a secret key so the client can’t modify the cookie data (or it will be invalidated). The Play 		session is not aimed to be used as a cache. If you need to cache some data related to a specific session, you can use the Play built-in 	cache mechanism and use the session.getId() key to keep them related to a specific user session.
+	Of course, cookies are signed with a secret key so the client can’t modify the cookie data 
+	(or it will be invalidated). The Play 		session is not aimed to be used as a cache.
+	If you need to cache some data related to a specific session, you can use the Play built-in 	
+	cache mechanism and use the session.getId() key to keep them related to a specific user session.
 
 		public static void index() {
 		    List messages = Cache.get(session.getId() + "-messages", List.class);
@@ -488,4 +498,6 @@ A Controller is a Java class, hosted by the controllers package, and subclassing
 	P.S.
 	The session expires when you close your web browser, unless you configure <b>application.session.maxAge </b>.
 
-	The cache has different semantics to the classic Servlet HTTP session object. You can’t assume that these objects will be always in the 	cache. So it forces you to handle the cache miss cases, and keeps your application fully stateless.
+	The cache has different semantics to the classic Servlet HTTP session object. You can’t assume that 
+	these objects will be always in the 	cache. So it forces you to handle the cache miss cases, 
+	and keeps your application fully stateless.
