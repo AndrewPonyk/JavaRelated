@@ -1,0 +1,21 @@
+CompilerOracle: exclude jregex/Pretokenizer.next
+Listening for transport dt_socket at address: 8000
+22:46:26,236 INFO  ~ Starting /media/88D4CBF1D4CBDF94/GitRepositories/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/yabe_blog/yabe
+22:46:26,287 INFO  ~ Module crud is available (/home/andrew/play-1.2.7/modules/crud)
+22:46:26,295 INFO  ~ Module secure is available (/home/andrew/play-1.2.7/modules/secure)
+22:46:33,475 WARN  ~ You're running Play! in DEV mode
+~
+~ Go to http://localhost:9000/@tests to run the tests
+~
+22:46:34,607 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+~ Server is up and running
+### Excluding compile: jregex.Pretokenizer::next
+22:47:10,279 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL
+22:47:16,741 INFO  ~ Application 'yabe' is now started !
+Size3
+bob@gmail.com
+jeff@gmail.com
+paul@gmail.com
+null
+null
+@KILLED

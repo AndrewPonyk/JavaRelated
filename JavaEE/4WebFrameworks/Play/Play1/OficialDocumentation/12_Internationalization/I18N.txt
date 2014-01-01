@@ -124,6 +124,6 @@
 	
 	!!!!! Messages inside messages
 	guess.characteristic=Devinez &{%2$s} de %1$s.
-	person.age = l’age
+	person.age = l'age
 
 	where <b> &{%s} </b> is itself a message look-up, with the argument value as the message key.

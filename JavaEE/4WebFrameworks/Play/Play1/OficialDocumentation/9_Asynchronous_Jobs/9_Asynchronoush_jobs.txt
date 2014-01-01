@@ -39,7 +39,7 @@
 
 2)	Bootstrap jobs 
 
-	'Bootstrap' means - 'начальна€ загрузка'
+	'Bootstrap' means - 'load on start'
 	
 		Bootstrap jobs are executed by Play at application start time. 
 		To mark your job as a bootstrap job you just need to add the <b> @OnApplicationStart </b> annotation.
@@ -92,8 +92,8 @@
 		
 		/*
 			The above annotation is for hours, if you want to specify the time duration in minutes or seconds, you can do it in the following way:-
-			i) For Minutes - @Every(У3mnФ),@Every(У30mnФ)
-			ii) For Seconds - @Every(У35sФ),@Every(У56sФ)
+			i) For Minutes - @Every("3mn"),@Every("30mn")
+			ii) For Seconds - @Every("35s"),@Every("56s")
 		*/
 		
 		

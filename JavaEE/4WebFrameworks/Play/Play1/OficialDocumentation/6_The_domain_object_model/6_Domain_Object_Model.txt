@@ -1,7 +1,7 @@
 1)	The domain object model
 	
 
-	The model has a central position in a Play application. It’s the domain-specific representation of the information on which the application operates.
+	The model has a central position in a Play application. It's the domain-specific representation of the information on which the application operates.
 
 	 
 
@@ -19,7 +19,7 @@
 
 
 		If you take a look at Play sample applications, you will often see that classes declare public variables.
-		 Now if you’re a Java developer with any experience at all, warning sirens are probably clanging like mad at the sight of a public variable. 
+		 Now if you're a Java developer with any experience at all, warning sirens are probably clanging like mad at the sight of a public variable. 
 		 In Java (as in other object-oriented languages), best practice says to make all fields private and provide accessors and mutators. 
 		 This is to promote encapsulation, a concept critical to object oriented design.
 
@@ -73,8 +73,8 @@
 		product.setPrice(58);
 		
 		Warning           !!!!!!!!!!!!!!!
-		You can’t directly use getter and setter methods to access properties if you rely on automatic generation. These methods are generated at runtime.
-		So if you reference them in code you write, the compiler won’t find the methods and will generate an error.
+		You can't directly use getter and setter methods to access properties if you rely on automatic generation. These methods are generated at runtime.
+		So if you reference them in code you write, the compiler won't find the methods and will generate an error.
 		
 		((Of course you can define the getter and setter methods yourself. If a method exists Play will use the existing accessors.))
 -----------------------------------------------------------------------------------------------------------------------------------------

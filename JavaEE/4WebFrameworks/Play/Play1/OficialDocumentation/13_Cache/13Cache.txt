@@ -52,7 +52,7 @@
 			${val}
 		*make a request http://localhost:9000
 		
-		* then comment this line  ( i expect that value was saved with 180 seconds expiration)
+		* then comment this line  ( i expect that value was saved with 180 seconds expiration) (and it was mistake , dont change the code when app IS RUNNING =))
 			    	String val=Cache.get("someObject",String.class);
 		* make a request 
 		* And  i have null 

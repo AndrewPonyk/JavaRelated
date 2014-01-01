@@ -24,7 +24,6 @@
 --------------------------------------------------------------------------
 2)	Configure log levels
 
-	
 	If you need to fully configure Log4j, create a log4j.properties file in the conf/ directory.
 	Since this directory is the first element of the classpath, this file will be the defaul
 	used by all libraries.

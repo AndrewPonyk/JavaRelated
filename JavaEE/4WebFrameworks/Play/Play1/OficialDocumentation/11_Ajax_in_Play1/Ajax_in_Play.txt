@@ -117,7 +117,7 @@
     		     });
 		</script>
 	
-	With this approach, you won’t have to update your templates in case you
+	With this approach, you won't have to update your templates in case you
 	decide to change the HTTP method in the routes file.
 ---------------------------------------------------------------------------------------------------------------
 

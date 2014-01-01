@@ -56,7 +56,7 @@
 -------------------------------------------------------------------------------------------------------
 3)	dependencies.yml
 
-	!!!! Dont use <b>tab</b> in dependencies.yml
+	!!!! Dont use 'tab' in dependencies.yml
 
 	To see available modules use <b>play list-modules</b> !!!!!!!!!!!!
 
@@ -271,7 +271,6 @@
 	
 	*exec http://localhost:9000/mymodule/ <- this will redirect us to module controller 
 	HAPPY END =)
-	
 
 
 -------------------------------------------------------------------------------------------------------------------

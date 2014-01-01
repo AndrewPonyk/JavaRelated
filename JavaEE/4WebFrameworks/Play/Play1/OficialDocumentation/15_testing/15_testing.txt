@@ -179,7 +179,7 @@
 	To run the tests, you must run your application in test mode using the play test command.
 
 	 play test 
-
+	and after this go to http://host:port/@tests # you can run tests by clicking 'start'
 
 	When you run a test, the result is saved into the /test-result 
 	directory of your application.
