@@ -1,0 +1,471 @@
+
+ 
+
+
+
+ 
+ 
+ 
+
+
+
+ 
+ 
+ <!DOCTYPE html>
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >
+ 
+ <meta name="ROBOTS" content="NOARCHIVE">
+ 
+ <link rel="icon" type="image/vnd.microsoft.icon" href="https://ssl.gstatic.com/codesite/ph/images/phosting.ico">
+ 
+ 
+ <link rel="canonical" href="http://code.google.com/p/selenium/wiki/GettingStarted" />
+ 
+ <script type="text/javascript">
+ 
+ 
+ 
+ 
+ var codesite_token = null;
+ 
+ 
+ var CS_env = {"relativeBaseUrl": "", "loggedInUserEmail": null, "profileUrl": null, "domainName": null, "assetHostPath": "https://ssl.gstatic.com/codesite/ph", "projectName": "selenium", "assetVersionPath": "https://ssl.gstatic.com/codesite/ph/3076573747170053082", "projectHomeUrl": "/p/selenium", "token": null};
+ var _gaq = _gaq || [];
+ _gaq.push(
+ ['siteTracker._setAccount', 'UA-18071-1'],
+ ['siteTracker._trackPageview']);
+ 
+ _gaq.push(
+ ['projectTracker._setAccount', 'UA-7221039-2'],
+ ['projectTracker._trackPageview']);
+ 
+ (function() {
+ var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+ (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+ })();
+ 
+ </script>
+ 
+ 
+ <title>GettingStarted - 
+ selenium -
+ 
+ Getting started with WebDriver - 
+ Browser automation framework - Google Project Hosting
+ </title>
+ <link type="text/css" rel="stylesheet" href="https://ssl.gstatic.com/codesite/ph/3076573747170053082/css/core.css">
+ 
+ <link type="text/css" rel="stylesheet" href="https://ssl.gstatic.com/codesite/ph/3076573747170053082/css/ph_detail.css" >
+ 
+ 
+ 
+ <link type="application/atom+xml" rel="alternate" href="/feeds/p/selenium/gitchanges/basic?path=/GettingStarted.wiki&amp;repo=wiki">
+ 
+ 
+<!--[if IE]>
+ <link type="text/css" rel="stylesheet" href="https://ssl.gstatic.com/codesite/ph/3076573747170053082/css/d_ie.css" >
+<![endif]-->
+ <style type="text/css">
+ .menuIcon.off { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 -42px }
+ .menuIcon.on { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 -28px }
+ .menuIcon.down { background: no-repeat url(https://ssl.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 0; }
+ 
+ 
+ #maincol {
+ padding-top: 0;
+ padding-bottom: 0;
+ }
+
+ 
+ </style>
+</head>
+<body class="t6">
+<script type="text/javascript">
+ window.___gcfg = {lang: 'en'};
+ (function() 
+ {var po = document.createElement("script");
+ po.type = "text/javascript"; po.async = true;po.src = "https://apis.google.com/js/plusone.js";
+ var s = document.getElementsByTagName("script")[0];
+ s.parentNode.insertBefore(po, s);
+ })();
+</script>
+<div class="headbg">
+
+ <div id="gaia">
+ 
+
+ <span>
+ 
+ 
+ <a href="#" id="projects-dropdown" onclick="return false;"><u>My favorites</u> <small>&#9660;</small></a>
+ | <a href="https://www.google.com/accounts/ServiceLogin?service=code&amp;ltmpl=phosting&amp;continue=https%3A%2F%2Fcode.google.com%2Fp%2Fselenium%2Fwiki%2FGettingStarted&amp;followup=https%3A%2F%2Fcode.google.com%2Fp%2Fselenium%2Fwiki%2FGettingStarted" onclick="_CS_click('/gb/ph/signin');"><u>Sign in</u></a>
+ 
+ </span>
+
+ </div>
+
+ <div class="gbh" style="left: 0pt;"></div>
+ <div class="gbh" style="right: 0pt;"></div>
+ 
+ 
+ <div style="height: 1px"></div>
+<!--[if lte IE 7]>
+<div style="text-align:center;">
+Your version of Internet Explorer is not supported. Try a browser that
+contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>,
+<a href="http://www.google.com/chrome">Google Chrome</a>, or
+<a href="http://code.google.com/chrome/chromeframe/">Google Chrome Frame</a>.
+</div>
+<![endif]-->
+
+
+
+ <table style="padding:0px; margin: 0px 0px 10px 0px; width:100%" cellpadding="0" cellspacing="0"
+ itemscope itemtype="http://schema.org/CreativeWork">
+ <tr style="height: 58px;">
+ 
+ 
+ 
+ <td id="plogo">
+ <link itemprop="url" href="/p/selenium">
+ <a href="/p/selenium/">
+ 
+ 
+ <img src="/p/selenium/logo?cct=1377695826"
+ alt="Logo" itemprop="image">
+ 
+ </a>
+ </td>
+ 
+ <td style="padding-left: 0.5em">
+ 
+ <div id="pname">
+ <a href="/p/selenium/"><span itemprop="name">selenium</span></a>
+ </div>
+ 
+ <div id="psum">
+ <a id="project_summary_link"
+ href="/p/selenium/"><span itemprop="description">Browser automation framework</span></a>
+ 
+ </div>
+ 
+ 
+ </td>
+ <td style="white-space:nowrap;text-align:right; vertical-align:bottom;">
+ 
+ <form action="/hosting/search">
+ <input size="30" name="q" value="" type="text">
+ 
+ <input type="submit" name="projectsearch" value="Search projects" >
+ </form>
+ 
+ </tr>
+ </table>
+
+</div>
+
+ 
+<div id="mt" class="gtb"> 
+ <a href="/p/selenium/" class="tab ">Project&nbsp;Home</a>
+ 
+ 
+ 
+ 
+ <a href="/p/selenium/downloads/list" class="tab ">Downloads</a>
+ 
+ 
+ 
+ 
+ 
+ <a href="/p/selenium/w/list" class="tab active">Wiki</a>
+ 
+ 
+ 
+ 
+ 
+ <a href="/p/selenium/issues/list"
+ class="tab ">Issues</a>
+ 
+ 
+ 
+ 
+ 
+ <a href="/p/selenium/source/checkout"
+ class="tab ">Source</a>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <div class=gtbc></div>
+</div>
+<table cellspacing="0" cellpadding="0" width="100%" align="center" border="0" class="st">
+ <tr>
+ 
+ 
+ 
+ <td class="subt">
+ <div class="issueDetail">
+<div class="isf">
+ 
+ <span class="inIssueList"> 
+ <span>Search</span>
+ <form action="/p/selenium/w/list" method="GET" style="display:inline">
+ <select id="can" name="can" >
+ <option disabled="disabled">Search within:</option>
+ 
+ <option value="1" >&nbsp;All wiki pages</option>
+ <option value="3" >&nbsp;Featured pages</option>
+ <option value="2" selected="selected">&nbsp;Current pages</option>
+ 
+ 
+ <option value="4" >&nbsp;Deprecated pages</option>
+ 
+ </select>
+ <span>for</span>
+ <span id="qq"><input type="text" size="38" id="searchq" name="q" value=""
+ autocomplete="off" ></span>
+ 
+ 
+ 
+ <input type="submit" value="Search" >
+ </form>
+ </span>
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+</div>
+</div>
+
+ </td>
+ 
+ 
+ 
+ 
+ 
+ 
+ <td align="right" valign="top" class="bevel-right"></td>
+ </tr>
+</table>
+
+
+<script type="text/javascript">
+ var cancelBubble = false;
+ function _go(url) { document.location = url; }
+</script>
+<div id="maincol"
+ 
+>
+
+ 
+
+
+
+
+
+
+
+ <style type="text/css">
+ .delcom { background: #e8e8e8 }
+ .commentcontent {
+ margin: 2em;
+ padding: 0px 10px;
+ width: 66em;
+ }
+ .artifactcomment {
+ border-top: 3px solid #c3d9ff;
+ }
+ #commentform {
+ border-top: 3px solid #c3d9ff;
+ }
+ </style>
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ <div id="wikiheader">
+ 
+ <span style="font-size:120%;font-weight:bold">GettingStarted</span>
+ &nbsp;
+ <div> 
+ 
+ <i>Getting started with WebDriver</i>
+ 
+ 
+ <br/>
+ 
+ <a class="label" style="padding-top: 2px"
+ href="/p/selenium/w/list?q=label:Featured"
+ title="Listed on project home page"
+ >Featured</a>, 
+ 
+ <a class="label" style="padding-top: 2px"
+ href="/p/selenium/w/list?q=label:WebDriver"
+ title=""
+ >WebDriver</a>
+ 
+ 
+ 
+ <div id="wikiauthor" style="float:right">
+ Updated <span title="Mon Jan 14 05:44:58 2013">
+ Jan 14, 2013</span>
+ 
+ by 
+
+ <a class="userlink"
+ href="/u/luke.semerau/">luke.semerau</a
+>
+ 
+ </div>
+ </div>
+ </div>
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h1><a name="The_5_Minute_Getting_Started_Guide"></a>The 5 Minute Getting Started Guide<a href="#The_5_Minute_Getting_Started_Guide" class="section_anchor"></a></h1><p>WebDriver is a tool for automating testing web applications, and in particular to verify that they work as expected. It aims to provide a friendly API that&#x27;s easy to explore and understand, which will help make your tests easier to read and maintain. It&#x27;s not tied to any particular test framework, so it can be used equally well with JUnit, TestNG or from a plain old &quot;main&quot; method. This &quot;Getting Started&quot; guide introduces you to WebDriver&#x27;s Java API and helps get you started becoming familiar with it. </p><p>Start by <a href="http://code.google.com/p/selenium/downloads/list" rel="nofollow">downloading</a> the latest binaries and unpack them into a directory. A safe choice is the latest version of <tt>selenium-server-standalone-</tt><i>x.y.z</i><tt>.jar</tt>  <i>x</i>, <i>y</i> and <i>z</i> will be digits e.g. 2.4.0 at the time of writing. From now on, we&#x27;ll refer to this directory as <tt>$WEBDRIVER_HOME</tt>. Now, open your favourite IDE and: </p><ul><li>Start a new Java project in your favourite IDE </li><li>Add all the JAR files under <tt>$WEBDRIVER_HOME</tt> to the <tt>CLASSPATH</tt> </li></ul><p>You can see that WebDriver acts just as a normal Java library does: it&#x27;s entirely self-contained, and you don&#x27;t need to remember to start any additional processes or run any installers before using it.  </p><p>You&#x27;re now ready to write some code. An easy way to get started is this example, which searches for the term &quot;Cheese&quot; on Google and then outputs the result page&#x27;s title to the console. You&#x27;ll start by using the <a href="/p/selenium/wiki/HtmlUnitDriver">HtmlUnitDriver</a>. This is a pure Java driver that runs entirely in-memory. Because of this, you won&#x27;t see a new browser window open.  </p><pre class="prettyprint">package org.openqa.selenium.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
+public class Example  {
+    public static void main(String[] args) {
+        // Create a new instance of the html unit driver
+        // Notice that the remainder of the code relies on the interface, 
+        // not the implementation.
+        WebDriver driver = new HtmlUnitDriver();
+
+        // And now use this to visit Google
+        driver.get(&quot;http://www.google.com&quot;);
+
+        // Find the text input element by its name
+        WebElement element = driver.findElement(By.name(&quot;q&quot;));
+
+        // Enter something to search for
+        element.sendKeys(&quot;Cheese!&quot;);
+
+        // Now submit the form. WebDriver will find the form for us from the element
+        element.submit();
+
+        // Check the title of the page
+        System.out.println(&quot;Page title is: &quot; + driver.getTitle());
+    }
+}
+</pre><p>Compile and run it. You should see a line with the title of the Google search results as output. Congratulations, you&#x27;ve managed to get started with WebDriver! </p><p>In this next example, let&#x27;s use a page that requires Javascript to work properly, such as Google Suggest. You will also be using the <a href="/p/selenium/wiki/FirefoxDriver">FirefoxDriver</a>. Make sure that Firefox is installed on your machine and is in the normal location for your OS. </p><p>Once that&#x27;s done, create a new class called GoogleSuggest, which looks like: </p><pre class="prettyprint">package org.openqa.selenium.example;
+
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+public class GoogleSuggest {
+    public static void main(String[] args) throws Exception {
+        // The Firefox driver supports javascript 
+        WebDriver driver = new FirefoxDriver();
+        
+        // Go to the Google Suggest home page
+        driver.get(&quot;http://www.google.com/webhp?complete=1&amp;hl=en&quot;);
+        
+        // Enter the query string &quot;Cheese&quot;
+        WebElement query = driver.findElement(By.name(&quot;q&quot;));
+        query.sendKeys(&quot;Cheese&quot;);
+
+        // Sleep until the div we want is visible or 5 seconds is over
+        long end = System.currentTimeMillis() + 5000;
+        while (System.currentTimeMillis() &lt; end) {
+            WebElement resultsDiv = driver.findElement(By.className(&quot;gssb_e&quot;));
+
+            // If results have been returned, the results are displayed in a drop down.
+            if (resultsDiv.isDisplayed()) {
+              break;
+            }
+        }
+
+        // And now list the suggestions
+        List&lt;WebElement&gt; allSuggestions = driver.findElements(By.xpath(&quot;//td[@class=&#x27;gssb_a gbqfsf&#x27;]&quot;));
+        
+        for (WebElement suggestion : allSuggestions) {
+            System.out.println(suggestion.getText());
+        }
+     }
+}</pre><p>When you run this program, you&#x27;ll see the list of suggestions being printed to the console. That&#x27;s all there is to using WebDriver!  </p><p>Hopefully, this will have whet your appetite for more. In the <a href="/p/selenium/wiki/NextSteps">NextSteps</a> page, you will learn how more about how to use WebDriver. It covers aspects such as navigating forward and backward in your browser&#x27;s history, how to use frames and windows and it provides a more complete discussion of the examples than has been done as you&#x27;ve been <a href="/p/selenium/wiki/GettingStarted">GettingStarted</a>. If you&#x27;re ready, let&#x27;s take the <a href="/p/selenium/wiki/NextSteps">NextSteps</a>! </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+ 
+ 
+ 
+ <form name="delcom" action="../w/delComment.do" method="POST">
+ <input type="hidden" name="sequence_num" value="" >
+ <input type="hidden" name="create_time" value="" >
+ <input type="hidden" name="mode" value="" >
+ <input type="hidden" name="pagename" value="GettingStarted" >
+ <input type="hidden" name="token" value="" >
+ </form>
+
+
+ <script src="https://ssl.gstatic.com/codesite/ph/3076573747170053082/js/prettify/prettify.js"></script>
+ <script type="text/javascript">
+ prettyPrint();
+ </script>
+
+<script type="text/javascript" src="https://ssl.gstatic.com/codesite/ph/3076573747170053082/js/dit_scripts.js"></script>
+
+
+
+  
+ 
+ 
+ <script type="text/javascript" src="https://ssl.gstatic.com/codesite/ph/3076573747170053082/js/ph_core.js"></script>
+ 
+ <script type="text/javascript" src="https://ssl.gstatic.com/codesite/ph/3076573747170053082/js/ph_dwiki.js"></script>
+ 
+ 
+ 
+ 
+</div> 
+
+<div id="footer" dir="ltr">
+ <div class="text">
+ <a href="/projecthosting/terms.html">Terms</a> -
+ <a href="http://www.google.com/privacy.html">Privacy</a> -
+ <a href="/p/support/">Project Hosting Help</a>
+ </div>
+</div>
+ <div class="hostedBy" style="margin-top: -20px;">
+ <span style="vertical-align: top;">Powered by <a href="http://code.google.com/projecthosting/">Google Project Hosting</a></span>
+ </div>
+
+ 
+ 
+
+
+ 
+ </body>
+</html>
+
+

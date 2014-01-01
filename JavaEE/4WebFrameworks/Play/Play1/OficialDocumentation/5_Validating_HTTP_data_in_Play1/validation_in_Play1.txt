@@ -22,7 +22,7 @@
 		Using the first approach, let’s see how to validate a simple HTTP parameter:
 		public static void hello(String name) {
 			 validation.required(name);
-			 …
+			 ...
 		}
 
 
@@ -75,7 +75,7 @@
 
 						Alternatively, use the key in the annotation’s message parameter:
 						public static void hello(@Required(message="validation.required.em") String name) {
-						   …
+						   ...
 						}
 
 				3.Provide a message key for a localised message as an additional validation parameter.
@@ -88,7 +88,7 @@
 
 		For action method parameter annotations:
 		public static void save(@Required(message = "Give us a name!") String name) {
-		   …
+		   ...
 		}
 ------------------------------------------------------------------------------------------------------
 3) Validation message parameters
@@ -118,7 +118,7 @@
 			Several of the built-in validations define additional message parameters that correspond to the validation parameters. For example, the ‘match’ validation defines a second String parameter for the specified regular expression, which differs from the %s placeholder above in that it specifies the parameter index ‘2’:
 			validation.match=Must match %2$s
 
-			Similarly, the ‘range’ validation defines two additional numeric parameters, with indices 2 and 3:
+			Similarly, the 'range' validation defines two additional numeric parameters, with indices 2 and 3:
 			validation.range=Not in the range %2$d through %3$d
 
 			Look in the file $PLAY_HOME/resources/messages to see which other validations have parameters.
@@ -189,17 +189,18 @@
 				validation.hasErrors= There are errors
 				validation.min = %1$s must be more than  %2$d
 				validation.password = Password length > %2$s and contains at least 1 number
-
+					
 				/conf/messages.uk
-					name= ²ì’ÿ
-					age=Â³ê
-					password = Ïàðîëü
-					submit = Çáåðåãòè
+					name= Ð†Ð¼â€™Ñ
+					age=Ð’Ñ–Ðº
+					password = ÐŸÐ°Ñ€Ð¾Ð»ÑŒ
+					submit = Ð—Ð±ÐµÑ€ÐµÐ³Ñ‚Ð¸
 
-					validation.hasErrors= Âèïðàâòå ïîìèëêè
-					validation.required=Îáîâ’ÿçêîâî ââåä³òü %1$s
-					validation.min = %1$s ìóñèòü áóòè á³ëüøå  %2$d
-					validation.password = Äîâæèíà ïàðîëÿ > %2$s ³ ïàðîëü ìàº ìàòè õî÷ îäíó öèôðó
+
+					validation.hasErrors= Ð’Ð¸Ð¿Ñ€Ð°Ð²Ñ‚Ðµ Ð¿Ð¾Ð¼Ð¸Ð»ÐºÐ¸
+					validation.required=ÐžÐ±Ð¾Ð²â€™ÑÐ·ÐºÐ¾Ð²Ð¾ Ð²Ð²ÐµÐ´Ñ–Ñ‚ÑŒ %1$s
+					validation.min = %1$s Ð¼ÑƒÑÐ¸Ñ‚ÑŒ Ð±ÑƒÑ‚Ð¸ Ð±Ñ–Ð»ÑŒÑˆÐµ  %2$d
+					validation.password = Ð”Ð¾Ð²Ð¶Ð¸Ð½Ð° Ð¿Ð°Ñ€Ð¾Ð»Ñ > %2$s Ñ– Ð¿Ð°Ñ€Ð¾Ð»ÑŒ Ð¼Ð°Ñ” Ð¼Ð°Ñ‚Ð¸ Ñ…Ð¾Ñ‡ Ð¾Ð´Ð½Ñƒ Ñ†Ð¸Ñ„Ñ€Ñƒ
 
 				simple =)
 
@@ -250,7 +251,7 @@
 
 		And finally the modified form:
 			#{ifErrors}
-			   <h1>Oops…</h1>
+			   <h1>Oops...</h1>
 			#{/ifErrors}
 
 			#{form @Application.hello()}
@@ -293,7 +294,7 @@
 	Several of the built-in validations define additional message parameters that correspond to the validation parameters. For example, the ‘match’ validation defines a second String parameter for the specified regular expression, which differs from the %s placeholder above in that it specifies the parameter index ‘2’:
 		validation.match=Must match %2$s
 
-	, the ‘range’ validation defines two additional numeric parameters, with indices 2 and 3:
+	, the 'range' validation defines two additional numeric parameters, with indices 2 and 3:
 		validation.range=Not in the range %2$d through %3$d
 
 		Look in the file $PLAY_HOME/resources/messages to see which other validations have parameters.

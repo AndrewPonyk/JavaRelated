@@ -84,7 +84,7 @@
 	}
 	
 -------------------------------------------------------------------------------------------
-4) Selenium tests
+4) Selenium tests some words ?
 	
 	Acceptance tests are written using Selenium. 
 	Here you can test your application by running it in an automated browser.
@@ -126,7 +126,87 @@
 			assertTextPresent('OK')  
 		#{/selenium}
 ---------------------------------------------------------------------------------------------------
-5)	Fixtures
+5) Selenium tests using Java (using HtmlUnitDriver and FirefoxDriver) ?
+	
+	We can write selenium tests using Java !!! (Using HtmlUnitDriver - console mode,
+	and  with FirefoxDrive - we can see what selenium test do in browser )
+	
+	! We need Firefox browser and library (i used selenium-2.39.0.zip add all jars to classpath)
+	
+	
+	Here is example  : we load google page type 'wiki' in query field , and click on first finded result =)
+	
+		package selenium;
+		import org.openqa.selenium.*;
+		import org.openqa.selenium.firefox.FirefoxDriver;
+		import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
+		public class Selenium {
+			public static void main(String[] args) {
+				//testUsingHtmlUnit();
+				testUsingFirefox();    
+			}
+			
+			// test in console mode
+			public static void testUsingHtmlUnit(){
+				WebDriver driver = new HtmlUnitDriver();
+				
+				driver.get("http://www.google.com");
+				
+				WebElement query = driver.findElement(By.name("q"));
+				query.sendKeys("wiki");
+				driver.findElement(By.name("btnG")).click();
+				
+				try {
+					Thread.sleep(4500);  // wait until javascript runs, (there are better ways to make pause =))
+
+				} catch (InterruptedException ex) {
+					System.err.println("thread error");
+				}
+				
+				WebElement firstFindedLink = driver.findElements(By.cssSelector("h3.r a")).get(0);
+				
+				int r = driver.findElements(By.cssSelector("h3.r a")).size();
+				for(int i=0;i <1000;i++){
+					System.out.println(r); // should be 10 , because google show 10 results per page
+				}
+				
+				firstFindedLink.click();
+				
+				System.err.println(driver.getPageSource());
+			}
+			
+			//test in visual mode !!!
+			public static void testUsingFirefox(){
+				org.openqa.selenium.firefox.FirefoxDriver firefox = new FirefoxDriver();
+				
+				firefox.get("http://www.google.com");
+				
+				WebElement query = firefox.findElement(By.name("q"));
+				query.sendKeys("wiki");
+				firefox.findElement(By.name("btnG")).click();
+				try {
+					Thread.sleep(4500);
+
+				} catch (InterruptedException ex) {
+					System.err.println("thread error");
+				}
+				
+				WebElement firstFindedLink = firefox.findElements(By.cssSelector("h3.r a")).get(8);
+				
+				int r = firefox.findElements(By.cssSelector("h3.r a")).size();
+				for(int i=0;i <1000;i++){
+					System.out.println(r); // should be 10 , because google show 10 results per page
+				}
+				
+				firstFindedLink.click();
+				
+				System.err.println(firefox.getPageSource());
+			}
+		}
+	
+---------------------------------------------------------------------------------------------------
+6)	Fixtures
 	When you run tests, you need to have stable data for your application.
 	The simplest way is to reset your database before each test.
 
@@ -174,7 +254,7 @@
 	and for Selenium tests:
 	#{fixture delete:'all', load:['users.yml', 'roles.yml', 'permissions.yml'] /}
 ------------------------------------------------------------------------------------------------
-6)	Running the tests
+7)	Running the tests
 	
 	To run the tests, you must run your application in test mode using the play test command.
 
@@ -206,7 +286,7 @@
 	%test.jpa.ddl=create-drop
 	
 -------------------------------------------------------------------------------------------------------
-7)	Continuous integration, and running the tests automatically
+8)	Continuous integration, and running the tests automatically
 
 	The auto-test command does the same as the test command, but it automatically 
 	launches a browser, runs all the tests, and stops.
