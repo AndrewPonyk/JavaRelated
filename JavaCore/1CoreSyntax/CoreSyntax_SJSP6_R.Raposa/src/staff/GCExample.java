@@ -19,11 +19,16 @@ public class GCExample {
 		System.out.println("Calling gc twice...");
 		System.gc();
 
+	
+		
 		two = null;
 		System.out.println("Calling gc again...");
 		System.gc();
 		//Thread.sleep(1);
 		System.out.println("End of main...");
+		
+		
 
 	}
+	
 }
