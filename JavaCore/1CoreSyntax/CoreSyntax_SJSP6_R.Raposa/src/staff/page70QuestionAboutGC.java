@@ -2,7 +2,7 @@ package staff;
 
 class FinalTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		House h = new House();
 		h.address = "Main Street";
 		System.gc();
