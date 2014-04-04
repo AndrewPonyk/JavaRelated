@@ -53,7 +53,6 @@ public class Application extends Controller {
     	if(validation.hasErrors()){
     		 render("Application/show.html", post, randomID);
     	}
-    	
     	flash.success("Thanks for posting %s", author);
     	post.addComment(author, content);
     	Cache.delete(randomID);
