@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Home</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" media="screen" href="/public/stylesheets/main.css">
+        
+        <link rel="shortcut icon" type="image/png" href="/public/images/favicon.png">
+        <script src="/public/javascripts/jquery-1.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+        
+    </head>
+    <body>
+    	The hello world App
+    	<hr/>
+        
+
+
+	<h2> 
+		
+		doestnt in myconf mode
+		<p>play run --%myconf - to see this variable</p>
+	</h2>
+
+<form action="/sayHello/" method="get">
+	<input type="text" name="m" />
+	<input type="text" name="surname" />
+	<input type="submit" value="submit" >  	
+</form>
+
+
+       
+    </body>
+</html>

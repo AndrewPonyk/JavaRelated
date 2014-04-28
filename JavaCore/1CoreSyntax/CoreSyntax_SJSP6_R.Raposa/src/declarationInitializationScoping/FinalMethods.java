@@ -12,7 +12,7 @@ class A {
 		System.out.println("hello i am A");
 	}
 	
-	public final void s(){
+	public  void s(){
 		System.out.println("s");
 	}
 }
@@ -24,7 +24,7 @@ class B extends A{
 	
 	
 	@Override
-	public void s() { // ERROR  Cannot reduce the visibility of the inherited method from A
+	private void s() { // ERROR  Cannot reduce the visibility of the inherited method from A
 		// TODO Auto-generated method stub
 		super.s();
 	}

@@ -18,8 +18,6 @@ public class XSLTTransform {
 	public static void main(String[] args) {
 		String xmlFile = FILENAME + "hello_xsl.xml", 
 				xslFile = FILENAME + "hello_xlst.xsl";
-
-
 		
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
@@ -41,3 +39,5 @@ public class XSLTTransform {
 	}
 
 }
+
+// anothertext
