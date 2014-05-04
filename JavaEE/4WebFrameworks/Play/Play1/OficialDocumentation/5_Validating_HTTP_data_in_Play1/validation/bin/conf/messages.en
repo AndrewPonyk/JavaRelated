@@ -1,0 +1,13 @@
+# You can specialize this file for each language.
+# For example, for French create a messages.fr file
+#
+
+name= Name
+age=Age
+password = Password
+submit= Save
+
+validation.hasErrors= There are errors
+validation.required=Input %1$s
+validation.min = %1$s must be more than  %2$d
+validation.password = Password length > %2$s and contains at least 1 number

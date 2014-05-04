@@ -1,0 +1,10 @@
+name= Ім’я
+age=Вік
+password = Пароль
+submit = Зберегти
+
+validation.hasErrors= Виправте помилки
+validation.required=Обов’язково введіть %1$s
+validation.min = %1$s мусить бути більше  %2$d
+validation.password = Довжина пароля > %2$s і пароль має мати хоч одну цифру
+

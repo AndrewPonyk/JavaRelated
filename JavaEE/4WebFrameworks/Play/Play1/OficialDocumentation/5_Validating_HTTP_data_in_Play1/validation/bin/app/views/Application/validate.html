@@ -1,0 +1,36 @@
+#{extends 'main.html' /}
+#{set title:'Application.validate' /}
+#{set pagename:'validate.html' /}
+
+#{set 'moreStyles'}
+	<link rel="stylesheet" media="screen" href="@{'/public/stylesheets/forms.css'}">
+#{/set}
+
+
+#{ifErrors}
+	<div class="errors">	
+	    &{'validation.hasErrors'}
+	    <!-- #{errors}
+       		<li>${error}</li>
+   		#{/errors} - simply list with errors
+   		 -->
+	</div> 
+
+#{/ifErrors}
+
+	#{form action:@@Application.process() , method:'GET' }
+	
+		<div>
+			<label>&{'name'}</label>
+			<input type="text" name="name" value="${flash.name}"/><span>#{error 'name' /}</span>
+		</div>
+		<div>
+			<label>&{'age'}</label>
+			<input type="text" name="age" value="${flash.age}"  /><span>#{error 'age' /}</span>
+		</div>
+		<div>
+			<label>&{'password'}</label>
+			<input type="text" name="password" value="${flash.password}"  />#{error 'password' /}
+		</div>
+		<input  type="submit" value="&{'submit'}"/>
+	#{/form}
