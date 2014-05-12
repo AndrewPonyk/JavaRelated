@@ -1,0 +1,10 @@
+/* AUTOMATICALLY GENERATED ON Sat May 10 23:28:29 EEST 2014*/
+
+grant {
+  permission java.util.PropertyPermission "user.dir", "read";
+  permission java.io.FilePermission "test.txt", "read,write";
+  permission java.util.PropertyPermission "file.encoding", "read";
+  /*permission java.io.FilePermission "${user.dir}/*", "read"; also works for files in project folder*/
+  /*permission java.io.FilePermission "<<ALL FILES>>", "read, write, delete, execute";  for All files*/
+};
+
