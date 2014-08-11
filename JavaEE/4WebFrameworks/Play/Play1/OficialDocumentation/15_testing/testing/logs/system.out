@@ -1,0 +1,13 @@
+CompilerOracle: exclude jregex/Pretokenizer.next
+Listening for transport dt_socket at address: 8000
+12:43:49,426 INFO  ~ Starting /home/andrew/git/JavaRelated/JavaEE/4WebFrameworks/Play/Play1/OficialDocumentation/15_testing/testing
+12:43:50,673 WARN  ~ You're running Play! in DEV mode
+~
+~ Go to http://localhost:9000/@tests to run the tests
+~
+12:43:50,893 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+~ Server is up and running
+12:43:57,346 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+12:43:57,456 INFO  ~ Application 'testing' is now started !
+test
+@KILLED

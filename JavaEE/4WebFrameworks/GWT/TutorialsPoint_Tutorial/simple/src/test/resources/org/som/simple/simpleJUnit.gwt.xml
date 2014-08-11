@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='org.som.simple.simple' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/simple/greet" class="org.som.simple.server.GreetingServiceImpl" />
+
+</module>
