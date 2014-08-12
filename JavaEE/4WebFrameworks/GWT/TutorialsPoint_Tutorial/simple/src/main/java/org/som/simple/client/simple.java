@@ -230,6 +230,8 @@ public class simple implements EntryPoint {
 				button1.getElement().getStyle().setProperty("background", "green");
 			}
 		});
+		
+		RootPanel.get().add(new Login());
 		/********************/
 
 		final Button sendButton = new Button(messages.sendButton() + ".");
