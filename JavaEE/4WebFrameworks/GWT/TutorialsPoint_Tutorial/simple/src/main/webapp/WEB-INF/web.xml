@@ -10,14 +10,24 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     <servlet-class>org.som.simple.server.GreetingServiceImpl</servlet-class>
   </servlet>
 
+     <servlet>
+      <servlet-name>messageServiceImpl</servlet-name>
+      <servlet-class>org.som.simple.server.MessageServiceImpl</servlet-class>
+   </servlet>
+  
   <servlet-mapping>
     <servlet-name>greetServlet</servlet-name>
     <url-pattern>/simple/greet</url-pattern>
   </servlet-mapping>
 
+     <servlet-mapping>
+      <servlet-name>messageServiceImpl</servlet-name>
+      <url-pattern>/simple/message</url-pattern>
+   </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>simple.html</welcome-file>
   </welcome-file-list>
-
+  
 </web-app>

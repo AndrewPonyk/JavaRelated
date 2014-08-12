@@ -12,7 +12,9 @@ public class GwtTestsimple extends GWTTestCase {
 
 	@Override
 	public String getModuleName() {
-		return "org.som.simple.simpleJUnit";
+		//return "org.som.simple.simpleJUnit";
+		//return "org.som.simple.simple";
+		return null;
 	}
 
 	@Test

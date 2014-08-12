@@ -53,13 +53,34 @@ public class simple implements EntryPoint {
 	private final Messages messages = GWT.create(Messages.class);
 	public String testMessage = "Some text";
 
+	/*      *********/
+	//Study RCP in GWT
+	private MessageServiceAsync messageService = GWT
+			.create(MessageService.class);
+	
+	private class MessageCallBack implements AsyncCallback<Message> {
+		public void onFailure(Throwable caught) {
+			/* server side error occured */
+			Window.alert("Unable to obtain server response: "
+					+ caught.getMessage());
+		}
+
+		public void onSuccess(Message result) {
+			/* server returned result, show user the message */
+			Window.alert(result.getMessage());
+		}
+	}
+	/*      *********/
+	
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
 		/********************/
 		Window.alert("Alert from java");
-
+		Integer tempValue =10; 
+		tempValue++;
+		
 		HTML html = new HTML("<h1>Welcome to GWT APP (text from java)</h1>");
 		RootPanel.getBodyElement().insertFirst(html.getElement());
 
@@ -232,6 +253,21 @@ public class simple implements EntryPoint {
 		});
 		
 		RootPanel.get().add(new Login());
+		
+		//RCP Example
+		Button callRCP = new Button("Call RCP method");
+		callRCP.addClickHandler(new ClickHandler() {
+			
+			public void onClick(ClickEvent arg0) {
+				Window.alert("calling");
+				
+				 messageService.getMessage("some value", 
+			               new MessageCallBack());
+				
+			}
+		});
+		
+		RootPanel.get("RCP_example").add(callRCP);
 		/********************/
 
 		final Button sendButton = new Button(messages.sendButton() + ".");
