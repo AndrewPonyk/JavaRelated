@@ -54,3 +54,7 @@ h1 {
     overflow: hidden;
     padding: 15px;
 }
+
+.s:FOCUS{
+	box-shadow: 0 0 6px rgb(116,189,239);
+}

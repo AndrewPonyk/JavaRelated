@@ -7,7 +7,7 @@
       <div align="center">
          <gwt:VerticalPanel res:styleName="style.background">
             <gwt:Label text="Login" res:styleName="style.blackText" />
-            <gwt:TextBox ui:field="loginBox" res:styleName="style.box" />
+            <gwt:TextBox ui:field="loginBox" res:styleName="style.box s"/>
             <gwt:Label text="Password" res:styleName="style.blackText" />
             <gwt:PasswordTextBox ui:field="passwordBox" 
             res:styleName="style.box" />

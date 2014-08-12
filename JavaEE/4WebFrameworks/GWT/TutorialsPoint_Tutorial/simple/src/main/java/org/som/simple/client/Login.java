@@ -16,7 +16,8 @@ import com.google.gwt.user.client.ui.Widget;
 public class Login extends Composite {
 
    private static LoginUiBinder uiBinder = GWT.create(LoginUiBinder.class);
-
+   
+   
    /*
    * @UiTemplate is not mandatory but allows multiple XML templates
    * to be used for the same widget. 
@@ -29,10 +30,19 @@ public class Login extends Composite {
    @UiField(provided = true)
    final LoginResources res;
 
+  
    public Login() {
       this.res = GWT.create(LoginResources.class);
       res.style().ensureInjected();
+      
+      System.out.println(res.style().blackText());
+      
       initWidget(uiBinder.createAndBindUi(this));
+
+      System.out.println(res.style().ensureInjected());
+      System.out.println(res.style().ensureInjected());
+      
+      System.out.println("logging");
    }
 
    @UiField
