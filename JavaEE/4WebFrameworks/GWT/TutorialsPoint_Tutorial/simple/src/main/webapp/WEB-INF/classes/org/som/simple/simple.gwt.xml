@@ -19,6 +19,8 @@
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.som.simple.client.simple' />
 
+  <extend-property name="locale" values="fr" />
+
   <!-- Specify the paths for translatable code                    -->
   <source path='client' />
   <source path='shared' />
