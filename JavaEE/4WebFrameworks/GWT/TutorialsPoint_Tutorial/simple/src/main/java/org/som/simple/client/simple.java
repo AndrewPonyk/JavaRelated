@@ -9,7 +9,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 
 import org.som.simple.client.Messages;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -41,6 +40,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -53,6 +54,7 @@ public class simple implements EntryPoint {
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
 
+	 private static Logger rootLogger = Logger.getLogger("");
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting
 	 * service.
@@ -86,6 +88,8 @@ public class simple implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		rootLogger.log(Level.SEVERE, "Module loaded" );
+		
 		/********************/
 		Window.alert("Alert from java"  + messages.someVale());
 		Integer tempValue =10; 
