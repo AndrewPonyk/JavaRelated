@@ -72,5 +72,24 @@
 	<fieldset id="RCP_example">
 		<legend>RCP_example</legend>
 	</fieldset>
+	<div id="i118n" style="border:1px solid black">
+		<h2>i118n in GWT : two words</h2>
+		Now that StockWatcher is internationalized, how does GWT know which
+		locale to load at runtime? The answer is that it uses the value of the
+		client property, locale. You can set a this client property two ways:
+
+		Add an HTML
+		meta
+		tag to the
+		head
+		of the application host page, containing the property name and value:
+		meta name="gwt:property" content="locale=de">
+		Append the client property value to the query string of the URL:
+		<b>http://www.example.org/myapp.html?locale=de</b>
+	</div>
+	
+	<div id="HistoryClassGwt" style="background-color: #ccc;margin:15px;border:1px solid grey">
+		<p><h2>History class</h2></p>
+	</div>
 </body>
 </html>

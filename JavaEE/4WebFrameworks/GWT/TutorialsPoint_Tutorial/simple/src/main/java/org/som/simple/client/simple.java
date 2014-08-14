@@ -1,10 +1,15 @@
 package org.som.simple.client;
 
+import org.som.simple.client.GreetingServiceAsync;
+import org.som.simple.client.MessageServiceAsync;
 import org.som.simple.shared.FieldVerifier;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
+import org.som.simple.client.Messages;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -12,6 +17,11 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -77,7 +87,7 @@ public class simple implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		/********************/
-		Window.alert("Alert from java");
+		Window.alert("Alert from java"  + messages.someVale());
 		Integer tempValue =10; 
 		tempValue++;
 		
@@ -268,6 +278,69 @@ public class simple implements EntryPoint {
 		});
 		
 		RootPanel.get("RCP_example").add(callRCP);
+		
+		
+		/// History Class in GWT example  : 
+		/* create a tab panel to carry multiple pages */  
+		final TabPanel tabPanel1 = new TabPanel();
+
+		/* create pages */
+		HTML firstPage = new HTML("<h1>We are on first Page.</h1>");
+		HTML secondPage = new HTML("<h1>We are on second Page.</h1>");
+		HTML thirdPage = new HTML("<h1>We are on third Page.</h1>");
+
+		String firstPageTitle = "First Page";
+		String secondPageTitle = "Second Page";
+		String thirdPageTitle = "Third Page";
+		tabPanel.setWidth("600");
+
+		/* add pages to tabPanel */
+		tabPanel1.add(firstPage, firstPageTitle);
+		tabPanel1.add(secondPage, secondPageTitle);
+		tabPanel1.add(thirdPage, thirdPageTitle);
+
+		
+		/* add tab selection handler */
+		tabPanel1.addSelectionHandler(new SelectionHandler<Integer>() {
+			public void onSelection(SelectionEvent<Integer> event) {
+				/*
+				 * add a token to history containing pageIndex History class
+				 * will change the URL of application by appending the token to
+				 * it.
+				 */
+				History.newItem("pageIndex" + event.getSelectedItem());
+			}
+		});
+		
+		/*
+		 * add value change handler to History this method will be called, when
+		 * browser's Back button or Forward button are clicked and URL of
+		 * application changes.
+		 */
+		History.addValueChangeHandler(new ValueChangeHandler<String>() {
+			public void onValueChange(ValueChangeEvent<String> event) {
+				String historyToken = event.getValue();
+				/* parse the history token */
+				try {
+					if (historyToken.substring(0, 9).equals("pageIndex")) {
+						String tabIndexToken = historyToken.substring(9, 10);
+						int tabIndex = Integer.parseInt(tabIndexToken);
+						/* select the specified tab panel */
+						tabPanel1.selectTab(tabIndex);
+					} else {
+						tabPanel1.selectTab(0);
+					}
+				} catch (IndexOutOfBoundsException e) {
+					tabPanel1.selectTab(0);
+				}
+			}
+		});
+		
+		/* select the first tab by default */
+		tabPanel1.selectTab(0);
+
+		/* add controls to RootPanel */
+		RootPanel.get("HistoryClassGwt").add(tabPanel1);
 		/********************/
 
 		final Button sendButton = new Button(messages.sendButton() + ".");
