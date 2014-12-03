@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>chap2_BookstoreJSPAndJSTL</display-name>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>BookServlet</servlet-name>
+    <servlet-class>com.apress.bookweb.controller.BookController</servlet-class>
+    <init-param>
+      <param-name>base</param-name>
+      <param-value>chap2_BookstoreJSPAndJSTL/books</param-value>
+    </init-param>
+    <init-param>
+      <param-name>imageURL</param-name>
+      <param-value>/chap2_BookstoreJSPAndJSTL/images</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <context-param>
+    <param-name>param1</param-name>
+    <param-value>chap2_BookstoreJSPAndJSTL/books</param-value>
+  </context-param>
+  <context-param>
+    <param-name>imageURL</param-name>
+    <param-value>/chap2_BookstoreJSPAndJSTL/images</param-value>
+  </context-param>
+  <servlet-mapping>
+    <servlet-name>BookServlet</servlet-name>
+    <url-pattern>/books</url-pattern>
+  </servlet-mapping>
+  
+  <context-param>
+    <param-name>contextParamInWebXML</param-name>
+    <param-value>12345</param-value>
+  </context-param>
+  
+  
+  <filter>
+      <filter-name>jspfilter</filter-name>
+      <filter-class>com.apress.bookweb.filter.JSPFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+      <filter-name>jspfilter</filter-name>
+      <url-pattern>/*</url-pattern>
+  </filter-mapping>
+</web-app>
