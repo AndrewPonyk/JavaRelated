@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:jsp="http://java.sun.com/JSP/Page">  
+
+<jsp:output doctype-root-element="html"  
+            doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"  
+            doctype-system="http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>  
+<jsp:directive.page contentType="text/html;charset=UTF-8"/>  
+  
+<head></head>  
+<body>  
+ <h3>.jspx = JSP Document</h3>
+ 
+ <b>
+    Main difference between .jsp and .jspx :
+    <ul>
+        <li>.jspx - is XML file (you cannot use % %> , you must use jsp:scriptlet)</li>
+    </ul>
+ </b>
+<jsp:scriptlet>out.println("from scriplet");</jsp:scriptlet>
+</body>  
+</html> 

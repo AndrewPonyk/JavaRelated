@@ -38,6 +38,8 @@ public class JSPFilter implements Filter {
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		System.out.println("JSP FILTER");
+		System.out.println("# " + request.getServletContext().getRealPath("/WEB-INF"));
 		request.setAttribute("jspfilter", "1");
 		
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
