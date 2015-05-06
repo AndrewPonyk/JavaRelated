@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib>
+	<tlib-version>1.0</tlib-version>
+	<short-name>simple-tags</short-name>
+	<uri>http://chap888/tags</uri>
+	<jsp-version>2.2</jsp-version>
+
+	<tag>
+		<name>simple</name>
+		<tag-class>javatags.Simple</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+            <name>repeat</name>
+            <required>true</required>
+		</attribute>
+	</tag>
+</taglib>
