@@ -1,8 +1,8 @@
 package com.ap.codingbasics.client;
 
 import java.util.Date;
-import java.util.Random;
 
+import com.ap.codingbasics.client.overlaytypes.OverlayExamples;
 import com.ap.codingbasics.client.timeutilsrpc.TimeUtilsService;
 import com.ap.codingbasics.client.timeutilsrpc.TimeUtilsServiceAsync;
 import com.google.gwt.core.client.EntryPoint;
@@ -25,9 +25,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -42,7 +44,7 @@ public class codingbasics implements EntryPoint {
 	// An indicator when the computation should quit
 	private boolean abortFlag = false;
 
-
+	private final String myInstanceField = "My Java Instance field";
 
 	private static final String SERVER_ERROR = "An error occurred while "
       + "attempting to contact the server. Please check your network "
@@ -50,13 +52,29 @@ public class codingbasics implements EntryPoint {
 
   private final Messages messages = GWT.create(Messages.class);
 
+  OverlayExamples overlayExamples = new OverlayExamples();
+
   private TabPanel tabPanel;
 
   private FlowPanel sheduleMessagesPanel;
 
   private TimeUtilsServiceAsync timeUtilsAsync = GWT.create(TimeUtilsService.class);
 
-	private void learnDelayedLogic(RootPanel root) {
+  // Used deferred binding. look at Popup.gwt.xml
+
+	private void learnDeferredBinding() {
+		RichTextArea area = new RichTextArea();
+		RichTextAreaImpl impl = GWT.create(RichTextAreaImpl.class);
+		String deferredText ="<b>Using implementation :</b>" + impl.getClass().toString() + "<br><hr>";
+		deferredText += "<b>Text</b> area class has <b>field</b> 'private RichTextAreaImpl impl = GWT.create(RichTextAreaImpl.class);'"
+				+ "and this is example of DEFERRED Binding , look in the RichText.gwt.xml";
+		area.setHTML(deferredText);
+		area.setWidth("700px");
+
+		RootPanel.get().add(area);
+	}
+
+  private void learnDelayedLogic(RootPanel root) {
 		sheduleMessagesPanel = new FlowPanel();
 
 		// GWT provides three classes that you can use to defer running code
@@ -193,11 +211,42 @@ public class codingbasics implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent arg0) {
 				Window.alert("JSNI is great " + doubleN(3));
+				Window.alert("Your browser is : " + getUserAgent());
 			}
 		});
 
 		root.add(jsniExample);
 	}
+
+	// Accessing Java Methods and Fields from JavaScript
+	//Invoking Java methods from JavaScript
+
+	/*Calling Java methods from JavaScript is somewhat similar to calling
+	Java methods from C code in JNI. In particular, JSNI borrows the
+	JNI mangled method signature approach to distinguish among overloaded methods.
+	JavaScript calls into Java methods are of the following form:
+
+	[instance-expr.]@class-name::method-name(param-signature)(arguments)
+	*
+	*
+	*/
+
+
+	private void callJavaFromJavascript(RootPanel root){
+		Button callJavaFromJS = new Button("callJavaFromJS");
+
+		callJavaFromJS.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent arg0) {
+				jsniNative();
+				jsniCallJavaMethod();
+			}
+		});
+
+		root.add(callJavaFromJS);
+	}
+
 
 	private void learnDateAndNumberFormatting(VerticalPanel vp) {
 		NumberFormat fmt = NumberFormat.getDecimalFormat();
@@ -292,8 +341,25 @@ public class codingbasics implements EntryPoint {
 		int k = 10;
 		k = k * 2;
 		Window.alert("from IDEA 1114444" + k);
+
+		//
+		callJavaFromJavascript(RootPanel.get());
+
+		/// Examples with Overlays
+		overlayExamples.parsingJsonStringToOrerlayArray();
+
+		overlayExamples.parsingJSObject();
+
+		// example of deferred binding
+		learnDeferredBinding();
 	}
 
+
+	private String getParameterFromUrl(String url, int n){
+
+		String result = url.substring(1,n);
+		return result;
+	}
 
 	private native int doubleN(int n)/*-{
 		return n * 2;
@@ -301,5 +367,18 @@ public class codingbasics implements EntryPoint {
 
 	public static native String getUserAgent() /*-{
 		return navigator.userAgent.toLowerCase();
+	}-*/;
+
+	public native void jsniNative()/*-{
+		alert(this.@com.ap.codingbasics.client.codingbasics::myInstanceField);
+	}-*/;
+
+	public native void jsniCallJavaMethod()/*-{
+		var result = this.@com.ap.codingbasics.client.codingbasics::getParameterFromUrl(Ljava/lang/String;I)($wnd.location.href, 10);
+		$wnd.alert("Result from java METHOD : " + result)
+	}-*/;
+
+	public native void jsniSomeProblemsWithLong()/*-{
+
 	}-*/;
 }

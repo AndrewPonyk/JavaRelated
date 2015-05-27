@@ -163,7 +163,7 @@ public class StockWatcherGWT implements EntryPoint {
 		});
 
 		Button getJSONP = new Button("Get JSONP");
-		RootPanel.get("jsonp").add(getJSONP);;
+		RootPanel.get("jsonp").add(getJSONP);
 		getJSONP.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -175,8 +175,6 @@ public class StockWatcherGWT implements EntryPoint {
 					public void onSuccess(JsArray<StockData> result) {
 						 Window.alert("Pobeda )))" );
 						 Window.alert("First element of json : " + result.get(0).getSymbol());
-
-
 					}
 
 					 @Override

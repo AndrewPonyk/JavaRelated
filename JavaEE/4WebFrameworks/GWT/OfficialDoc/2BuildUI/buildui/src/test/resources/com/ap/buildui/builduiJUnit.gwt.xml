@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="buildui">
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='com.ap.buildui.buildui' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/buildui/greet" class="com.ap.buildui.server.GreetingServiceImpl" />
+
+</module>

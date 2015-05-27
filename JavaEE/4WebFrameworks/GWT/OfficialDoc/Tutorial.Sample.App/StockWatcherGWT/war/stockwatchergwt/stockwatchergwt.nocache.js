@@ -431,16 +431,16 @@ function stockwatchergwt(){
     }
     var strongName;
     try {
-      unflattenKeylistIntoAnswers(['default', 'ie8'], '14D2341B8ADC42987705BC2453B05805');
-      unflattenKeylistIntoAnswers(['de', 'ie9'], '197DCFA36EE7DAFD91646C37F98BFACD');
-      unflattenKeylistIntoAnswers(['default', 'ie10'], '359461B1D7476776B71B8DD1C5A3CF17');
-      unflattenKeylistIntoAnswers(['default', 'ie9'], '6A32889DF956E90446662C02E7C61C00');
-      unflattenKeylistIntoAnswers(['de', 'safari'], '8048D94564B14DE3C47B8C1BEA4C987C');
-      unflattenKeylistIntoAnswers(['de', 'ie10'], '8841A6C01D9428B6DC5D72426AAEA6AA');
+      unflattenKeylistIntoAnswers(['de', 'ie8'], '1150B7426EFDB512DE50CEF4B5B6A152');
+      unflattenKeylistIntoAnswers(['default', 'gecko1_8'], '296559D3BDBF710A4F64C488DE16CE8F');
+      unflattenKeylistIntoAnswers(['de', 'safari'], '303B10114A9A4D991BA7AE904B821A69');
+      unflattenKeylistIntoAnswers(['default', 'ie9'], '51258291ED2604AF7EC9818DD929BA6C');
+      unflattenKeylistIntoAnswers(['de', 'ie9'], '518871D64496F5F32BED7B6F033AD10F');
+      unflattenKeylistIntoAnswers(['de', 'ie10'], '9ABD372998D3636ECECC52045E6B3EE9');
       unflattenKeylistIntoAnswers(['default', 'safari'], 'B0716D2F8DF19FCD3D37555562EB0674');
-      unflattenKeylistIntoAnswers(['de', 'gecko1_8'], 'C0139C8F074B4CF684E8A3C1203B1185');
-      unflattenKeylistIntoAnswers(['de', 'ie8'], 'D5A3E3E1DF9C93EF75CD55D162772893');
-      unflattenKeylistIntoAnswers(['default', 'gecko1_8'], 'E3D71DEF07A5D4332455A82ED8031722');
+      unflattenKeylistIntoAnswers(['default', 'ie10'], 'BA89E5BE2C214CDA3DACCD70EAE73001');
+      unflattenKeylistIntoAnswers(['de', 'gecko1_8'], 'DB82C7C50618732D469F474D7F15461C');
+      unflattenKeylistIntoAnswers(['default', 'ie8'], 'F8E9976B8414F19C67E278975A8CC044');
       strongName = answers[computePropValue('locale')][computePropValue('user.agent')];
       var idx = strongName.indexOf(':');
       if (idx != -1) {
@@ -458,18 +458,7 @@ function stockwatchergwt(){
     if (!$wnd_0.__gwt_stylesLoaded) {
       $wnd_0.__gwt_stylesLoaded = {};
     }
-    function installOneStylesheet(stylesheetUrl){
-      if (!__gwt_stylesLoaded[stylesheetUrl]) {
-        var l = $doc_0.createElement('link');
-        l.setAttribute('rel', 'stylesheet');
-        l.setAttribute('href', computeUrlForResource(stylesheetUrl));
-        $doc_0.getElementsByTagName('head')[0].appendChild(l);
-        __gwt_stylesLoaded[stylesheetUrl] = true;
-      }
-    }
-
     sendStats('loadExternalRefs', 'begin');
-    installOneStylesheet('gwt/standard/standard.css');
     sendStats('loadExternalRefs', 'end');
   }
 
