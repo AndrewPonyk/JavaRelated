@@ -37,3 +37,7 @@ h1 {
   border : 1px solid;
   margin: 15px 0;
 }
+
+.gwt-SplitLayoutPanel-VDragger, .gwt-SplitLayoutPanel-HDragger{
+    background: #ccc;
+}

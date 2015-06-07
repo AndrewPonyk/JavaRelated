@@ -19,10 +19,11 @@ public class buildui implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-
+            
 		learnPopupPanelAndDialogBox();
-		//
-		learnTabLayoutPanel();
+		
+                //
+                learnTabLayoutPanel();
 
 		//
 		learnFlowPanel();
@@ -32,8 +33,22 @@ public class buildui implements EntryPoint {
 
 		//
 		learnUIWidgetBinder();
+                
+                //
+                learnHorizontalPanel();
+                
+                //
+                learnSplitLayoutPanel();
+                
+                //
+                learnDockLayoutPanel();
+                
+                //
+                learnStackPanel();
+                
+                //
+                learnTreeWidget();
 	}
-
 
 	private void learnUIDivBinder(){
 		HelloWorldBinder binder = new HelloWorldBinder();
@@ -65,15 +80,66 @@ public class buildui implements EntryPoint {
 	}
 
 	private void learnHorizontalPanel(){
-
+            HorizontalPanel hp = new HorizontalPanel();
+          
+            hp.getElement().setAttribute("style", "margin:10px; border: 2px solid red");
+            hp.getElement().setAttribute("id", "");
+            hp.add(new Label("This is horizontal panel example"));
+            hp.add(new Button("123"));
+            hp.add(new Button("456"));
+            
+            RootPanel.get().add(hp);
 	}
 
-	private void learnVerticalSplitPanel(){
-
-	}
+        
+    private void learnDockLayoutPanel(){
+        DockLayoutPanel sp = new DockLayoutPanel(Unit.PX);
+        sp.ensureDebugId("cwDockLayoutPanel");
+        sp.getElement().getStyle()
+                .setProperty("border", "3px solid blue");
+        sp.getElement().getStyle()
+                .setProperty("margin", "20px 0");
+        
+                // Add text all around.
+        sp.addNorth(new Label("North element .... DockLayoutPanel"), 50);
+        sp.addSouth(new Label("South elemen ..a"), 50);
+        sp.addEast(new Label("East east text"), 100);
+        sp.addWest(new Label("It is west stext"), 100);
+        sp.addNorth(new Label("This is north2 text"), 50);
+        sp.addSouth(new Label("This is south2 text"), 50);
+        sp.add(new Label("This is siple CENTER CENTER CENTER text "));
+        sp.setSize("1000px", "300px");
+        
+        RootPanel.get().add(sp);
+    }    
+        
+        /*The SplitLayoutPanel is identical to the DockLayoutPanel (and indeed extends it), except
+        that it automatically creates a user-draggable splitter between each pair of child widgets.
+        It also supports only the use of pixel units.
+        Use this instead of HorizontalSplitPanel and VerticalSplitPanel.
+        */
+    private void learnSplitLayoutPanel() {
+        
+        SplitLayoutPanel sp = new SplitLayoutPanel(5);
+        sp.ensureDebugId("cwSplitLayoutPanel");
+        sp.getElement().getStyle()
+                .setProperty("border", "3px solid blue");
+        
+                // Add text all around.
+        sp.addNorth(new Label("North element ..."), 50);
+        sp.addSouth(new Label("South elemen ..a"), 50);
+        sp.addEast(new Label("East east text"), 100);
+        sp.addWest(new Label("It is west stext"), 100);
+        sp.addNorth(new Label("This is north2 text"), 50);
+        sp.addSouth(new Label("This is south2 text"), 50);
+        sp.add(new Label("This is siple CENTER CENTER CENTER text "));
+        sp.setSize("1000px", "300px");
+        
+        RootPanel.get().add(sp);
+    }
 
 	private void learnStackPanel(){
-
+            RootLayoutPanel.get().add(new Button("..........................."));
 	}
 
 	private void learnPopupPanelAndDialogBox(){
@@ -120,4 +186,7 @@ public class buildui implements EntryPoint {
 		RootPanel.get().add(p);
 	}
 	//End---------------------- Learn Different Panels
+
+    private void learnTreeWidget() {
+    }
 }
