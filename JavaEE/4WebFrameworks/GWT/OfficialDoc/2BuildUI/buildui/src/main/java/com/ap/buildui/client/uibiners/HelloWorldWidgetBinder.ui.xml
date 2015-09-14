@@ -1,0 +1,9 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    <g:HTMLPanel>
+        Hello, <g:ListBox ui:field='listBox' visibleItemCount='1'/>.
+        <g:Button ui:field="submitButton">Submit button in *.ui.xml</g:Button>
+        
+    </g:HTMLPanel>
+
+</ui:UiBinder>

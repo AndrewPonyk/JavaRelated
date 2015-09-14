@@ -1,0 +1,16 @@
+<!-- HelloWorld.ui.xml -->
+
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'>
+	<div class="binder-div-class ddd">
+
+		<hr /><hr/>
+		<b>Hello world UIBinder:::</b>
+		Hello,
+		<span class='nameSpan' ui:field='nameSpan' />
+		.
+		<span class='secondSpan' ui:field='secondSpan' />
+		<hr />
+		<div id = "temp"></div>
+		<ul class="myclass" ui:field="results"></ul>
+	</div>
+</ui:UiBinder>

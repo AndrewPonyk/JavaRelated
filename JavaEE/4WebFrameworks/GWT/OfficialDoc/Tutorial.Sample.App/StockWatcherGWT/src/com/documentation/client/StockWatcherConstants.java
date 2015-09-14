@@ -20,4 +20,5 @@ public interface StockWatcherConstants extends Constants {
 
 	@DefaultStringValue("Add")
 	String add();
+
 }

@@ -1,0 +1,22 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+
+GET     /contacts                   controllers.Agenda.list()
+
+GET     /contacts/new               controllers.Agenda.newContact()
+POST    /contacts/post              controllers.Agenda.createContact()
+
+GET     /contacts/:id               controllers.Agenda.show(id : Long)
+
+GET     /tempAction                 controllers.Agenda.tempAction()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/img/glyphicons-halfings-white.png   controllers.Assets.at(path="/public", file="/images/glyphicons-halflings-white.png")
+GET     /assets/img/glyphicons-halfings.png   controllers.Assets.at(path="/public", file="/images/glyphicons-halflings.png")
+
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+

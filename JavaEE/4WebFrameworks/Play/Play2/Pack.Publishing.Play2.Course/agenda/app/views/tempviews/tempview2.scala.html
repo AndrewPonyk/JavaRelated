@@ -1,0 +1,14 @@
+@(message : String)(anotherMessage: String)(names : List[String])
+
+<h4>tempView2</h4>
+@message
+<hr>
+@anotherMessage
+
+@for(name<- names){
+    <i>@name</i>
+}
+
+@main("Inherited in subpackage"){
+    12345
+}

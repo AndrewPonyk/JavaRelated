@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.packt.plugins</groupId>
+  <artifactId>using-my-mail-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>using-my-mail-plugin</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+      <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+          <version>4.2.6.Final</version>
+      </dependency>
+
+  </dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+                <artifactId>mail-maven-plugin</artifactId>
+                <groupId>com.packt.plugins</groupId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>clean-sendmail</id>
+                        <phase>pre-clean</phase>
+                        <goals><goal>mail</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+<!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        &lt;!&ndash;<phase>none</phase> &ndash;&gt; &lt;!&ndash;Use this line to skip plugin execution&ndash;&gt;
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals> 
+                    </execution>
+                </executions>
+            </plugin>-->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+			</plugin>
+		</plugins>
+	</build>
+    <distributionManagement>
+
+        <repository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>packt</id>
+            <url>http://localhost:8081/nexus/content/repositories/packt</url>
+        </repository>
+    </distributionManagement>
+</project>
