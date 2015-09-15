@@ -1,0 +1,87 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.packt</groupId>
+    <artifactId>json-parser-dist</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>PACKT JSON Parser Distribution</name>
+    <dependencies>
+        <!--
+        Under the dependencies section we have to specify all the
+        dependent jars that must be assembled into the final
+        artifact. In this case we have two jar files. The first one
+        is the external dependency that we used to parse the JSON
+        file and the second one includes the class we wrote.
+        -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.packt</groupId>
+            <artifactId>json-parser</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>distribution-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>json-parser</finalName>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dist.xml
+                                </descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+            Even though the maven-jar-plugin is inherited from the
+            super POM, here we have redefined it because we need to add
+            some extra configurations. Since we need to make our final
+            archive executable, we need to define the class to be
+            executable in the jar manifest. Here we have set
+            com.packt.json.JSONParser as our main class. Also –
+            classpath is set to the lib directory. If you look at the
+            assembly descriptor used in the assembly plugin, you will
+            notice that, the dependent jar files are copied into the
+            lib directory. The manifest configuration in the maven-jarplugin
+            will result in the following manifest file (METAINF/
+            MANIFEST.MF).
+                        Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: prabath
+Build-Jdk: 1.6.0_65
+Main-Class: com.packt.json.JSONParser
+Class-Path: lib/json-simple-1.1.jar lib/json-parser-1.0.0.jar
+-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.packt.json.JSONParser
+                            </mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,5 @@
+IN the project "using-assembly-plugin"
+we perform custom jar creating : 
+	- we include only .java classes from com.my package into jar
+
+	- to create this custom jar just perform 'mvn clean install'

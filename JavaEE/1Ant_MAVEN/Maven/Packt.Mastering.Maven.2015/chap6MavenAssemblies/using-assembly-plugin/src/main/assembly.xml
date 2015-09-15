@@ -1,0 +1,28 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd" >
+    <id>1.0-SNAPSHOT</id>
+    <baseDirectory>tet</baseDirectory>
+
+    <formats>
+        <format>jar</format>
+    </formats>
+
+    <fileSets>
+
+        <fileSet>
+            <directory>src/main/java/com/my</directory>
+            <outputDirectory>/docs</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <!--<useStrictFiltering>true</useStrictFiltering>-->
+            <outputDirectory>META-INF</outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
