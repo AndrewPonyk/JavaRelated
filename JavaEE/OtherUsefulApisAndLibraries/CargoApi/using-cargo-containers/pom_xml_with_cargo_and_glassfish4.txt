@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ap</groupId>
+	<artifactId>using-cargo-containers</artifactId>
+	<packaging>war</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>using-cargo-containers Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+	   <cargo.samples.servlet.port>8080</cargo.samples.servlet.port>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+
+	</dependencies>
+	<build>
+		<finalName>using-cargo-containers</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.4.9</version>
+
+				<configuration>
+<!--
+					<container>
+						<containerId>tomcat7x</containerId>
+						<zipUrlInstaller>
+							<url>http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.64/bin/apache-tomcat-7.0.64.zip</url>
+						</zipUrlInstaller>
+					</container> -->
+
+                   <container>
+                        <containerId>glassfish4x</containerId>
+                        <zipUrlInstaller>
+                            <url>http://download.java.net/glassfish/4.1/release/glassfish-4.1.zip</url>
+                        </zipUrlInstaller>
+                    </container>
+
+
+
+					<configuration>
+						<!-- <home>${project.build.directory}/catalina-base</home> -->
+						<properties>
+							<cargo.servlet.port>${cargo.samples.servlet.port}</cargo.servlet.port>
+							<!-- <cargo.rmi.port>${cargo.samples.rmi.port}</cargo.rmi.port> <cargo.tomcat.ajp.port>${cargo.samples.tomcat.ajp.port}</cargo.tomcat.ajp.port> -->
+						</properties>
+					</configuration>
+					<deployables>
+						<deployable>
+							<groupId>com.ap</groupId>
+							<artifactId>using-cargo-containers</artifactId>
+							<type>war</type>
+						</deployable>
+					</deployables>
+					<packager>
+						<outputLocation>${project.build.directory}/tomcat-packaged</outputLocation>
+					</packager>
+				</configuration>
+				<executions>
+					<!-- <execution>
+						<id>start</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>package</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>package</goal>
+						</goals>
+					</execution> -->
+				</executions>
+
+			</plugin>
+		</plugins>
+	</build>
+</project>
+

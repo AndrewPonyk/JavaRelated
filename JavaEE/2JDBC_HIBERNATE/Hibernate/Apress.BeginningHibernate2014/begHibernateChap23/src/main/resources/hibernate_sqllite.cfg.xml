@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">
+            org.sqlite.JDBC
+        </property>
+        <property name="connection.url">
+            jdbc:sqlite://home/andrew/git/JavaRelated/JavaEE/2JDBC_HIBERNATE/Hibernate/Apress.BeginningHibernate2014/beginningHibernate2014.db
+        </property>
+        <property name="connection.username">sa</property>
+        <property name="connection.password" />
+        <property name="dialect">com.my.SQLiteDialect</property>
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">false</property>
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto">create</property>
+
+        <mapping class="ch2.Message" />
+
+        <mapping class="ch3.Person" />
+        <mapping class="ch3.Skill" />
+        <mapping class="ch3.Ranking" />
+
+        <mapping class="ch4.Email"/>
+        <mapping class="ch4.Messagech4"/>
+
+    </session-factory>
+</hibernate-configuration>
