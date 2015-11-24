@@ -4,8 +4,11 @@ package ch12;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
+import java.util.List;
 
-// Hibernate OGM DOESNT WORK WITH INNER CLASSES, so if you have any inner entity it will throw exception
+// Hibernate OGM DOESNT WORK WITH INNER CLASSES (Because of $ sign ), so if you have any inner entity you
+// SHOULD give @Entity(name="NameWithoutDolarSign")
 
 // good tutorial
 // http://blog.eisele.net/2015/01/nosql-with-hibernate-ogm-part-one.html
@@ -22,8 +25,9 @@ public class Programch12 {
     public static void main(String[] args) {
 
         System.out.println("Hibernate and NOSQL");
-       saveEntity();
-        getEntityById(1L);
+        saveEntity();
+        findAll();
+        //getEntityById(1L);
     }
 
     public static void saveEntity(){
@@ -47,4 +51,15 @@ public class Programch12 {
         em.close();
     }
 
+    public  static void findAll(){
+        EntityManager em = getEntityManager();
+        em.getTransaction().begin();
+
+        List<PersonNoSQL> resultList = em.createQuery("from  PersonNoSQL").getResultList();
+        for(PersonNoSQL item : resultList){
+            System.out.println(item.getId() + ":" + item.getName());
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
 }

@@ -94,6 +94,7 @@ public class Programch4 {
 
 
     @Entity
+    @Table(name = "PersonInner")
     public static class PersonInner{
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -9,6 +9,7 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
         <!-- Use Hibernate OGM provider: configuration will be transparent -->
         <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
         <class>ch12.PersonNoSQL</class>
+        <exclude-unlisted-classes/>
         <properties>
             <property name="hibernate.ogm.datastore.provider"
                       value="org.hibernate.ogm.datastore.mongodb.impl.MongoDBDatastoreProvider"/>
@@ -20,15 +21,27 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
         </properties>
     </persistence-unit>
 
-<!--    <persistence-unit name="chapter12-ispn" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
-        <class>ch12.PersonNoSQL</class>
+    <persistence-unit name="utiljpa">
+        <!-- This next node should be included for use of the Hibernate provider in
+        A Java EE environment in which Hibernate is not the default. -->
+        <!--
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        -->
         <properties>
-            <property name="hibernate.ogm.datastore.provider"
-                      value="org.hibernate.ogm.datastore.infinispan.impl.InfinispanDatastoreProvider"/>
-            <property name="hibernate.transaction.jta.platform"
-                      value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform"/>
-        </properties>
-    </persistence-unit>-->
+            <!-- Properties prefixed with “javax” are part of the JPA specification.
+            Hibernate will use them as it can.
+            Properties prefixed with “hibernate” are passed to the Hibernate
+            provider, and map to the standard hibernate properties.
+            -->
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/beginningHibernate2014"/>
+            <property name="javax.persistence.jdbc.user" value="dev"/>
+            <property name="javax.persistence.jdbc.password" value="dev"/>
 
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.show_sql" value="true"/>
+
+        </properties>
+    </persistence-unit>
 </persistence>

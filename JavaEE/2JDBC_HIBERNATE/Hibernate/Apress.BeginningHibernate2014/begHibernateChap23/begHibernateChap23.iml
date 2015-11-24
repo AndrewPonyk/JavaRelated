@@ -26,13 +26,25 @@
     <orderEntry type="library" name="Maven: org.jboss:jandex:1.1.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hsqldb:hsqldb:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.8.11.2" level="project" />
+    <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-core:4.1.6" level="project" />
+    <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-api-jpa:4.1.5" level="project" />
+    <orderEntry type="library" name="Maven: javax.jdo:jdo-api:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.transaction:jta:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-rdbms:4.1.6" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-validator:5.2.2.Final" level="project" />
+    <orderEntry type="library" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.el:javax.el-api:2.2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish.web:javax.el:2.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-c3p0:4.2.8.Final" level="project" />
     <orderEntry type="library" name="Maven: com.mchange:c3p0:0.9.5-pre10" level="project" />
     <orderEntry type="library" name="Maven: com.mchange:mchange-commons-java:0.2.8" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.37" level="project" />
+    <orderEntry type="library" name="Maven: org.hibernate:hibernate-ehcache:4.2.8.Final" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache-core:2.4.3" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.ogm:hibernate-ogm-mongodb:4.2.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.ogm:hibernate-ogm-core:4.2.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-entitymanager:4.3.9.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.hql:hibernate-hql-parser:1.2.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.4" level="project" />

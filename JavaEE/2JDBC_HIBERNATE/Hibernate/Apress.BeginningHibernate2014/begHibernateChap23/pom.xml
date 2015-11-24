@@ -38,7 +38,48 @@
 			<version>3.8.11.2</version>
 		</dependency>
 
+		<!-- Data Nucleus JPA provider-->
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-core</artifactId>
+			<version>4.1.6</version>
+		</dependency>
 
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-api-jpa</artifactId>
+			<version>4.1.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.jdo</groupId>
+			<artifactId>jdo-api</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+<dependency>
+	<groupId>org.datanucleus</groupId>
+	<artifactId>datanucleus-rdbms</artifactId>
+	<version>4.1.6</version>
+</dependency>
+
+
+		<!-- Hibernate validator -->
+		<dependency>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate-validator</artifactId>
+		    <version>5.2.2.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+			<dependency>
+				<groupId>org.glassfish.web</groupId>
+				<artifactId>javax.el</artifactId>
+				<version>2.2.4</version>
+			</dependency>
 		<!-- Connection pooling -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -57,6 +98,12 @@
 			<version>5.1.37</version>
 		</dependency>
 
+		<!-- Second level Cache -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>4.2.8.Final</version>
+		</dependency>
 
 		<!-- For Hibernate and MongoDB -->
 		<dependency>
@@ -110,6 +157,26 @@
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.datanucleus</groupId>
+				<artifactId>datanucleus-maven-plugin</artifactId>
+				<version>4.0.0-release</version>
+				<configuration>
+					<api>JPA</api>
+					<persistenceUnitName>dataNucleusUnit</persistenceUnitName>
+					<!--<log4jConfiguration>${basedir}/log4j.properties</log4jConfiguration>-->
+					<verbose>true</verbose>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>enhance</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -29,5 +29,20 @@
         <mapping class="ch4.TestM"/>
 
         <mapping class="ch4.Programch4$PersonInner"/>
+
+        <mapping class="ch5.ch5UnidirectionalOneToOneProgram$Author"/>
+        <mapping class="ch5.ch5UnidirectionalOneToOneProgram$Biography"/>
+
+        <mapping class="ch5.ch5UnidirectionalOneToMany$Onech5"/>
+        <mapping class="ch5.ch5UnidirectionalOneToMany$Manych5"/>
+
+        <mapping class="ch5.ch5BidirectionalOneToMany$Book" />
+        <mapping class="ch5.ch5BidirectionalOneToMany$Publisher" />
+
+        <mapping class="ch5.ch5EmbeddableComposeIdProgram$CPKBook"/>
+
+        <mapping class="ch8.CacheEntity"/>
+
+        <mapping class="ch11.UserWithFilter"/>
     </session-factory>
 </hibernate-configuration>
