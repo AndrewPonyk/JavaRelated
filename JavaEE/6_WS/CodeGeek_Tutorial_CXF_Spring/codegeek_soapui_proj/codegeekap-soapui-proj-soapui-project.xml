@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="85ae692a-7cf7-4a0c-97ff-d662ea255b5c" activeEnvironment="Default" name="codegeekap_soapui_proj" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="4eb270a0-7b27-438a-a78c-4f0eb970c5b1" wsaVersion="NONE" name="DateServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://services.ap.com/}DateServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/codegeekap/services/dateservice?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/codegeekap/services/dateservice?wsdl"><con:part><con:url>http://localhost:8080/codegeekap/services/dateservice?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="DateServiceImplService" targetNamespace="http://services.ap.com/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://services.ap.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://services.ap.com/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="getDate" type="tns:getDate"/>
+      <xs:element name="getDateResponse" type="tns:getDateResponse"/>
+      <xs:element name="getLviv" type="tns:getLviv"/>
+      <xs:element name="getLvivResponse" type="tns:getLvivResponse"/>
+      <xs:complexType name="getDate">
+        <xs:sequence>
+          <xs:element name="arg0" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getDateResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getLviv">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="getLvivResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getDateResponse">
+    <wsdl:part element="tns:getDateResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLvivResponse">
+    <wsdl:part element="tns:getLvivResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getDate">
+    <wsdl:part element="tns:getDate" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLviv">
+    <wsdl:part element="tns:getLviv" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DateService">
+    <wsdl:operation name="getDate">
+      <wsdl:input message="tns:getDate" name="getDate"></wsdl:input>
+      <wsdl:output message="tns:getDateResponse" name="getDateResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLviv">
+      <wsdl:input message="tns:getLviv" name="getLviv"></wsdl:input>
+      <wsdl:output message="tns:getLvivResponse" name="getLvivResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DateServiceImplServiceSoapBinding" type="tns:DateService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getDate">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getDate">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getDateResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLviv">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getLviv">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getLvivResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DateServiceImplService">
+    <wsdl:port binding="tns:DateServiceImplServiceSoapBinding" name="DateServiceImplPort">
+      <soap:address location="http://localhost:8080/codegeekap/services/dateservice"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/codegeekap/services/dateservice</con:endpoint></con:endpoints><con:operation id="612fdd5d-569a-42d4-9af3-a6699fa2d097" isOneWay="false" action="" name="getDate" bindingOperationName="getDate" type="Request-Response" outputName="getDateResponse" inputName="getDate" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="7b4ead2e-22ec-497c-955d-e2215cc7aae9" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/codegeekap/services/dateservice</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://services.ap.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:getDate>
+         <arg0>?</arg0>
+      </ser:getDate>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://services.ap.com/DateService/getDate"/></con:call></con:operation><con:operation id="105c6334-fdf5-4080-925f-da2cd4199cf1" isOneWay="false" action="" name="getLviv" bindingOperationName="getLviv" type="Request-Response" outputName="getLvivResponse" inputName="getLviv" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="1028f880-d962-4b28-a67c-02c32a400d96" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/codegeekap/services/dateservice</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://services.ap.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:getLviv/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://services.ap.com/DateService/getLviv"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>

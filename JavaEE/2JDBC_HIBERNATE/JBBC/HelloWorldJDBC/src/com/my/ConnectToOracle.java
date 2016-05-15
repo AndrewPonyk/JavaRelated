@@ -11,7 +11,7 @@ public class ConnectToOracle {
 		System.out.println("Connecting to oracle db");
 		
 		Class.forName("oracle.jdbc.driver.OracleDriver");
-		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:22337:orcl",
+		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl",
 				"system", "Aa123456");
 		
 		Statement statement = conn.createStatement();

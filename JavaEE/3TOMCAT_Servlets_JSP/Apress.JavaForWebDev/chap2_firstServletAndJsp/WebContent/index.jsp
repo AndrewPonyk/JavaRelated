@@ -9,5 +9,8 @@
 <body>
 	${requestScope['val']} <br>
 	${requestScope['valFilter']}
+index.jsp
+
+<a href="${pageContext.request.contextPath}/HttpCacheControl"> Test http cache</a>
 </body>
 </html>
