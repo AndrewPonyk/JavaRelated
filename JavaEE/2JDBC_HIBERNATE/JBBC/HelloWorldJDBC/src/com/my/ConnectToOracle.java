@@ -12,11 +12,12 @@ public class ConnectToOracle {
 		
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl",
-				"system", "Aa123456");
+				"sqlex", "Aa123456");
 		
 		Statement statement = conn.createStatement();
-		ResultSet rs = statement.executeQuery("select * from users");
-		
+		ResultSet rs = statement.executeQuery("select * from test WHERE NAME  LIKE '%in%'");
+
+
 		while(rs.next()){
 			System.out.println(String.format("%s _ %s", rs.getString("ID"), rs.getString("NAME")));
 		}
@@ -25,3 +26,7 @@ public class ConnectToOracle {
 		
 	}
 }
+
+
+// In intellij editing sql in java code is simple, read :
+// https://www.jetbrains.com/help/idea/2016.1/using-language-injections.html

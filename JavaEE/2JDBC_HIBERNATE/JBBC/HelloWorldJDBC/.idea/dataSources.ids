@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="Oracle - orcl@localhost" uuid="3583cd94-0527-448d-89c8-5d5bb1e2fb5f">
+    <database-info product="Oracle" version="Oracle Database 11g Release 11.1.0.0.0 - Production" jdbc-version="10.2" driver-name="Oracle JDBC driver" driver-version="10.2.0.1.0">
+      <extra-name-characters>$#</extra-name-characters>
+      <identifier-quote-string>&quot;</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="upper" quoted-identifiers="exact"/>
+    <schema name="SQLEX" catalog=""/>
+    <schema name="SYS" catalog=""/>
+    <schema name="SYSTEM" catalog=""/>
+  </data-source>
+</component>

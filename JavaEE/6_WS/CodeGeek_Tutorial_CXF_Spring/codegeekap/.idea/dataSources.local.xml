@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="Oracle - orcl@localhost" uuid="3c1ab55e-9761-4c03-9e8f-4fcfde760e30">
+      <secret-storage>master_key</secret-storage>
+      <user-name>sqlex</user-name>
+      <schema-pattern>*.SQLEX *.SYS *.SYSTEM</schema-pattern>
+      <default-schemas>*.SQLEX *.SYS *.SYSTEM</default-schemas>
+    </data-source>
+  </component>
+</project>
