@@ -19,8 +19,5 @@ public class DemoAP {
         System.out.println(matcher.group("row"));
         System.out.println(matcher.group("column"));
         System.out.println(matcher.group("anotherval"));
-//        int row = inputAsRow(matcher.group("row"));
-//        int column = inputAsColumn(matcher.group("column"));
-
     }
 }

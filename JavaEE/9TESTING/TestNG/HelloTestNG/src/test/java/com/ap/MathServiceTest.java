@@ -14,4 +14,9 @@ public class MathServiceTest {
     public void positiveNumbersSum(){
         assertEquals(mathService.sum(4,2), 6);
     }
+
+    @Test
+    public void negativeNumbersSum(){
+        assertEquals(mathService.sum(-14,-2), -16);
+    }
 }
