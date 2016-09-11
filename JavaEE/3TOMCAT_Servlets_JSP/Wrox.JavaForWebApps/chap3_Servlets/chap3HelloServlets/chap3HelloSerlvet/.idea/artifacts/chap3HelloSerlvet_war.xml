@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="chap3HelloSerlvet:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="chap3HelloSerlvet.war">
+      <element id="artifact" artifact-name="chap3HelloSerlvet:war exploded" />
+    </root>
+  </artifact>
+</component>
