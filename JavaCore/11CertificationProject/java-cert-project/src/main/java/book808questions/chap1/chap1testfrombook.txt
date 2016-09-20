@@ -1,0 +1,25 @@
+1 ABE ++++++
+2 D +++++
+3 B ---------- inattentive
+4 AB +++++
+5 F,     CD inattentive
+6 E +++++++
+7 ABC +++++++++
+8 B ++++++
+9 ACDE +++++
+10 BE --- E, inattentive, main can be final, but must be void
+11 CD ++++
+12 G +++++
+13 AD ++++++
+14 D ++++
+15 ADE ----------- AE, Underscores are allowed as long as they are directly between two other digits.
+16 BCDEF , ------- BCD  Underscores are allowed as long as they are directly between two other digits.
+17 AE  ++++
+18 CE  ------- CDE, intattentive
+19 AD ------ BD, inattentive
+20 BE +++++++++
+21 A +++++
+22 BE  +++++
+23 CD ++++
+
+Result : 69%.

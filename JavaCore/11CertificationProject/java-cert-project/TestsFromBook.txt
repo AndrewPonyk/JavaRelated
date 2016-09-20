@@ -1,0 +1,23 @@
+!!!! Chapter tests on http://sybextestbanks.wiley.com/ are the same as in book !!!
+
+
+1 E +
+2 C +
+3 C       CDE -------
+4 C +,
+5 D +
+6 B +
+7 B +
+8 A +
+9 B C +
+10 C,F    CDF------------- , fail)
+11 B +
+12 B +
+13 C +
+14 E     DEF ----------
+15 A,C,D      ACE --------- inattentive
+16 B,C,F,G           DFG hard
+17 A,C,D,E,F     ACF, lambdas !! int is not Integer --------------
+18 LocalDate - study  -----------------
+19 C +
+20 A,C + remember : Exception base class, which is a checked exception, also IOException is checked
