@@ -14,10 +14,11 @@ public class FirstStreamExample {
         cities.forEach(System.out::println);
 
         // join String collection
-        System.out.println(cities.stream().reduce((a,b)-> a+b).get());
+        System.out.println(cities.stream().reduce((a,b)-> a+b).get() + " <- reduce");
 
         // sum of length
         System.out.println(cities.stream().map(e->e.length()).reduce((a,b)->a+b).get());
+
 
         // ------------------- Streams and Maps
         Map<String, Integer> citiesPopulation = new HashMap<>();

@@ -13,13 +13,13 @@ public class NTHElementFromCOLLECTIONEXAMPLE {
                 "Slovakia", "Chech", "Spain");
 
         List<String> nThCountries = IntStream.
-                range(0, countries.size()).
-                filter(n -> n % 3 == 0).
-                mapToObj(countries::get).collect(
+                range(0, countries.size()). // 0,1,2,3
+                filter(n -> n % 3 == 0). //
+                mapToObj(e-> countries.get(e).substring(0,2)).collect(
                 Collectors.toList()
         );
 
-        nThCountries.forEach(System.out::println); // every 3th
+        nThCountries.forEach(e-> System.out.println(e)); // every 3th
 
         System.out.println();
         IntStream.range(0, 4).forEach(e->{System.out.println(countries.get(e));});

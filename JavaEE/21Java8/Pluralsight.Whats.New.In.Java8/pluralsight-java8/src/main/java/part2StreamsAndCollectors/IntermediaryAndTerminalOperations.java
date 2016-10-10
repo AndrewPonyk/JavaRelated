@@ -8,8 +8,9 @@ import java.util.stream.Stream;
 // https://docs.oracle.com/javase/tutorial/collections/streams/
 public class IntermediaryAndTerminalOperations {
     public static void main(String[] args) {
-        System.out.println("Intermediary And Terminal Operations");
-        List<String> numbers = Arrays.asList("one", "two", "three", "four", "five");
+        System.out.println("Intermediary And Terminal Operations:");
+        List<StringBuilder> numbers = Arrays.asList(new StringBuilder("one"), new StringBuilder("two"), new StringBuilder("three"), new StringBuilder("four"), new StringBuilder("five"));
+
 
         long k = numbers.stream().peek(System.out::println).count();
         System.out.println("k = " + k);
@@ -18,6 +19,7 @@ public class IntermediaryAndTerminalOperations {
     }
 }
 
+// [...] -> {...} -> 5
 
 //      Pipelines and Streams
 /*

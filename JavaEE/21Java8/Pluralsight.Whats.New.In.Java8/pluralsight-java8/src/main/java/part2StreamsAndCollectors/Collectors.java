@@ -34,3 +34,5 @@ public class Collectors {
         System.out.println(collectGroupBy);
     }
 }
+
+// e,e -> {}

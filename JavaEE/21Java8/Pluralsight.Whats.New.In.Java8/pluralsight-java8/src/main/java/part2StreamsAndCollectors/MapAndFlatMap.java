@@ -9,11 +9,12 @@ public class MapAndFlatMap {
         System.out.println("Map and FlatMap");
 
         List<Integer> numb3rs = Arrays.asList(1, 2, 3, 4, 5);
-        List<Integer> numb3rs2 = Arrays.asList(22,33,44,55,66);
+        List<Integer> numb3rs2 = Arrays.asList(22, 33, 44, 55, 66);
 
-        List<List<Integer>> twoLevelList= Arrays.asList(numb3rs, numb3rs2);
+        List<List<Integer>> twoLevelList =
+                Arrays.asList(numb3rs, numb3rs2);
 
-        twoLevelList.stream().flatMap(l->l.stream()).map(e->e).forEach(System.out::println);
+        twoLevelList.stream().flatMap(l -> l.stream()).map(e -> e + 10).forEach(System.out::println);
 
         /*
         * To do this pre-Java 8 you just need a loops:
