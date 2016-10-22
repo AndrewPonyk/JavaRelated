@@ -23,11 +23,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ServiceA.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/pluralsight/service/ServiceA.java">
+      <file leaf-file-name="CustomerRepository.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.06833713">
-              <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.09389672">
+              <caret line="6" column="37" selection-start-line="6" selection-start-column="37" selection-end-line="6" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -56,13 +56,13 @@
         <option value="$PROJECT_DIR$/src/Main.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/repository/DaoAImpl.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/repository/DaoA.java" />
-        <option value="$PROJECT_DIR$/src/com/pluralsight/service/ServiceA.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/MainWith_Autowired.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/service/ServiceAImpl.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/service/CustomerService.java" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/Main.java" />
         <option value="$PROJECT_DIR$/src/applicationContext.xml" />
         <option value="$PROJECT_DIR$/src/com/pluralsight/service/CustomerServiceImpl.java" />
+        <option value="$PROJECT_DIR$/src/com/pluralsight/service/ServiceA.java" />
       </list>
     </option>
   </component>
@@ -83,9 +83,9 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
-    <option name="y" value="-4" />
+    <option name="y" value="24" />
     <option name="width" value="1301" />
-    <option name="height" value="772" />
+    <option name="height" value="744" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -110,8 +110,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -184,35 +182,15 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="service" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DemoApp_WithXML_Configuration" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DemoApp_WithXML_Configuration" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="pluralsight" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="repository" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -224,6 +202,7 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="dynamic.classpath" value="false" />
+    <property name="FullScreen" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="ExtractSuperBase.RECENT_KEYS">
@@ -704,26 +683,27 @@
       <workItem from="1475426178817" duration="1560000" />
       <workItem from="1475432678314" duration="9584000" />
       <workItem from="1475932739483" duration="2480000" />
-      <workItem from="1476647711031" duration="3381000" />
+      <workItem from="1476647711031" duration="4836000" />
+      <workItem from="1477136856194" duration="30000" />
+      <workItem from="1477142119952" duration="13000" />
+      <workItem from="1477165156704" duration="13000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="17005000" />
+    <option name="totallyTimeSpent" value="18535000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1301" height="772" extended-state="6" />
-    <editor active="true" />
+    <frame x="65" y="24" width="1301" height="744" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32808024" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.311299" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -732,14 +712,16 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34230193" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -766,10 +748,26 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/applicationContext.xml">
+    <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
           <folding />
         </state>
       </provider>
@@ -778,7 +776,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/applicationContext.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -856,7 +860,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.31437126">
           <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -864,7 +867,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.18779343">
           <caret line="8" column="47" selection-start-line="8" selection-start-column="47" selection-end-line="8" selection-end-column="47" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -872,7 +874,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.06833713">
           <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -880,7 +881,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.17084283">
           <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -888,7 +888,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.13667426">
           <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -896,15 +895,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37585422">
           <caret line="17" column="20" selection-start-line="17" selection-start-column="20" selection-end-line="17" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.13667426">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -912,7 +902,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.2733485">
           <caret line="11" column="43" selection-start-line="11" selection-start-column="43" selection-end-line="11" selection-end-column="43" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -920,7 +909,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.13667426">
           <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -928,14 +916,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5808656">
           <caret line="23" column="5" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/pluralsight/service/ServiceA.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06833713">
-          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.17084283">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/pluralsight/repository/CustomerRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09389672">
+          <caret line="6" column="37" selection-start-line="6" selection-start-column="37" selection-end-line="6" selection-end-column="37" />
           <folding />
         </state>
       </provider>
