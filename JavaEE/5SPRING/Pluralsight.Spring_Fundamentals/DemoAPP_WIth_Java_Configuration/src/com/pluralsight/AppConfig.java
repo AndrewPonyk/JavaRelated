@@ -1,13 +1,12 @@
 package com.pluralsight;
 
-import com.pluralsight.repository.CustomerRepository;
-import com.pluralsight.repository.DaoA;
-import com.pluralsight.repository.DaoAImpl;
-import com.pluralsight.repository.HibernateCustomerRepositoryImpl;
+import com.pluralsight.repository.*;
 import com.pluralsight.service.CustomerService;
 import com.pluralsight.service.CustomerServiceImpl;
 import com.pluralsight.service.ServiceA;
 import com.pluralsight.service.ServiceAImpl;
+import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,5 +34,10 @@ public class AppConfig {
     @Bean(name = "daoA")
     public DaoA getDaoA(){
         return new DaoAImpl();
+    }
+
+    @Bean(name = "daoASecondImplementation")
+    public DaoA getDaoASecondImplementation(){
+        return new DaoASecondImpl();
     }
 }
