@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	   					   http://www.springframework.org/schema/context
+       					   http://www.springframework.org/schema/context/spring-context-4.1.xsd	
+       					   http://www.springframework.org/schema/util 
+       					   http://www.springframework.org/schema/util/spring-util-4.1.xsd   
+       					   http://www.springframework.org/schema/jdbc 
+       					   http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd 
+       					   http://www.springframework.org/schema/tx 
+           				   http://www.springframework.org/schema/tx/spring-tx-4.1.xsd  				   
+	   					   http://www.springframework.org/schema/aop 
+						   http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+
+	
+	<!-- This tag will configure context for annotations -->
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:util.properties" />
+	
+	<!-- This tag will configure context for annotations and scan packages for components and wire them -->
+	<context:component-scan base-package="spring.persistence" />
+	
+	<!-- bean definitions will be defined here -->
+	
+	<jdbc:embedded-database id="dataSource">
+		<jdbc:script location="classpath:dbschema.sql"/>
+		<jdbc:script location="classpath:test-data.sql"/>
+	</jdbc:embedded-database>
+
+    <!-- Persistence Context and EntityManager configuration -->
+	<bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" >
+        <property name="packagesToScan" value="spring.persistence" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" >
+            	<property name="generateDdl" value="true" />
+				<property name="showSql" value="true" />				
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop> 			                               
+            </props>
+        </property>
+    </bean>
+    
+     <!-- initialize PlatformTransactionManager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource" />	
+    </bean>   
+    
+	<!-- Automatic Transaction Participation -->
+	<bean class="org.springframework.orm.jpa.JpaTransactionManager">
+    	<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	
+	<!-- Persistence Exception Translation -->
+	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+	<!-- Spring will act like JPA container to inject EntitManager through EntityManagerFactory -->
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+	    
+    <!-- activate @Transactional annotation -->
+    <tx:annotation-driven  proxy-target-class="true" transaction-manager="transactionManager"/>
+    
+	<util:properties id="util" location="classpath:util.properties"/>
+   
+</beans>
+          

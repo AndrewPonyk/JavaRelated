@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	   					   http://www.springframework.org/schema/context
+       					   http://www.springframework.org/schema/context/spring-context-4.1.xsd	
+       					   http://www.springframework.org/schema/util 
+       					   http://www.springframework.org/schema/util/spring-util-4.1.xsd   					   
+	   					   ">
+
+	
+	<!-- This tag will configure context for annotations -->
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:util.properties" />
+	
+	<!-- This tag will configure context for annotations and scan packages for components and wire them -->
+	<!-- <context:component-scan base-package="spring.bean" />-->
+	
+	<!-- bean definitions will be defined here -->
+	
+	<!-- Setter dependency injection -->
+	<!-- mainly used for optional properties -->
+    <bean id="mailService" class="spring.bean.MailService">
+        <property name="logService" ref="logService"/> <!-- bean reference -->
+        <property name="mailServer" value="smtp.gmail.com"/>
+        <property name="port" value="smtp"/>
+        <property name="protocol" value="9999"/>
+        <property name="serviceConfig">
+            <!-- <property/> or <constructor-arg/> elements defines inner bean. -->
+            <!-- no ID is required for inner beans hence it is always anonymous and belongs to parent bean
+            	 It is not possible to inject or autowire inner beans in other beans  -->
+        	<bean class="spring.bean.MailServiceConfig"> <!-- inner bean -->
+            	<property name="active" value="true"/>
+            	<property name="maxHourlyEmailLimit" value="25000"/>
+        	</bean>	        	
+        </property>
+    </bean>
+    
+    <bean id="logService" class="spring.bean.LogService" />
+ 
+    <!-- DBLogService @Qualifier example -->
+    <bean id="DBlogService" class="spring.bean.DBLogService" />
+
+    <bean id="registerService" class="spring.bean.RegisterService" />
+	
+	<bean id="dataSource" class="spring.bean.DataSource">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>    
+	
+	<!-- Constructor dependency injection -->
+	<!-- mainly used for required properties -->
+	<!-- 
+	    scopes are defined singleton,prototype,session,request,global session and application
+		singleton (Default Scope): a single instance of the object will be created inside framework
+		prototype: a new instance of the object will be created each time the bean is referenced
+		session: it is used in web environment and a new instance will be created per user web HTTP session
+		request: it is used in web environment and a new instance will be created per each request
+		global session: same as session and used in web applications, typically used in portlet context
+		application: it is used in web applications and Scopes a single bean definition in
+			a ServletContext.
+	-->
+
+	<bean id="databaseService" class="spring.bean.DatabaseService" scope="singleton"> 
+        <constructor-arg ref="dataSource" />
+    </bean>
+    
+    <!-- Combining setter and constructor injection -->
+    <bean id="loginService" class="spring.bean.LoginService">
+        <property name="databaseService" ref="databaseService"/>
+        <constructor-arg ref="logService" />
+    </bean>
+    
+    <bean id="userManager" class="spring.bean.UserManager"/>
+    
+    <!-- Bean inheritance example -->
+    <!-- SpEL Usage -->
+    <bean id="testUser" class="spring.bean.User">
+    	<property name="username" value="#{util['username.test']}" />
+    	<property name="password" value="testPassword" />
+    	<property name="active" value="true" />
+    </bean>
+    
+    <bean id="superUser" class="spring.bean.SuperUser" parent="testUser" >   
+    	<property name="systemPassword" value="${system.password}" />
+    	<property name="contact" value="${system.contact}" />
+    </bean>
+	
+	<bean id="complexBean" class="spring.util.ComplexBeanFactoryBeanImplementation"/>
+	
+	<util:properties id="util" location="classpath:util.properties"></util:properties>
+	
+	<!-- Importing all aspect-config xml -->
+	<import resource="classpath:aspect-config.xml"/>
+	
+</beans>
+          

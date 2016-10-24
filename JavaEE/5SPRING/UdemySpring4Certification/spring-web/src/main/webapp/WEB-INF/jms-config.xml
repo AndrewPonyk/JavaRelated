@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:jms="http://www.springframework.org/schema/jms"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						   http://www.springframework.org/schema/beans/spring-beans.xsd
+						   http://www.springframework.org/schema/context 
+						   http://www.springframework.org/schema/context/spring-context.xsd
+						   http://www.springframework.org/schema/jms 
+                           http://www.springframework.org/schema/jms/spring-jms.xsd
+						   ">
+
+	<!-- Activemq connectionFactory -->
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    	<property name="brokerURL" value="vm://localhost?broker.persistent=false"/>
+	</bean>
+	
+	<!-- JmsTemplate configuration -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="defaultDestination" ref="defaultDestination" />
+	</bean>
+	
+	<!-- Message Sender custom bean referencing jmsTemplate -->
+	<bean id="messageSender" class="spring.jms.MessageSender">
+  		<property name="jmsTemplate" ref="jmsTemplate"/>
+  		<property name="jmsTopicTemplate" ref="jmsTopicTemplate"/>
+ 	</bean>
+ 	
+ 	<!-- Message Receiver custom bean referencing jmsTemplate -->
+	<bean id="messageReceiver" class="spring.jms.MessageReceiver">
+  		<property name="jmsTemplate" ref="jmsTemplate"/>
+ 	</bean>
+ 	
+ 	<!-- destination Queue configuration -->
+	<bean id="defaultDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="queue" />
+	</bean>	
+	
+ 	<!-- destination Topic definition for jms:listeners -->
+ 	<bean id="destinationTopic" class="org.apache.activemq.command.ActiveMQTopic">
+   		 <constructor-arg value="topic"/>
+	</bean>
+	
+	<!-- JmsTopicTemplate configuration -->
+ 	<bean id="jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+    	<property name="connectionFactory" ref="connectionFactory"/>
+    	<property name="pubSubDomain" value="true"/>
+    	<property name="defaultDestination" ref="destinationTopic" />
+	</bean>
+	
+ 	<!-- JMS Listener1 Definition -->
+    <bean id="jmsListener1" class="spring.jms.JMSListener1" />
+    <!-- JMS Listener2 Definition -->
+    <bean id="jmsListener2" class="spring.jms.JMSListener2" />
+    
+ 	<jms:listener-container connection-factory="connectionFactory" destination-type="topic"> 	
+ 	    <jms:listener destination="topic" ref="jmsListener1" method="receive"  /> 
+ 		<jms:listener destination="topic" ref="jmsListener2"/>	
+ 	</jms:listener-container>
+ 
+ 
+</beans>

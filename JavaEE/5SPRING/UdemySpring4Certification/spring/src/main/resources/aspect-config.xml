@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd ">
+
+	<!-- enables aspect auto configuration using annotation -->
+	<!-- <aop:aspectj-autoproxy />  -->
+
+	<bean id="aspectManager" class="spring.aspect.AspectManager" />
+	
+	<!-- aspect configuration starts -->
+	<aop:config>
+
+			<!-- referencing aspect class-->
+			<aop:aspect id="aspectManagerConfigClass" ref="aspectManager">
+
+			<!-- @Before -->
+			<aop:pointcut id="pointCutBeforeMonitorMailServiceSendMethod" expression="execution(* spring.bean.MailService.send*(*))" />
+			<aop:before method="monitorMailServiceSendMethod" pointcut-ref="pointCutBeforeMonitorMailServiceSendMethod" />
+			
+			<!-- @After -->
+			<aop:pointcut id="pointCutAfterMonitorRegisterServiceRegisterMethod" expression="execution(* spring.bean.RegisterService.register*(*))" />
+			<aop:after method="monitorRegisterServiceRegisterMethod" pointcut-ref="pointCutAfterMonitorRegisterServiceRegisterMethod" />
+			
+			<!-- @AfterThrowing -->
+			<aop:pointcut id="pointCutAfterThrowingUserManagerThrow" expression="execution(void spring.bean.UserManager.throw*())" />				
+			<aop:after-throwing method="afterThrowingUserManagerThrow" throwing="e" pointcut-ref="pointCutAfterThrowingUserManagerThrow" />
+			
+			<!-- @AfterReturning -->
+			<aop:pointcut id="pointCutAfterReturningUserManagerThrow" expression="execution(boolean spring.bean.UserManager.throw*())" />
+			<aop:after-returning method="afterReturningUserManagerThrow" returning="result" pointcut-ref="pointCutAfterReturningUserManagerThrow" />
+			
+			<!-- @After -->
+			<aop:pointcut id="pointCutAfterThrowUserUpdateExceptionMethod" expression="execution(void spring.bean.UserManager.throw*())" />			
+			<aop:after method="afterThrowUserUpdateExceptionMethod" pointcut-ref="pointCutAfterThrowUserUpdateExceptionMethod" />
+			
+			<!-- @Around -->
+			<aop:pointcut id="pointCutAroundDeleteUser" expression="execution(boolean spring.bean.UserManager.deleteUser(*))" />
+			<aop:around method="aroundDeleteUser" pointcut-ref="pointCutAroundDeleteUser" />
+			
+			<aop:pointcut expression="execution(* spring.bean.UserManager.*(*))" id="pointCutUserManagerMethods"/>
+			<aop:pointcut expression="execution(* spring.bean.RegisterService.*(*))" id="pointRegisterServiceMethods"/>
+			
+			<!-- @After -->					
+			<aop:after method="namedPointCutExample" pointcut-ref="pointCutUserManagerMethods" />
+			<aop:after method="namedPointCutExample" pointcut-ref="pointRegisterServiceMethods" />
+			
+		</aop:aspect>
+
+	</aop:config>
+
+</beans>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    					http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        http://www.springframework.org/schema/security 
+                        http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+	         	
+ 	<http auto-config="true" use-expressions="true" >
+
+        <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"/>
+        <intercept-url pattern="/profile/**" access="hasRole('ROLE_USER')"/>
+		<access-denied-handler error-page="/denied.html"/>
+             
+		<form-login login-page="/login.html" authentication-failure-url="/login.html?error=true" />
+		<logout logout-success-url="/"/>
+		
+		<!-- Custom filter definition -->
+		<!-- <custom-filter position="SESSION_MANAGEMENT_FILTER" ref="Customfilter"/>
+		<bean id="filter" class="spring.filter.CustomFilter"/>
+		 -->
+    </http>
+ 	
+ 	<jdbc-user-service id="jdbcUserService" data-source-ref="dataSource" 
+            users-by-username-query="SELECT USERNAME, PASSWORD, ENABLED FROM USER WHERE USERNAME=?" 
+        	authorities-by-username-query="SELECT U.USERNAME, A.AUTHORITY  
+        	 FROM AUTHORITIES A, USER U WHERE U.USERNAME = A.USERNAME AND U.USERNAME = ? "/>
+        	
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="jdbcUserService"/>            
+    </authentication-manager>
+    
+    <!-- password hashing -->
+    <!-- 
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="jdbcUserService">
+        	<password-encoder hash="md5"/>
+        </authentication-provider>            
+    </authentication-manager>
+    -->
+   
+    <!-- password salting -->
+    <!--
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="jdbcUserService" >
+            <password-encoder hash="sha-256">  
+            	<salt-source user-property="username"/>
+        	</password-encoder>          
+        </authentication-provider>
+    </authentication-manager>
+    -->
+    
+</beans:beans>

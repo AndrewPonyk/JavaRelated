@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	   					   http://www.springframework.org/schema/context
+       					   http://www.springframework.org/schema/context/spring-context-4.1.xsd	
+       					   http://www.springframework.org/schema/util 
+       					   http://www.springframework.org/schema/util/spring-util-4.1.xsd   
+       					   http://www.springframework.org/schema/jdbc 
+       					   http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd 
+       					   http://www.springframework.org/schema/tx 
+           				   http://www.springframework.org/schema/tx/spring-tx-4.1.xsd  				   
+	   					   http://www.springframework.org/schema/aop 
+						   http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
+
+	
+	<!-- This tag will configure context for annotations -->
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:util.properties" />
+	
+	<!-- This tag will configure context for annotations and scan packages for components and wire them -->
+	<!-- <context:component-scan base-package="spring.bean" />-->
+	
+	<!-- bean definitions will be defined here -->
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.hsqldb.driverClass}" />
+		<property name="url" value="${jdbc.hsqldb.url}" />
+		<property name="username" value="${jdbc.hsqldb.username}" />
+		<property name="password" value="${jdbc.hsqldb.password}" />
+	</bean>
+		
+	<!-- initialize data source -->
+	<jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="classpath:dbschema.sql"/>
+        <jdbc:script location="classpath:test-data.sql"/>
+    </jdbc:initialize-database>
+
+	<bean id="databaseService" class="spring.jdbc.transactions.orm.DatabaseService" scope="singleton"> 
+        <constructor-arg ref="dataSource" />
+    </bean>
+    
+    <!-- activate @Transactional annotation -->
+    <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
+
+    <!-- initialize PlatformTransactionManager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource" />	
+    </bean>
+    
+    <!-- DBLogService -->    
+    <bean id="dbLogService" class="spring.jdbc.transactions.orm.DBLogService">
+    	<constructor-arg ref="databaseService" />
+    </bean>
+    
+    <bean id="userManager" class="spring.jdbc.transactions.orm.UserManager">
+     	<constructor-arg ref="databaseService" />
+    </bean>
+    
+	<util:properties id="util" location="classpath:util.properties"/>
+	
+	<!-- Declarative transaction XML Configuration -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+      <tx:attributes>
+     	 <tx:method name="logAllUserInfo" read-only="true" timeout="30"/>
+      </tx:attributes>
+   </tx:advice>
+	
+   <aop:config>
+      <aop:pointcut id="logAllUserInfoQuery" 
+      expression="execution(* spring.jdbc.transactions.orm.UserManager.logAllUserInfo(..))"/>
+      <aop:advisor pointcut-ref="logAllUserInfoQuery" advice-ref="txAdvice" />
+   </aop:config>
+   
+    <bean id="userManagerTransactionTemplate" class="spring.jdbc.transactions.orm.UserManagerTransactionTemplate">
+    	<constructor-arg ref="transactionManager" />
+    	 <property name="userManager" ref="userManager"/>
+    </bean>
+   
+</beans>
+          
