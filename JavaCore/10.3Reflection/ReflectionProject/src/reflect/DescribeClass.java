@@ -10,12 +10,7 @@ public class DescribeClass {
 			className = args[0];
 		}
 		
-		
-		
-		
 		crackImmutableString();
-
-		
 	}
 
 	public static void crackImmutableString() throws NoSuchFieldException,
@@ -40,7 +35,9 @@ public class DescribeClass {
 		Field value = sClass.getDeclaredField("value");
 		value.setAccessible(true);
 		value.set(s, val);
-		
+
+		System.out.println(s);
+
 		Field count = sClass.getDeclaredField("count");
 		count.setAccessible(true);
 		count.set(s, 3);
