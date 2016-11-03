@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="UdemyJavaEEBuildWebServices:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="app-with-webservice-annotation.war">
+      <element id="artifact" artifact-name="UdemyJavaEEBuildWebServices:war exploded" />
+    </root>
+  </artifact>
+</component>

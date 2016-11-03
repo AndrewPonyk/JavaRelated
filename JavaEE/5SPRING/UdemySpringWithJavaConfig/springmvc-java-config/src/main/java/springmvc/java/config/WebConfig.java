@@ -28,6 +28,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         // / -> index.jsp
+        javax.jws.WebService w;
         registry.addViewController("/").setViewName("index");
     }
 }
