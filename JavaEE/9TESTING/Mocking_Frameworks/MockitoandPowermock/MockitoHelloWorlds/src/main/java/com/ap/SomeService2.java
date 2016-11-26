@@ -12,8 +12,11 @@ public class SomeService2
 	public void usingMethodFromSomeService(){
 		Holder<String> response = new Holder<String>();
 		someService.methodChangeArgument(response);
+
 		if(response.value.toString().equals("99")){
 			System.out.println("no problem )))");
+		} else {
+			throw new IllegalArgumentException("Illegal argument");
 		}
 	}
 	

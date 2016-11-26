@@ -29,7 +29,7 @@ public class MyTest {
 
 			public Object answer(InvocationOnMock invocation) throws Throwable {
 				 Object[] args = invocation.getArguments();
-				((Holder<String>)args[0]).value = "MOCKED MUTABLE";
+				((Holder<String>)args[0]).value = "99"; // mock method which change incomming parameter. Look code inside SomeService2 - we must mock 99
 				return null;
 			}
 		}).when(someService).methodChangeArgument(any(Holder.class));
