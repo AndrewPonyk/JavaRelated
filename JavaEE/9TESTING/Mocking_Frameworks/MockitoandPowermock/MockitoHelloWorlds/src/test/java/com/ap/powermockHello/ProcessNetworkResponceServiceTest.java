@@ -34,5 +34,6 @@ public class ProcessNetworkResponceServiceTest {
 
         String dataFromGoogle = service.getDataFromGoogle(); // mock rest client response (but inside this method RestClient is created, so we mocked its constructor, which now will return mock object)
         assertEquals("(Mock google content!!!)", dataFromGoogle);
+
     }
 }

@@ -25,8 +25,8 @@
         <module name="udemy-java-multithreading" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="udemy-java-multithreading" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="udemy-java-multithreading" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

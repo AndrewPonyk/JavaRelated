@@ -1,26 +1,26 @@
-package com.my.demo3;
+package com.my;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by andrii on 22.11.16.
  */
-public class AppSynchronizationKeyword {
+public class Part3AppSynchronizationKeyword {
 
-    private int count = 0;
+    private int count = 0; // making volatile DOESN'T help !!! , we should
     private AtomicInteger atomicCount = new AtomicInteger(0);
 
     public static void main(String[] args) {
         System.out.println("Incrementing");
 
-        AppSynchronizationKeyword app = new AppSynchronizationKeyword();
+        Part3AppSynchronizationKeyword app = new Part3AppSynchronizationKeyword();
         app.doWork();
     }
 
     private void doWork() {
         Thread t1 = new Thread(new Runnable() {
             public void run() {
-                for(int i =0;i<10000;i++){
+                for (int i = 0; i < 10000; i++) {
                     count++;
                     atomicCount.incrementAndGet();
                 }
@@ -28,7 +28,7 @@ public class AppSynchronizationKeyword {
         });
         Thread t2 = new Thread(new Runnable() {
             public void run() {
-                for (int i =0;i<10000;i++){
+                for (int i = 0; i < 10000; i++) {
                     count++;
                     atomicCount.incrementAndGet();
                 }
@@ -46,8 +46,11 @@ public class AppSynchronizationKeyword {
             e.printStackTrace();
         }
 
+
         // we expect 20000
         System.out.println(count);
         System.out.println(atomicCount.get());
+
+        // we also can use synchronized method incrementCount(){ count++}, but Atomic integer is better))
     }
 }
