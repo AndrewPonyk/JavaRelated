@@ -14,14 +14,16 @@ public class Server extends UnicastRemoteObject implements Hello {
     }
         
     public static void main(String args[]) {
-        
+         if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
         try {
             Server obj = new Server();
             Hello stub = (Hello)obj;
 
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Hello", stub);
+            registry.rebind("Hello", stub);
 
             System.err.println("Server ready");
         } catch (Exception e) {
