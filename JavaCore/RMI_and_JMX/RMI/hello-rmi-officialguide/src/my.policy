@@ -1,0 +1,3 @@
+grant codeBase "file:D:\mygit\JavaRelated\JavaCore\RMI_and_JMX\RMI\hello-rmi-officialguide\src\guru\" {
+    permission java.security.AllPermission;
+};
