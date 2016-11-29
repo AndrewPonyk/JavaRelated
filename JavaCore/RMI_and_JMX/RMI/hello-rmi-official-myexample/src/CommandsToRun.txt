@@ -1,0 +1,5 @@
+Server:
+java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar  -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.hostname=localhost  -Djava.net.preferIPv4Stack=true  bind.RemoteImpl
+
+Client
+java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.security.policy=client.policy client.UseMyRemote localhost

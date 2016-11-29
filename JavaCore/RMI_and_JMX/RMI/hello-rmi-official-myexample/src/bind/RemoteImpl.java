@@ -1,28 +1,27 @@
-package engine;
+package bind;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import compute.Compute;
-import compute.Task;
+import remote.MyRemote;
 
-public class ComputeEngine implements Compute {
+public class RemoteImpl implements MyRemote {
 
-    public ComputeEngine() {
+    public RemoteImpl() {
         super();
     }
 
-    public <T> T executeTask(Task<T> t) {
-        return t.execute();
+    public String getWorld(){
+    	return "Hello!!!";
     }
 
     public static void main(String[] args) {
         try {
-            String name = "Compute";
-            Compute engine = new ComputeEngine();
-            Compute stub =
-                (Compute) UnicastRemoteObject.exportObject(engine, 0);
+            String name = "MyRemote";
+            MyRemote myRemote = new RemoteImpl();
+            MyRemote stub =
+                (MyRemote) UnicastRemoteObject.exportObject(myRemote, 0);
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(name, stub);
             System.out.println("ComputeEngine bound");

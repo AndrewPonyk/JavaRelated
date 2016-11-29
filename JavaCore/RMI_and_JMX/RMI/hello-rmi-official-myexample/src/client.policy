@@ -1,0 +1,3 @@
+grant codeBase "file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/" {
+    permission java.security.AllPermission;
+};
