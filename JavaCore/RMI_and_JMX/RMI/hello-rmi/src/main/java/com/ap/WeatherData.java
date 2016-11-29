@@ -10,6 +10,15 @@ public class WeatherData implements Serializable{
     private String location;
     private String weather;
 
+    @Override
+    public String toString() {
+        return "WeatherData{" +
+                "date=" + date +
+                ", location='" + location + '\'' +
+                ", weather='" + weather + '\'' +
+                '}';
+    }
+
     public WeatherData(Date date, String location, String weather) {
         this.date = date;
         this.location = location;
