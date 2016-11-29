@@ -1,0 +1,6 @@
+
+Start server:
+java -cp /home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguide/src/:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguides/src/compute.jar  -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguide/src/compute.jar -Djava.rmi.server.hostname=localhost  -Djava.net.preferIPv4Stack=true  engine.ComputeEngine
+
+Start client:
+java -cp /home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguide/src/:home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguides/src/compute.jar -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-officialguide/src/compute.jar -Djava.security.policy=client.policy client.ComputePi localhost 45
