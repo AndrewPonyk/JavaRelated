@@ -1,5 +1,9 @@
 Server:
-java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar  -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.hostname=localhost  -Djava.net.preferIPv4Stack=true  bind.RemoteImpl
+java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar  -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.hostname=<your public ip>  -Djava.net.preferIPv4Stack=true  bind.RemoteImpl
 
 Client
-java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.security.policy=client.policy client.UseMyRemote localhost
+java -cp .:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.rmi.server.codebase=file:/home/andrii/git/JavaRelated/JavaCore/RMI_and_JMX/RMI/hello-rmi-official-myexample/src/myremote.jar -Djava.security.policy=client.policy client.UseMyRemote <your public ip192.168.1.103 - for me>
+
+(Finally I was able to call method from remote computer
+Main poinst: when you start server please set -Djava.rmi.server.hostname=<your public ip>
+From remote laptop(lenovo) client code works without '-Djava.security.policy=client.policy client.UseMyRemote')
