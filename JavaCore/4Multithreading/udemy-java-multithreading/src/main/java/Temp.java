@@ -1,9 +1,7 @@
 import java.lang.reflect.Field;
 import java.util.Set;
 
-/**
- * Created by andrii on 30.11.16.
- */
+
 public class Temp {
 
     private Object lock1= new String("first lock");
