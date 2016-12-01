@@ -39,7 +39,7 @@ public class Part11DeadLock {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Starting threads, which will cause deadlock");
+    	System.out.println("Starting threads, which will cause deadlock");
         Part11DeadLock runner = new Part11DeadLock();
 
         Thread t1 = new Thread(() -> {
