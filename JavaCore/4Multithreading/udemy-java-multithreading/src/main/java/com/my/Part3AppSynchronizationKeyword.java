@@ -2,9 +2,6 @@ package com.my;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by andrii on 22.11.16.
- */
 public class Part3AppSynchronizationKeyword {
 
     private int count = 0; // making volatile DOESN'T help !!! , we should
