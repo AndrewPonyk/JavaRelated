@@ -1,0 +1,958 @@
+https://chandruscm.wordpress.com/tag/how-to-pass-string-array-from-c-to-java/
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<title>How to pass string array from C to java | I dont know zilch !</title>
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="pingback" href="https://chandruscm.wordpress.com/xmlrpc.php" />
+
+<!--[if lt IE 9]>
+<script src="https://s0.wp.com/wp-content/themes/pub/newsworthy/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+<meta name="google-site-verification" content="qgLyUHtQYJqoaLJPgQnn2Gt7dIjzpNVRQj4XT6jzfe0" />
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel="alternate" type="application/rss+xml" title="I dont know zilch ! &raquo; Feed" href="https://chandruscm.wordpress.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="I dont know zilch ! &raquo; Comments Feed" href="https://chandruscm.wordpress.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="I dont know zilch ! &raquo; How to pass string array from C to java Tag Feed" href="https://chandruscm.wordpress.com/tag/how-to-pass-string-array-from-c-to-java/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+			<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1473172720h&ver=4.6.1-RC1-38499"}};
+			!function(a,b,c){function d(a){var c,d,e,f,g,h=b.createElement("canvas"),i=h.getContext&&h.getContext("2d"),j=String.fromCharCode;if(!i||!i.fillText)return!1;switch(i.textBaseline="top",i.font="600 32px Arial",a){case"flag":return i.fillText(j(55356,56806,55356,56826),0,0),!(h.toDataURL().length<3e3)&&(i.clearRect(0,0,h.width,h.height),i.fillText(j(55356,57331,65039,8205,55356,57096),0,0),c=h.toDataURL(),i.clearRect(0,0,h.width,h.height),i.fillText(j(55356,57331,55356,57096),0,0),d=h.toDataURL(),c!==d);case"diversity":return i.fillText(j(55356,57221),0,0),e=i.getImageData(16,16,1,1).data,f=e[0]+","+e[1]+","+e[2]+","+e[3],i.fillText(j(55356,57221,55356,57343),0,0),e=i.getImageData(16,16,1,1).data,g=e[0]+","+e[1]+","+e[2]+","+e[3],f!==g;case"simple":return i.fillText(j(55357,56835),0,0),0!==i.getImageData(16,16,1,1).data[0];case"unicode8":return i.fillText(j(55356,57135),0,0),0!==i.getImageData(16,16,1,1).data[0];case"unicode9":return i.fillText(j(55358,56631),0,0),0!==i.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity","unicode9"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='all-css-0-1' href='https://s0.wp.com/_static/??-eJx9j90OwiAMhV9ILP5kiRfGZ9mwuk4KZIUQ3l7mohdquGnOab6TnkIOyngX0UXgpIJNd3ICORjPSpgsli+3NSIb+B+z9ECBCWPozUO9XAsndyNHsXxECzZ+xrrn0MeFYLxSjxa5Yq0Yh+6dWuRYizU7rb8OQ5hRRNXJlFjFsR76za1rCGkAh1myn+NYQGKxuLAXPu+O3UGf9lrr6QkylYg/' type='text/css' media='all' />
+<link rel='stylesheet' id='newsworthy-oswald-css'  href='https://fonts.googleapis.com/css?family=Oswald%3A400%2C700%2C300&#038;ver=4.6.1-RC1-38499' type='text/css' media='all' />
+<link rel='stylesheet' id='all-css-2-1' href='https://s2.wp.com/_static/??-eJx9j+EKwjAMhF/IGpSh7of4LF1Xs0jWjCbi69s5UYfQX7mD+5IcECQxCpL0I7ZBdQOPyRVjMRmMdzfxHalkMIpjCd5I0sq4K3vKNTTHjgWLRCipH1uDfJiXdz5/VS0+idryCejg83zrPWuUSiDPpQrK2vxBNsQxKgwNIEvnubb1QT1G01fZRTvM1DufesekNrOX8bxrjm27b0/N4fYE2lCUOw==' type='text/css' media='all' />
+<script type='text/javascript' src='https://s1.wp.com/_static/??-eJyF0NsKwjAMBuAXsiuepl6Iz9LV35G6Hmxahz69FSYiVIVAIPkISeQYBDk95CNYmhKXjHibUmN4Jn8BYamPKqGx5F5Ye5fg0tNa39EAkRlR9aVWBp18xQXPyYK5oEr3cyVyV8L4lxmkoPRZRDDdUTuEw3vn7x+Y1MHu56u2XS+Wu83WPACvA3MG'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://chandruscm.wordpress.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://s1.wp.com/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress.com" />
+<link rel="shortcut icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/88245eccd7161a8108936578cbb86289?s=32" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/88245eccd7161a8108936578cbb86289?s=32" sizes="16x16" />
+<link rel="apple-touch-icon-precomposed" href="https://secure.gravatar.com/blavatar/88245eccd7161a8108936578cbb86289?s=114" />
+<link rel='openid.server' href='https://chandruscm.wordpress.com/?openidserver=1' />
+<link rel='openid.delegate' href='https://chandruscm.wordpress.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://chandruscm.wordpress.com/osd.xml" title="I dont know zilch !" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="application-name" content="I dont know zilch !" /><meta name="msapplication-window" content="width=device-width;height=device-height" /><meta name="msapplication-tooltip" content="For the noobs out there like me" /><meta name="msapplication-task" content="name=Subscribe;action-uri=https://chandruscm.wordpress.com/feed/;icon-uri=https://secure.gravatar.com/blavatar/88245eccd7161a8108936578cbb86289?s=16" /><meta name="msapplication-task" content="name=Sign up for a free blog;action-uri=http://wordpress.com/signup/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Support;action-uri=http://support.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Forums;action-uri=http://forums.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="title" content="Posts about How to pass string array from C to java on I dont know zilch !" />
+<meta name="description" content="Posts about How to pass string array from C to java written by chandruscm" />
+	<style type="text/css">
+			.site-title,
+		.site-description {
+			position: absolute !important;
+			clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+			clip: rect(1px, 1px, 1px, 1px);
+		}
+		</style>
+	<style type="text/css" id="custom-background-css">
+body.custom-background { background-image: url('https://chandruscm.files.wordpress.com/2014/10/blogback1.jpg'); background-repeat: repeat; background-position: top left; background-attachment: scroll; }
+</style>
+<style type="text/css" id="syntaxhighlighteranchor"></style>
+</head>
+
+<body class="archive tag tag-how-to-pass-string-array-from-c-to-java tag-383514323 custom-background mp6 customizer-styles-applied single-author highlander-enabled highlander-light infinite-scroll neverending">
+
+<div id="nav-wrapper">
+<nav id="site-navigation" class="navigation-main" role="navigation">
+	<div class="menu-wrapper">
+	<h1 class="menu-toggle">Menu</h1>
+	<div class="assistive-text skip-link"><a href="#content" title="Skip to content">Skip to content</a></div>
+
+	<div class="menu-menu-1-container"><ul id="menu-menu-1" class="menu"><li id="menu-item-2659" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2659"><a href="http://chandruscm.com/">Apps</a></li>
+<li id="menu-item-2655" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-2655"><a href="https://chandruscm.wordpress.com/">Blog</a></li>
+<li id="menu-item-2660" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2660"><a href="http://chandruscm.com/about/">About</a></li>
+</ul></div>	</div>
+</nav><!-- #site-navigation -->
+</div>
+
+<div id="container">
+	<header id="branding" role="banner">
+      <div id="inner-header" class="clearfix">
+		<hgroup id="site-heading">
+							<a href="https://chandruscm.wordpress.com/" title="I dont know zilch !" rel="home">
+					<img src="https://chandruscm.files.wordpress.com/2015/05/cropped-site_header_16_bit1.png" class="header-image" width="600" height="120" alt="" />
+				</a>
+			
+			<h1 class="site-title"><a href="https://chandruscm.wordpress.com/" title="I dont know zilch !" rel="home">I dont know zilch !</a></h1>
+			<h2 class="site-description">For the noobs out there like me</h2>
+		</hgroup>
+
+        	<form method="get" id="searchform" class="searchform" action="https://chandruscm.wordpress.com/" role="search">
+		<label for="s" class="assistive-text">Search</label>
+		<input type="search" class="field" name="s" value="" id="s" placeholder="Search &hellip;" />
+		<input type="submit" class="submit" id="searchsubmit" value="Search" />
+	</form>
+      </div>
+	</header><!-- #branding -->
+    <div id="content" class="clearfix">
+
+        <div id="main" class="column clearfix" role="main">
+
+		
+			<header class="page-header">
+				<h1 class="page-title">
+					Tag Archives: <span>How to pass string array from C to java</span>				</h1>
+							</header><!-- .page-header -->
+
+						
+				<article id="post-601" class="post-601 post type-post status-publish format-standard hentry category-coding tag-exception-in-thread-main-java-lang-unsatisfiedlinkerror tag-fatal-error-jni-h-no-such-file-or-directory tag-how-to-call-c-libraries-from-java tag-how-to-create-native-libraries-in-java tag-how-to-pass-integer-array-from-c-to-java tag-how-to-pass-integers-from-c-to-java tag-how-to-pass-string-array-from-c-to-java tag-how-to-pass-strings-from-c-to-java tag-how-to-return-object-arrays-using-jni tag-how-to-use-c-code-in-java tag-how-to-use-c-function-in-java tag-how-to-use-jni-with-cc tag-how-to-use-native-functions-in-java tag-java-native-interface tag-jni">
+		<div class="posted-meta">
+    	<div class="date-meta">
+        	<a href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/" rel="bookmark">08.10.15</a>
+        </div>
+        <div class="author-meta">
+        	by <a class="url fn n" href="https://chandruscm.wordpress.com/author/chandruscm/" title="View all posts by chandruscm" rel="author">chandruscm</a>        </div>
+    </div><!-- end .posted-meta -->
+	<header class="entry-header">
+		<h1 class="entry-title"><a href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/" rel="bookmark">JNI ( Java Native Interface ) for C/C++ with&nbsp;examples</a></h1>
+	</header><!-- .entry-header -->
+
+		<div class="entry-content">
+		<p>When writing applications in Java, there are times when Java alone fails to meet the needs of an application. You might want to use a feature not present in the standard Java class library or you might just want to use an existing library written in some other language. That&#8217;s where JNI comes in.</p>
+<p>I found that most of the online documentation on JNI seems pretty scattered and obsolete. Therefore the scope of this post is to show you how to implement JNI with simple examples for :</p>
+<ul>
+<li>Writing a HelloWorld in C and calling it from Java</li>
+<li>Passing Integers and Strings from C to Java</li>
+<li>Passing object Arrays from C to Java</li>
+</ul>
+<p>The same can be implemented with C++ too. Note the modification mentioned in step 4 below.</p>
+<h2 style="text-align:center;">Clone all the examples from <a href="https://github.com/chandruscm/JNIexamples.git" target="_blank">Git</a></h2>
+<p>&nbsp;</p>
+<h2>HelloWorld from C</h2>
+<p>1. Write the Java code</p>
+<pre class="brush: java; title: ; notranslate" title="">
+//HelloWorld.java
+
+public class HelloWorld 
+{
+  native void cfunction();//Declaring the native function
+                            
+  static
+  {
+     System.loadLibrary(&quot;forhelloworld&quot;);//Linking the native library
+  }                                      //which we will be creating.
+
+  public static void main(String args[]) 
+  {
+     HelloWorld obj = new HelloWorld();
+     obj.cfunction();//Calling the native function
+  }
+}
+
+</pre>
+<p>2. Compile the Java code and generate the class file</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+
+javac HelloWorld.java
+
+</pre>
+<p>3. Generate a Header file from the class file</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+
+javah HelloWorld
+
+</pre>
+<p>This will generate a file HelloWorld.h which contains :</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//HelloWorld.h
+
+/* DO NOT EDIT THIS FILE - it is machine generated */
+#include &lt;jni.h&gt;
+/* Header for class HelloWorld */
+
+#ifndef _Included_HelloWorld
+#define _Included_HelloWorld
+#ifdef __cplusplus
+extern &quot;C&quot; {
+#endif
+/*
+ * Class:     HelloWorld
+ * Method:    cfunction
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_HelloWorld_cfunction
+  (JNIEnv *, jobject);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+</pre>
+<p>3. Obtain the JNI function signature from the header file</p>
+<ol>
+<li>These 2 lines make up the function header :</li>
+</ol>
+<pre class="brush: cpp; title: ; notranslate" title="">
+JNIEXPORT void JNICALL Java_HelloWorld_cfunction
+(JNIEnv *, jobject);
+</pre>
+<p>Even if we declare native functions with no arguments, the JNI function signature still holds 2 arguments, they are:</p>
+<ul>
+<li>JNIEnv * : A pointer referencing all the JNI functions</li>
+<li>jobject     : An equivalent of <em>this</em> pointer</li>
+</ul>
+<p>4. Write the native code using the function signature</p>
+<ul>
+<li>Add the header file jni.h </li>
+<li>Instead of the main() function, use the function signature obtained from the previous step.</li>
+<li>Add argument variables for JNIEnv (env) and Jobject (jobj).</li>
+<li><strong>IMPORTANT :: If the native code is in C++, please note the only modification to be made is that the JNI functions should be called as env-&gt;func_name() instead of (*env)-&gt;func_name(). That is because C uses structures while C++ uses classes.</strong></li>
+</ul>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//HelloWorld.c
+ 
+#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+ 
+JNIEXPORT void JNICALL Java_HelloWorld_cfunction
+(JNIEnv *env, jobject jobj)
+{
+   printf(&quot;\n &gt; C says HelloWorld !\n&quot;);
+}
+</pre>
+<p>5. Generate the library file from the native code</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+gcc -o libforhelloworld.so -shared -fPIC -I (PATH TO jni.h header) HelloWorld.c -lc 
+</pre>
+<ul>
+<li><strong>    libforhelloworld.so</strong> is the name of the native library you are going to create, it should be named as &#8220;lib&#8221;+(the library name used in the load library statement within the java code)</li>
+<li><strong>    -fPIC</strong> is some sort optimization for loading the machine code into the RAM, gcc requested this flag to be set. Might not be required for all systems.</li>
+</ul>
+<p>If you don&#8217;t specify the path correctly you will encounter this error :</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+HelloWorld.c:1:17: fatal error: jni.h: No such file or directory
+ #include &lt;jni.h&gt;
+                 ^
+compilation terminated.
+
+</pre>
+<p>It is usually present inside</p>
+<pre class="brush: plain; title: ; notranslate" title="">/usr/lib/jvm/default-java/include</pre>
+<p>or</p>
+<pre class="brush: plain; title: ; notranslate" title="">/usr/lib/jvm/java-1.7.0-openjdk-amd64/include</pre>
+<p>depending upon the version of Java you have installed in your system.</p>
+<p>6. Place the library file in the standard /usr/lib folder</p>
+<p>If the previous command executed successfully, it would have generated a file libforhelloworld.so . Conventionally this library file need not be placed anywhere else, it needs to reside in the current working directory.</p>
+<p>But for that to work you need to have set the JAVA_PATH variables correctly, in most cases they won&#8217;t be set correctly. An easy hack to this would be to just place it inside /usr/lib</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+sudo cp libforhelloworld.so /usr/lib
+</pre>
+<p>If you don&#8217;t place the library file, you would encounter this error :</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+Exception in thread &quot;main&quot; java.lang.UnsatisfiedLinkError: no forhelloworld in java.library.path
+        at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1886)
+        at java.lang.Runtime.loadLibrary0(Runtime.java:849)
+        at java.lang.System.loadLibrary(System.java:1088)
+        at HelloWorld.&lt;clinit&gt;(HelloWorld.java:9)
+</pre>
+<p>7. Execute the Java application</p>
+<pre class="brush: bash; title: ; notranslate" title="">
+java HelloWorld
+</pre>
+<p>If you&#8217;ve followed all the steps correctly, C would greet the world😀</p>
+<pre class="brush: plain; title: ; notranslate" title="">
+ &gt; C says HelloWorld !
+</pre>
+<p>&nbsp;</p>
+<h2>PASS INTEGERS FROM C TO JAVA</h2>
+<p>Example : Write a Java program to find the factorial of a number. Pass the number as an argument from Java to a native function in C which returns the factorial as an integer.</p>
+<p>Java code</p>
+<pre class="brush: java; title: ; notranslate" title="">
+//factorial.java
+ 
+import java.util.Scanner;
+ 
+public class factorial
+{
+  native int fact(int num);
+ 
+  static
+  {
+        System.loadLibrary(&quot;forfact&quot;);
+  }
+ 
+  public static void main(String args[])
+  {
+        Scanner inp = new Scanner(System.in);
+ 
+        System.out.println(&quot; &gt; Enter number :: &quot;);
+        int num = inp.nextInt();
+ 
+        factorial obj = new factorial();
+ 
+        System.out.println(&quot; &gt; The factorial of &quot;+num+&quot; is &quot;+obj.fact(num));
+  }
+}                                                                                                         
+</pre>
+<p>C code</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//factorial.c
+ 
+#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+ 
+JNIEXPORT jint JNICALL Java_factorial_fact
+(JNIEnv *env, jobject jobj, jint num)
+{
+  jint result=1;
+ 
+  while(num)
+  {
+        result*=num;
+        num--;
+  }
+ 
+return result;
+}
+</pre>
+<p>&nbsp;</p>
+<h2>PASS STRINGS FROM C TO JAVA</h2>
+<p>Example : Write a Java program to reverse a given string. Pass the given string as an argument from Java to a native function in C which returns the reversed string.</p>
+<p>Java code</p>
+<pre class="brush: java; title: ; notranslate" title="">
+//reverse.java
+ 
+import java.util.Scanner;
+ 
+public class reverse
+{
+  native String reversefunc(String word);
+ 
+  static
+  {
+        System.loadLibrary(&quot;forreverse&quot;);
+  }
+ 
+  public static void main(String args[])
+  {
+        Scanner inp = new Scanner(System.in);
+ 
+        System.out.println(&quot; &gt; Enter a string :: &quot;);
+        String word = inp.nextLine();
+ 
+        reverse obj = new reverse();
+ 
+        System.out.println(&quot; &gt; The reversed string is :: &quot;+obj.reversefunc(word));
+  }
+}
+</pre>
+<p>C code</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//reverse.c
+ 
+#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+ 
+JNIEXPORT jstring JNICALL Java_reverse_reversefunc
+(JNIEnv *env,jobject jobj,jstring original)
+{
+  const char *org;
+  char *rev;
+ 
+  org = (*env)-&gt;GetStringUTFChars(env,original,NULL);
+ 
+  int i;
+  int size = (*env)-&gt;GetStringUTFLength(env,original);
+   
+  for(i=0;i&lt;size;i++)
+        rev[i]=org[size-i-1];
+ 
+  rev[size]='&#092;&#048;';
+ 
+return (*env)-&gt;NewStringUTF(env,rev);
+}
+</pre>
+<p>&nbsp;</p>
+<h2>PASS INTEGER ARRAYS FROM C TO JAVA</h2>
+<p>Example : Write a program that generates the first n Fibonacci numbers. Pass &#8216;n&#8217; as an argument from Java to a native function in C that returns the Fibonacci numbers as an integer array.</p>
+<p>Java code</p>
+<pre class="brush: java; title: ; notranslate" title="">
+//fibonacci.java
+ 
+import java.util.Scanner;
+ 
+public class fibonacci
+{
+  native int[] returnfibo(int n);
+ 
+  static
+  {
+        System.loadLibrary(&quot;fibonacci&quot;);
+  }
+ 
+  public static void main(String args[])
+  {
+        Scanner inp = new Scanner(System.in);
+ 
+        System.out.println(&quot; &gt; Enter n :: &quot;);
+        int n = inp.nextInt();
+ 
+        fibonacci obj = new fibonacci();
+        int[] Fibo = obj.returnfibo(n);
+ 
+        System.out.println(&quot; &gt; The first &quot;+n+&quot; fibonacci numbers are :: &quot;);
+ 
+        for(int i=0;i&lt;n;i++)
+          System.out.print(Fibo[i]+&quot;,&quot;);
+  }
+}
+</pre>
+<p>C code</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//fibonacci.c
+ 
+#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+ 
+JNIEXPORT jintArray JNICALL Java_fibonacci_returnfibo
+(JNIEnv *env,jobject jobj,jint n)
+{
+  jintArray fiboarray  = (*env)-&gt;NewIntArray(env,n);
+ 
+  int first=0;
+  int second=1;
+  int next;
+  int i;
+  int fibo[n];
+ 
+  for(i=0;i&lt;n;i++)
+  {
+        if(i&lt;=1)
+          next = i;
+        else
+        {
+          next = first + second;
+          first = second;
+          second = next;
+        }
+ 
+        fibo[i] = next;
+  }
+ 
+  (*env)-&gt;SetIntArrayRegion(env,fiboarray,0,n,fibo);
+ 
+return fiboarray;
+}
+</pre>
+<p>&nbsp;</p>
+<h2>PASS STRING ARRAYS FROM C TO JAVA</h2>
+<p>Example : Write a Java program that displays the days of the week, which are passed from a native function in C.</p>
+<p>Java code</p>
+<pre class="brush: java; title: ; notranslate" title="">
+//daysofweek.java
+ 
+public class daysofweek
+{
+  native String[] returndays();
+ 
+   static
+   {
+      System.loadLibrary(&quot;daysofweek&quot;);
+   }
+ 
+   static public void main(String args[])
+   {
+ 
+      daysofweek obj = new daysofweek();
+      String[] days = obj.returndays();
+ 
+      System.out.println(&quot; &gt; The days of the week are :: &quot;);
+      for(String name: days)
+        System.out.println(name);
+   }
+}
+</pre>
+<p>C code</p>
+<pre class="brush: cpp; title: ; notranslate" title="">
+//daysofweek.c
+ 
+#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+ 
+JNIEXPORT jobjectArray JNICALL Java_daysofweek_returndays(JNIEnv *env, jobject jobj)
+{
+ 
+  char *days[]={&quot;Sunday&quot;,
+                &quot;Monday&quot;,
+                &quot;Tuesday&quot;,
+                &quot;Wednesday&quot;,
+                &quot;Thursday&quot;,
+                &quot;Friday&quot;,
+                &quot;Saturday&quot;};
+ 
+  jstring str;
+  jobjectArray day = 0;
+  jsize len = 7;
+  int i;
+ 
+  day = (*env)-&gt;NewObjectArray(env,len,(*env)-&gt;FindClass(env,&quot;java/lang/String&quot;),0);
+   
+  for(i=0;i&lt;7;i++)
+  {
+    str = (*env)-&gt;NewStringUTF(env,days[i]);
+    (*env)-&gt;SetObjectArrayElement(env,day,i,str);
+  }
+   
+return day;
+}
+</pre>
+<p>As you can see, the C code is returning an array of char pointers (C strings), while the Java code is expecting an array of Java Strings. But you don&#8217;t have to worry about that, the good old implicit conversion comes to the rescue🙂</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share this on:</h3><div class="sd-content"><ul><li class="share-facebook"><a rel="nofollow" data-shared="sharing-facebook-601" class="share-facebook sd-button share-icon no-text" href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/?share=facebook" target="_blank" title="Share on Facebook"><span></span><span class="sharing-screen-reader-text">Share on Facebook (Opens in new window)</span></a></li><li class="share-twitter"><a rel="nofollow" data-shared="sharing-twitter-601" class="share-twitter sd-button share-icon no-text" href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/?share=twitter" target="_blank" title="Click to share on Twitter"><span></span><span class="sharing-screen-reader-text">Click to share on Twitter (Opens in new window)</span></a></li><li class="share-google-plus-1"><a rel="nofollow" data-shared="sharing-google-601" class="share-google-plus-1 sd-button share-icon no-text" href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/?share=google-plus-1" target="_blank" title="Click to share on Google+"><span></span><span class="sharing-screen-reader-text">Click to share on Google+ (Opens in new window)</span></a></li><li class="share-reddit"><a rel="nofollow" data-shared="" class="share-reddit sd-button share-icon no-text" href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/?share=reddit" target="_blank" title="Click to share on Reddit"><span></span><span class="sharing-screen-reader-text">Click to share on Reddit (Opens in new window)</span></a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-71908243-601-5842779d1bd3f' data-src='//widgets.wp.com/likes/#blog_id=71908243&amp;post_id=601&amp;origin=chandruscm.wordpress.com&amp;obj_id=71908243-601-5842779d1bd3f' data-name='like-post-frame-71908243-601-5842779d1bd3f'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div><!-- .entry-content -->
+	
+	<footer class="entry-meta">
+		<span class="post-format-link"><a href="" title="Permalink to " rel="bookmark">Standard</a></span> </span>		<span class="sep"> | </span>
+								<span class="cat-links">
+				Posted in <a href="https://chandruscm.wordpress.com/category/coding/" rel="category tag">Coding</a>			</span>
+			
+						<span class="sep"> | </span>
+			<span class="tags-links">
+				Tagged <a href="https://chandruscm.wordpress.com/tag/exception-in-thread-main-java-lang-unsatisfiedlinkerror/" rel="tag">Exception in thread "main" java.lang.UnsatisfiedLinkError:</a>, <a href="https://chandruscm.wordpress.com/tag/fatal-error-jni-h-no-such-file-or-directory/" rel="tag">fatal error: jni.h: No such file or directory</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-call-c-libraries-from-java/" rel="tag">How to call C libraries from Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-create-native-libraries-in-java/" rel="tag">How to create native libraries in Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-pass-integer-array-from-c-to-java/" rel="tag">How to pass integer array from C to Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-pass-integers-from-c-to-java/" rel="tag">How to pass integers from C to java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-pass-string-array-from-c-to-java/" rel="tag">How to pass string array from C to java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-pass-strings-from-c-to-java/" rel="tag">How to pass strings from C to Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-return-object-arrays-using-jni/" rel="tag">How to return object arrays using JNI</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-use-c-code-in-java/" rel="tag">How to use C code in Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-use-c-function-in-java/" rel="tag">How to use C function in Java</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-use-jni-with-cc/" rel="tag">How to use JNI with C/C++</a>, <a href="https://chandruscm.wordpress.com/tag/how-to-use-native-functions-in-java/" rel="tag">How to use native functions in Java</a>, <a href="https://chandruscm.wordpress.com/tag/java-native-interface/" rel="tag">Java Native Interface</a>, <a href="https://chandruscm.wordpress.com/tag/jni/" rel="tag">JNI</a>			</span>
+					
+				<span class="sep"> | </span>
+		<span class="comments-link"><a href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/#comments">2 Comments</a></span>
+		
+			</footer><!-- .entry-meta -->
+</article><!-- #post-## -->
+			
+			
+		
+        </div> <!-- end #main -->
+
+        		<div id="sidebar" class="widget-area sidebar-column" role="complementary">
+			
+			
+					<aside id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="widget-title">Recent Posts</h2>		<ul>
+					<li>
+				<a href="https://chandruscm.wordpress.com/2016/07/03/google-io-mkbhd-and-how-i-missed-a-selfie-with-sundar-pichai/">Google I/O, MKBHD and how I missed a selfie with Sundar&nbsp;Pichai</a>
+						</li>
+					<li>
+				<a href="https://chandruscm.wordpress.com/2015/12/30/how-to-setup-google-play-game-services-in-libgdx-using-android-studio/">How to setup Google Play Game Services in LibGDX using Android&nbsp;Studio</a>
+						</li>
+					<li>
+				<a href="https://chandruscm.wordpress.com/2015/12/29/how-to-obtain-sha1-signing-certificate-fingerprint-from-android-studio/">How to obtain SHA1 Signing certificate fingerprint from Android&nbsp;Studio</a>
+						</li>
+					<li>
+				<a href="https://chandruscm.wordpress.com/2015/08/10/how-to-use-jni-java-native-interface-with-cc/">JNI ( Java Native Interface ) for C/C++ with&nbsp;examples</a>
+						</li>
+					<li>
+				<a href="https://chandruscm.wordpress.com/2015/08/02/dalvik-vs-a-r-t-android-run-time/">DALVIK vs A.R.T ( Android Run Time&nbsp;)</a>
+						</li>
+				</ul>
+		</aside>		<aside id="top-posts-5" class="widget widget_top-posts"><h2 class="widget-title">Top Posts</h2><ul>				<li>
+										<a href="https://chandruscm.wordpress.com/2015/12/30/how-to-setup-google-play-game-services-in-libgdx-using-android-studio/" class="bump-view" data-bump-view="tp">
+						How to setup Google Play Game Services in LibGDX using Android Studio					</a>
+									</li>
+							<li>
+										<a href="https://chandruscm.wordpress.com/2014/10/31/how-to-customize-your-windows-like-a-boss-8-8-1/" class="bump-view" data-bump-view="tp">
+						How to customize your Windows like a BOSS ( 8 / 8.1 )					</a>
+									</li>
+							<li>
+										<a href="https://chandruscm.wordpress.com/2015/12/29/how-to-obtain-sha1-signing-certificate-fingerprint-from-android-studio/" class="bump-view" data-bump-view="tp">
+						How to obtain SHA1 Signing certificate fingerprint from Android Studio					</a>
+									</li>
+							<li>
+										<a href="https://chandruscm.wordpress.com/2015/04/02/fixed-waiting-for-response-from-gravitybox-system-framework-error-xposed-modules-not-working/" class="bump-view" data-bump-view="tp">
+						[ FIXED ] Waiting for response from Gravitybox system framework Error | Xposed modules not working					</a>
+									</li>
+							<li>
+										<a href="https://chandruscm.wordpress.com/2014/10/25/2048-in-c-c/" class="bump-view" data-bump-view="tp">
+						2048 in C / C++					</a>
+									</li>
+			</ul></aside><aside id="tag_cloud-3" class="widget widget_tag_cloud"><h2 class="widget-title">Category Cloud</h2><div style="overflow: hidden;"><a href="https://chandruscm.wordpress.com/category/android/" style="font-size: 275%; padding: 1px; margin: 1px;"  title="Android (7)">Android</a> <a href="https://chandruscm.wordpress.com/category/boss/" style="font-size: 187.5%; padding: 1px; margin: 1px;"  title="BOSS (4)">BOSS</a> <a href="https://chandruscm.wordpress.com/category/bugs-2/" style="font-size: 129.16666666667%; padding: 1px; margin: 1px;"  title="Bugs (2)">Bugs</a> <a href="https://chandruscm.wordpress.com/category/c/" style="font-size: 100%; padding: 1px; margin: 1px;"  title="C (1)">C</a> <a href="https://chandruscm.wordpress.com/category/coding/" style="font-size: 129.16666666667%; padding: 1px; margin: 1px;"  title="Coding (2)">Coding</a> <a href="https://chandruscm.wordpress.com/category/cpp-2/" style="font-size: 100%; padding: 1px; margin: 1px;"  title="cpp (1)">cpp</a> <a href="https://chandruscm.wordpress.com/category/how-tos/" style="font-size: 275%; padding: 1px; margin: 1px;"  title="How-tos (7)">How-tos</a> <a href="https://chandruscm.wordpress.com/category/linux/" style="font-size: 129.16666666667%; padding: 1px; margin: 1px;"  title="Linux (2)">Linux</a> <a href="https://chandruscm.wordpress.com/category/modding/" style="font-size: 158.33333333333%; padding: 1px; margin: 1px;"  title="Modding (3)">Modding</a> <a href="https://chandruscm.wordpress.com/category/non-tech/" style="font-size: 100%; padding: 1px; margin: 1px;"  title="Non-Tech (1)">Non-Tech</a> <a href="https://chandruscm.wordpress.com/category/windows/" style="font-size: 129.16666666667%; padding: 1px; margin: 1px;"  title="Windows (2)">Windows</a> </div></aside><aside id="text-16" class="widget widget_text"><h2 class="widget-title">About me</h2>			<div class="textwidget"><a href="https://about.me/chandruscm" target="_blank"><img src="https://chandruscm.files.wordpress.com/2016/07/me.jpg" alt="Logo"></a>
+<br><h2>CHANDRAMOHAN SUDAR</h2>
+Undergrad doing B.Tech in Computer Science at Amrita University, Kerala, India. Loves all sorts of programming challenges and problem solving. Interested in almost everything from Android to creating the next J.A.R.V.I.S
+<br><br>
+My influences are Nikola Tesla, Edgser Dijkstra, Stephen Hawking and my rocket scientist Father!</div>
+		</aside><aside id="blog_subscription-5" class="widget widget_blog_subscription"><h2 class="widget-title"><label for="subscribe-field">Follow Blog via Email</label></h2>
+				<form action="https://subscribe.wordpress.com" method="post" accept-charset="utf-8" id="subscribe-blog">
+											<p>Enter your email address to follow this blog and receive notifications of new posts by email.</p>
+<p>Join 757 other followers</p>
+						<p><input type="text" name="email" style="width: 95%; padding: 1px 2px" placeholder="Enter your email address" value="" id="subscribe-field"/></p>
+					
+					<p>
+						<input type="hidden" name="action" value="subscribe"/>
+						<input type="hidden" name="blog_id" value="71908243"/>
+						<input type="hidden" name="source" value="https://chandruscm.wordpress.com/tag/how-to-pass-string-array-from-c-to-java/"/>
+						<input type="hidden" name="sub-type" value="widget"/>
+						<input type="hidden" name="redirect_fragment" value="blog_subscription-5" />
+						<input type="hidden" id="_wpnonce" name="_wpnonce" value="bc64a197d1" />						<input type="submit" value="Follow" />
+					</p>
+				</form>
+			
+</aside><aside id="blog-stats-7" class="widget widget_blog-stats"><h2 class="widget-title">Blog Stats</h2>		<ul>
+			<li>92,754 hits</li>
+		</ul>
+		</aside><aside id="text-12" class="widget widget_text">			<div class="textwidget"><a href="http://feedjit.com/ir1/b9702f12695f96b7a4bd9b5eaccd135e/"><img src="https://i2.wp.com/feedjit.com/b/b9702f12695f96b7a4bd9b5eaccd135e.png" alt="" border="0" /></a></div>
+		</aside><aside id="image-7" class="widget widget_image"><h2 class="widget-title">latest project</h2><div style="overflow:hidden;"><a href="https://play.google.com/store/apps/details?id=com.chandruscm.orble.android&#038;hl=en"><img src="https://chandruscm.files.wordpress.com/2016/02/blogad1.png?w=512&amp;h=833" alt="A minimalistic reflex based game" class="aligncenter" width="512" height="833" /></a></div>
+</aside><aside id="gallery-5" class="widget widget-gallery">
+<div class="widget-gallery-square no-carousel">
+<div
+	class="tiled-gallery type-square tiled-gallery-unresized"
+	data-original-width="265"
+			data-carousel-extra='{&quot;blog_id&quot;:71908243,&quot;permalink&quot;:&quot;https:\/\/chandruscm.wordpress.com\/2015\/08\/10\/how-to-use-jni-java-native-interface-with-cc\/&quot;,&quot;likes_blog_id&quot;:71908243}'
+		>
+		<div class="gallery-row"
+		style="width: 265px; height: 265px;"
+		data-original-width="265"
+		data-original-height="265"
+	>
+							<div class="gallery-group"
+				style="width: 265px; height: 265px;"
+				data-original-width="265"
+				data-original-height="265"
+			>
+				<div class="tiled-gallery-item">
+		<a href="https://chandruscm.files.wordpress.com/2015/05/scm-logo2.png" border="0">
+			<img
+			data-attachment-id="487"
+data-orig-file="https://chandruscm.files.wordpress.com/2015/05/scm-logo2.png"
+data-orig-size="500,500"
+data-comments-opened="1"
+data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}"
+data-image-title="SCM"
+data-image-description=""
+data-medium-file="https://chandruscm.files.wordpress.com/2015/05/scm-logo2.png?w=300"
+data-large-file="https://chandruscm.files.wordpress.com/2015/05/scm-logo2.png?w=500"
+			src="https://chandruscm.files.wordpress.com/2015/05/scm-logo2.png?w=261&#038;h=261&#038;crop=1"
+			width="261"
+			height="261"
+			data-original-width="261"
+			data-original-height="261"
+			title="SCM"
+			alt="SCM"
+			style="width: 261px; height: 261px;"
+		/>
+		</a>
+	
+	
+	</div>
+
+			</div>
+			</div>
+</div>
+
+</div>
+</aside>		</div><!-- #secondary .widget-area -->
+
+    </div> <!-- end #content -->
+
+	<footer id="colophon" role="contentinfo">
+		<div id="site-generator">
+
+		<a href="https://wordpress.com/?ref=footer_blog">Blog at WordPress.com.</a>
+		</div>
+	</footer><!-- #colophon -->
+</div><!-- #container -->
+
+		<script type="text/javascript">
+		//<![CDATA[
+		var infiniteScroll = {"settings":{"id":"main","ajaxurl":"https:\/\/chandruscm.wordpress.com\/?infinity=scrolling","type":"scroll","wrapper":true,"wrapper_class":"infinite-wrap","footer":"page","click_handle":"1","text":"Older posts","totop":"Scroll back to top","currentday":"10.08.15","order":"DESC","scripts":[],"styles":[],"google_analytics":false,"offset":0,"history":{"host":"chandruscm.wordpress.com","path":"\/tag\/how-to-pass-string-array-from-c-to-java\/page\/%d\/","use_trailing_slashes":true,"parameters":""},"query_args":{"tag":"how-to-pass-string-array-from-c-to-java","error":"","m":"","p":0,"post_parent":"","subpost":"","subpost_id":"","attachment":"","attachment_id":0,"name":"","static":"","pagename":"","page_id":0,"second":"","minute":"","hour":"","day":0,"monthnum":0,"year":0,"w":0,"category_name":"","cat":"","tag_id":383514323,"author":"","author_name":"","feed":"","tb":"","paged":0,"meta_key":"","meta_value":"","preview":"","s":"","sentence":"","title":"","fields":"","menu_order":"","embed":"","category__in":[],"category__not_in":[],"category__and":[],"post__in":[],"post__not_in":[],"post_name__in":[],"tag__in":[],"tag__not_in":[],"tag__and":[],"tag_slug__in":["how-to-pass-string-array-from-c-to-java"],"tag_slug__and":[],"post_parent__in":[],"post_parent__not_in":[],"author__in":[],"author__not_in":[],"posts_per_page":7,"ignore_sticky_posts":false,"suppress_filters":false,"cache_results":false,"update_post_term_cache":true,"lazy_load_term_meta":true,"update_post_meta_cache":true,"post_type":"","nopaging":false,"comments_per_page":"50","no_found_rows":false,"order":"DESC"},"last_post_date":"2015-08-10 03:23:11","stats":"blog=71908243&v=wpcom&tz=5&user_id=0&subd=chandruscm&x_pagetype=infinite"}};
+		//]]>
+		</script>
+		<!--  -->
+<script type='text/javascript' src='//0.gravatar.com/js/gprofiles.js?ver=201648y'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s1.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1380573781h'></script>
+
+	<script>
+		//initialize and attach hovercards to all gravatars
+		jQuery( document ).ready( function( $ ) {
+
+			if (typeof Gravatar === "undefined"){
+				return;
+			}
+
+			if ( typeof Gravatar.init !== "function" ) {
+				return;
+			}			
+
+			Gravatar.profile_cb = function( hash, id ) {
+				WPGroHo.syncProfileData( hash, id );
+			};
+			Gravatar.my_hash = WPGroHo.my_hash;
+			Gravatar.init( 'body', '#wp-admin-bar-my-account' );
+		});
+	</script>
+
+		<div style="display:none">
+	</div>
+		<div id="infinite-footer">
+			<div class="container">
+				<div class="blog-info">
+					<a id="infinity-blog-title" href="https://chandruscm.wordpress.com/" rel="home">
+						I dont know zilch !					</a>
+				</div>
+				<div class="blog-credits">
+					<a href="https://wordpress.com/?ref=footer_blog">Blog at WordPress.com.</a> 				</div>
+			</div>
+		</div><!-- #infinite-footer -->
+		
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/chandruscm.wordpress.com\/2015\/08\/10\/how-to-use-jni-java-native-interface-with-cc\/":601};
+	</script>
+		<script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-facebook' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+		});
+		</script>
+				<script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-twitter' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+		});
+		</script>
+				<script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-google-plus-1' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomgoogle-plus-1', 'menubar=1,resizable=1,width=480,height=550' );
+				return false;
+			});
+		});
+		</script>
+		
+	<div id="carousel-reblog-box">
+		<form action="" name="carousel-reblog">
+			<textarea id="carousel-reblog-content" name="carousel-reblog-content" placeholder="Add your thoughts here... (optional)"></textarea>
+			<label for="carousel-reblog-to-blog-id" id="carousel-reblog-lblogid">Post to</label>
+			<select name="carousel-reblog-to-blog-id" id="carousel-reblog-to-blog-id">
+						</select>
+
+			<div class="submit">
+				<span class="canceltext"><a href="" class="cancel">Cancel</a></span>
+				<input type="submit" name="carousel-reblog-submit" class="button" id="carousel-reblog-submit" value="Reblog Post" />
+				<input type="hidden" id="carousel-reblog-blog-id" value="71908243" />
+				<input type="hidden" id="carousel-reblog-blog-url" value="https://chandruscm.wordpress.com" />
+				<input type="hidden" id="carousel-reblog-blog-title" value="I dont know zilch !" />
+				<input type="hidden" id="carousel-reblog-post-url" value="" />
+				<input type="hidden" id="carousel-reblog-post-title" value="" />
+			</div>
+
+			<input type="hidden" id="_wpnonce" name="_wpnonce" value="0257399553" /><input type="hidden" name="_wp_http_referer" value="/tag/how-to-pass-string-array-from-c-to-java/" />		</form>
+
+		<div class="arrow"></div>
+	</div>
+<script type='text/javascript' src='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9EvyClNz8wr1i+uzCtJrMjITM/IAeKS1CJMEWP94uSizIISoOIM5/yiVL2sYh19yo1yKiotzvBKLEukpnlOicUZ1DTPuaCAmsYF5CRm5gENtM+1NTQxMjI2MTI0NskCAC2gnkY='></script>
+<script type='text/javascript'>
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414h&amp;ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+</script>
+<link rel='stylesheet' id='all-css-0-2' href='https://s1.wp.com/_static/??/wp-content/mu-plugins/tiled-gallery/tiled-gallery.css,/wp-content/mu-plugins/carousel/jetpack-carousel.css?m=1458924076j' type='text/css' media='all' />
+<!--[if lte IE 8]>
+<link rel='stylesheet' id='jetpack-carousel-ie8fix-css'  href='https://s1.wp.com/wp-content/mu-plugins/carousel/jetpack-carousel-ie8fix.css?m=1412618825h&#038;ver=20121024' type='text/css' media='all' />
+<![endif]-->
+<script type='text/javascript'>
+/* <![CDATA[ */
+var actionbardata = {"siteID":"71908243","siteName":"I dont know zilch !","siteURL":"http:\/\/chandruscm.wordpress.com","icon":"<img alt='' src='https:\/\/secure.gravatar.com\/blavatar\/88245eccd7161a8108936578cbb86289?s=36' class='avatar avatar-36' height='36' width='36' \/>","canManageOptions":"","canCustomizeSite":"","isFollowing":"","themeSlug":"pub\/newsworthy","signupURL":"https:\/\/wordpress.com\/start\/","loginURL":"https:\/\/chandruscm.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fchandruscm.wordpress.com%2F2015%2F08%2F10%2Fhow-to-use-jni-java-native-interface-with-cc%2F","themeURL":"https:\/\/wordpress.com\/themes\/newsworthy\/","xhrURL":"https:\/\/chandruscm.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"e2d4813bce","isSingular":"","isFolded":"","isLoggedIn":"","isMobile":"","subscribeNonce":"<input type=\"hidden\" id=\"_wpnonce\" name=\"_wpnonce\" value=\"bc64a197d1\" \/>","referer":"https:\/\/chandruscm.wordpress.com\/tag\/how-to-pass-string-array-from-c-to-java\/","canFollow":"1","statusMessage":"","customizeLink":"https:\/\/chandruscm.wordpress.com\/wp-admin\/customize.php?url=https%3A%2F%2Fchandruscm.wordpress.com%2Ftag%2Fhow-to-pass-string-array-from-c-to-java%2F","i18n":{"view":"View Site","follow":"Follow","following":"Following","edit":"Edit","login":"Log In","signup":"Sign Up","customize":"Customize","report":"Report this content","themeInfo":"Get theme: Newsworthy","shortlink":"Copy shortlink","copied":"Copied","followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","editFollows":"Manage Sites I Follow","editSubs":"Manage Subscriptions","viewReader":"View Site in the Reader","subscribe":"Sign me up","enterEmail":"Enter your email address","followers":"Join 757 other followers","alreadyUser":"Already have a WordPress.com account? <a href=\"https:\/\/chandruscm.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fchandruscm.wordpress.com%2F2015%2F08%2F10%2Fhow-to-use-jni-java-native-interface-with-cc%2F\">Log in now.<\/a>"}};
+/* ]]> */
+</script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https:\/\/chandruscm.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"89774cb15a","display_exif":"1","display_geo":"1","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","download_original":"View full size <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","comment_registration":"0","require_name_email":"0","login_url":"https:\/\/chandruscm.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fchandruscm.wordpress.com%2F2015%2F08%2F10%2Fhow-to-use-jni-java-native-interface-with-cc%2F","local_comments_commenting_as":"<fieldset><label for=\"email\">Email<\/label> <input type=\"text\" name=\"email\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-email-field\" \/><\/fieldset><fieldset><label for=\"author\">Name<\/label> <input type=\"text\" name=\"author\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-author-field\" \/><\/fieldset><fieldset><label for=\"url\">Website<\/label> <input type=\"text\" name=\"url\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-url-field\" \/><\/fieldset>","reblog":"Reblog","reblogged":"Reblogged","reblog_add_thoughts":"Add your thoughts here... (optional)","reblogging":"Reblogging...","post_reblog":"Post Reblog","stats_query_args":"blog=71908243&v=wpcom&tz=5&user_id=0&subd=chandruscm","is_public":"1","reblog_enabled":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s2.wp.com/_static/??-eJyNkN1uwyAMhV9ojE2t2t1MexYCTmJCDMMQ1rcfTE209QLt7vjnHH22LEFoTwkoScvSwIYawtez5Sf5a7RmEVyekFg6XIDlZ4YMsyLjIHaWkUYkTLdDPO6mGdYaF/IgCQoXH9N8aySkNpxUQk//tvCCQTikRYxeZxYj9u5QZkUSg4pyVZwgViX8BjGiqelHr5egG15LOFRnu6CZILGclKs/+wG+y44poQMjdsufanchaZcbcvtAGf1gQafHyD1vq8d5qZgbib3XIQJzB0Kr6DODkxZSUHoRe6N6Ptb31/P1cjq9Xa4v9htVSt7Z'></script>
+<script type='text/javascript' src='https://platform.twitter.com/widgets.js?ver=20111117'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s2.wp.com/_static/??-eJyVyzsOg0AMANELYZxEfCrEWZbFEJPFWF4D1w9NapRqmnl4KsRNnMRx3UHTPrNk9JPdyWBIIX4GthGUCYUOMpKRZS6XXOA/Vm+dbtlhSoEN8zvYNf96oX7tnlX7qh9NU7fLF8llQ4A='></script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script><script type="text/javascript">
+			jQuery.extend( infiniteScroll.settings.scripts, ["jquery","jquery-core","jquery-migrate","mobile-useragent-info","postmessage","jquery_inview","jetpack_resize","spin","jquery.spin","grofiles-cards","wpgroho","syntaxhighlighter-core","syntaxhighlighter-brush-java","syntaxhighlighter-brush-bash","syntaxhighlighter-brush-cpp","syntaxhighlighter-brush-plain","devicepx","jetpack_likes_queuehandler","the-neverending-homepage","navigation","skip-link-focus-fix","wpcom-masterbar-js","wpcom-actionbar-bar","gallery-widget","tiled-gallery","swfobject","videopress","jetpack-carousel","twitter-widgets","twitter-widgets-infinity","twitter-widgets-pending","sharing-js"] );
+			jQuery.extend( infiniteScroll.settings.styles, ["wpcom-smileys","jetpack_likes","the-neverending-homepage","wpcom-core-compat-playlist-styles","mp6hacks","wpcom-bbpress2-staff-css","style","noticons","geo-location-flair","reblogging","wpcom-actionbar-bar","sharedaddy","social-logos","h4-global","widget-grid-and-list","newsworthy-oswald","tiled-gallery","jetpack-carousel","jetpack-carousel-ie8fix"] );
+		</script>		<iframe src='https://widgets.wp.com/likes/master.html?ver=20160429#ver=20160429' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+		<div id='likes-other-gravatars'><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+		<script>
+			var _comscore = _comscore || [];
+			_comscore.push({
+				c1: "2",
+				c2: "7518284"
+			});
+			(function() {
+				var s = document.createElement("script"),
+					el = document.getElementsByTagName("script")[0];
+				s.async = true;
+				s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
+				el.parentNode.insertBefore(s, el);
+			})();
+		</script>
+		<noscript>
+			<p class="robots-nocontent"><img src="https://sb.scorecardresearch.com/p?c1=2&c2=7518284&c3=&c4=&c5=&c6=&c15=&cv=2.0&cj=1" alt="" style="display:none;" width="1" height="1" /></p>
+		</noscript><script src="//stats.wp.com/w.js?55" type="text/javascript" async defer></script>
+<script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'71908243','blog_tz':'5','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'71908243','v':'wpcom','tz':'5','user_id':'0','subd':'chandruscm'}]);
+_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1LVmwrVi5vQS5fVFtfdHBbPyw1VXIrU3hWLHhzVndTdktBX0ddJnpXRjVaOTd6fj1YMX4ydzRiVE1bNlpOME11T2N2THhKcHZESElSV0JPW0ddbVlMWms0LnN8eDdxQlFsakNVcGlmczQtMSZbTlRYSlZKSCtwR3RKUTh+UV03VVZBRUtNQ2k5eUllSUorOUNualFVNEF6Tj0lNVBicWVNVlEzJXRjLEU1PWFTV1g2XWk0TjdEZ2JuQTlPLEhQZjdvTEwycVJZZV16ekFUTGhXdXw5WklMM1dMWUMuMXB6UGglZnVkUnYtX1t5Z3RHcEYmdjFpclNob1JVK1k2MzZdb3ZjVD9rN3M/TkJlJldCK1gxdjBkS2VOdjQwd1p5RGF3M0w4c20rX28sRFlffExKOXNmNXk9T3xS'}]);
+_stq.push([ 'clickTrackerInit', '71908243', '0' ]);
+	</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+</body>
+</html>
