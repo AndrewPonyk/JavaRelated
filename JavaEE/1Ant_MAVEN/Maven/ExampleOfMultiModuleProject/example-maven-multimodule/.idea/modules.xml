@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/example-maven-multimodule.iml" filepath="$PROJECT_DIR$/example-maven-multimodule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/m1/m1.iml" filepath="$PROJECT_DIR$/m1/m1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/m2/m2.iml" filepath="$PROJECT_DIR$/m2/m2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/m3-webapp/m3-webapp.iml" filepath="$PROJECT_DIR$/m3-webapp/m3-webapp.iml" />
+    </modules>
+  </component>
+</project>

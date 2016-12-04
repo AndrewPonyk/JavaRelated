@@ -1,0 +1,22 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="m3-webapp:war exploded">
+    <output-path>$PROJECT_DIR$/m3-webapp/target/m3-webapp</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="m3-webapp" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="archive" name="m1-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="m1" />
+          </element>
+          <element id="library" level="project" name="Maven: javax.servlet:javax.servlet-api:3.1.0" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/m3-webapp/target/m3-webapp/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="m3-webapp/web/Web" />
+    </root>
+  </artifact>
+</component>
