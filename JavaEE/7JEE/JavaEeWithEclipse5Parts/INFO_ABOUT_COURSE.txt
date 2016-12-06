@@ -1,0 +1,17 @@
+5 small videos with some hello worlds
+
+Gupta creates HelloWorld dynamic web project, and add jpa jsf jax-rs code.
+
+-=======================================
+In part 2 this helps:
+http://stackoverflow.com/questions/13092567/automatic-ejb-timer-on-glassfish-server-not-triggering
+
+!!! persistent=false - without this times doesnt work
+============================================================================================================
+In part 3 
+Sql:
+	create table APP.myuser(name varchar(30) not null primary key,	
+	password varchar(30) not null);
+
+There was a problem :in glassfish admin console http://localhost:4848/common/index.jsf
+under JDBC Connection Pools Derby Pool I changed DatabaseName to 'sample' !!!!!!!!!!!!!! and it works
