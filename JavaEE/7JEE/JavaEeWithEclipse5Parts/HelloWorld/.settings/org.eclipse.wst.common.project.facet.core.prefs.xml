@@ -4,9 +4,9 @@
       <attribute name="provider-id" value="GlassFish-4-SystemLibrary-JPA"/>
     </node>
   </facet>
-  <facet id="jst.jaxrs">
+  <facet id="jst.jsf">
     <node name="libprov">
-      <attribute name="provider-id" value="oracle.eclipse.tools.glassfish.jaxrsLibraryproviderID"/>
+      <attribute name="provider-id" value="GlassFish-4-SystemLibrary-JSF"/>
     </node>
   </facet>
 </root>
