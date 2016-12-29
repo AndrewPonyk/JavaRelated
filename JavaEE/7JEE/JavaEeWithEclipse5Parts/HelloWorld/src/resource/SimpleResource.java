@@ -8,9 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-@Path("simple")
+@Path("/simplews")
 public class SimpleResource {
-    @SuppressWarnings("unused")
     @Context
     private UriInfo context;
 

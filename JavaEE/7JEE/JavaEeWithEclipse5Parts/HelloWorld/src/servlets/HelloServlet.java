@@ -26,7 +26,7 @@ public class HelloServlet extends HttpServlet {
 	@EJB
 	HelloBean bean;
 	
-	@PersistenceUnit
+	//@PersistenceUnit
 	EntityManagerFactory emf;
 	
     /**

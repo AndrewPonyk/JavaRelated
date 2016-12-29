@@ -14,11 +14,11 @@
 		<h:form>
 			<h:panelGrid columns="3">
 				<h:outputText value="Name"/>
-				<h:inputText value="#{user.name}" title="name" id="name" required="true">
+				<h:inputText value="#{userBean.name}" title="name" id="name" required="true">
 				</h:inputText>
 				<h:message for="name" style="color:red"/>
 				<h:outputText value="Password"/>
-				<h:inputText value="#{user.password}" title="password" id="password"
+				<h:inputText value="#{userBean.password}" title="password" id="password"
 				required="true"/>
 				<h:message for="password" style="color:red"/>
 			</h:panelGrid>

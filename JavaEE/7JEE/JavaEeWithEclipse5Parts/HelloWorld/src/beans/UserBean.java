@@ -2,9 +2,10 @@ package beans;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 
-@ManagedBean(name="user")
-@RequestScoped
+@ManagedBean
+@SessionScoped
 public class UserBean {
 	private String name;
 	private String password;
