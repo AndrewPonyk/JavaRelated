@@ -9,9 +9,14 @@ http://stackoverflow.com/questions/13092567/automatic-ejb-timer-on-glassfish-ser
 !!! persistent=false - without this times doesnt work
 ============================================================================================================
 In part 3 
+Start db in glassfish/bin : asadmin start-database
 Sql:
 	create table APP.myuser(name varchar(30) not null primary key,	
 	password varchar(30) not null);
 
-There was a problem :in glassfish admin console http://localhost:4848/common/index.jsf
-under JDBC Connection Pools Derby Pool I changed DatabaseName to 'sample' !!!!!!!!!!!!!! and it works
+
+About derby and glassfish
+https://web.liferay.com/community/wiki/-/wiki/Main/Derby+with+Glassfish
+
+Helps a lot with jaxrs
+http://stackoverflow.com/questions/17616708/rest-service-errors-with-resource-is-not-available-glassfish-4-0-jax-rs-2-0

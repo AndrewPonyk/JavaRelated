@@ -26,7 +26,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="udemy-java-simulations-multithreading" target="1.5" />
+      <module name="udemy-java-simulations-multithreading" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
