@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.LinkOption;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -38,6 +39,9 @@ public class FileUploadServlet extends HttpServlet{
 		writer.println(part);
 		System.out.println(part);
 		try{
+                        if(!new File(PATH_TO_SAVE).exists()){
+                            new File(PATH_TO_SAVE).mkdir(); 
+                        }
 			out = new FileOutputStream(new File(PATH_TO_SAVE + fileName));
 			
 			filecontent = part.getInputStream();
