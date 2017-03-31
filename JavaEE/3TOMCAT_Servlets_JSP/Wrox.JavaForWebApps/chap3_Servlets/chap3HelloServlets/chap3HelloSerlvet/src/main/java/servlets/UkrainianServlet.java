@@ -15,7 +15,7 @@ public class UkrainianServlet extends HttpServlet{
 			throws ServletException, IOException {
 		
 		getServletContext().setAttribute("ua", "Variable from Application scope");
-		request.setAttribute("ukrainianArgument", "Український текст їїї");
+		request.setAttribute("ukrainianArgument", "Український текст ї");
 		request.getRequestDispatcher("/ukr.jsp").forward(request, response);
 	}
 }
