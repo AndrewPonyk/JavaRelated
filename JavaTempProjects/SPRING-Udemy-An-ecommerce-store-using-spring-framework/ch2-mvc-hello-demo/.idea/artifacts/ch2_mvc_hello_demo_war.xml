@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="ch2-mvc-hello-demo:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="ch2-mvc-hello-demo.war">
+      <element id="artifact" artifact-name="ch2-mvc-hello-demo:war exploded" />
+    </root>
+  </artifact>
+</component>
