@@ -8,6 +8,7 @@
     <title>Home.jsp</title>
 </head>
 <body>
+${greetings}
 <h2>${greetings}</h2>
 <div style="border:1px solid black">
     List displayed by JSTL

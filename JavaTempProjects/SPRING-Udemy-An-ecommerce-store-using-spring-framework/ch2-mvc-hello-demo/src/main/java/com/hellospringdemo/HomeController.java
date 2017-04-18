@@ -21,4 +21,12 @@ public class HomeController {
         return "Home";
     }
 
+    @RequestMapping("/home1")
+    public String index1(Model model){
+        model.addAttribute("greetings", "12345");
+        List<String> listData = Arrays.asList(new String[]{"a", "fd", "abc"});
+        model.addAttribute("listData", listData);
+        return "Home";
+    }
+
 }
