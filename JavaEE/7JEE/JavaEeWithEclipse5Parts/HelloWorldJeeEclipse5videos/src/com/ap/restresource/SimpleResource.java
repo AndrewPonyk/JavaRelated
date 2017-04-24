@@ -1,5 +1,9 @@
 package com.ap.restresource;
 
+import java.util.List;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -8,12 +12,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import com.ap.model.Myuser;
+
 @Path("simple")
 public class SimpleResource {
     @SuppressWarnings("unused")
     @Context
     private UriInfo context;
 
+    @PersistenceUnit
+    EntityManagerFactory emf;
+    
+    
     /**
      * Default constructor. 
      */
@@ -27,9 +37,11 @@ public class SimpleResource {
      */
     @GET
     @Produces("application/xml")
-    public String getXml() {
+    public List<Myuser> getXml() {
         // TODO return proper representation object
-        return "<greeting>hello</greeting>"; 
+		return (List<Myuser>)emf.createEntityManager().createNamedQuery("Myuser.findAll")
+				.getResultList();
+     
     }
  
     /**

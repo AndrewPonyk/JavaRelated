@@ -25,3 +25,469 @@ public class Main {
         System.out.println(i5);//2
     }
 --------------------------------------------------------------------------------------------------------
+5
+Control Flow
+
+package ch5flow;
+
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		System.out.println("Flow");
+		int[] j = { 11, 22, 33, 44 };
+		
+		// --------- for
+		for (int i = 0; i < j.length; i++) {
+			System.out.println("Value at position:" + i + ", is: " + j[i]);
+		}
+		
+		// --------- while
+		// ...
+
+		// switch
+		// note: only constants( final or literals) can be  in case statement
+		Integer i = new Scanner(System.in).nextInt();
+
+		switch (i){
+			case 1:
+				System.out.println("I=1");
+				break;
+			case 10:
+				System.out.println("I=10");
+				break;
+			default:
+				System.out.println("Default val");
+		}
+
+		// Java 8 switch changes
+		// 1) Allow String in switch
+		// 2) Allow wrappers in switch
+		//Character, Byte, Short, and Integer , !!! NOT Long
+
+	}
+}
+------------------------------------------------------------------------------------------
+6
+Comparing Strings
+
+package ch6CompareStrings;
+
+import java.util.Scanner;
+
+/**
+ * Created by andrii on 22.04.17.
+ */
+//https://www.oreilly.com/learning/java7-features interesting
+public class Main {
+    public static void main(String[] args) {
+        //compare String with null
+        System.out.println("hello".equals(null)); // false
+     
+        // 
+        String myName = "Matt Joh";
+        String yourName = "Matt Gqa";
+        String myFirstName = myName.substring(0, 4);
+        String yourFirstName = yourName.substring(0, 4);
+        
+        System.out.println(myFirstName == yourFirstName); // it is false because substring uses new String(), and 
+        // returned objects are not in string pool
+        
+        System.out.println(myFirstName.intern() == yourFirstName.intern()); // true, intern() method interning stings, ensure that value will be in string pool
+        
+        
+        
+        // String in switch
+        String val = new Scanner(System.in).nextLine();
+        switch (val) {
+		case "1":
+			System.out.println("You print 1");
+			break;
+		case "2":
+			System.out.println("You print 2");
+			
+		default:
+			System.out.println("You print something else");
+			break;
+		}
+    }
+}
+-------------------------------------------------------------------------------------------------
+7 Object orientation
+
+package ch7ObjectOrientation;
+
+public class NameManager {
+	private String myName;
+
+	public String getFirstName() {
+		int spacePosition = myName.indexOf(" ");
+		return myName.substring(0, spacePosition);
+	}
+
+	public String getSurname() {
+		int spacePosition = myName.indexOf(" ");
+		return myName.substring(spacePosition + 1);
+	}
+
+	public void setName(String newName) {
+		myName = newName;
+	}
+
+}
+
+
+package ch7ObjectOrientation;
+
+public class Main {
+	public static void main(String[] args) {
+		NameManager simonManager = new NameManager();
+		NameManager joanneManager = new NameManager();
+
+		simonManager.setName("Simon Pieman");
+		joanneManager.setName("Joanne Smith");
+
+		System.out.println(simonManager.getFirstName());
+		System.out.println(joanneManager.getSurname());
+	}
+}
+
+----------------------------------------------------------------------------------------
+8 Writing classes
+package ch8WritingClasses;
+
+/**
+ * Created by andrii on 22.04.17.
+ */
+public class Main {
+    public static void main(String[] args) {
+        Customer simon = new Customer("Mr", "Simon", "Pieman", "Lviv", "09823", "ivan@ukr.net", 1, GenderType.MALE);
+
+        System.out.println(simon.getFirstName());
+        System.out.println(simon.getMailingName());
+        System.out.println(simon.getGender());
+    }
+}
+
+
+package ch8WritingClasses;
+
+/**
+ * Created by andrii on 22.04.17.
+ */
+public enum GenderType {
+    MALE, FEMALE, UNKNOWN;
+}
+
+package ch8WritingClasses;
+
+public class Customer {
+
+    private String title;
+    private String firstName;
+    private String surname;
+    private String address;
+    private String phoneNumber;
+    private String email;
+    private int customerNumber;
+    private GenderType gender;
+    private boolean isvalid;
+
+    public Customer(String title, String firstName, String surname, String address,
+                    String phoneNumber, String email, int customerNumber, GenderType gender) {
+
+        setName(title, firstName, surname);
+        this.address = address;
+        this.phoneNumber=phoneNumber;
+        this.email = email;
+        this.customerNumber = customerNumber;
+        this.gender = gender;
+        this.isvalid = true;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    private void setName(String title, String firstName, String surname) {
+        this.title = title;
+        this.firstName = firstName;
+        this.surname = surname;
+    }
+
+    public String getMailingName() {
+        String mailingName;
+        mailingName = title + " " + firstName.substring(0,1)
+                + " " + surname;
+        return mailingName;
+    }
+
+    public GenderType getGender() {
+        return gender;
+    }
+
+}
+------------------------------------------------------------------
+9 Practical Session 1
+An in-depth practical - in this session we create our second class, and see more on manipulating strings and overloading
+
+package ch9PracticalSession1;
+
+
+public class Book {
+
+    private int bookID;
+    private String title;
+    private String author;
+    private String isbn;
+
+    public Book(int bookID, String title, String author, String isbn)
+    {
+        this.bookID = bookID;
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public int getBookID() {
+        return bookID;
+    }
+}
+
+
+package ch9PracticalSession1;
+
+/**
+ * Created by andrii on 23.04.17.
+ */
+
+public class UI {
+
+    public void printHeader() {
+        System.out.println("BookID  Title                 Author");
+    }
+
+    public void printBook(Book book) {
+        System.out.println(fixLengthString(book.getBookID(),6) + "  " + fixLengthString(book.getTitle(),20) +
+                "  " + fixLengthString(book.getAuthor(),20));
+    }
+
+    private String fixLengthString(String start, int length) {
+        if (start.length() >= length) {
+            return start.substring(0,length);
+        }
+        return String.format("%-" + length + "s", start);
+    }
+
+    private String fixLengthString(int start, int length) {
+        String startString = String.valueOf(start);
+        return fixLengthString(startString, length);
+    }
+
+}
+
+package ch9PracticalSession1;
+
+/**
+ * Created by andrii on 22.04.17.
+ */
+public class Main {
+    public static void main(String[] args) {
+        Book book1 = new Book(1,"An introduction to Java","Matt Greencroft","12345");
+        Book book2 = new Book(2,"Better Java","Joe Le Blanc","23456");
+
+        UI ui = new UI();
+        ui.printHeader();
+        ui.printBook(book1);
+        ui.printBook(book2);
+
+    }
+}
+--------------------------------------------------------------------------
+10 Arrays
+
+package ch10ArrayOfObjects;
+
+/**
+ * Created by andrii on 22.04.17.
+ */
+public class Main {
+    public static void main(String[] args) {
+        BookCatalog bookCatalog = new BookCatalog();
+
+        Book book1 = new Book(1,"An introduction to Java","Matt Greencroft","12345");
+        Book book2 = new Book(2,"Better Java","Joe Le Blanc","23456");
+
+        bookCatalog.addBook(book1);
+        bookCatalog.addBook(book2);
+
+
+        UI ui = new UI();
+        ui.printHeader();
+        ui.printBookCatalog(bookCatalog.getBookArray());
+
+        Book foundBook = bookCatalog.findBook("Better java");
+        if (foundBook !=null) {
+            System.out.println(foundBook.getTitle());
+        }
+
+
+    }
+}
+
+
+package ch10ArrayOfObjects;
+
+
+public class Book {
+
+    private int bookID;
+    private String title;
+    private String author;
+    private String isbn;
+
+    public Book(int bookID, String title, String author, String isbn)
+    {
+        this.bookID = bookID;
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public int getBookID() {
+        return bookID;
+    }
+}
+
+
+package ch10ArrayOfObjects;
+
+/**
+ * Created by andrii on 23.04.17.
+ */
+public class BookCatalog {
+    private Book[] bookArray = new Book[100];
+    private int nextPosition = 0;
+
+    public Book[] getBookArray() {
+        return bookArray;
+    }
+
+    public void addBook(Book newBook) {
+        bookArray[nextPosition] = newBook;
+        nextPosition++;
+    }
+
+    public Book findBook(String title)
+    {
+        for (int counter = 0; counter < nextPosition; counter++) {
+            if (bookArray[counter].getTitle().equalsIgnoreCase((title))) {
+                return bookArray[counter];
+            }
+        }
+        return null;
+    }
+
+}
+
+
+package ch10ArrayOfObjects;
+
+/**
+ * Created by andrii on 23.04.17.
+ */
+
+public class UI {
+
+    public void printHeader() {
+        System.out.println("BookID  Title                 Author");
+    }
+
+    public void printBook(Book book) {
+        System.out.println(fixLengthString(book.getBookID(),6) + "  " + fixLengthString(book.getTitle(),20) +
+                "  " + fixLengthString(book.getAuthor(),20));
+    }
+
+    private String fixLengthString(String start, int length) {
+        if (start.length() >= length) {
+            return start.substring(0,length);
+        }
+        return String.format("%-" + length + "s", start);
+    }
+
+    private String fixLengthString(int start, int length) {
+        String startString = String.valueOf(start);
+        return fixLengthString(startString, length);
+    }
+
+    public void printBookCatalog(Book[] bookCatalog) {
+        for (int counter = 0; counter <bookCatalog.length; counter++ )
+        {
+            if (bookCatalog[counter] != null) {
+                printBook(bookCatalog[counter]);
+            }
+        }
+    }
+
+}
+
+
+!!! Varargs example
+package ch10ArrayOfObjects;
+
+/**
+ * Created by andrii on 23.04.17.
+ */
+public class VarargsExample {
+
+    public static void main(String[] args) {
+        foo(1); // "int i"
+        //foo(1,1); //Ambuguous, "int ... i" and "int i, int... j"
+    }
+
+
+    public static void foo(int i){
+        System.out.println("int i");
+    }
+
+    public static void foo(int ... i){
+        System.out.println("int ... i");
+    }
+
+    public static void foo(int i, int... j){
+        System.out.println(j.length);
+        System.out.println("int i, int... j");
+    }
+}
+
+---------------------------------------------------------------------
+11 Packages
+

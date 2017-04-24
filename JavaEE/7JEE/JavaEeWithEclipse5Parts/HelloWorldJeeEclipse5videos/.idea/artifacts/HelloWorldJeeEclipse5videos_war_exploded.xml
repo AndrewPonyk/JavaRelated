@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="HelloWorldJeeEclipse5videos:war exploded">
+    <output-path>$PROJECT_DIR$/classes/artifacts/HelloWorldJeeEclipse5videos_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="HelloWorldJeeEclipse5videos" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="HelloWorldJeeEclipse5videos/web/Web" />
+    </root>
+  </artifact>
+</component>

@@ -14,8 +14,8 @@ public class MyEjbTimer {
         // TODO Auto-generated constructor stub
     }
 	
-	@Schedule(second="*/10", minute="*", hour="8-23", dayOfWeek="Mon-Sun",
-      dayOfMonth="*", month="*", year="*", info="MyTimer", persistent=false)
+	@Schedule(second="*/10", minute="*", hour="0-23", dayOfWeek="Mon-Sun",
+      dayOfMonth="*", month="*", year="*", info="MyTimer", persistent=true)
     private void scheduledTimeout(final Timer t) {
         System.out.println("MyEjbTimer called at: " + new java.util.Date());
     }  

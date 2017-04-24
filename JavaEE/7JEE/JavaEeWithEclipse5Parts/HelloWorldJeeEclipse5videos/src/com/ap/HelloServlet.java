@@ -2,6 +2,7 @@ package com.ap;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.persistence.EntityManagerFactory;
@@ -35,14 +36,21 @@ public class HelloServlet extends HttpServlet {
 		
 		response.setContentType("text/html");// with this our html tags (like <br>) works!!
 		String servedInfo = "Served at::: " + request.getContextPath();    
-		PrintWriter writer = response.getWriter();
+		final PrintWriter writer = response.getWriter();
 		writer.print(servedInfo); 
 		writer.print("<br/>");
 		writer.print(bean.sayHello("Rob"));
-		writer.print("<br/>");
-		Myuser user = (Myuser) emf.createEntityManager().createNamedQuery("Myuser.findAll")
-				.getResultList().get(0);
-		writer.print(user.getName());
+		writer.print("<br/><br/>");
+		writer.print("Users from db <table style='border-collapse: collapse;'>");
+		
+		List<Myuser> users = (List<Myuser>)emf.createEntityManager().createNamedQuery("Myuser.findAll")
+				.getResultList();
+		users.forEach(user-> {
+			writer.print("<tr>");
+			writer.print("<td style='border:1px solid black'>" + user.getName() + "</td>");
+			writer.print("<td style='border:1px solid black'>" + user.getPassword() + "</td>");
+		});
+		writer.print("</table>");
 		
 	}
 
