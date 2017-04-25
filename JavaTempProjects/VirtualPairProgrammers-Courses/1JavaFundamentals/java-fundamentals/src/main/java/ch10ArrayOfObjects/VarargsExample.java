@@ -8,6 +8,7 @@ public class VarargsExample {
     public static void main(String[] args) {
         foo(1); // "int i"
         //foo(1,1); //Ambuguous, "int ... i" and "int i, int... j"
+        foo(1,new int[]{2,3,4});
     }
 
 
