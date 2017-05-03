@@ -1,0 +1,11 @@
+1)https://stackoverflow.com/questions/3994860/how-to-execute-jobs-just-after-spring-loads-application-context/15975897#15975897
+
+2) https://stackoverflow.com/questions/8836073/is-it-possible-to-make-a-spring-applicationlistener-listen-for-2-or-more-types-o
+
+3) https://stackoverflow.com/questions/10898417/can-i-ensure-that-one-of-my-spring-applicationlisteners-gets-executed-last
+
+4) https://stackoverflow.com/questions/12810153/spring-session-handling-httpsessiondestroyedevent-not-received
+
+
+5) List of events:
+ http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/event/package-summary.html
