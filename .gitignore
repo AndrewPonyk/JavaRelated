@@ -1,5 +1,7 @@
 *path
 *~
+*.class
+
 target/
 gwt-unitCache
 /JavaEE/7JEE/JavaEEWithNetbeans5Parts/HelloJeeWithNetbeans/nbproject/private/
