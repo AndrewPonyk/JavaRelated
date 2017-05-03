@@ -1,0 +1,39 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="69resteasy:war exploded">
+    <output-path>$PROJECT_DIR$/target/resteasy-1.0-SNAPSHOT</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="69resteasy" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.jboss.resteasy:resteasy-jaxrs:2.0-beta-2" />
+          <element id="library" level="project" name="Maven: org.jboss.resteasy:jaxrs-api:2.0-beta-2" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.5.8" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:1.5.8" />
+          <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.5.8" />
+          <element id="library" level="project" name="Maven: javax.annotation:jsr250-api:1.0" />
+          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
+          <element id="library" level="project" name="Maven: commons-httpclient:commons-httpclient:3.1" />
+          <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.2" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.0" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.0.1" />
+          <element id="library" level="project" name="Maven: net.jcip:jcip-annotations:1.0" />
+          <element id="library" level="project" name="Maven: org.jboss.resteasy:resteasy-jaxb-provider:2.0-beta-2" />
+          <element id="library" level="project" name="Maven: com.sun.xml.bind:jaxb-impl:2.1.12" />
+          <element id="library" level="project" name="Maven: javax.xml.bind:jaxb-api:2.1" />
+          <element id="library" level="project" name="Maven: com.sun.xml.stream:sjsxp:1.0.1" />
+          <element id="library" level="project" name="Maven: javax.xml.stream:stax-api:1.0" />
+          <element id="library" level="project" name="Maven: org.jboss.resteasy:resteasy-jettison-provider:2.0-beta-2" />
+          <element id="library" level="project" name="Maven: org.codehaus.jettison:jettison:1.1" />
+          <element id="library" level="project" name="Maven: org.scannotation:scannotation:1.0.3" />
+          <element id="library" level="project" name="Maven: javassist:javassist:3.12.1.GA" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/resteasy-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="69resteasy/web/Web" />
+    </root>
+  </artifact>
+</component>
