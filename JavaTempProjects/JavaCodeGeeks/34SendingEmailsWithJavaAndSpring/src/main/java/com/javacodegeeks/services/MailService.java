@@ -1,5 +1,6 @@
 package com.javacodegeeks.services;
 
+import com.javacogeeks.MailServiceApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
