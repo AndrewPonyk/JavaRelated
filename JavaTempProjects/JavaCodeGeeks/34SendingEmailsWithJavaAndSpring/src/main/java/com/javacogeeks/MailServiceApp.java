@@ -1,6 +1,7 @@
 package com.javacogeeks;
 
 import com.javacodegeeks.services.MailService;
+import com.javacodegeeks.services.TempBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -29,12 +30,13 @@ Then try your code again it will work, worked for me
 public class MailServiceApp
 {
     public static void main( String[] args ) throws IOException, MessagingException {
-//        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
-//
-//        MailService mailService = context.getBean("mailService", MailService.class);
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+        TempBean t = context.getBean("tempBean", TempBean.class);
+        System.out.println(t.getVal());
+        MailService mailService = context.getBean("mailService", MailService.class);
 //        mailService.sendMail("", "","From java 1","123");
 //
-//        ((Closeable)context).close();
+
 
 
 
@@ -45,25 +47,24 @@ public class MailServiceApp
         final  String password ="";
 
 
-        Properties props = new Properties();
-        props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.host", "smtp.gmail.com");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "587");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false");
-        Session session = Session.getDefaultInstance(props,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(from,password);
-                    }
-                });
+//        Properties props = new Properties();
+//        props.setProperty("mail.transport.protocol", "smtp");
+//        props.setProperty("mail.host", "smtp.gmail.com");
+//        props.put("mail.smtp.auth", "true");
+//        props.put("mail.smtp.port", "587");
+//        props.put("mail.debug", "true");
+//        props.put("mail.smtp.socketFactory.port", "465");
+//        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+//        props.put("mail.smtp.socketFactory.fallback", "false");
+//        Session session = Session.getDefaultInstance(props,
+//                new javax.mail.Authenticator() {
+//                    protected PasswordAuthentication getPasswordAuthentication() {
+//                        return new PasswordAuthentication(from,password);
+//                    }
+//                });
 
 
-
-        //session.setDebug(true);
+        Session session = context.getBean("emailSession", Session.class);
         Transport transport = session.getTransport();
         InternetAddress addressFrom = new InternetAddress(from);
 
@@ -76,6 +77,7 @@ public class MailServiceApp
         transport.connect();
         Transport.send(message);
         transport.close();
+        ((Closeable)context).close();
     }
 }
 
@@ -84,8 +86,8 @@ public class MailServiceApp
 //http://stackoverflow.com/questions/10509699/must-issue-a-starttls-command-first
 
 
-/*7
-        down vote
+/*7 Votes
+
         smtp port and socketFactory has to be change
 
         String to = "reciveremail@xxxx.xxx";

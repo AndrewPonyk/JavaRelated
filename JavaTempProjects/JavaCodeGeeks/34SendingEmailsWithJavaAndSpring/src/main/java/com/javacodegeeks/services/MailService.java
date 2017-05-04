@@ -6,10 +6,12 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.mail.Session;
+
 @Service
 public class MailService {
     @Autowired
-    private MailSender mailSender;
+    private Session session;
 
     @Autowired
     private SimpleMailMessage alertMailMessage;
@@ -21,13 +23,13 @@ public class MailService {
         message.setSubject(subject);
         message.setText(body);
 
-        mailSender.send(message);
+        //mailSender.send(message);
     }
 
     public void sendAlertMail(String alert){
         SimpleMailMessage mailMessage = new SimpleMailMessage(alertMailMessage);
         mailMessage.setText(alert);
 
-        mailSender.send(mailMessage);
+        //mailSender.send(mailMessage);
     }
 }
