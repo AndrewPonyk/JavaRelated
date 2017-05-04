@@ -12,10 +12,6 @@
         </property>
     </bean>
 
-    <bean id="tempBean" class="com.javacodegeeks.services.TempBean">
-        <property name="val" value="${val}"/>
-    </bean>
-
     <bean id="passwordAuth" class="javax.mail.PasswordAuthentication">
         <constructor-arg>
             <value>${email}</value>
@@ -47,7 +43,7 @@
         <constructor-arg ref="authenticator" />
     </bean>
 
-
+    <!-- ================================================================================================= -->
     <!--Old example from javacodegeeks-->
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="smtp.gmail.com"/>

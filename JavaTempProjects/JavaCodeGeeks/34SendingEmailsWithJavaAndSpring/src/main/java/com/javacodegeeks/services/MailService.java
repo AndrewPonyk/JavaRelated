@@ -6,30 +6,40 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
-import javax.mail.Session;
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class MailService {
     @Autowired
     private Session session;
 
-    @Autowired
-    private SimpleMailMessage alertMailMessage;
+    public void sendMail(String friendlyFrom, String to, String subject, String body){
+        try {
+            Transport transport = session.getTransport();
+            InternetAddress addressFrom = new InternetAddress(friendlyFrom +
+                    "<mail@gmail.com>"); // set friendly name  Letter will be from Company XYZ
 
-    public void sendMail(String from, String to, String subject, String body){
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
 
-        //mailSender.send(message);
-    }
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(addressFrom); // works without this
+            message.setSubject(subject);
+            message.setContent(body, "text/plain");
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 
-    public void sendAlertMail(String alert){
-        SimpleMailMessage mailMessage = new SimpleMailMessage(alertMailMessage);
-        mailMessage.setText(alert);
+            transport.connect();
+            Transport.send(message);
+            transport.close();
 
-        //mailSender.send(mailMessage);
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (AddressException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -5,33 +5,73 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.Closeable;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.Properties;
 
 
 // It wasn't working on gmail (Auth exception)
 //http://stackoverflow.com/questions/25341198/javax-mail-authenticationfailedexception-is-thrown-while-sending-email-in-java
 
 /**I had the same problem !!
-
 This is how i Solved.. google prevent it for security purpose..
-
 Go Login from Your browser from that email.. i had problem with google if it is google go here : https://www.google.com/settings/security/lesssecureapps
-
 you will see turn off or turn on. Click "Turn on"
-
 Then try your code again it will work, worked for me
  */
 public class MailServiceApp
 {
     public static void main( String[] args ) throws IOException, MessagingException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+//        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+//
+//        MailService mailService = context.getBean("mailService", MailService.class);
+//        mailService.sendMail("", "","From java 1","123");
+//
+//        ((Closeable)context).close();
 
-        MailService mailService = context.getBean("mailService", MailService.class);
-        mailService.sendMail("Friendly company name", "andrew9999@ukr.net","From java 1",
-                "Text: " + LocalDateTime.now().toString());
-        ((Closeable)context).close();
+
+
+        String to = "";
+        String subject = "subject";
+        String msg ="email text....";
+        final String from ="";
+        final  String password ="";
+
+
+        Properties props = new Properties();
+        props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+        Session session = Session.getDefaultInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(from,password);
+                    }
+                });
+
+
+
+        //session.setDebug(true);
+        Transport transport = session.getTransport();
+        InternetAddress addressFrom = new InternetAddress(from);
+
+        MimeMessage message = new MimeMessage(session);
+        message.setSender(addressFrom);
+        message.setSubject(subject);
+        message.setContent(msg, "text/plain");
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+        transport.connect();
+        Transport.send(message);
+        transport.close();
     }
 }
 
@@ -40,17 +80,14 @@ public class MailServiceApp
 //http://stackoverflow.com/questions/10509699/must-issue-a-starttls-command-first
 
 
-/*7 Votes
-
+/*7
+        down vote
         smtp port and socketFactory has to be change
-
         String to = "reciveremail@xxxx.xxx";
         String subject = "subject"
         String msg ="email text...."
 final String from ="senderemail@gmail.com"
 final  String password ="senderPassword"
-
-
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
         props.setProperty("mail.host", "smtp.gmail.com");
@@ -66,17 +103,14 @@ protected PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(from,password);
         }
         });
-
         //session.setDebug(true);
         Transport transport = session.getTransport();
         InternetAddress addressFrom = new InternetAddress(from);
-
         MimeMessage message = new MimeMessage(session);
         message.setSender(addressFrom);
         message.setSubject(subject);
         message.setContent(msg, "text/plain");
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-
         transport.connect();
         Transport.send(message);
         transport.close();
