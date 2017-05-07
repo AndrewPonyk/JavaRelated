@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for simple MailServiceApp.
+ * Unit test for simple SpringMailServiceApp.
  */
 public class AppTest 
     extends TestCase
