@@ -1433,5 +1433,156 @@ public class Main {
 
 ----------------------------------------------------------------------------------------------------------
 ch20 Unit testing
+// Added 3 Unit tests for Book BookCatalog Loan
+// Note: Constructor is called for each test method
+
+package ch19PracticalSessionLoanRegistry;
+
+
+import ch19PracticalSessionLoanRegistry.models.Book;
+import ch19PracticalSessionLoanRegistry.models.Customer;
+import ch19PracticalSessionLoanRegistry.models.Loan;
+import ch19PracticalSessionLoanRegistry.utilities.GenderType;
+import org.junit.Test;
+
+import java.util.GregorianCalendar;
+
+import static org.junit.Assert.assertEquals;
+
+public class LoanTest {
+
+	@Test
+	public void testDueDate() {
+		Book book = new Book(0,"","","","",0);
+		Customer customer = new Customer("", "", "", "", "", "", 0, GenderType.MALE);
+		Loan loan = new Loan(0, customer, book);
+		
+		GregorianCalendar gcExpected = new GregorianCalendar();
+		gcExpected.add(GregorianCalendar.DAY_OF_MONTH, 14);
+
+		assertEquals("Checking loan 2 weeks",gcExpected.getTime(), loan.getDueDate());
+
+		// why use this? if there is equals
+//		GregorianCalendar gcActual = new GregorianCalendar();
+//		gcActual.setTime(loan.getDueDate());
+//		assertEquals("Checking year",gcExpected.get(GregorianCalendar.YEAR), gcActual.get(GregorianCalendar.YEAR));
+//		assertEquals("Checking month",gcExpected.get(GregorianCalendar.MONTH), gcActual.get(GregorianCalendar.MONTH));
+//		assertEquals("Checking day",gcExpected.get(GregorianCalendar.DAY_OF_MONTH), gcActual.get(GregorianCalendar.DAY_OF_MONTH));
+	}
+	
+}
+
+
+package ch19PracticalSessionLoanRegistry;
+
+
+import ch19PracticalSessionLoanRegistry.models.Book;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class BookTest {
+
+	@Test
+	public void test2EqualBooks() {
+		Book book1 = new Book(100,"","","","",1);
+		Book book2 = new Book(100,"","","","",1);
+		
+		assertTrue(book1.equals(book2));
+	}
+	
+	@Test
+	public void test2NonEqualBooks() {
+		Book book1 = new Book(100,"","","","",1);
+		Book book2 = new Book(101,"","","","",1);
+		
+		assertFalse(book1.equals(book2));
+	}
+
+}
+
+
+package ch19PracticalSessionLoanRegistry;
+
+import static org.junit.Assert.*;
+
+
+import ch19PracticalSessionLoanRegistry.models.Book;
+import ch19PracticalSessionLoanRegistry.models.BookCatalog;
+import ch19PracticalSessionLoanRegistry.models.BookNotFoundException;
+import org.junit.Test;
+
+public class BookCatalogTest {
+
+	private BookCatalog bc;
+	private Book book1;
+
+	public BookCatalogTest() {
+		bc = new BookCatalog();
+		Book book1 = new Book(1,"Learning Java","","","",0);
+		bc.addBook(book1);
+		System.out.println("Constructor being run"); // constructor is calling for each test
+	}
+
+	@Test
+	public void testAddABook() {
+
+		int initialNumber = bc.getNumberOfBooks();
+
+		Book book = new Book(1,"","","","",0);
+		bc.addBook(book);
+
+		assertTrue(initialNumber == bc.getNumberOfBooks() -1);
+
+	}
+
+	@Test
+	public void testFindBook() {
+
+		try {
+			Book foundBook = bc.findBook("Learning Java");
+		}
+		catch (BookNotFoundException e)
+		{
+			fail("Book not found");
+		}
+	}
+
+	@Test
+	public void testFindBookIgnoringCase() {
+
+		try {
+			Book foundBook = bc.findBook("learning Java");
+		}
+		catch (BookNotFoundException e) 
+		{
+			fail("Book not found");
+		}
+	}
+	
+	@Test
+	public void testFindBookWithExtraSpaces() {
+
+		try {
+			Book foundBook = bc.findBook(" learning Java ");
+		}
+		catch (BookNotFoundException e) 
+		{
+			fail("Book not found");
+		}
+	}
+
+	@Test(expected = BookNotFoundException.class)
+	public void testFindBookThatDoesntExist() throws BookNotFoundException {
+
+		Book foundBook = bc.findBook("Learning More Java");
+
+	}
+
+}
+
+
+-----------------------------------------------------------------------------------
 
 

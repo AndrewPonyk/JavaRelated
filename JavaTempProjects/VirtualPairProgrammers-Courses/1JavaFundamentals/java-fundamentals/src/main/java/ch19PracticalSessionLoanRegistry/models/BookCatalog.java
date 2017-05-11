@@ -9,7 +9,12 @@ public class BookCatalog {
 	public Book[] getBookArray() {
 		return bookArray;
 	}
-	
+
+	public int getNumberOfBooks() {
+		return nextPosition;
+	}
+
+
 	public void addBook(Book newBook) {
 		bookArray[nextPosition] = newBook;
 		nextPosition++;
@@ -18,11 +23,12 @@ public class BookCatalog {
 	public Book findBook(String title) throws BookNotFoundException
 	{
 		for (int counter = 0; counter < nextPosition; counter++) {
-			if (bookArray[counter].getTitle().equalsIgnoreCase((title))) {
+			if (bookArray[counter].getTitle().equalsIgnoreCase((title.trim()))) {
 				return bookArray[counter];
 			}
 		}
 		throw new BookNotFoundException();
 	}
+
 
 }
