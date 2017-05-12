@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 
-public class ImprovingArrays {
+public class ArrayListHashMapHasSet {
 
 
 	public static void main(String[] args) {
@@ -20,7 +20,7 @@ public class ImprovingArrays {
 		System.out.println(result);
 		myArrayList.add("third item");
 		myArrayList.add("fourth item");
-		
+
 		myHashSet.add("first item");
 		myHashSet.add("second item");
 		myHashSet.add("third item");
@@ -66,6 +66,11 @@ public class ImprovingArrays {
 		myHashMap.put(book1.getTitle(),book1);
 		myHashMap.put(book2.getTitle(),book2);
 		myHashMap.put(book3.getTitle(),book3);
+		myHashMap.put(null, book3); // can be one element with null key
+//		public V put(K key, V value) {
+//			return putVal(hash(key), key, value, false, true);
+//		}
+
 
 		System.out.println(myHashMap.size());
 
