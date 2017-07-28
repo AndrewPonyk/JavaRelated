@@ -27,9 +27,11 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/ui/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="267">
+            <state relative-caret-position="1170">
               <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -37,10 +39,11 @@
       <file leaf-file-name="UI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/ui/UI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="271">
+            <state relative-caret-position="390">
               <caret line="31" column="36" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#185#186#0" expanded="false" />
+                <element signature="e#259#260#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -49,19 +52,18 @@
       <file leaf-file-name="Material.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Material.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
+            <state relative-caret-position="165">
               <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Customer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Customer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-              <folding />
+              <folding>
+                <element signature="e#324#325#0" expanded="false" />
+                <element signature="e#343#344#0" expanded="false" />
+                <element signature="e#369#370#0" expanded="false" />
+                <element signature="e#385#386#0" expanded="false" />
+                <element signature="e#429#430#0" expanded="false" />
+                <element signature="e#459#460#0" expanded="false" />
+                <element signature="e#708#709#0" expanded="false" />
+                <element signature="e#727#728#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -69,9 +71,14 @@
       <file leaf-file-name="DVD.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/DVD.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
+            <state relative-caret-position="30">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-              <folding />
+              <folding>
+                <element signature="e#468#469#0" expanded="false" />
+                <element signature="e#490#491#0" expanded="false" />
+                <element signature="e#652#653#0" expanded="false" />
+                <element signature="e#667#668#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -79,27 +86,51 @@
       <file leaf-file-name="Loan.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Loan.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
+            <state relative-caret-position="90">
               <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#1240#1241#0" expanded="false" />
+                <element signature="e#1262#1263#0" expanded="false" />
+                <element signature="e#1288#1289#0" expanded="false" />
+                <element signature="e#1306#1307#0" expanded="false" />
+                <element signature="e#1335#1336#0" expanded="false" />
+                <element signature="e#1356#1357#0" expanded="false" />
+                <element signature="e#1391#1392#0" expanded="false" />
+                <element signature="e#1411#1412#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BookCatalog.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/BookCatalog.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="24" column="26" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BookCatalogTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookCatalogTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="475">
+              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BookCatalog.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/BookCatalog.java">
+      <file leaf-file-name="BookTest.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#275#276#0" expanded="true" />
-                <element signature="e#313#314#0" expanded="true" />
-                <element signature="e#347#348#0" expanded="true" />
-                <element signature="e#375#376#0" expanded="true" />
-                <element signature="e#414#415#0" expanded="true" />
-                <element signature="e#458#459#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="330">
+              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -107,20 +138,8 @@
       <file leaf-file-name="LoansRegistry.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/LoansRegistry.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
+            <state relative-caret-position="225">
               <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BookNotFoundException.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/BookNotFoundException.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -129,7 +148,7 @@
       <file leaf-file-name="Book.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Book.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
+            <state relative-caret-position="30">
               <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
               <folding />
             </state>
@@ -350,144 +369,6 @@
               <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ch22CollectionsInPractice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ch22CollectionsInPractice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ch22CollectionsInPractice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="models" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ch21IntroToCollections" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ch19PracticalSessionLoanRegistry" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java-fundamentals" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
@@ -514,7 +395,7 @@
       <recent name="$PROJECT_DIR$/src/main/java/ch18Exceptions" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="JUnit.BookCatalogTest">
     <configuration default="false" name="BookTest.test2EqualBooks" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -1252,9 +1133,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.Main" />
-        <item index="1" class="java.lang.String" itemvalue="Application.ArrayListHashMapHasSet" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.BookCatalogTest" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.BookCatalogTest" />
+        <item index="1" class="java.lang.String" itemvalue="Application.Main" />
+        <item index="2" class="java.lang.String" itemvalue="Application.ArrayListHashMapHasSet" />
         <item index="3" class="java.lang.String" itemvalue="JUnit.BookCatalogTest.testFindBook" />
         <item index="4" class="java.lang.String" itemvalue="JUnit.BookTest.test2EqualBooks" />
       </list>
@@ -1286,17 +1167,18 @@
       <workItem from="1494171598249" duration="9384000" />
       <workItem from="1494355252217" duration="7314000" />
       <workItem from="1495391479001" duration="4677000" />
+      <workItem from="1499601163279" duration="1854000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="BookCatalogTest - 2017.05.09 at 23h 01m 28s.xml">
-      <configuration name="BookCatalogTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="BookCatalogTest - 2017.05.09 at 23h 06m 57s.xml">
       <configuration name="BookCatalogTest" configurationId="JUnit" />
     </history-entry>
     <history-entry file="BookCatalogTest - 2017.05.09 at 23h 18m 02s.xml">
+      <configuration name="BookCatalogTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="BookCatalogTest - 2017.07.09 at 18h 08m 51s.xml">
       <configuration name="BookCatalogTest" configurationId="JUnit" />
     </history-entry>
     <history-entry file="BookCatalogTest_testFindBook - 2017.05.09 at 23h 01m 23s.xml">
@@ -1322,7 +1204,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="59967000" />
+    <option name="totallyTimeSpent" value="61821000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1334,7 +1216,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="1535" height="876" extended-state="7" />
+    <frame x="65" y="24" width="1535" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1345,13 +1227,12 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1583062" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33374843" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33374843" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27557003" sideWeight="0.4786642" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1362,6 +1243,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2495114" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1411,9 +1293,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="468">
           <caret line="34" column="21" selection-start-line="34" selection-start-column="21" selection-end-line="34" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1449,7 +1328,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
           <caret line="14" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1499,9 +1377,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
           <caret line="22" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1516,7 +1391,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1524,7 +1398,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
           <caret line="24" column="26" selection-start-line="0" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1532,7 +1405,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1548,10 +1420,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
           <caret line="11" column="28" selection-start-line="11" selection-start-column="28" selection-end-line="11" selection-end-column="28" />
-          <folding>
-            <element signature="e#147#148#0" expanded="false" />
-            <element signature="e#212#213#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1559,9 +1427,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1674">
           <caret line="108" column="9" selection-start-line="108" selection-start-column="9" selection-end-line="108" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1569,11 +1434,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="8" column="13" selection-start-line="0" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1405#1406#0" expanded="false" />
-            <element signature="e#1425#1426#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1581,7 +1441,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="19" column="13" selection-start-line="0" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1589,9 +1448,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
           <caret line="41" column="12" selection-start-line="41" selection-start-column="12" selection-end-line="41" selection-end-column="12" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1625,7 +1481,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1188">
           <caret line="89" column="17" selection-start-line="89" selection-start-column="17" selection-end-line="89" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1633,7 +1488,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="612">
           <caret line="57" column="55" selection-start-line="57" selection-start-column="55" selection-end-line="57" selection-end-column="55" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1641,7 +1495,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="666">
           <caret line="60" column="60" selection-start-line="60" selection-start-column="60" selection-end-line="60" selection-end-column="60" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1649,7 +1502,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2898">
           <caret line="186" column="17" selection-start-line="186" selection-start-column="17" selection-end-line="186" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1657,19 +1509,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
           <caret line="24" column="43" selection-start-line="0" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="22" column="29" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1677,9 +1516,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
           <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#345#346#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1687,10 +1523,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="10206">
           <caret line="612" column="0" selection-start-line="609" selection-start-column="0" selection-end-line="612" selection-end-column="0" />
-          <folding>
-            <element signature="e#24298#24299#0" expanded="false" />
-            <element signature="e#24363#24364#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1699,7 +1531,7 @@
         <state relative-caret-position="233">
           <caret line="67" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1708,7 +1540,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1716,7 +1547,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1724,23 +1554,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookCatalogTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="15" column="28" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/BookNotFoundException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="30">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
           <folding />
         </state>
@@ -1748,31 +1567,60 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Customer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="75">
           <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#974#975#0" expanded="false" />
+            <element signature="e#997#998#0" expanded="false" />
+            <element signature="e#1029#1030#0" expanded="false" />
+            <element signature="e#1050#1051#0" expanded="false" />
+            <element signature="e#1092#1093#0" expanded="false" />
+            <element signature="e#1121#1122#0" expanded="false" />
+            <element signature="e#1522#1523#0" expanded="false" />
+            <element signature="e#1542#1543#0" expanded="false" />
+            <element signature="e#1574#1575#0" expanded="false" />
+            <element signature="e#1598#1599#0" expanded="false" />
+            <element signature="e#1638#1639#0" expanded="false" />
+            <element signature="e#1668#1669#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/DVD.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="30">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-          <folding />
+          <folding>
+            <element signature="e#468#469#0" expanded="false" />
+            <element signature="e#490#491#0" expanded="false" />
+            <element signature="e#652#653#0" expanded="false" />
+            <element signature="e#667#668#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Loan.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
+        <state relative-caret-position="90">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#1240#1241#0" expanded="false" />
+            <element signature="e#1262#1263#0" expanded="false" />
+            <element signature="e#1288#1289#0" expanded="false" />
+            <element signature="e#1306#1307#0" expanded="false" />
+            <element signature="e#1335#1336#0" expanded="false" />
+            <element signature="e#1356#1357#0" expanded="false" />
+            <element signature="e#1391#1392#0" expanded="false" />
+            <element signature="e#1411#1412#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Book.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
+        <state relative-caret-position="30">
           <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
           <folding />
         </state>
@@ -1780,53 +1628,73 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/Material.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
+        <state relative-caret-position="165">
           <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#324#325#0" expanded="false" />
+            <element signature="e#343#344#0" expanded="false" />
+            <element signature="e#369#370#0" expanded="false" />
+            <element signature="e#385#386#0" expanded="false" />
+            <element signature="e#429#430#0" expanded="false" />
+            <element signature="e#459#460#0" expanded="false" />
+            <element signature="e#708#709#0" expanded="false" />
+            <element signature="e#727#728#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/ui/UI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
+        <state relative-caret-position="390">
           <caret line="31" column="36" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#185#186#0" expanded="false" />
+            <element signature="e#259#260#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/LoansRegistry.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
+        <state relative-caret-position="225">
           <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/ui/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
+        <state relative-caret-position="1170">
           <caret line="79" column="8" selection-start-line="79" selection-start-column="8" selection-end-line="79" selection-end-column="8" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch22CollectionsInPractice/models/BookCatalog.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        <state relative-caret-position="270">
+          <caret line="24" column="26" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#275#276#0" expanded="true" />
-            <element signature="e#313#314#0" expanded="true" />
-            <element signature="e#347#348#0" expanded="true" />
-            <element signature="e#375#376#0" expanded="true" />
-            <element signature="e#414#415#0" expanded="true" />
-            <element signature="e#458#459#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookCatalogTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="475">
+          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/ch19PracticalSessionLoanRegistry/BookTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
