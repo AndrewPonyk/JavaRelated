@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/demo")
 public class MainConroller {
@@ -42,8 +44,9 @@ public class MainConroller {
     }
 
     @RequestMapping("/findByRegex")
-    public @ResponseBody User findByRegex(@RequestParam String name){
-        User user = userRepository.customName(name);
+    public @ResponseBody
+    List<User> findByRegex(@RequestParam String name){
+        List<User> user = userRepository.findByRegex(name);
         return user;
     }
 }
