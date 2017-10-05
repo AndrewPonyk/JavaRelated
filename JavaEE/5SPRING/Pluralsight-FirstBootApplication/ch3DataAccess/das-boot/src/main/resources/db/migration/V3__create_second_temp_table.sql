@@ -1,0 +1,3 @@
+CREATE TABLE temp1(
+id INT PRIMARY KEY
+)

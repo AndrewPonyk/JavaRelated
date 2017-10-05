@@ -1,0 +1,68 @@
+Setup IDEA 2016.1:
+
+Install lombok plugin
+Settings -> Compiler -> Annotation Processors -> Enable annotation processing: checked (default configuration)
+Settings -> Compiler -> Annotation Processors -> Annotation Processors add "lombok.launch.AnnotationProcessorHider$AnnotationProcessor"
+Also if you are using maven add to maven-compiler-plugin configuration -> annotationProcessors -> annotationProcessor: lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+-------------------------
+LOGGING
+
+Another quite useful Lombok annotation is related to logging (http://projectlombok.org/features/Log.html): Lombok can create a Logger field, named log, in our class. There are six variations of the annotation depending on the logging framework (java, apache, log4j, slf4j,,,).
+
+The logging annotation does not reduce the amount of code in our class (one line for the annotation vs. one line for the manual logger definition) but it can help us to guarantee that we are using the same logging framework among all project classes. In some projects with large teams, I’ve found different logging frameworks used simply because different programmers were using IDE auto-complete functions in a different way.
+
+Having something like
+
+1
+2
+@Slf4J
+public class ….
+help us to use the same logger on all the class files.
+
+-------------------------------------------------------
+
+https://projectlombok.org/features/all
+
+val
+Finally! Hassle-free final local variables.
+
+@NonNull
+or: How I learned to stop worrying and love the NullPointerException.
+
+@Cleanup
+Automatic resource management: Call your close() methods safely with no hassle.
+
+@Getter/@Setter
+Never write public int getFoo() {return foo;} again.
+
+@ToString
+No need to start a debugger to see your fields: Just let lombok generate a toString for you!
+
+@EqualsAndHashCode
+Equality made easy: Generates hashCode and equals implementations from the fields of your object..
+
+@NoArgsConstructor, @RequiredArgsConstructor and @AllArgsConstructor
+Constructors made to order: Generates constructors that take no arguments, one argument per final / non-nullfield, or one argument for every field.
+
+@Data
+All together now: A shortcut for @ToString, @EqualsAndHashCode, @Getter on all fields, and @Setter on all non-final fields, and @RequiredArgsConstructor!
+
+@Value
+Immutable classes made very easy.
+
+@Builder
+... and Bob's your uncle: No-hassle fancy-pants APIs for object creation!
+
+@SneakyThrows
+To boldly throw checked exceptions where no one has thrown them before!
+
+@Synchronized
+synchronized done right: Don't expose your locks.
+
+@Getter(lazy=true)
+Laziness is a virtue!
+
+@Log
+Captain's Log, stardate 24435.7: "What was that line again?"
+experimental
+Head to the lab: The new stuff we're working on.
