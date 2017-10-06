@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="71e0f48f-67f2-488e-a9dd-415085209528" name="Default" comment="" />
+    <list default="true" id="b4e6d126-e43e-44d2-bcd2-44c4439ab0c8" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,22 +15,12 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="web.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SecurityConfiguration.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SecurityConfiguration.java">
+    <leaf>
+      <file leaf-file-name="ResourceServerConfiguration.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/ResourceServerConfiguration.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="405">
-              <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+              <caret line="27" column="37" lean-forward="false" selection-start-line="27" selection-start-column="37" selection-end-line="27" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -38,21 +28,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SecurityWebApplicationInitializer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SecurityWebApplicationInitializer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HelloWorldController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/controller/HelloWorldController.java">
+      <file leaf-file-name="Oauth2SecurityConfiguration.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/Oauth2SecurityConfiguration.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="455">
-              <caret line="47" column="30" lean-forward="true" selection-start-line="47" selection-start-column="30" selection-end-line="47" selection-end-column="30" />
+              <caret line="57" column="77" lean-forward="true" selection-start-line="57" selection-start-column="77" selection-end-line="57" selection-end-column="77" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2165#2166#0" expanded="true" />
+                <element signature="e#2212#2213#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MethodSecurityConfig.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/MethodSecurityConfig.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -60,70 +54,107 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HelloWorldProjectConfiguration.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/HelloWorldProjectConfiguration.java">
+      <file leaf-file-name="HelloWorldRestController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/HelloWorldRestController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="43" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="43" />
+            <state relative-caret-position="461">
+              <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="User.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/User.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="615">
+              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+              <folding>
+                <element signature="e#238#239#0" expanded="true" />
+                <element signature="e#271#272#0" expanded="true" />
+                <element signature="e#311#312#0" expanded="true" />
+                <element signature="e#343#344#0" expanded="true" />
+                <element signature="e#373#374#0" expanded="true" />
+                <element signature="e#399#400#0" expanded="true" />
+                <element signature="e#437#438#0" expanded="true" />
+                <element signature="e#467#468#0" expanded="true" />
+                <element signature="e#500#501#0" expanded="true" />
+                <element signature="e#529#530#0" expanded="true" />
+                <element signature="e#573#574#0" expanded="true" />
+                <element signature="e#609#610#0" expanded="true" />
+                <element signature="e#646#647#0" expanded="true" />
+                <element signature="e#671#672#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserService.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/UserService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="16" column="5" lean-forward="false" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#385#386#0" expanded="true" />
+                <element signature="e#430#431#0" expanded="true" />
+                <element signature="e#467#468#0" expanded="true" />
+                <element signature="e#500#501#0" expanded="true" />
+                <element signature="e#545#546#0" expanded="true" />
+                <element signature="e#573#574#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="SpringMvcInitializer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SpringMvcInitializer.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/SpringMvcInitializer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
-              <caret line="9" column="45" lean-forward="true" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="45" />
+              <caret line="9" column="40" lean-forward="false" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
               <folding>
-                <element signature="e#313#314#0" expanded="true" />
-                <element signature="e#385#386#0" expanded="true" />
-                <element signature="e#439#440#0" expanded="true" />
-                <element signature="e#466#467#0" expanded="true" />
-                <element signature="e#513#514#0" expanded="true" />
-                <element signature="e#556#557#0" expanded="true" />
+                <element signature="e#306#307#0" expanded="true" />
+                <element signature="e#361#362#0" expanded="true" />
+                <element signature="e#415#416#0" expanded="true" />
+                <element signature="e#442#443#0" expanded="true" />
+                <element signature="e#489#490#0" expanded="true" />
+                <element signature="e#532#533#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="welcome.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/welcome.jsp">
+      <file leaf-file-name="ProjectConfig.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/ProjectConfig.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-              <folding />
+            <state relative-caret-position="90">
+              <caret line="6" column="14" lean-forward="false" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin.jsp">
+      <file leaf-file-name="AuthorizationServerConfiguration.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/AuthorizationServerConfiguration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-              <folding />
+            <state relative-caret-position="524">
+              <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dba.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/dba.jsp">
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="accessDenied.jsp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/accessDenied.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="95" lean-forward="true" selection-start-line="0" selection-start-column="95" selection-end-line="0" selection-end-column="114" />
+            <state relative-caret-position="97">
+              <caret line="56" column="35" lean-forward="false" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -135,9 +166,15 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
-        <option value="Jsp File" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>users</find>
+      <find>/user/</find>
+      <find>jackson</find>
+    </findStrings>
   </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
@@ -148,17 +185,15 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/com/ap/config/SecurityConfiguration.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/com/ap/config/SecurityWebApplicationInitializer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/config/SecurityWebApplicationInitializer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/config/SpringMvcInitializer.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/home.jsp" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/config/HelloWorldProjectConfiguration.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/accessDenied.jsp" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin.jsp" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/dba.jsp" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/welcome.jsp" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ap/controller/HelloWorldController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/ResourceServerConfiguration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/AuthorizationServerConfiguration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/Oauth2SecurityConfiguration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/MethodSecurityConfig.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/User.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/SpringMvcInitializer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/ProjectConfig.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/HelloWorldRestController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ap/UserService.java" />
       </list>
     </option>
   </component>
@@ -190,7 +225,7 @@
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="SpringSecurityHelloWithAnnotations Maven Webapp" />
+          <option name="myItemId" value="SpringSecurityOauth2 Maven Webapp" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -200,7 +235,7 @@
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="SpringSecurityHelloWithAnnotations Maven Webapp" />
+          <option name="myItemId" value="SpringSecurityOauth2 Maven Webapp" />
           <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
@@ -235,21 +270,21 @@
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -264,18 +299,14 @@
               <option name="myItemId" value="webapp" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -286,26 +317,14 @@
               <option name="myItemId" value="main" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="views" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
+              <option name="myItemId" value="SpringSecurityOauth2" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -322,73 +341,31 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="ap" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controller" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="SpringSecurityHelloWithAnnotations" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ap" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="config" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
+    <property name="js.eslint.eslintPackage" value="" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="js.eslint.eslintPackage" value="" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.ap" />
+    </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.HelloSS">
+  <component name="RunManager" selected="Tomcat Server.springoauth2">
     <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" ALTERNATIVE_JRE_ENABLED="false">
       <deployment />
       <server-settings />
@@ -699,7 +676,7 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="SpringSecurityHelloWithAnnotations" />
+      <module name="SpringSecurityOauth2" />
       <envs />
       <method />
     </configuration>
@@ -795,18 +772,18 @@
     <configuration default="true" type="osgi.bnd.run" factoryName="Test Launcher (JUnit)">
       <method />
     </configuration>
-    <configuration default="false" name="HelloSS" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 8.5.8" ALTERNATIVE_JRE_ENABLED="false">
-      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/HelloSS" />
+    <configuration default="false" name="springoauth2" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 8.5.8" ALTERNATIVE_JRE_ENABLED="false">
+      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/springoauth2/" />
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
-        <artifact name="SpringSecurityHelloWithAnnotations:war exploded">
+        <artifact name="SpringSecurityOauth2:war exploded">
           <settings>
-            <option name="CONTEXT_PATH" value="/HelloSS" />
+            <option name="CONTEXT_PATH" value="/springoauth2" />
           </settings>
         </artifact>
       </deployment>
       <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="Unnamed_SpringSecurityHelloWithAnnotations" />
+        <option name="BASE_DIRECTORY_NAME" value="Unnamed_SpringSecurityOauth2" />
       </server-settings>
       <predefined_log_file id="Tomcat" enabled="true" />
       <predefined_log_file id="Tomcat Catalina" enabled="true" />
@@ -815,7 +792,7 @@
       <predefined_log_file id="Tomcat Localhost Access" enabled="false" />
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="45528" />
+        <option name="DEBUG_PORT" value="37446" />
       </RunnerSettings>
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
         <option name="USE_ENV_VARIABLES" value="true" />
@@ -864,12 +841,12 @@
       </ConfigurationWrapper>
       <method>
         <option name="BuildArtifacts" enabled="true">
-          <artifact name="SpringSecurityHelloWithAnnotations:war exploded" />
+          <artifact name="SpringSecurityOauth2:war exploded" />
         </option>
       </method>
     </configuration>
     <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="Tomcat Server.HelloSS" />
+      <item index="0" class="java.lang.String" itemvalue="Tomcat Server.springoauth2" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
@@ -880,56 +857,55 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="71e0f48f-67f2-488e-a9dd-415085209528" name="Default" comment="" />
-      <created>1507130032025</created>
+      <changelist id="b4e6d126-e43e-44d2-bcd2-44c4439ab0c8" name="Default" comment="" />
+      <created>1507231417886</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1507130032025</updated>
-      <workItem from="1507176404364" duration="6394000" />
+      <updated>1507231417886</updated>
+      <workItem from="1507231420853" duration="5498000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6394000" />
+    <option name="totallyTimeSpent" value="5498000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1535" height="876" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13289902" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16677524" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32129514" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2495114" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="SonarLint" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -939,7 +915,17 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/ap/HelloWorldRestController.java</url>
+          <line>26</line>
+          <properties />
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="4" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="antWorkspaceConfiguration">
@@ -947,143 +933,124 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="19" lean-forward="false" selection-start-line="16" selection-start-column="19" selection-end-line="16" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SecurityConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="19" lean-forward="false" selection-start-line="16" selection-start-column="19" selection-end-line="16" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/accessDenied.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="95" lean-forward="true" selection-start-line="0" selection-start-column="95" selection-end-line="0" selection-end-column="114" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/dba.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/welcome.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="114" lean-forward="false" selection-start-line="0" selection-start-column="114" selection-end-line="0" selection-end-column="114" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SecurityWebApplicationInitializer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/controller/HelloWorldController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="47" column="30" lean-forward="true" selection-start-line="47" selection-start-column="30" selection-end-line="47" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SecurityConfiguration.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/ResourceServerConfiguration.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
-          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+          <caret line="27" column="37" lean-forward="false" selection-start-line="27" selection-start-column="37" selection-end-line="27" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/SpringMvcInitializer.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/Oauth2SecurityConfiguration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="45" lean-forward="true" selection-start-line="9" selection-start-column="45" selection-end-line="9" selection-end-column="45" />
+        <state relative-caret-position="455">
+          <caret line="57" column="77" lean-forward="true" selection-start-line="57" selection-start-column="77" selection-end-line="57" selection-end-column="77" />
           <folding>
-            <element signature="e#313#314#0" expanded="true" />
-            <element signature="e#385#386#0" expanded="true" />
-            <element signature="e#439#440#0" expanded="true" />
-            <element signature="e#466#467#0" expanded="true" />
-            <element signature="e#513#514#0" expanded="true" />
-            <element signature="e#556#557#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#2165#2166#0" expanded="true" />
+            <element signature="e#2212#2213#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/config/HelloWorldProjectConfiguration.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/MethodSecurityConfig.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
-          <caret line="14" column="43" lean-forward="false" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="43" />
+          <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/User.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding>
+            <element signature="e#238#239#0" expanded="true" />
+            <element signature="e#271#272#0" expanded="true" />
+            <element signature="e#311#312#0" expanded="true" />
+            <element signature="e#343#344#0" expanded="true" />
+            <element signature="e#373#374#0" expanded="true" />
+            <element signature="e#399#400#0" expanded="true" />
+            <element signature="e#437#438#0" expanded="true" />
+            <element signature="e#467#468#0" expanded="true" />
+            <element signature="e#500#501#0" expanded="true" />
+            <element signature="e#529#530#0" expanded="true" />
+            <element signature="e#573#574#0" expanded="true" />
+            <element signature="e#609#610#0" expanded="true" />
+            <element signature="e#646#647#0" expanded="true" />
+            <element signature="e#671#672#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/SpringMvcInitializer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="40" lean-forward="false" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
+          <folding>
+            <element signature="e#306#307#0" expanded="true" />
+            <element signature="e#361#362#0" expanded="true" />
+            <element signature="e#415#416#0" expanded="true" />
+            <element signature="e#442#443#0" expanded="true" />
+            <element signature="e#489#490#0" expanded="true" />
+            <element signature="e#532#533#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/ProjectConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="14" lean-forward="false" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="56" column="35" lean-forward="false" selection-start-line="56" selection-start-column="35" selection-end-line="56" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/HelloWorldRestController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="44" column="0" lean-forward="true" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/UserService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="5" lean-forward="false" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#385#386#0" expanded="true" />
+            <element signature="e#430#431#0" expanded="true" />
+            <element signature="e#467#468#0" expanded="true" />
+            <element signature="e#500#501#0" expanded="true" />
+            <element signature="e#545#546#0" expanded="true" />
+            <element signature="e#573#574#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ap/AuthorizationServerConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="524">
+          <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1096,10 +1063,12 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
+          <last-edited>SpringSecurityOauth2:war</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
@@ -1107,7 +1076,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>No facets are configured</last-edited>
+          <last-edited>Web</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1142,7 +1111,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>SpringSecurityHelloWithAnnotations</last-edited>
+          <last-edited>SpringSecurityOauth2</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1155,7 +1124,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Maven: aopalliance:aopalliance:1.0</last-edited>
+          <last-edited>Maven: junit:junit:3.8.1</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
