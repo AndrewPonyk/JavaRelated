@@ -16,7 +16,7 @@ public class SampleResourceApplication {
 		SpringApplication.run(SampleResourceApplication.class, args);
 	}
 
-	@RequestMapping("/")
+	@RequestMapping("/demo")
 	public String securedCall() {
 		return "success (id: " + UUID.randomUUID().toString().toUpperCase() + ")";
 	}
