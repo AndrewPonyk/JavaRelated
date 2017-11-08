@@ -9,3 +9,19 @@ gwt-unitCache
 /JavaEE/7JEE/JavaEEWithNetbeans5Parts/HelloJeeWithNetbeans/dist/
 .metadata
 
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+target/

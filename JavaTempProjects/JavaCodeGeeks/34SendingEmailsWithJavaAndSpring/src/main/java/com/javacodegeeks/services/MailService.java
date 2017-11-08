@@ -3,13 +3,19 @@ package com.javacodegeeks.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class MailService {
+    Logger logger = Logger.getLogger(MailService.class.getName());
+
     @Autowired
     private Session session;
 
@@ -30,13 +36,8 @@ public class MailService {
             Transport.send(message);
             transport.close();
 
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (AddressException e) {
-            e.printStackTrace();
         } catch (MessagingException e) {
-            e.printStackTrace();
+           logger.log(Level.ALL, e.getMessage());
         }
-
     }
 }

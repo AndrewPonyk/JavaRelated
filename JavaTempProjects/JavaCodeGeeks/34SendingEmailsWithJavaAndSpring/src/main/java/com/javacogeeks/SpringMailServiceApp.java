@@ -25,7 +25,7 @@ Then try your code again it will work, worked for me
  */
 public class SpringMailServiceApp
 {
-    public static void main( String[] args ) throws IOException, MessagingException {
+    public static void main( String[] args ) throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
 
         MailService mailService = context.getBean("mailService", MailService.class);
