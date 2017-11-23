@@ -8,21 +8,21 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.util.Date;
 import java.util.Properties;
 
 //basic usage of sonarqube
 //mvn clean package sonar:sonar  -Dsonar.host.url=http://localhost:9000 -Dsonar.login=a6038e62294db47baf288d5eb4ea0083bd78ff01
 public class JavaCoreSendMailApp {
-    public static final String PASSWORD = "";
-    public static final String FROM = "gmail.com";
 
     public static void main(String[] args) throws MessagingException {
-        sendTextAndHtmlText();
-        sendEmailWithAttachment();
+        sendTextAndHtmlText("", "bet notification", "1.5:"+new Date(),
+                "", "");
+        //sendEmailWithAttachment("", "bet notification", "sample text", "", "");
 
     }
 
-    private static void sendEmailWithAttachment() throws MessagingException {
+    private static void sendEmailWithAttachment(String to, String subject, String msg, String from, String password) throws MessagingException {
         // worked example from here (7 votes)
         //http://stackoverflow.com/questions/10509699/must-issue-a-starttls-command-first
 
@@ -30,10 +30,10 @@ public class JavaCoreSendMailApp {
         //7 Votes
         //smtp port and socketFactory has to be change
 
-        String to = "andrew9999@ukr.net";
-        String subject = "Email with hotel image";
-        final String from = FROM;
-        final String password = PASSWORD;
+//        String to = "andrew9999@ukr.net";
+//        String subject = "Email with hotel image";
+//        final String from = FROM;
+//        final String password = PASSWORD;
 
         Session session = getSession(from, password);
 
@@ -65,7 +65,7 @@ public class JavaCoreSendMailApp {
         transport.close();
     }
 
-    private static void sendTextAndHtmlText() throws MessagingException {
+    private static void sendTextAndHtmlText(String to, String subject, String msg, String from, String password) throws MessagingException {
         // worked example from here (7 votes)
         //http://stackoverflow.com/questions/10509699/must-issue-a-starttls-command-first
 
@@ -73,11 +73,11 @@ public class JavaCoreSendMailApp {
         //7 Votes
         //smtp port and socketFactory has to be change
 
-        String to = "andrew9999@ukr.net";
-        String subject = "subject";
-        String msg = "email text....";
-        final String from = FROM;
-        final String password = PASSWORD;
+//        String to = "andrew9999@ukr.net";
+//        String subject = "subject";
+//        String msg = "email text....";
+//        final String from = FROM;
+//        final String password = PASSWORD;
 
 
         Session session = getSession(from, password);
@@ -103,7 +103,7 @@ public class JavaCoreSendMailApp {
 
         transport.connect();
         Transport.send(message);
-        Transport.send(messageWithHtml);
+        //Transport.send(messageWithHtml);
         transport.close();
     }
 
@@ -113,7 +113,7 @@ public class JavaCoreSendMailApp {
         props.setProperty("mail.host", "smtp.gmail.com");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false"); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         props.put("mail.smtp.socketFactory.port", "465");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.socketFactory.fallback", "false");
