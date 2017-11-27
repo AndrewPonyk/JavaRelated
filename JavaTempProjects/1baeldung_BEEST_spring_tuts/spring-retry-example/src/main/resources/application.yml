@@ -1,0 +1,4 @@
+spring:
+  retry:
+    max-attempts: 2
+    delay: 1000
