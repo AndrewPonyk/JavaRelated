@@ -26,8 +26,9 @@ public class RestService {
     }
 
     @Retryable(value = SocketTimeoutException.class, maxAttemptsExpression = "#{${spring.retry.max-attempts}}",
-            backoff = @Backoff(maxDelay = 1000L))
+            backoff = @Backoff(delayExpression = "#{${spring.retry.delay}}"))
     public String getSomeExternalResource(){
+        System.out.println(System.currentTimeMillis()/1000);
         logger.info("Heeeeeeellllllo");
         return restTemplate.getForObject("http://google111.com", String.class);
     }
