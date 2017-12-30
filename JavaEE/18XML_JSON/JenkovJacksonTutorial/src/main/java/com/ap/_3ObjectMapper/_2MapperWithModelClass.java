@@ -1,10 +1,15 @@
 package com.ap._3ObjectMapper;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 public class _2MapperWithModelClass {
@@ -22,6 +27,10 @@ public class _2MapperWithModelClass {
         private String brand;
         private Integer doors;
         private String[] owners;
+
+        @JsonSerialize(using = ToStringSerializer.class)
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        private LocalDate localDate;
 
         public String getBrand() {
             return brand;
@@ -54,6 +63,15 @@ public class _2MapperWithModelClass {
                     ", doors=" + doors +
                     ", owners=" + Arrays.toString(owners) +
                     '}';
+        }
+
+
+        public LocalDate getLocalDate() {
+            return localDate;
+        }
+
+        public void setLocalDate(LocalDate localDate) {
+            this.localDate = localDate;
         }
     }
 }
