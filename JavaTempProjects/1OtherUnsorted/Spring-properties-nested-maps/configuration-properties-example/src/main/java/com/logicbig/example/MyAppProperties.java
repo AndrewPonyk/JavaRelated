@@ -1,5 +1,6 @@
 package com.logicbig.example;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,10 @@ import java.util.Map;
 @Component
 @ConfigurationProperties("app")
 public class MyAppProperties {
+
+    //https://stackoverflow.com/questions/12576156/reading-a-list-from-properties-file-and-load-with-spring-annotation-value/29970335#29970335
+    @Value("${my.list.of.ints}")
+    private List<String> myList;
 
     private List<String> adminEmails;
     boolean sendEmailOnErrors;
@@ -76,5 +81,13 @@ public class MyAppProperties {
                 ",\n orderScreenProperties=" + orderScreenProperties +
                 ",\n customerScreenProperties=" + customerScreenProperties +
                 "\n}";
+    }
+
+    public List<String> getMyList() {
+        return myList;
+    }
+
+    public void setMyList(List<String> myList) {
+        this.myList = myList;
     }
 }
