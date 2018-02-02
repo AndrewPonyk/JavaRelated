@@ -23,7 +23,7 @@ public class App
         System.out.println(contributors);
 
         List<Repo> myRepos = gitHub.userRepos("AndrewPonyk");
-        System.out.println(myRepos);
+        myRepos.forEach(System.out::println);
     }
 }
 
