@@ -5,9 +5,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.File;
+
 public class Run2ChromeInstancesAndGoogle {
     // run 2 chrome instances
     public static void main(String[] args) throws InterruptedException {
+
+        System.setProperty("webdriver.chrome.driver", driver());
 
         new Thread(() -> {
             try {
@@ -24,8 +28,6 @@ public class Run2ChromeInstancesAndGoogle {
             }
         }).start();
 
-        System.setProperty("webdriver.chrome.driver", "C:\\tmp\\chromedriver.exe");
-
         WebDriver driver = new ChromeDriver();
         driver.get("http://www.google.com/xhtml");
         WebElement searchBox = driver.findElement(By.name("q"));
@@ -33,5 +35,14 @@ public class Run2ChromeInstancesAndGoogle {
         searchBox.submit();
         Thread.sleep(5000);  // Let the user actually see something!
         driver.quit();
+    }
+
+    public static String driver(){
+        File driver = new File("C:\\tmp\\chromedriver.exe");
+        if(driver.exists()){
+            return "C:\\tmp\\chromedriver.exe";
+        } else {
+            return "/home/andrii/Programs/chromedriver";
+        }
     }
 }
