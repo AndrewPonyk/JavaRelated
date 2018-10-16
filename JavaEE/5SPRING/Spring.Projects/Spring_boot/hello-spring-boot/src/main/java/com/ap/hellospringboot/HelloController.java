@@ -12,7 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
-    
+
+    @RequestMapping(method = RequestMethod.GET, path = "/")
+    public String testGet(){
+        return "GET";
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/")
     public String testPost(@RequestBody String body){
         System.out.println(body);
