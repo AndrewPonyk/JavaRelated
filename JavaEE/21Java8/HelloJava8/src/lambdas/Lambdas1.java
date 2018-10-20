@@ -4,6 +4,7 @@ import fucntionalinterfaces.ITrade;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by andrew on 27.06.15.
@@ -27,6 +28,12 @@ public class Lambdas1 {
 
         someMethod(itradeChecker);
         someMethod(s->null);
+
+
+        Optional<Integer> testOptional = Optional.empty();
+
+        final Integer integer = testOptional.orElseGet(() -> new Integer(100));
+        System.out.println(integer);
     }
 
 

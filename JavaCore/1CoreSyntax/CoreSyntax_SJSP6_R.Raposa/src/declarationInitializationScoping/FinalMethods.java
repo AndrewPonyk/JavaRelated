@@ -8,7 +8,7 @@ public class FinalMethods {
 }
 
 class A {
-	public final static void say(){
+	public static void say(){
 		System.out.println("hello i am A");
 	}
 	
@@ -24,7 +24,7 @@ class B extends A{
 	
 	
 	@Override
-	private void s() { // ERROR  Cannot reduce the visibility of the inherited method from A
+	public void s() { // ERROR  Cannot reduce the visibility of the inherited method from A
 		// TODO Auto-generated method stub
 		super.s();
 	}
