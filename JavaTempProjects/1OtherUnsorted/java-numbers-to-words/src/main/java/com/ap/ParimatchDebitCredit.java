@@ -1,6 +1,7 @@
 package com.ap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math3.util.Precision;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,17 +11,17 @@ import java.util.regex.Pattern;
 
 public class ParimatchDebitCredit {
     public static void main(String[] args) throws IOException {
-        List<String> lines = FileUtils.readLines(new File("/home/andrii/Documents/par_mon_20102018.txt"), "UTF-8");
+        List<String> lines = FileUtils.readLines(new File("C:\\mygit\\JavaRelated\\JavaTempProjects\\1OtherUnsorted\\java-numbers-to-words\\src\\main\\resources\\par_mon_04012019.txt"), "UTF-8");
 
         Double deposit = 0.0;
         Double withdraw = 0.0;
 
         final String regex = "([\\d\\.]*\\suah)";
-        final String withDrawregex = "(-)";
 
+        //iterate through lines
         for (int i=0;i<lines.size();i++){
             String line = lines.get(i).toLowerCase().replaceAll("грн.", "uah");
-            if(line.contains("onus")
+            if(line.contains("onus") || line.contains("Обмен бонусных")
                     || line.trim().length() ==0){
                 continue;
             }
@@ -32,7 +33,7 @@ public class ParimatchDebitCredit {
                 while (matcher.find()) {
                     //System.out.println("Full match: " + matcher.group(0));
                     for (int j = 1; j <= matcher.groupCount(); j++) {
-                        //System.out.println("Group " + j + ": " + matcher.group(j));
+                        System.out.println("Deposit" + j + ": " + matcher.group(j));
                         Double sum = Double.valueOf(matcher.group(j).replaceAll("uah", "").replaceAll(" ", ""));
                         deposit +=sum;
                     }
@@ -48,7 +49,7 @@ public class ParimatchDebitCredit {
 
                 while (matcher.find()) {
                     for (int j = 1; j <= matcher.groupCount(); j++) {
-                        System.out.println("Group " + j + ": " + matcher.group(j));
+                        System.out.println("Withdraw " + j + ": " + matcher.group(j));
                         Double withdrawSum = Double.valueOf(matcher.group(j).replaceAll(" ", ""));
                         withdraw += withdrawSum;
                     }
@@ -57,6 +58,6 @@ public class ParimatchDebitCredit {
 
             //System.out.println(line);
         }
-        System.out.println("Deposit: " + deposit + ", widhdraw:" + withdraw);
+        System.out.println("Deposit: " + Precision.round(deposit, 2)  + ", widhdraw:" + Precision.round(withdraw, 2));
     }
 }
