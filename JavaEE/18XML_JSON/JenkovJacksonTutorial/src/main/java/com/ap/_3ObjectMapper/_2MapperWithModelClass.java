@@ -9,12 +9,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 
 public class _2MapperWithModelClass {
 
-    public static String json = "{\"brand\":\"Audi\",\"doors\":5,\"owners\":[\"Rob\",\"John\"]}";
+    public static String json = "{\"brand\":\"Audi\",\"price\":22.3,\"doors\":5,\"owners\":[\"Rob\",\"John\"]}";
 
     public static void main(String[] args) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -27,6 +28,8 @@ public class _2MapperWithModelClass {
         private String brand;
         private Integer doors;
         private String[] owners;
+
+        private BigDecimal price;
 
         @JsonSerialize(using = ToStringSerializer.class)
         @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -62,6 +65,7 @@ public class _2MapperWithModelClass {
                     "brand='" + brand + '\'' +
                     ", doors=" + doors +
                     ", owners=" + Arrays.toString(owners) +
+                    ", price=" + price +
                     '}';
         }
 
@@ -72,6 +76,14 @@ public class _2MapperWithModelClass {
 
         public void setLocalDate(LocalDate localDate) {
             this.localDate = localDate;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public void setPrice(BigDecimal price) {
+            this.price = price;
         }
     }
 }

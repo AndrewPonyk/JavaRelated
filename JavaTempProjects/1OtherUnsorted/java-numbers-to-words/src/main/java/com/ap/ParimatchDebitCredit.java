@@ -1,17 +1,21 @@
 package com.ap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.math3.util.Precision;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParimatchDebitCredit {
     public static void main(String[] args) throws IOException {
-        List<String> lines = FileUtils.readLines(new File("C:\\mygit\\JavaRelated\\JavaTempProjects\\1OtherUnsorted\\java-numbers-to-words\\src\\main\\resources\\par_mon_04012019.txt"), "UTF-8");
+
+        List<String> lines = IOUtils.readLines(ParimatchDebitCredit.class.getClassLoader().getResourceAsStream("par_mon_04012019.txt"));
+
 
         Double deposit = 0.0;
         Double withdraw = 0.0;
@@ -58,6 +62,8 @@ public class ParimatchDebitCredit {
 
             //System.out.println(line);
         }
-        System.out.println("Deposit: " + Precision.round(deposit, 2)  + ", widhdraw:" + Precision.round(withdraw, 2));
+        System.out.println("Deposit: " + Precision.round(deposit, 2)
+                + ", widhdraw:" + Precision.round(withdraw, 2)
+                + "(diff: " + (-1*Precision.round(withdraw, 2) - Precision.round(deposit, 2)) + ")");
     }
 }
