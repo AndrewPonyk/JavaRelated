@@ -1,10 +1,14 @@
 package com.demo.controllers;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import com.demo.dao.TeamDao;
+import com.demo.model.Player;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,16 +19,20 @@ import com.demo.model.Team;
 
 @Controller
 public class WhateverConroller {
-	
-	private Team team;
-	
+
+	@Autowired
+	private TeamDao teamDao;
+
+
 	@PostConstruct
 	public void init(){
-		team = new Team();
+		Team team = new Team();
+		team.setId(1L);
 		team.setName("Karpaty");
 		team.setLocation("Lviv");
 		team.setMascotte("Lion");
-		team.setPlayers(new HashSet<>());
+		team.setPlayers(new HashSet<>(Arrays.asList(new Player("Khudobiak", "attacker"))));
+		teamDao.save(team);
 	}
 	
 	@RequestMapping("/hi/{name}")
@@ -33,8 +41,8 @@ public class WhateverConroller {
 		return "hello";
 	}
 	
-	@RequestMapping("/team")
-	public @ResponseBody Team team(){
-		return team;
+	@RequestMapping("/teams/{name}")
+	public @ResponseBody Team team(@PathVariable String name){
+		return teamDao.findByName(name);
 	}
 }

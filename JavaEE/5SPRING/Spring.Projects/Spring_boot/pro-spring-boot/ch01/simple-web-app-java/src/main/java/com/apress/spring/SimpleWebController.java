@@ -8,7 +8,8 @@ public class SimpleWebController {
 
 	@RequestMapping("/")
 	public String greetings(){
-		return "<h1> Spring Boot Rocks in Java to0o!</h1>";
+		return "console.error(\"test12345\");\n" +
+				"<h1> Spring Boot Rocks in Java to0o!</h1>";
 	}
 
 

@@ -15,6 +15,7 @@
   
   <ul class="timeline">
    <div th:each="entry,status : ${journal}">
+
     <li th:attr="class=${status.odd}?'timeline-inverted':''">
       <div class="tl-circ"></div>
       <div class="timeline-panel">

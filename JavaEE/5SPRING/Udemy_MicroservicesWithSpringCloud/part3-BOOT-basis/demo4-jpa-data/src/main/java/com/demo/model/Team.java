@@ -1,24 +1,26 @@
 package com.demo.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Set;
 
-//import javax.persistence.CascadeType;
-//import javax.persistence.Entity;
-//import javax.persistence.GeneratedValue;
-//import javax.persistence.Id;
-//import javax.persistence.JoinColumn;
-//import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 
-//@Entity
+@Entity
+//@XmlRootElement
 public class Team {
-	//@Id 
-	//@GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 	private String name;
 	private String location;
 	private String mascotte;
-	//@OneToMany(cascade=CascadeType.ALL)
-	//@JoinColumn(name = "teamId")
+	@OneToMany(cascade=CascadeType.ALL)
+	@JoinColumn(name = "teamId")
 	private Set<Player> players;
 	
 	public String getName() {

@@ -2,6 +2,8 @@ package com.ap;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,8 +30,9 @@ public class Temp {
         System.out.println(ChronoUnit.MILLIS.between(now, now1));
         System.out.println(ChronoUnit.MILLIS.between(now1, now));
 
-
-
+        LinkedList<String> list = new LinkedList<String>();
+        String remove = list.remove();
+        list.poll();
 
     }
 }
