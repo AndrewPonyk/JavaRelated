@@ -1,0 +1,8 @@
+# Client config
+---
+spring:
+   application:
+      name: simple-zuul-gateway
+
+
+ 

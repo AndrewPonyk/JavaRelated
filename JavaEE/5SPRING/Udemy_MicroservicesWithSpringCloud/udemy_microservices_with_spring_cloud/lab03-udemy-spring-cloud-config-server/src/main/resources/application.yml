@@ -1,0 +1,13 @@
+# Server config
+---
+spring:
+   cloud:
+      config:
+         server:
+            git:
+               uri: https://github.com/thtesche/udemy_microservices_with_spring_cloud.git
+               searchPaths: configdata
+               
+               
+server:
+    port: 8888

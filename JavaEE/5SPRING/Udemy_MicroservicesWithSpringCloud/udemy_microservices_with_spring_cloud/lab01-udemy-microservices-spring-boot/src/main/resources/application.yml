@@ -1,0 +1,17 @@
+content: Default content
+
+# ServiceId specific content
+---
+spring:
+   profiles: lab-04-inst-01
+content: Content from lab-04-inst-01
+
+---
+spring:
+   profiles: lab-04-inst-02
+content: Content from lab-04-inst-02
+
+---
+spring:
+   profiles: lab-04-inst-03
+content: Content from lab-04-inst-03

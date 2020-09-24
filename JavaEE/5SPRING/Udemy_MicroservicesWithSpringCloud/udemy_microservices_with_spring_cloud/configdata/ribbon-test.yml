@@ -1,0 +1,14 @@
+---
+demo:
+  property:
+    test: I was found via config server.
+
+spring:
+  application:
+      name: lab05-ribbon
+      
+# Eureka settings
+eureka:
+   client:
+      serviceUrl:
+         defaultZone: http://localhost:8011/eureka/,http://localhost:8012/eureka/,http://localhost:8013/eureka/

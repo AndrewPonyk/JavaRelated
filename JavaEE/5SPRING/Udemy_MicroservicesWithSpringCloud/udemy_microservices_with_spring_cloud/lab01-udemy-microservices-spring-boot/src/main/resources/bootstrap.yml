@@ -1,0 +1,47 @@
+## YAML Template.
+---
+spring:
+  profiles: default
+  application:
+      name: LAB01-Microservice-Hello-World
+
+# side-by-side on localhost -- which is unrealistic in production -- but does illustrate how multiple instances collaborate.
+#
+# Add to your /etc/hosts
+# 127.0.0.1       lab-04-inst-01
+# 127.0.0.1       lab-04-inst-02
+# 127.0.0.1       lab-04-inst-03
+#
+# Run by opening 3 separate command prompts:
+# java -jar -Dspring.profiles.active=lab-04-inst-01 target/lab01-udemy-microservices-spring-boot-0.0.1-SNAPSHOT.jar
+# java -jar -Dspring.profiles.active=lab-04-inst-02 target/lab01-udemy-microservices-spring-boot-0.0.1-SNAPSHOT.jar
+# java -jar -Dspring.profiles.active=lab-04-inst-03 target/lab01-udemy-microservices-spring-boot-0.0.1-SNAPSHOT.jar
+---
+spring:
+  profiles: lab-04-inst-01
+  application:
+    name: lab-04
+
+eureka:
+  instance:
+    hostname: lab-04-inst-01
+
+---
+spring:
+  profiles: lab-04-inst-02
+  application:
+    name: lab-04
+
+eureka:
+  instance:
+    hostname: lab-04-inst-02  
+
+---
+spring:
+  profiles: lab-04-inst-03
+  application:
+    name: lab-04
+    
+eureka:
+  instance:
+    hostname: lab-04-inst-03     
