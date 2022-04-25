@@ -1,0 +1,4 @@
+package com.ap.swagger_with_springboot1x_tutorial.config;
+
+public class SwaggerConfig {
+}

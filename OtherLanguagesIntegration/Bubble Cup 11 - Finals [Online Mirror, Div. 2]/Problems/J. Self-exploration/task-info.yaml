@@ -1,0 +1,33 @@
+type: codeforces
+files:
+- name: src/Main.java
+  visible: true
+  text: |-
+    /**
+     * Accomplished using the EduTools plugin by JetBrains https://plugins.jetbrains.com/plugin/10081-edutools
+     */
+
+    public class Main {
+       public static void main(String[] args) {
+          // Write your solution here
+       }
+    }
+  learner_created: false
+- name: testData/1/input.txt
+  visible: true
+  text: 10 1001 0 0 1 1
+  learner_created: false
+- name: testData/1/output.txt
+  visible: true
+  text: 1
+  learner_created: false
+- name: testData/2/input.txt
+  visible: true
+  text: 10 10001 1 2 3 4
+  learner_created: false
+- name: testData/2/output.txt
+  visible: true
+  text: 0
+  learner_created: false
+feedback_link: https://codeforces.com/contest/1046/problem/J?locale=en
+status: Unchecked
