@@ -1,4 +1,4 @@
-package com.ap.swagger_with_springboot1x_tutorial.controller;
+package com.ap.springdocopenapiinsteadofswaggertutorial.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

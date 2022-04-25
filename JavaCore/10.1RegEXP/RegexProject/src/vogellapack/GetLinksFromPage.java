@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sun.imageio.plugins.common.InputStreamAdapter;
 
 public class GetLinksFromPage {
 

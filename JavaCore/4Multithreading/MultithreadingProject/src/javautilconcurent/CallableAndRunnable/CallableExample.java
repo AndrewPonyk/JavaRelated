@@ -11,10 +11,7 @@ public class CallableExample {
 		
 		ExecutorService pool = Executors.newFixedThreadPool(3);
 	
-		ThreadPoolExecutor p;
-		
-		Integer result = pool.submit(new WordLengthCallable("hello")).get(); 
-		
+		Integer result = pool.submit(new WordLengthCallable("hello")).get();
 		System.out.println(result);
 		
 		pool.shutdown();
@@ -31,7 +28,7 @@ class WordLengthCallable implements Callable<Integer> {
 
 	public Integer call() {
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

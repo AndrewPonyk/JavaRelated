@@ -29,16 +29,10 @@ import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.options.Validation.Required;
-import org.apache.beam.sdk.transforms.Count;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.SimpleFunction;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
-import org.apache.beam.vendor.grpc.v1p26p0.org.jboss.marshalling.ByteWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,13 +40,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * An example that counts words in Shakespeare and includes Beam best practices.
  *
- * <p>This class, {@link WordCount}, is the second in a series of four successively more detailed
+ * <p>This class, {@link WordCountLocalPC}, is the second in a series of four successively more detailed
  * 'word count' examples. You may first want to take a look at {@link MinimalWordCount}. After
  * you've looked at this example, then see the {@link DebuggingWordCount} pipeline, for introduction
  * of additional concepts.
@@ -93,7 +88,7 @@ import java.util.List;
  * <p>The input file defaults to a public data set containing the text of of King Lear, by William
  * Shakespeare. You can override it and choose your own input with {@code --inputFile}.
  */
-public class WordCount {
+public class WordCountLocalPC {
 
     /**
      * Concept #2: You can make your pipeline assembly code less verbose by defining your DoFns
@@ -130,7 +125,7 @@ public class WordCount {
     public static class FormatAsTextFn extends SimpleFunction<KV<String, Long>, String> {
         @Override
         public String apply(KV<String, Long> input) {
-            return input.getKey() + ":-> " + input.getValue();
+            return input.getKey() + ":->" + input.getValue();
         }
     }
 
@@ -157,8 +152,22 @@ public class WordCount {
         }
     }
 
+    public static class FilterContains implements ProcessFunction<String, Boolean> {
+        private String regex;
+
+
+        public FilterContains(String s) {
+            this.regex = s;
+        }
+
+        @Override
+        public Boolean apply(String input) throws Exception {
+            return input.contains(regex);
+        }
+    }
+
     /**
-     * Options supported by {@link WordCount}.
+     * Options supported by {@link WordCountLocalPC}.
      *
      * <p>Concept #4: Defining your own configuration options. Here, you can add your own arguments to
      * be processed by the command-line parser, and specify default values for them. You can then
@@ -173,7 +182,7 @@ public class WordCount {
          * this option to choose a different input file or glob.
          */
         @Description("Path of the file to read from")
-        @Default.String("gs://apache-beam-samples/shakespeare/kinglear.txt")
+        @Default.String("D:\\Temp\\folder_with_text_files\\1.txt")
         String getInputFile();
 
         void setInputFile(String value);
@@ -182,6 +191,7 @@ public class WordCount {
          * Set this required option to specify where to write the output.
          */
         @Description("Path of the file to write to")
+        @Default.String("D:\\Temp\\folder_with_text_files\\")
         @Required
         String getOutput();
 
@@ -196,26 +206,35 @@ public class WordCount {
 //    p.apply("ReadLines", TextIO.read().from(options.getInputFile()))
 //        .apply(new CountWords())
 //        .apply(MapElements.via(new FormatAsTextFn()))
-//        .apply("WriteCounts", TextIO.write().to(options.getOutput()));
+//        .apply("WriteCounts", TextIO.write().to(options.getOutput()+"\\results").withNumShards(1));
 
-
+        //CSV generation
 //        p.apply("ReadLines", TextIO.read().from(options.getInputFile()))
 //                .apply(new CountWords())
 //                .apply(MapElements.via(new FormatAsTextFn()))
-//                .apply(MapElements.into(TypeDescriptors.lists(TypeDescriptors.strings())).via(s -> Arrays.asList(s, s)))
+//                .apply(MapElements.into(TypeDescriptors.lists(TypeDescriptors.strings())).via(s -> Arrays.asList(s.split(":->")[0], s.split(":->")[1])))
 //                .apply("WriteCSV Using beam", FileIO.<List<String>>write().withNumShards(1).
-//                        via(new CSVSink(Arrays.asList("user", "amount")))
-//                        .to("gs://questionerwebapp/")
+//                        via(new CSVSink(Arrays.asList("word", "amount")))
+//                        .to(options.getOutput())
 //                        .withPrefix("words")
 //                        .withSuffix(".csv"));
 
-        p.apply("ReadLines", TextIO.read().from(options.getInputFile()))
-                .apply(new CountWords())
-                .apply(MapElements.via(new FormatAsTextFn()))
-                .apply(MapElements.into(TypeDescriptors.lists(TypeDescriptors.strings())).via(s -> Arrays.asList(s, s)))
-                .apply("WriteCSV Using beam", FileIO.<List<String>>write().withNumShards(1).
+        //EXCEL
+        PCollection<String> linsesFromFiles = p.apply("ReadLines", TextIO.read().from(options.getInputFile()));
+
+        //filtering lines
+        //PCollection<String> filteredLines = linsesFromFiles.apply(Filter.by(new FilterContains("ira")));
+        PCollection<String> filteredLines = linsesFromFiles.apply(Filter.by(e-> e.contains("ira")));
+
+
+        PCollection<KV<String, Long>> wordCounts = filteredLines.apply(new CountWords());
+
+        PCollection<String> keyValStrings = wordCounts.apply(MapElements.via(new FormatAsTextFn()));
+        PCollection<List<String>> eachListContainsWordAndCount =
+                keyValStrings.apply(MapElements.into(TypeDescriptors.lists(TypeDescriptors.strings())).via(s -> Arrays.asList(s.split(":->")[0], s.split(":->")[1])));
+        eachListContainsWordAndCount.apply("WriteCSV Using beam", FileIO.<List<String>>write().withNumShards(1).
                         via(new ExcelSink(Arrays.asList("user", "amount")))
-                        .to("gs://questionerwebapp/")
+                        .to(options.getOutput())
                         .withPrefix("wordsExcel")
                         .withSuffix(".xls"));
 
@@ -256,6 +275,7 @@ public class WordCount {
     private String header;
     private PrintWriter writer;
     private OutputStream outputStream;
+    private List<String> data = new ArrayList<>();
 
         public ExcelSink(List<String> colNames) {
       this.header = String.join(",", colNames);
@@ -266,12 +286,13 @@ public class WordCount {
     }
 
     public void write(List<String> element) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = TestGenerateExcel.generateExcelFileBytes("");
-        outputStream.write(byteArrayOutputStream.toByteArray());
+        data.addAll(element);
     }
 
     public void flush() throws IOException {
-            outputStream.flush();
+        ByteArrayOutputStream byteArrayOutputStream = TestGenerateExcel.generateExcelFileBytes(data);
+        outputStream.write(byteArrayOutputStream.toByteArray());
+        outputStream.flush();
     }
   }
 }

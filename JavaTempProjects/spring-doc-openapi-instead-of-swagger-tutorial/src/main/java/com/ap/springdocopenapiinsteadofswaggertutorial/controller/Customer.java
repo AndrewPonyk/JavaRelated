@@ -1,12 +1,14 @@
-package com.ap.swagger_with_springboot1x_tutorial.controller;
+package com.ap.springdocopenapiinsteadofswaggertutorial.controller;
 
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.NotNull;
 
 public class Customer {
     @NotNull(message = "First Name should not be null!!!!") // THIS is for SPRING
-    @ApiModelProperty(required = true)  // THIS is for SWAGGER!
+    //Swagger is like interface (springfox and newest spring-doc are implementations)
+    @Schema(required = true) // THIS IS INSTED OF springfox @ApiModelProperty
     public String firstName;
     public String lastName;
 

@@ -6,8 +6,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+
+///!!! Future is just interface. Behind the scene, the implementation is FutureTask.
+/*
+You can absolutely use FutureTask manually but you will lose the advantages of using Executor (pooling thread, limit the thread, etc).
+ Using FutureTask is quite similar to using the old Thread and using the run method.
+ */
 public class FutureTaskClassHelloWorld {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool(1);
 
 		final SlowStringReverser reverser = new SlowStringReverser();
@@ -24,21 +30,19 @@ public class FutureTaskClassHelloWorld {
 		
 		executor.execute(future); // doesn't block main THREAD !!!!!!!!!!!!!!!!! !!!!
 		executor.shutdown();
-		
-		
-		while (!future.isDone()) {     // BLOCK main thread , and wait for result ! 
+
+		while (!future.isDone()) {    // future.get() BLOCK main thread , and wait for result !
+			System.out.println("Waiting..");
 			// Play framework has 'await' method
-			try {
-				System.out.println("Result " + future.get());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			} 
+			Thread.sleep(500);
 		}
-		
+
+		try {
+			System.out.println("Result " + future.get());
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 		System.out.println("end of main");
-		
 	}
 }
 
@@ -61,6 +65,7 @@ class SlowStringReverser {
 			reversedString.append(orgString.charAt(i));
 			try {
 				Thread.sleep(1000);
+				System.out.println("processing ...");
 			} catch (InterruptedException ie) {
 			}
 		}

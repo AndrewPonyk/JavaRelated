@@ -1,4 +1,4 @@
-FROM frolvlad/alpine-oraclejdk8:slim
+FROM openjdk:8-alpine
 VOLUME /tmp
 ADD target/spring-boot-docker-1.0-SNAPSHOT.jar app.jar
 ENV JAVA_OPTS=""

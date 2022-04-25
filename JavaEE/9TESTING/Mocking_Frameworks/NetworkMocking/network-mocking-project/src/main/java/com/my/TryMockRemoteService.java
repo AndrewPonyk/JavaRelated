@@ -32,12 +32,15 @@ public class TryMockRemoteService {
        // WireMockTestClient defaultTestClient = new WireMockTestClient(defaultServer.port());
        // WireMockTestClient altTestClient = new WireMockTestClient(altServer.port());
 
-        //String thisHostName = InetAddress.getLocalHost().getHostName();
-        WireMock.configureFor("localhost", 8282);
 
-        givenThat(get(urlEqualTo("/resource/on/other/address"))
+//        String thisHostName = InetAddress.getLocalHost().getHostName();
+//        WireMock.configureFor("localhost", 8282);
+
+        init();
+        givenThat(get(urlEqualTo("resource/on/other/address"))
                 .willReturn(aResponse()
-                        .withStatus(206)));
+                        .withStatus(206)
+                .withBody("test")));
 
         System.in.read();
     }

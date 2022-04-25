@@ -1,4 +1,7 @@
-package PACKAGE_NAME;
-
 public class Task2App {
+    public static void main(String[] args) {
+
+    }
+
+
 }

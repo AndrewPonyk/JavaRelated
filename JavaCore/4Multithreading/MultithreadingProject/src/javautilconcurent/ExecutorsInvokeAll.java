@@ -59,6 +59,5 @@ public class ExecutorsInvokeAll {
 		Perhaps they stop, perhaps the execute until the end. It is a best effort attempt.
 		
 		*/
-		
 	}
 }

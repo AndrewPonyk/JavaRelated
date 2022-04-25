@@ -103,6 +103,15 @@ public class String_matches {
 		
 		
 		System.out.println("3:3:2:2".matches("(\\d:){3}(\\d)"));
+
+		//equ example (string should match /env/source/id or /source/id)
+		str = "/prod/insta/100";
+		regex = "/[^/]+/[^/]+(/[^/]+)?";
+		System.out.println("17) Insta example: " + str.matches(regex));
+		str = "/prod/insta";
+		System.out.println("17) Insta example: " + str.matches(regex));
+		str = "/insightgateway/source/source";
+		System.out.println("17) Insta example: " + str.matches(regex));
 	}
 
 	public static boolean isTrue(String s) {

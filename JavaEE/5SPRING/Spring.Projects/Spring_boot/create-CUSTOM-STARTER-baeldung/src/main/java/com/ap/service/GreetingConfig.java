@@ -1,4 +1,7 @@
 package com.ap.service;
 
-public class GreetingConfig {
+import java.util.Properties;
+
+public class GreetingConfig extends Properties {
+
 }

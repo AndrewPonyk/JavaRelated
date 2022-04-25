@@ -2,6 +2,7 @@ package com.my;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 import java.io.IOException;
 
@@ -10,7 +11,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 public class WiremockHelloAndRegex {
     public static void main(String[] args) throws IOException {
         System.out.println("Hello wiremock");
-        WireMockServer wireMockServer = new WireMockServer(8081); //No-args constructor will start on port 8080, no HTTPS
+        WireMockServer wireMockServer =
+                new WireMockServer(WireMockConfiguration.wireMockConfig()
+                        .port(8081)
+                .extensions(LibraryBookReturnDateTransformer.class)); //No-args constructor will start on port 8080, no HTTPS
         wireMockServer.start();
 
         // simple REGEX stub urlMatching

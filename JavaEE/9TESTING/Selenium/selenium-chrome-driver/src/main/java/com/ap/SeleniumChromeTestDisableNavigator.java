@@ -9,7 +9,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import java.io.File;
 import java.util.ArrayList;
 
-public class SeleniumTestDisableNavigator {
+public class SeleniumChromeTestDisableNavigator {
     public static void main(String[] args) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", driver());
 

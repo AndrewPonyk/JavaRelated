@@ -1,32 +1,23 @@
 package com.ap;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.io.File;
-import java.util.ArrayList;
 
-public class SeleniumChromeTestDisableNavigator {
+public class SeleniumFirefoxTestDisableNavigator {
+
     public static void main(String[] args) throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver", driver());
+        System.setProperty("webdriver.gecko.driver", "C:\\tmp\\geckodriver.exe");
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--disable-blink-features");
-        chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
-
-        WebDriver driver = new ChromeDriver(chromeOptions);
-        Thread.sleep(3000);
-//        driver.get("https://www.bet365.com/#/IP/B1");
-        String baseUrl = "http://www.google.co.uk/";
-        driver.get(baseUrl);
-        driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL +"t");
-
-        ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
-        driver.switchTo().window(tabs.get(1)); //switches to new tab
-        driver.get("https://www.facebook.com");
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        WebDriver driver = new FirefoxDriver();
+        //((JavascriptExecutor)driver).executeScript("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})");
+        //((JavascriptExecutor)driver).executeScript("location.href='https://www.bet365.com/#/IP/B1'");
+        driver.get("https://www.marathonbet.com/en/betting/Table+Tennis+-+382549");
     }
 
     public static String driver(){

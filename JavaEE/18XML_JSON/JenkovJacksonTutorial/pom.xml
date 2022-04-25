@@ -37,6 +37,25 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.9.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
+        <!-- https://mvnrepository.com/artifact/javafx/javafx -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

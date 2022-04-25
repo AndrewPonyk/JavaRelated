@@ -1,21 +1,21 @@
 package com.ap._6JacksonAnnotations;
 
-import javafx.util.Pair;
-
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class SortMap {
     public static void main(String[] args) {
         System.out.println("Sort linked hashmap");
         LinkedHashMap<String, Pair<Integer, Integer>> map = new LinkedHashMap<>();
 
-        map.put("111", new Pair<>(30,33));
-        map.put("3333", new Pair<>(30,33));
-        map.put("222", new Pair<>(10, 7));
-        map.put("333", new Pair<>(1, 1));
+        map.put("111", Pair.of(30,33));
+        map.put("3333", Pair.of(30,33));
+        map.put("222", Pair.of(10, 7));
+        map.put("333", Pair.of(1, 1));
 
         ValueComparator vcp = new ValueComparator(map);
         TreeMap<String, Pair<Integer, Integer>> sortedMap = new TreeMap<String, Pair<Integer, Integer>>(vcp);

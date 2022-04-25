@@ -22,4 +22,9 @@ files:
   text: 1
   learner_created: false
 feedback_link: https://codeforces.com/contest/1046/problem/A?locale=en
-status: Unchecked
+status: Failed
+feedback:
+  message: Test №1 is failed
+  time: Tue, 14 Dec 2021 20:54:17 UTC
+  expected: 1
+  actual: <no output>
