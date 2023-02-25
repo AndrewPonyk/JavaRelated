@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.password">admin</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/demodb?useSSL=FALSE</property>
+        <property name="hibernate.connection.username">admin</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <property name="hibernate.cache.region.factory_class">jcache</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.javax.cache.provider">org.ehcache.jsr107.EhcacheCachingProvider</property>
+        <property name="hibernate.javax.cache.uri">ehcache.xml</property>
+
+        <!--
+        ISSUE with hibernate.javax.cache.uri (RELATIVE PATH): fixed in 5.4.0
+        https://hibernate.atlassian.net/browse/HHH-12979 HHH-12979
+Setting hibernate.javax.cache.uri property value as relative path causes an error
+
+        full path (works) file:///D:/mygit/JavaRelated/JavaTempProjects/hibernate-jcache-ehcache3-hello/src/main/resources/ehcache.xml
+        -->
+    </session-factory>
+</hibernate-configuration>

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.validation.constraints.NotNull;
 
 //https://springdoc.org/index.html#Introduction
+//https://stackoverflow.com/questions/59291371/migrating-from-springfox-swagger-2-to-springdoc-open-api
 
 @Configuration
 //http://localhost:8080/swagger-ui/index.html THIS is entry point

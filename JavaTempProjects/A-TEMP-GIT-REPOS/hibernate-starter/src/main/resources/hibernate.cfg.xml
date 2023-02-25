@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd"
+        >
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:postgresql://localhost:5432/hib_learn</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">postgres</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.internal.JCacheRegionFactory</property>
+        <property name="hibernate.javax.cache.uri">/ehcache-config.xml</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+<!--        <property name="hibernate.connection.isolation">8</property>-->
+
+
+        <mapping class="com.mprog.entity.User"/>
+        <mapping class="com.mprog.entity.Company"/>
+        <mapping class="com.mprog.entity.Profile"/>
+        <mapping class="com.mprog.entity.Chat"/>
+        <mapping class="com.mprog.entity.UserChat"/>
+        <mapping class="com.mprog.entity.Payment"/>
+
+        <!--        <mapping class="com.mprog.entity.Programmer"/>-->
+<!--        <mapping class="com.mprog.entity.Manager"/>-->
+
+    </session-factory>
+</hibernate-configuration>

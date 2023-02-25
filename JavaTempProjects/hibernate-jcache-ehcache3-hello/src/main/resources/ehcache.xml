@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+        xsi:schemaLocation="
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+    <service>
+        <jsr107:defaults enable-management="true" enable-statistics="true" default-template="default"/>
+    </service>
+    <!--SPEND 1 day on this,kkkkkkk,     default-template="default" -  WORKSSSSSSSSSSSSS!!!!!!!!!!!!!!!!!!!!-->
+    <!--https://stackoverflow.com/questions/59263094/ehcache3-defaultcache-configuration-equivalent-->
+    <!-- Each entity should be configured as @Cache and @Cachable !!!!!-->
+
+    <!-- ================================= -->
+<!--    <cache-template name="simple">-->
+<!--        <expiry>-->
+<!--            <ttl unit="seconds">30</ttl>-->
+<!--        </expiry>-->
+<!--        <heap unit="entries">100</heap>-->
+<!--    </cache-template>-->
+<!--    <cache alias="com.ap.Person" uses-template="simple"/>-->
+    <!-- ================================= WORKS AFTER 4 HOURS worksssssss!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+
+
+
+    <cache-template name="default">
+        <expiry>
+            <ttl unit="seconds">3</ttl>
+        </expiry>
+        <heap>1024</heap>
+    </cache-template>
+</config>
