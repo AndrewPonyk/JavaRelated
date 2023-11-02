@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts-config PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+    <form-beans>
+        <form-bean name="userLogin" type="com.crossairlines.form.UserRegisterForm"/>
+        <form-bean name="navigator" type="com.crossairlines.navigator.userForm"/>
+        <form-bean name="welcomeUser" type="com.crossairlines.form.UserLoginForm"/>
+        <form-bean name="welcomeAdmin" type="com.crossairlines.form.UserForm"/>
+        <form-bean name="searchFlight" type="com.crossairlines.form.SearchFlightForm"/>
+        <form-bean name="flightDetails" type="com.crossairlines.form.FlightDetailForm"/>
+        <form-bean name="bookTicket" type="com.crossairlines.form.BookTicketForm"/>
+        <form-bean name="payment" type="com.crossairlines.form.PaymentForm"/>
+    </form-beans>
+    <action-mappings>
+        <action path="/userLogin" name="userLogin"  validate="true" input="/pages/register.jsp" parameter="action" type="com.crossairlines.action.UserAction" >
+            <forward name="registerSuccess" path="/pages/userLogin.jsp"/>
+            <forward name="registerFailed" path="/pages/register.jsp"/>
+        </action>
+        <action path="/welcomeUser" name="welcomeUser"  validate="true" input="/pages/userLogin.jsp" parameter="action" type="com.crossairlines.action.UserAction" >
+            <forward name="LoginSuccess" path="/pages/userWelcome.jsp"/>
+            <forward name="redirectToBooking" path="/pages/bookTicket.jsp"/>
+            <forward name="LoginFailed" path="/pages/userLogin.jsp"/>
+        </action>
+
+        <action path="/admin" forward="/pages/adminLogin.jsp" ></action>
+        <action path="/home" forward="/pages/index.jsp" ></action>
+        <action path="/about" forward="/pages/about.jsp" ></action>
+        <action path="/login" forward="/pages/userLogin.jsp" ></action>
+        <action path="/register" forward="/pages/register.jsp" ></action>
+        <action path="/adminHome" forward="/pages/adminWelcome.jsp" ></action>
+        <action path="/users" forward="/pages/updateUserDetails.jsp" ></action>
+        <action path="/flights" forward="/pages/flightsDetails.jsp" ></action>
+        <action path="/addNewUser" forward="/pages/addUser.jsp" ></action>
+        <action path="/myDetails" forward="/pages/myDetails.jsp" ></action>
+
+        <action path="/logout" type="com.crossairlines.navigator.Navigator" >
+            <forward name="logout" path="/admin.do" redirect="true" ></forward>
+        </action>
+        <action path="/welcomeAdmin" name="welcomeAdmin" validate="true" input="/pages/adminLogin.jsp" parameter="action" type="com.crossairlines.action.UserAction">
+            <forward name="AdminLoginSuccess" path="/pages/adminWelcome.jsp"/>
+            <forward name="AdminLoginFailed" path="/pages/adminLogin.jsp"/>
+            <forward name="updateUserDetails" path="/pages/adminWelcome.jsp"/>
+            <forward name="usersDetails" path="/pages/updateUserDetails.jsp"/>
+            <forward name="updateUser" path="/pages/userDetails.jsp"/>
+            <forward name="adminUpdatedUser" path="/pages/updateUserDetails.jsp"/>
+            <forward name="userDeleted" path="/pages/updateUserDetails.jsp"/>
+            <forward name="userAdded" path="/pages/updateUserDetails.jsp"/>
+        </action>
+        <action path="/flightadded" name="flightDetails" validate="true" input="/pages/adminLogin.jsp" parameter="action" type="com.crossairlines.action.FlightAction">
+            <forward name="flightAdded" path="/pages/adminWelcome.jsp"/>
+        </action>
+        <!--  <action path="/welcomeAdmin1" name="welcomeAdmin1" validate="true" input="/pages/adminWelcome.jsp" parameter="action" type="com.crossairlines.action.UserAction">
+            <forward name="adminUpdatedUser" path="/pages/adminWelcome.jsp"/>
+        </action> -->
+        <action path="/searchFlight" name="searchFlight" validate="true" input="/pages/index.jsp" parameter="action" type="com.crossairlines.action.FlightSearch" >
+            <forward name="success" path="/pages/flightDetails.jsp"/>
+        </action>
+        <action path="/bookTicket" name="bookTicket" validate="true" input="/pages/fligtDetails.jsp" parameter="action" type="com.crossairlines.action.FlightAction" >
+            <forward name="bookMyTicket" path="/pages/bookTicket.jsp"/>
+            <forward name="redirectToLogin" path="/login.do"/>
+        </action>
+
+        <action path="/payment" name="bookTicket" validate="true" input="/pages/bookTicket.jsp" parameter="action" type="com.crossairlines.action.FlightAction" >
+            <forward name="bookMyTicket" path="/pages/bookTicket.jsp"/>
+            <forward name="checkout" path="/pages/payment.jsp"/>
+        </action>
+        <action path="/printTicket" name="payment" validate="true" input="/pages/bookTicket.jsp" parameter="action" type="com.crossairlines.action.FlightAction" >
+            <forward name="bookMyTicket" path="/pages/bookTicket.jsp"/>
+            <forward name="checkout" path="/pages/payment.jsp"/>
+        </action>
+
+    </action-mappings>
+    <message-resources parameter="Messages"></message-resources>
+</struts-config>

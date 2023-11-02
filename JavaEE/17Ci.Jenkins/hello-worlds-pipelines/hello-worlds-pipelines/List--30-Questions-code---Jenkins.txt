@@ -1,0 +1,36 @@
+[1] Write a Jenkins pipeline that clones a Git repository, runs unit tests, builds a Docker image,
+and pushes the image to a container registry.
+[2] Create a Jenkins pipeline that deploys a Kubernetes application to a development environment.
+[3] Write a Jenkins pipeline that runs a performance test on a web application using JMeter.
+[4] Implement a Jenkins pipeline that deploys a Docker image to a Kubernetes cluster and performs a canary
+ deployment with a specified percentage of traffic.
+[5] Develop a Jenkins pipeline that sends notifications to a Slack channel whenever a build fails.
+[6] Create a Jenkins pipeline that deploys a web application to a staging environment and waits for user
+confirmation before deploying to production.
+[7] Write a Jenkins pipeline that deploys a serverless application to AWS Lambda using the Serverless Framework.
+[8] Implement a Jenkins pipeline that creates an AWS CloudFormation stack to provision infrastructure, deploys
+ an application to the stack, and destroys the stack after the test.
+[9] Develop a Jenkins pipeline that runs a security scan on a Docker image using Clair and reports vulnerabilities found.
+[10] Create a Jenkins pipeline that triggers a deployment to a canary environment when a new Docker image is
+ pushed to a specified repository, waits for confirmation, and deploys to production.
+[11] Write a Jenkins pipeline that deploys a Java application to a Tomcat server running on a remote machine.
+[12] Implement a Jenkins pipeline that deploys a Node.js application to a remote server using SSH.
+[13] Develop a Jenkins pipeline that builds and deploys a .NET Core application to an Azure App Service.
+[14] Create a Jenkins pipeline that runs integration tests against a deployed web application and reports the results.
+[15] Write a Jenkins pipeline that monitors a GitHub repository for changes, and triggers a build and
+deployment when changes are detected.
+[16] Implement a Jenkins pipeline that performs blue-green deployment for a web application.
+[17] Develop a Jenkins pipeline that deploys a web application to an AWS Elastic Beanstalk environment.
+[18] Create a Jenkins pipeline that performs a rolling deployment for a Kubernetes application.
+[19] Write a Jenkins pipeline that runs end-to-end tests against a deployed web application.
+[20] Implement a Jenkins pipeline that deploys a Django application to a remote server using SSH.
+[21] Develop a Jenkins pipeline that builds a Java application, packages it as a Docker image, and deploys it to a remote Docker host.
+[22] Create a Jenkins pipeline that deploys a PHP application to a shared hosting environment using FTP.
+[23] Write a Jenkins pipeline that builds and deploys a Python Flask application to a Heroku instance.
+[24] Implement a Jenkins pipeline that runs a SonarQube analysis on a Java application and reports the results.
+[25] Develop a Jenkins pipeline that deploys a Rails application to a remote server using Capistrano.
+[26] Create a Jenkins pipeline that deploys a .NET Framework application to an IIS server.
+[27] Write a Jenkins pipeline that deploys a React application to an S3 bucket.
+[28] Implement a Jenkins pipeline that builds and deploys a Rust application to a remote server using SSH.
+[29] Develop a Jenkins pipeline that deploys a Spring Boot application to a Pivotal Cloud Foundry instance.
+[30] Create a Jenkins pipeline that performs a blue-green deployment for a Kubernetes application using Istio.

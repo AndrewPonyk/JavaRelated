@@ -1,0 +1,29 @@
+type Query {
+  bookById(id: ID): Book
+}
+
+type Mutation {
+    addBook(book: BookInput!): Boolean!
+    #updateBook(id: ID!, book: BookInput!): BookInfo!
+    #deleteBook(id: ID!): BookInfo!
+    # - its COMMENT IN graphqls !!!!!!
+}
+
+input BookInput {
+  name: String
+  pageCount: Int
+  authorId: ID
+}
+
+type Book {
+  id: ID
+  name: String
+  pageCount: Int
+  author: Author
+}
+
+type Author {
+  id: ID
+  firstName: String
+  lastName: String
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.crossairlines.pojo.BookTicket" table="bookticket">
+
+        <id name="bookingId" type="int" column="bookingId">
+            <generator class="increment" />
+        </id>
+        <property name="adultCount" type="int" column="adultCount"/>
+        <property name="childCount" type="int" column="childCount"/>
+        <property name="finalFare" type="int" column="amount"/>
+
+        <one-to-one name="payment"></one-to-one>
+        <one-to-one name="user"></one-to-one>
+        <one-to-one name="flightDetails"></one-to-one>
+    </class>
+</hibernate-mapping>

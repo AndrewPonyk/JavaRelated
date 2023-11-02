@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.crossairlines.pojo.User" table="users">
+
+        <id name="userAuthId" type="int" column="userAuthId">
+            <generator class="increment"/>
+        </id>
+
+        <property name="email" column="email" type="string"/>
+        <property name="password" column="password" type="string"/>
+        <property name="isAdmin" column="isAdmin" type="boolean"/>
+        <property name="FirstName" column="firstName" type="string"/>
+        <property name="middleName" column="middleName" type="string"/>
+        <property name="lastName" column="lastName" type="string"/>
+        <property name="dob" column="dob" type="date"/>
+        <property name="address" column="address" type="string"/>
+        <property name="mobileNo" column="mobileNo" type="long"/>
+        <set name="bookTicket" >
+            <key column="userAuthId" ></key>
+            <one-to-many class="com.crossairlines.pojo.BookTicket"></one-to-many>
+        </set>
+    </class>
+
+</hibernate-mapping>

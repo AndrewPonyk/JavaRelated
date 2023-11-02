@@ -1,0 +1,25 @@
+1) Simple query book by id
+
+query bookDetails{
+  bookById(id:"book-1"){
+    id,
+    name,
+    pageCount,
+    author {
+      id
+      firstName
+      lastName
+    }
+  }
+}
+
+
+2) Add book query :
+mutation {
+  addBook(book:{
+    name:"temp",
+    pageCount:100,
+    authorId:"author-1"
+  }
+  )
+}

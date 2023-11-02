@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.crossairlines.pojo.Payment"
+           table="payment">
+
+        <id name="paymentId" type="int" column="paymentId">
+            <generator class="increment" />
+        </id>
+
+        <property name="cardNumber" column="cardNumber" type="string" />
+        <property name="cardHolderName" column="cardHolderName" type="string"/>
+        <property name="expiryDate" column="expiryDate" type="string"/>
+        <property name="cvv" column="cvvNumber" type="int"/>
+        <one-to-one name="bookTicket" />
+        <one-to-one name="user"/>
+    </class>
+</hibernate-mapping>

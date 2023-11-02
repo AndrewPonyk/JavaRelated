@@ -1,0 +1,1 @@
+<b style="color: red">THIS IS MY BODY content</b>

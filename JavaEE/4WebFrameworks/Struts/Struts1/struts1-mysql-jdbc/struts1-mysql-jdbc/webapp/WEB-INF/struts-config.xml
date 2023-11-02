@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE struts-config PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+    <form-beans>
+        <form-bean name="loginForm" type="com.ap.form.LoginForm" />
+    </form-beans>
+
+    <global-forwards>
+        <forward
+                name="welcome1"
+                path="/Welcome1.do"/>
+    </global-forwards>
+
+    <action-mappings>
+        <action
+                path="/Welcome1"
+                type="org.apache.struts.actions.ForwardAction"
+                parameter="/welcomeStruts.jsp"/>
+
+        <action path="/validateLogin" type="com.ap.action.LoginAction" name="loginForm">
+            <forward name="success" path="/welcomeStruts.jsp"/>
+            <forward name="error" path="/login.jsp"/>
+        </action>
+
+        <action path="/Welcome" forward="/welcomeStruts.jsp"/>
+    </action-mappings>
+
+    <!--works with enlish and french-->
+    <message-resources parameter="com.ap.messages" null="false">
+        <set-property property="factory" value="org.apache.struts.util.PropertyMessageResourcesFactory" />
+    </message-resources>
+
+    <plug-in className="org.apache.struts.tiles.TilesPlugin" >
+        <set-property property="definitions-config"
+                      value="/WEB-INF/tiles-defs.xml"/>
+    </plug-in>
+
+</struts-config>

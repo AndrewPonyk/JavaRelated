@@ -1,0 +1,13 @@
+Airline Reservation System 
+•	The user should be able to search for flights through a standard screen.
+•	A Database administrator maintains the user and flights details in the database.
+•	Through a standard flight search method, the user will be able to search one-way, round trip flights.
+•	The user should able to specify the departure, arrival places and date of their flight.
+•	The user will have the option to select the either non-stop, single stop or multi-stop flights.
+•	The user can only search for a flight in the future and within one year of current date.
+•	The user should be able to see the price, duration of travel, departure time and arrival time.
+•	User should be able to specify the flight class, which will be with respect to the flight chosen.
+•	The user should be able to choose the seats from the list of available seats of particular flights.
+•	The user must complete all the necessary steps to book flight to be guaranteed and authorized.
+•	After booking the flight, the user may cancel or modify their flight.
+•	The web interface should be interactive and easily navigable. Users should be able to understand the menu and options provided by ARS.

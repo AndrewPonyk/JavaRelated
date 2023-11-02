@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.crossairlines.pojo.Airport" table="airports">
+
+        <id name="airportId" type="int" column="airportId">
+            <generator class="increment"/>
+        </id>
+
+        <property name="originCity" column="origincity" type="string"/>
+        <property name="destCity" column="distcity" type="string"/>
+        <property name="originAirport" column="origin" type="string"/>
+        <property name="destinationAirport" column="destination" type="string"/>
+        <property name="distance" column="distance" type="double"/>
+        <property name="timeTaken" column="timetaken" type="double"/>
+    </class>
+
+</hibernate-mapping>

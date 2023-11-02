@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE struts-config PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+    <form-beans>
+        <form-bean
+                name="logonForm"
+                type="app.LogonForm"/>
+
+    </form-beans>
+    <global-forwards>
+        <forward
+                name="logon"
+                path ="/Logon.do"/>
+        <forward
+                name="welcome"
+                path="/Welcome.do"/>
+        <forward
+                name="logoff"
+                path="/Logoff.do"/>
+
+        <!-- ... -->
+    </global-forwards>
+
+    <action-mappings>
+
+        <action
+                path="/Welcome"
+                type="org.apache.struts.actions.ForwardAction"
+                parameter="/pages/Welcome.jsp"/>
+
+        <action
+                path="/Logon"
+                type="org.apache.struts.actions.ForwardAction"
+                parameter="/pages/logon.jsp"/>
+
+        <action
+                path="/LogonSubmit"
+                type="app.LogonAction"
+                name="logonForm"
+                scope="request"
+                validate="true"
+                input="/pages/logon.jsp">
+            <forward
+                    name="success"
+                    path="/pages/Welcome.jsp"/>
+        </action>
+
+        <action
+                path="/Logoff"
+                type="app.LogoffAction">
+            <forward
+                    name="success"
+                    path="/pages/Welcome.jsp"/>
+        </action>
+
+    </action-mappings>
+
+    <message-resources parameter="resources.application" null="false">
+        <set-property property="factory" value="org.apache.struts.util.PropertyMessageResourcesFactory" />
+    </message-resources>
+
+
+</struts-config>

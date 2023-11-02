@@ -1,0 +1,46 @@
+/*
+Sample pipeline with build maven project and use external lib
+!!! In external lib in folder "vars" each file should contain method named "call"
+*/
+
+@Library("ap-jenkins-lib@main") _
+pipeline {
+  agent any
+  parameters{
+      string(name:'name', defaultValue:'Andy', description:'Enter your name')
+  }
+
+  stages {
+      stage("Greeting "){
+          steps{
+              greet('John')
+          }
+      }
+     stage('Clean woorspace') {
+         steps{
+             cleanWs()
+         }
+     }
+
+
+    stage('Clone') {
+      steps {
+
+        bat 'git clone https://github.com/jglick/simple-maven-project-with-tests.git '
+      }
+    }
+    stage('Build') {
+      steps {
+        bat 'cd simple-maven-project-with-tests && mvn clean package'
+      }
+    }
+
+    stage('Post post post build'){
+        steps{
+            echo 'Its really post post - post action , not more actions will be performed'
+            echo "Buy ${params.name}" // here must be double quotes to use ${params.name}
+        }
+
+    }
+  }
+}

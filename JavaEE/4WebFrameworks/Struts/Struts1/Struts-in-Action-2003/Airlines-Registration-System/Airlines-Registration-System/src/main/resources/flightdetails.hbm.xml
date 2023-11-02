@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.crossairlines.pojo.FlightDetails" table="flightdetails">
+
+        <id name="flightDetailsId" type="int" column="flightDetailsId">
+            <generator class="increment"/>
+        </id>
+
+        <property name="fromCountry" column="fromcountry" type="string"/>
+        <property name="destCountry" column="destinationcountry" type="string"/>
+        <property name="originCity" column="origincity" type="string"/>
+        <property name="destinationCity" column="destinationcity" type="string"/>
+        <property name="originAirport" column="originairport" type="string"/>
+        <property name="destinationAirport" column="destinationairport" type="string"/>
+        <property name="flightType" column="flightType" type="string"/>
+        <property name="company" column="company" type="string"/>
+        <property name="departDate" column="departdate" type="date"/>
+        <property name="arrivalDate" column="arrivaldate" type="date"/>
+        <property name="departTime" column="departtime" type="string"/>
+        <property name="arrivalTime" column="arrivaltime" type="string"/>
+        <property name="economyFare" column="economyfare" type="double"/>
+        <property name="businessFare" column="businessfare" type="double"/>
+        <property name="firstClassFare" column="firstclassfare" type="double"/>
+    </class>
+
+</hibernate-mapping>

@@ -1,0 +1,26 @@
+I have included
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive</artifactId>
+        </dependency>
+
+        in pom.xml => JSON serialization wasnt work
+        SO this code was not working correctly
+            @GET
+            @Produces(MediaType.APPLICATION_JSON)
+            public HelloResponse getHello() {
+                HelloResponse response = new HelloResponse();
+                response.setMessage("Hello World!");
+                response.setFrom("Quarkus");
+                return response;
+            }
+
+
+
+            After replacing quarkus-resteasy-reactive by
+             <dependency>
+                        <groupId>io.quarkus</groupId>
+                        <artifactId>quarkus-resteasy-reactive</artifactId>
+                    </dependency>
+
+                    Works!!

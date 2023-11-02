@@ -1,0 +1,76 @@
+Simple questions:
+What is Vert.x and what are its key features?
+  How does Vert.x compare to other popular JVM-based frameworks such as Spring or Akka?
+  What are the advantages of using Vert.x for building reactive applications?
+  Can you explain the event loop model used by Vert.x?
+  How does Vert.x handle concurrency and scalability in a distributed system?
+  Can you describe the different types of Vert.x verticles and their use cases?
+  What is the role of the Vert.x EventBus and how is it used for communication between verticles?
+  How does Vert.x handle IO operations and avoid blocking the event loop?
+  Can you explain how Vert.x handles backpressure in a reactive system?
+  How does Vert.x support clustering and high availability?
+  What are the different options for configuring and deploying Vert.x applications?
+  How does Vert.x support polyglot programming, and which languages can be used with Vert.x?
+  What is the role of the Vert.x Service Proxy and how is it used to provide a synchronous API to a reactive system?
+  Can you explain how Vert.x supports service discovery and integration with external systems?
+  How does Vert.x handle error handling and fault tolerance in a distributed system?
+  Can you describe the different deployment options for Vert.x, such as using Docker or Kubernetes?
+  How does Vert.x handle security and authentication in a distributed system?
+  Can you explain how Vert.x handles distributed tracing and monitoring in a microservices architecture?
+  What are the best practices for testing and debugging Vert.x applications?
+  How does Vert.x support reactive streams and what are the benefits of using them?
+  Can you describe the different types of Vert.x modules and how they can be used to extend the framework?
+  How does Vert.x support WebSocket and real-time communication in a reactive system?
+  Can you explain how Vert.x supports batch processing and background jobs?
+  What are the benefits of using Vert.x for building event-driven applications?
+  How does Vert.x handle data serialization and deserialization in a distributed system?
+  Can you describe the different types of Vert.x clusters and their use cases?
+  What is the role of the Vert.x Circuit Breaker and how is it used to handle failures in a distributed system?
+  How does Vert.x support caching and in-memory data storage?
+  Can you explain how Vert.x supports reactive database access and data persistence?
+  What are the limitations of using Vert.x for building enterprise-grade systems, and how can they be addressed?
+
+
+Little bit complicated:
+  What is the purpose of the Vert.x event loop, and how does it differ from other concurrency models?
+  How do you implement a custom codec in Vert.x?
+  How can you use Vert.x to create a distributed, reactive cache?
+  What is the difference between a Verticle and a Worker Verticle?
+  How does Vert.x handle WebSocket connections, and what protocols does it support?
+  How do you configure Vert.x to use SSL/TLS for secure communication?
+  What are the benefits of using Vert.x to build microservices, and how does it compare to other frameworks like Spring Boot?
+  How can you use Vert.x to handle and process large files, such as CSV or JSON?
+  How does Vert.x handle database connections, and what databases are supported?
+  How can you use Vert.x to build a RESTful API, and what libraries or components are needed?
+  How can you use Vert.x to integrate with other messaging systems, such as Kafka or RabbitMQ?
+  How can you use Vert.x to implement a distributed task queue, such as a job scheduler or message broker?
+  How does Vert.x handle errors and exceptions, and what strategies can be used for handling them?
+  How can you use Vert.x to implement an event-driven architecture, and what are the key components?
+  How can you use Vert.x to handle authentication and authorization in a distributed system?
+  How can you use Vert.x to implement a reactive data pipeline, such as a stream processing system?
+  How does Vert.x handle message serialization and deserialization, and what serialization libraries are supported?
+  How can you use Vert.x to implement a scalable, fault-tolerant distributed system, and what design patterns can be used?
+  How does Vert.x handle scaling and load balancing, and what strategies can be used for optimizing performance?
+  How can you use Vert.x to implement real-time, collaborative applications, such as chat or gaming platforms?
+
+COMPLICATED questions:
+Can you explain the differences between a Vert.x worker verticle and an event loop verticle? When should you use one over the other?
+How do you manage shared state between multiple verticles in Vert.x?
+Can you explain how to use Vert.x to consume data from a Kafka topic?
+How do you handle circuit breaker and rate limiting in Vert.x?
+How can you configure a custom thread pool for Vert.x?
+Can you explain the differences between clustered and non-clustered mode in Vert.x? When should you use one over the other?
+Can you describe the event bus in Vert.x and how it can be used to communicate between verticles?
+How do you handle long-lived connections in Vert.x?
+How can you use Vert.x to consume data from a REST API?
+Can you explain how to use Vert.x to interact with a database?
+Can you explain the differences between Vert.x and Akka?
+How can you use Vert.x to handle WebSocket connections?
+Can you describe the Reactive Streams API in Vert.x and how it can be used?
+How can you use Vert.x to handle HTTP/2 connections?
+Can you explain how to use Vert.x to create microservices?
+How can you use Vert.x to handle MQTT connections?
+Can you explain the differences between Vert.x and Spring WebFlux?
+How can you use Vert.x to implement a circuit breaker pattern?
+Can you explain how to use Vert.x to handle server-sent events?
+How can you use Vert.x to handle UDP connections?

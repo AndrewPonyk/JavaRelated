@@ -1,0 +1,52 @@
+Sure, here are 50 Jenkins built-in pipeline functions:
+
+[1] archive - Archives artifacts (e.g. build artifacts)
+[2] bat - Executes Windows batch script
+[3] build - Triggers another job
+[4] checkout - Checks out source code
+[5] cleanWs - Cleans up workspace
+[6] confirm - Interactive confirmation prompt
+[7] credentials - Binds a variable to a credentials
+[8] def - Defines a global variable
+[9] dir - Changes working directory
+[10] dockerFingerprintFrom - Records the usage of Docker images
+[11] dockerFingerprintRun - Records the usage of Docker images
+[12] echo - Prints message to console
+[13] error - Throws an error
+[14] fileExists - Checks if file exists
+[15] findFiles - Finds files in workspace
+[16] git - Git SCM
+[17] input - Waits for interactive input
+[18] isUnix - Checks if current platform is Unix-based
+[19] junit - Publishes JUnit test results
+[20] library - Loads a shared library
+[21] load - Loads a Jenkins plugin
+[22] mail - Sends an email
+[23] node - Allocates node (e.g. build agent)
+[24] powershell - Executes PowerShell script
+[25] pwd - Prints working directory
+[26] readFile - Reads file content
+[27] retry - Retries the execution of a step
+[28] script - Executes a Groovy script
+[29] sh - Executes shell script
+[30] sleep - Waits for a specified amount of time
+[31] stage - Defines a stage in the pipeline
+[32] stash - Stashes files
+[33] step - Generalizes sh and bat
+[34] tee - Sends output to a file and console
+[35] timeout - Aborts the execution of a step after a specified amount of time
+[36] timestamps - Adds timestamps to console output
+[37] tool - Binds a variable to a tool installation
+[38] unarchive - Unarchives artifacts
+[39] unstash - Unstashes files
+[40] waitUntil - Waits until a condition is true
+[41] warnError - Marks build as unstable if step fails
+[42] withCredentials - Binds a variable to a credentials
+[43] withEnv - Sets environment variables
+[44] withGradle - Runs a Gradle build
+[45] withMaven - Runs a Maven build
+[46] withSonarQubeEnv - Configures SonarQube environment
+[47] writeFile - Writes file content
+[48] xmlRead - Reads XML file
+[49] xmlSlurper - Parses XML content
+[50] zip - Compresses files into ZIP archive
