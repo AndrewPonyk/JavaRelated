@@ -9,7 +9,7 @@
     </form-beans>
 
     <action-mappings>
-        <action path="/helloWorld" type="com.ap.action.HelloWorldAction" name="helloWorldForm">
+        <action path="/helloWorld" type="com.ap.action.HelloWorldAction" name="helloWorldForm" scope="session">
             <forward name="success" path="/helloWorld.jsp" />
             <forward name="failure" path="/failure.jsp" />
         </action>

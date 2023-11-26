@@ -1,0 +1,8 @@
+{
+    "local-tomcat.tomcatInstances": [
+        "name": "Tomcat",
+        "catalinaHome": "D:\WindowsPrograms\apache-tomcat-9.0.41",
+        "deploymentPort": 8080
+    ],
+    "local-tomcat.warDir":"target"
+}
