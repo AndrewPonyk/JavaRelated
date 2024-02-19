@@ -6,9 +6,11 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 public class FileExplorerMultipleFolders extends JFrame {
 
@@ -115,7 +117,19 @@ public class FileExplorerMultipleFolders extends JFrame {
             }
         }
 
-        fileList.setListData(allFiles.stream().map(FileInfo::getFile).toArray(File[]::new));
+        allFiles.sort((o1, o2) -> {
+            if(o1.getSizeInKB()==o2.getSizeInKB()){
+                return 0;
+            }
+            if(o1.getSizeInKB()> o2.getSizeInKB()) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+
+        fileList.setListData(
+                allFiles.stream().map(e->new File(e.getFile().getAbsolutePath()+ "   --->>>>" + e.getSizeInKB())).toArray(File[]::new));
     }
 
     private void loadFilesRecursively(Path folderPath) throws IOException {
@@ -146,7 +160,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
         Vector<File> filteredFiles = new Vector<>();
         for (File file : allFiles.stream().map(FileInfo::getFile).toArray(File[]::new)) {
-            Matcher matcher = pattern.matcher(file.getName());
+            Matcher matcher = pattern.matcher(file.getName().toLowerCase());
             if (matcher.find()) {
                 filteredFiles.add(file);
             }
@@ -160,7 +174,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
     private void openFile(File file) {
         try {
-            File tempToOpen = new File(file.getAbsolutePath().split("     ->>>>")[0]);
+            File tempToOpen = new File(file.getAbsolutePath().split("   --->>>>")[0]);
             Desktop.getDesktop().open(tempToOpen);
         } catch (IOException ex) {
             ex.printStackTrace();
