@@ -16,4 +16,9 @@ public class App
         System.err.println(builder.create().toJson(new App()));
         
     }
+
+    @Override
+    public String toString() {
+        throw new NullPointerException("This is a NullPointerException");
+    }
 }

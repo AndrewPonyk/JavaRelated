@@ -18,6 +18,15 @@ public class JavaDoesntAllowArraysOfGenericObjects {
 			System.out.print(item);
 		}
 		
+		//print in reverse order
+		for(int i=lists[0].size()-1;i>=0;i--){
+			System.out.print(lists[0].get(i));
+		}
+
+		//print in random order
+		for(int i=0;i<lists[0].size();i++){
+			System.out.print(lists[0].get(i));
+		}
 		
 	}
 }

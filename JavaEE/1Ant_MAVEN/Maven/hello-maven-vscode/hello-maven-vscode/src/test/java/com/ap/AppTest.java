@@ -17,4 +17,9 @@ public class AppTest
     {
         assertTrue( true );
     }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowNullPointerException() {
+        new App().toString();
+    }
 }
