@@ -10,6 +10,7 @@ import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
@@ -21,6 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @WebMvcTest(value = CustomerController.class)
 class CustomerControllerTest extends BaseControllerTest {
@@ -223,6 +227,15 @@ class CustomerControllerTest extends BaseControllerTest {
 
         verify(customerService, times(1)).deleteAllCustomers();
         verifyNoMoreInteractions(customerService);
+    }
+
+    @Test
+    void shouldReturnCurrentTimeAsJson() throws Exception {
+        // when
+        mockMvc.perform(get("/current-time").accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(result -> assertThat(result.getResponse().getContentAsString()).startsWith("{\"current-time\":"));
     }
 }
 

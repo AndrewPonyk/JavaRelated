@@ -1,11 +1,14 @@
 package org.mesutormanli.customerapi.controller;
 
+import java.util.Date;
+
 import org.mesutormanli.customerapi.model.dto.CustomerDto;
 import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -72,4 +75,10 @@ public class CustomerController {
         }
     }
 
+    @GetMapping("/current-time")
+    public ResponseEntity<String> getCurrentTime() {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{ \"current-time\": " + new Date().toString() + " }");
+    }
 }
