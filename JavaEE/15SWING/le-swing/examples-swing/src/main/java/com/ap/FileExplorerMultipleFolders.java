@@ -127,6 +127,15 @@ public class FileExplorerMultipleFolders extends JFrame {
                 return 1;
             }
         });
+        for (int i = 1; i < allFiles.size(); i++) {
+            if (allFiles.get(i).getSizeInKB() == allFiles.get(i-1).getSizeInKB()) {
+                allFiles.get(i-1).setFile(new File(allFiles.get(i-1).getFile().getAbsolutePath()+ "   --->>>>    DUPLIIIIIIIIIIIIIIIIIIIIIIICATEEEEEEEEEEE "));
+                allFiles.get(i).setFile(new File(allFiles.get(i).getFile().getAbsolutePath()+ "   --->>>>    DUPLIIIIIIIIIIIIIIIIIIIIIIICATEEEEEEEEEEE "));
+            }
+        }
+
+        //fileList.setListData(
+                //        allFiles.stream().filter(e->e.getFile().getName().toLowerCase().contains("iiiiiiic")).map(e->new File(e.getFile().getAbsolutePath()+ "   --->>>>" + e.getSizeInKB())).toArray(File[]::new));
 
         fileList.setListData(
                 allFiles.stream().map(e->new File(e.getFile().getAbsolutePath()+ "   --->>>>" + e.getSizeInKB())).toArray(File[]::new));
@@ -150,7 +159,6 @@ public class FileExplorerMultipleFolders extends JFrame {
         }
     }
 
-
     private void applyFilter() {
         if (allFiles == null) return; // No files loaded yet
 
@@ -160,7 +168,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
         Vector<File> filteredFiles = new Vector<>();
         for (File file : allFiles.stream().map(FileInfo::getFile).toArray(File[]::new)) {
-            Matcher matcher = pattern.matcher(file.getName().toLowerCase());
+            Matcher matcher = pattern.matcher(file.getAbsolutePath().toLowerCase());
             if (matcher.find()) {
                 filteredFiles.add(file);
             }
