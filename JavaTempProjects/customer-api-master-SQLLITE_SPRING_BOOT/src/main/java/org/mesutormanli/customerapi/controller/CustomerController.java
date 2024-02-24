@@ -1,5 +1,7 @@
 package org.mesutormanli.customerapi.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.mesutormanli.customerapi.model.dto.CustomerDto;
@@ -79,6 +81,6 @@ public class CustomerController {
     public ResponseEntity<String> getCurrentTime() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body("{ \"current-time\": " + new Date().toString() + " }");
+                .body("{ \"current-time\": " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")) + " }");
     }
 }
