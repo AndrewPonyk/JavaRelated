@@ -198,6 +198,12 @@ public class FileExplorerMultipleFolders extends JFrame {
             }
         });
 
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (e.getKeyCode() == KeyEvent.VK_F && e.isControlDown() && e.getID() == KeyEvent.KEY_PRESSED) {
+                filterInputField.requestFocusInWindow();
+            }
+            return false;
+        });
     }
 
     private void deleteFile(File file) {
