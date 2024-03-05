@@ -46,7 +46,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.gridy = 0;
         inputPanel.add(folderInputField, gbc);
 
-        checkBoxSortBySize = new JCheckBox("Sort by size");
+        checkBoxSortBySize = new JCheckBox("Sort by size and mark duplicates");
         checkBoxSortBySize.setSelected(false);
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -283,7 +283,7 @@ public class FileExplorerMultipleFolders extends JFrame {
                     if(sizeInB > 399000) {
                         allFiles.add(fileInfo);
                         fileCount++;
-                        if( fileInfo.getSizeInB() > 9000 && fileCount % 10 == 0) {
+                        if( fileCount % 50 == 0) {
                             System.out.println("Adding item:" + fileInfo.getFile().getAbsolutePath());
                         }
                     }
