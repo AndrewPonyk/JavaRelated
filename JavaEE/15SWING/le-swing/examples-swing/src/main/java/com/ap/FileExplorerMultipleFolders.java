@@ -297,6 +297,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
         String patternString = filterInputField.getText().toLowerCase();
         patternString = patternString.toLowerCase().replaceAll("\\*", ".*");  // Replace wildcard * with regex .*
+        patternString = patternString.toLowerCase().replaceAll(" ", ".*");
         Pattern pattern = Pattern.compile(patternString);
 
         java.util.List<File> filteredFiles = new ArrayList<>();
