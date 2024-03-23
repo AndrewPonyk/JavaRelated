@@ -117,6 +117,14 @@ public class FileExplorerMultipleFolders extends JFrame {
             }
         });
 
+        filterInputField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                applyFilter();
+            }
+        });
+
+
         // Add menu items to the context menu
         JMenuItem openItem = new JMenuItem("Open");
         openItem.addActionListener(e -> {
