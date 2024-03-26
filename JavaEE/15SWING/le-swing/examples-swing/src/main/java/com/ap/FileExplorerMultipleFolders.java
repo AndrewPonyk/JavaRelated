@@ -277,6 +277,7 @@ public class FileExplorerMultipleFolders extends JFrame {
     }
 
     private void loadFilesRecursively(Path folderPath) throws IOException {
+
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
@@ -297,6 +298,10 @@ public class FileExplorerMultipleFolders extends JFrame {
                     }
                 }
             }
+        } catch (Exception ex) {
+            System.out.println("Error while reading folder: " + folderPath.toString());
+            ex.printStackTrace();
+
         }
     }
 
