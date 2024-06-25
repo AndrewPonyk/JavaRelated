@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE struts-config PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+        "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<struts-config>
+
+    <form-beans>
+        <form-bean name="helloWorldForm" type="com.ap.form.HelloWorldForm" />
+        <form-bean name="withFormRequestForm" type="com.ap.form.WithFormRequestForm" />
+    </form-beans>
+
+    <action-mappings>
+        <action path="/helloWorld" type="com.ap.action.HelloWorldAction" name="helloWorldForm" scope="session">
+            <forward name="success" path="/helloWorld.jsp" />
+            <forward name="failure" path="/failure.jsp" />
+        </action>
+        <action path="/withFormRequest" type="com.ap.action.WithFormRequestAction" name="withFormRequestForm" scope="request">
+            <forward name="success" path="/withFormRequest.jsp" />
+        </action>
+    </action-mappings>
+
+
+</struts-config>

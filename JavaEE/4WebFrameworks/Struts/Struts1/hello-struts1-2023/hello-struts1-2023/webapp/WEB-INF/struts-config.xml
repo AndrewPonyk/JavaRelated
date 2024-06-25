@@ -6,12 +6,16 @@
 
     <form-beans>
         <form-bean name="helloWorldForm" type="com.ap.form.HelloWorldForm" />
+        <form-bean name="withFormRequestForm" type="com.ap.form.WithFormRequestForm" />
     </form-beans>
 
     <action-mappings>
         <action path="/helloWorld" type="com.ap.action.HelloWorldAction" name="helloWorldForm" scope="session">
             <forward name="success" path="/helloWorld.jsp" />
             <forward name="failure" path="/failure.jsp" />
+        </action>
+        <action path="/withFormRequest" type="com.ap.action.WithFormRequestAction" name="withFormRequestForm" scope="request">
+            <forward name="success" path="/withFormRequest.jsp" />
         </action>
     </action-mappings>
 

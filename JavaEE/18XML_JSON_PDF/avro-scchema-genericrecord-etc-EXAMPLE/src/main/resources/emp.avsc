@@ -1,0 +1,25 @@
+{
+   "namespace": "tutorialspoint.com",
+   "type": "record",
+   "name": "emp",
+   "fields": [
+      {"name": "name", "type": "string"},
+      {"name": "id", "type": "int"},
+      {"name": "salary", "type": "int"},
+      {"name": "age", "type": "int"},
+      {"name": "address", "type": "string"},
+      {
+                  "name":"children",
+                  "type":{
+                      "type": "array",
+                      "items":{
+                          "name":"Child",
+                          "type":"record",
+                          "fields":[
+                              {"name":"name", "type":"string"}
+                          ]
+                      }
+                  }
+              }
+   ]
+}

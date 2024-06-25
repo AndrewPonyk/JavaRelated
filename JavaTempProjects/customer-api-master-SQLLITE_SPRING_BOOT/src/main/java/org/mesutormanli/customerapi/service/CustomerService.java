@@ -1,5 +1,7 @@
 package org.mesutormanli.customerapi.service;
 
+import java.util.List;
+
 import org.mesutormanli.customerapi.model.dto.CustomerDto;
 import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
@@ -17,5 +19,7 @@ public interface CustomerService {
     CustomerDeleteResponse deleteCustomer(Long id);
 
     CustomerDeleteResponse deleteAllCustomers();
+
+    List<CustomerDeleteResponse> deleteMultipleCustomers(List<Long> ids);
 
 }

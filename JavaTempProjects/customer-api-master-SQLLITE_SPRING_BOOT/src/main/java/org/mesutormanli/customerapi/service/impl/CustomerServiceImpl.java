@@ -89,5 +89,14 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+
+    @Override
+    public List<CustomerDeleteResponse> deleteMultipleCustomers(List<Long> ids) {
+        return ids.stream()
+                .map(this::deleteCustomer)
+                .collect(Collectors.toList());
+    }
+
+    
 }
 

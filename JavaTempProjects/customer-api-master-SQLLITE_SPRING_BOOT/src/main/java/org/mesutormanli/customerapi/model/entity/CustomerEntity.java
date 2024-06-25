@@ -59,5 +59,6 @@ public class CustomerEntity {
     private String getPersonalInformationSplittedByComma(){
         return name + "," + surname + "," + age + "," + address + "," + telephone + "," + email + "," + nationality + "," + maritalStatus;
     }
+    
 
 }

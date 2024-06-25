@@ -12,13 +12,13 @@ public class ReverseArray {
         Arrays.stream(reverse).forEach(System.out::println);
     }
 
-    static Integer[] reverse(Integer[] arr, int counter){
-        try {
+    static Integer[] reverse(Integer[] arr, int counter) {
+        if (counter < arr.length / 2) { // base case
             int temp = arr[counter];
-            arr[counter] = arr[arr.length - counter - 2];
-            arr[arr.length - counter - 2] = temp;
+            arr[counter] = arr[arr.length - counter - 1];
+            arr[arr.length - counter - 1] = temp;
             return reverse(arr, counter+1);
-        }catch (Exception e){
+        } else {
             return arr;
         }
     }
