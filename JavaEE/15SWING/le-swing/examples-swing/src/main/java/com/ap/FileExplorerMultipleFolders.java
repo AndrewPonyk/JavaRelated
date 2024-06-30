@@ -15,7 +15,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
     public static final String SPLITTER_METADATA = "   --->>>>";
 
-    public static Map<String, List<FileInfo>> folderFilesCount = new HashMap<>();
+    public static HashMap<String, List<FileInfo>> folderFilesCount = new HashMap<>();
 
     public static Map<String, String> pconfig = new LinkedHashMap<>();
 
@@ -40,18 +40,19 @@ public class FileExplorerMultipleFolders extends JFrame {
             e.printStackTrace();
         }
 
-        try {
-            FileInputStream fileIn = new FileInputStream("C:\\tmp\\folderFilesCount.ser");
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            folderFilesCount = (Map<String, List<FileInfo>>) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (IOException i) {
-            i.printStackTrace();
-        } catch (ClassNotFoundException c) {
-            System.out.println("Class not found");
-            c.printStackTrace();
-        }
+//        try {
+            //todo: for now DO NOT LOAD CACHE
+//            FileInputStream fileIn = new FileInputStream("C:\\tmp\\folderFilesCount.ser");
+//            ObjectInputStream in = new ObjectInputStream(fileIn);
+//            folderFilesCount = (HashMap<String, List<FileInfo>>) in.readObject();
+//            in.close();
+//            fileIn.close();
+//        } catch (IOException i) {
+//            i.printStackTrace();
+//        } catch (ClassNotFoundException c) {
+//            System.out.println("Class not found");
+//            c.printStackTrace();
+//        }
     }
 
     private final JList<File> fileList;
@@ -61,8 +62,11 @@ public class FileExplorerMultipleFolders extends JFrame {
     private final JTextField folderInputField;
 
     private final JCheckBox checkBoxSortBySize;
+
+    private final JCheckBox checkBoxCheckCount;
+
     private final JTextField filterInputField;
-    private Vector<FileInfo> allFiles;
+    private List<FileInfo> allFiles;
 
     private Integer fileCount = 0;
 
@@ -80,7 +84,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 1;
 
         // Text field for folder input
-        folderInputField = new JTextField("E:\\Programming,E:\\Vidokursu_and_Books_From_118a");
+        folderInputField = new JTextField("J:\\Programming,J:\\Vidokursu_and_Books_From_118a");
         gbc.gridx = 0;
         gbc.gridy = 0;
         inputPanel.add(folderInputField, gbc);
@@ -92,6 +96,12 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 0;
         inputPanel.add(checkBoxSortBySize, gbc);
 
+        checkBoxCheckCount = new JCheckBox("Check count");
+        checkBoxCheckCount.setSelected(false);
+        gbc.gridx = 2; // set the position to be right after the existing checkbox
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        inputPanel.add(checkBoxCheckCount, gbc);
 
         // Text field for filter input
         filterInputField = new JTextField("*");
@@ -265,24 +275,27 @@ public class FileExplorerMultipleFolders extends JFrame {
     private void loadFiles() {
         fileCount = 0;
         String[] paths = folderInputField.getText().split(",");
-        allFiles = new Vector<>();
+        allFiles = new LinkedList<>();
 
         for (String path : paths) {
             Path folderPath = Paths.get(path.trim());
 
             try {
                 loadFilesRecursively(folderPath);
-
-                FileOutputStream fileOut = new FileOutputStream("c:\\tmp\\folderFilesCount.ser");
-                ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                out.writeObject(folderFilesCount);
-                out.close();
-                fileOut.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
+        try {
+            FileOutputStream fileOut = new FileOutputStream("c:\\tmp\\folderFilesCount.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(folderFilesCount);
+            out.close();
+            fileOut.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (checkBoxSortBySize.isSelected()) {
             allFiles.sort((o1, o2) -> {
@@ -327,14 +340,13 @@ public class FileExplorerMultipleFolders extends JFrame {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
-                    // Recursively call this method on subfolders
                     if(folderFilesCount.get(entry.toString()) != null
-                            && !folderContainsFolders(entry.toString())
-                            && folderFilesCount.get(entry.toString()).size() == getNumberFilesInDir(entry.toString()) ) {
-
-                        allFiles.addAll(folderFilesCount.get(entry.toString()));
-                        System.err.println("Adding item from cache:" + entry.toString());
-                        continue;
+                            && !folderContainsFolders(entry.toString()) ) {
+//                        if(!checkBoxCheckCount.isSelected() || folderFilesCount.get(entry.toString()).size() == getNumberFilesInDir(entry.toString())) {
+//                            allFiles.addAll(folderFilesCount.get(entry.toString()));
+//                            System.err.println("Adding item from cache:" + entry);
+//                            continue;
+//                        } // TODO : disable cache nah
                     }
                     loadFilesRecursively(entry);
 
@@ -352,7 +364,7 @@ public class FileExplorerMultipleFolders extends JFrame {
                     if (sizeInB > 399000) {
                         allFiles.add(fileInfo);
                         fileCount++;
-                        if (fileCount % 100 == 0) {
+                        if (fileCount % 700 == 0) {
                             System.out.println("Adding item:" + fileInfo.getFile().getAbsolutePath());
                         }
                     }
@@ -394,6 +406,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         String patternString = filterInputField.getText().toLowerCase();
         patternString = patternString.toLowerCase().replaceAll("\\*", ".*");  // Replace wildcard * with regex .*
         patternString = patternString.toLowerCase().replaceAll(" ", ".*");
+        patternString = patternString.toLowerCase().replaceAll("\\+", ".+");
         Pattern pattern = Pattern.compile(patternString);
 
         java.util.List<FileInfo> filteredFiles = new ArrayList<>();
@@ -406,20 +419,20 @@ public class FileExplorerMultipleFolders extends JFrame {
         }
         //fileList.setListData(filteredFiles.toArray(new File[0]));//old version, just filter
         //automatically sort by size
-        filteredFiles.sort((o1, o2) -> {
-            if (o1.getSizeInB() == o2.getSizeInB()) {
-                return 0;
-            }
-            if (o1.getSizeInB() > o2.getSizeInB()) {
-                return -1;
-            } else {
-                return 1;
-            }
-        });
+//        filteredFiles.sort((o1, o2) -> {
+//            if (o1.getSizeInB() == o2.getSizeInB()) {
+//                return 0;
+//            }
+//            if (o1.getSizeInB() > o2.getSizeInB()) {
+//                return -1;
+//            } else {
+//                return 1;
+//            }
+//        });
+
         fileList.setListData(
                 filteredFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB()))
                         .toArray(File[]::new));
-
     }
 
     private void resetFilter() {
