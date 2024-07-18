@@ -76,7 +76,7 @@ public class FileExplorerMultipleFolders extends JFrame {
 
     private final JCheckBox checkBoxSortBySize;
 
-    private final JCheckBox checkBoxCheckCount;
+    private final JCheckBox checkBoxCheckDurations;
 
     private final JTextField filterInputField;
     private List<FileInfo> allFiles;
@@ -109,12 +109,12 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 0;
         inputPanel.add(checkBoxSortBySize, gbc);
 
-        checkBoxCheckCount = new JCheckBox("Check count");
-        checkBoxCheckCount.setSelected(false);
+        checkBoxCheckDurations = new JCheckBox("Check durations");
+        checkBoxCheckDurations.setSelected(false);
         gbc.gridx = 2; // set the position to be right after the existing checkbox
         gbc.gridy = 0;
         gbc.weightx = 0;
-        inputPanel.add(checkBoxCheckCount, gbc);
+        inputPanel.add(checkBoxCheckDurations, gbc);
 
         // Text field for filter input
         filterInputField = new JTextField("*");
@@ -340,7 +340,7 @@ public class FileExplorerMultipleFolders extends JFrame {
                     allFiles.stream().filter(e -> e.getFile().getName().toLowerCase().contains("iiiiiiic"))
                             .map(e -> new File(e.getFile().getAbsolutePath() + "   --->>>>" + e.getSizeInB()))
                             .toArray(File[]::new));
-        } else {
+        } else if(checkBoxCheckDurations.isSelected()){
             //todo: add checkbox , for now by default sort by duration
             allFiles.sort((o1, o2) -> {
                 // Handle null durations first (place files with null duration at the end)
@@ -350,6 +350,10 @@ public class FileExplorerMultipleFolders extends JFrame {
                 // Reverse the comparison logic for descending order
                 return o2.getDuration().compareTo(o1.getDuration());
             });
+            fileList.setListData(
+                    allFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB() + " " + e.getDurationInHoursMinutesSeconds() ))
+                            .toArray(File[]::new));
+        } else {
             fileList.setListData(
                     allFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB() + " " + e.getDurationInHoursMinutesSeconds() ))
                             .toArray(File[]::new));
@@ -383,13 +387,18 @@ public class FileExplorerMultipleFolders extends JFrame {
                     long sizeInBytes = Files.size(entry);
                     long sizeInB = sizeInBytes;
 
-                    Integer videoDuration = durations.get(entry.toFile().getAbsolutePath());
-                    if (videoDuration == null) {
-                        videoDuration = getVideoDuration(entry.toFile().getAbsolutePath());
+                    Integer videoDuration = 0;
+                    if(checkBoxCheckDurations.isSelected()) {
+                        videoDuration = durations.get(entry.toFile().getAbsolutePath());
+                        if (videoDuration == null) {
+                            videoDuration = getVideoDuration(entry.toFile().getAbsolutePath());
+                        }
+                        durations.put(entry.toFile().getAbsolutePath(), videoDuration);
                     }
+
                     FileInfo fileInfo = new FileInfo(entry.toFile(), sizeInB, videoDuration);
-                    durations.put(entry.toFile().getAbsolutePath(), videoDuration);
-                    if (sizeInB > 999000) { // add only bigger than 999kb
+
+                    if (sizeInB > 566000) { // add only bigger than 566kb
                         allFiles.add(fileInfo);
                         fileCount++;
                         if (fileCount % 200 == 0) {
