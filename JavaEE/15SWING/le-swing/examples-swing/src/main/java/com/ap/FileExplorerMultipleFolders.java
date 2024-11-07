@@ -1,5 +1,9 @@
 package com.ap;
 
+
+import ws.schild.jave.MultimediaInfo;
+import ws.schild.jave.MultimediaObject;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -15,9 +19,11 @@ public class FileExplorerMultipleFolders extends JFrame {
 
     public static final String SPLITTER_METADATA = "   --->>>>";
 
-    public static Map<String, List<FileInfo>> folderFilesCount = new HashMap<>();
+    public static HashMap<String, List<FileInfo>> folderFilesCount = new HashMap<>();
 
     public static Map<String, String> pconfig = new LinkedHashMap<>();
+
+    public static Map<String, Integer> durations = new LinkedHashMap<>();
 
     public static Map<String, Integer> colorMapping = new HashMap<String, Integer>(){{
        put("red", 0xFF0000);
@@ -40,18 +46,26 @@ public class FileExplorerMultipleFolders extends JFrame {
             e.printStackTrace();
         }
 
+//        try {
+            //todo: for now DO NOT LOAD CACHE
+//            FileInputStream fileIn = new FileInputStream("C:\\tmp\\folderFilesCount.ser");
+//            ObjectInputStream in = new ObjectInputStream(fileIn);
+//            folderFilesCount = (HashMap<String, List<FileInfo>>) in.readObject();
+//            in.close();
+//            fileIn.close();
+//        } catch (IOException i) {
+//            i.printStackTrace();
+//        } catch (ClassNotFoundException c) {
+//            System.out.println("Class not found");
+//            c.printStackTrace();
+//        }
+
         try {
-            FileInputStream fileIn = new FileInputStream("C:\\tmp\\folderFilesCount.ser");
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            folderFilesCount = (Map<String, List<FileInfo>>) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (IOException i) {
-            i.printStackTrace();
-        } catch (ClassNotFoundException c) {
-            System.out.println("Class not found");
-            c.printStackTrace();
+            durations  = readMapFromFile("c:\\tmp\\durations.txt");
+        } catch (Exception e) {
+            System.out.printf(e.getMessage());
         }
+
     }
 
     private final JList<File> fileList;
@@ -61,8 +75,11 @@ public class FileExplorerMultipleFolders extends JFrame {
     private final JTextField folderInputField;
 
     private final JCheckBox checkBoxSortBySize;
+
+    private final JCheckBox checkBoxCheckDurations;
+
     private final JTextField filterInputField;
-    private Vector<FileInfo> allFiles;
+    private List<FileInfo> allFiles;
 
     private Integer fileCount = 0;
 
@@ -80,7 +97,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 1;
 
         // Text field for folder input
-        folderInputField = new JTextField("E:\\Programming,E:\\Vidokursu_and_Books_From_118a");
+        folderInputField = new JTextField("J:\\Programming,J:\\Vidokursu_and_Books_From_118a");
         gbc.gridx = 0;
         gbc.gridy = 0;
         inputPanel.add(folderInputField, gbc);
@@ -92,6 +109,12 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 0;
         inputPanel.add(checkBoxSortBySize, gbc);
 
+        checkBoxCheckDurations = new JCheckBox("Check durations");
+        checkBoxCheckDurations.setSelected(false);
+        gbc.gridx = 2; // set the position to be right after the existing checkbox
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        inputPanel.add(checkBoxCheckDurations, gbc);
 
         // Text field for filter input
         filterInputField = new JTextField("*");
@@ -265,24 +288,28 @@ public class FileExplorerMultipleFolders extends JFrame {
     private void loadFiles() {
         fileCount = 0;
         String[] paths = folderInputField.getText().split(",");
-        allFiles = new Vector<>();
+        allFiles = new LinkedList<>();
 
         for (String path : paths) {
             Path folderPath = Paths.get(path.trim());
 
             try {
                 loadFilesRecursively(folderPath);
-
-                FileOutputStream fileOut = new FileOutputStream("c:\\tmp\\folderFilesCount.ser");
-                ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                out.writeObject(folderFilesCount);
-                out.close();
-                fileOut.close();
+                writeMapToFile("c:\\tmp\\durations.txt", durations);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
+        try {
+            FileOutputStream fileOut = new FileOutputStream("c:\\tmp\\folderFilesCount.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(folderFilesCount);
+            out.close();
+            fileOut.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (checkBoxSortBySize.isSelected()) {
             allFiles.sort((o1, o2) -> {
@@ -313,9 +340,22 @@ public class FileExplorerMultipleFolders extends JFrame {
                     allFiles.stream().filter(e -> e.getFile().getName().toLowerCase().contains("iiiiiiic"))
                             .map(e -> new File(e.getFile().getAbsolutePath() + "   --->>>>" + e.getSizeInB()))
                             .toArray(File[]::new));
+        } else if(checkBoxCheckDurations.isSelected()){
+            //todo: add checkbox , for now by default sort by duration
+            allFiles.sort((o1, o2) -> {
+                // Handle null durations first (place files with null duration at the end)
+                if (o1.getDuration() == null && o2.getDuration() == null) {return 0;}
+                else if (o1.getDuration() == null) {return 1;}
+                else if (o2.getDuration() == null) { return -1; }
+                // Reverse the comparison logic for descending order
+                return o2.getDuration().compareTo(o1.getDuration());
+            });
+            fileList.setListData(
+                    allFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB() + " " + e.getDurationInHoursMinutesSeconds() ))
+                            .toArray(File[]::new));
         } else {
             fileList.setListData(
-                    allFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB()))
+                    allFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB() + " " + e.getDurationInHoursMinutesSeconds() ))
                             .toArray(File[]::new));
         }
 
@@ -327,32 +367,41 @@ public class FileExplorerMultipleFolders extends JFrame {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath)) {
             for (Path entry : stream) {
                 if (Files.isDirectory(entry)) {
-                    // Recursively call this method on subfolders
                     if(folderFilesCount.get(entry.toString()) != null
-                            && !folderContainsFolders(entry.toString())
-                            && folderFilesCount.get(entry.toString()).size() == getNumberFilesInDir(entry.toString()) ) {
-
-                        allFiles.addAll(folderFilesCount.get(entry.toString()));
-                        System.err.println("Adding item from cache:" + entry.toString());
-                        continue;
+                            && !folderContainsFolders(entry.toString()) ) {
+//                        if(!checkBoxCheckCount.isSelected() || folderFilesCount.get(entry.toString()).size() == getNumberFilesInDir(entry.toString())) {
+//                            allFiles.addAll(folderFilesCount.get(entry.toString()));
+//                            System.err.println("Adding item from cache:" + entry);
+//                            continue;
+//                        } // TODO : disable cache nah
                     }
                     loadFilesRecursively(entry);
 
                     //serialize alfiles to file
-                    if(!folderContainsFolders(entry.toString())){
-                        folderFilesCount.put(entry.toString(), getAllFiles(entry.toString()));
-                    }
+//                    if(!folderContainsFolders(entry.toString())){
+//                        folderFilesCount.put(entry.toString(), getAllFiles(entry.toString()));
+//                    } //TODO: disable cache nah
 
                 } else {
                     // Add regular files to the list
                     long sizeInBytes = Files.size(entry);
                     long sizeInB = sizeInBytes;
 
-                    FileInfo fileInfo = new FileInfo(entry.toFile(), sizeInB);
-                    if (sizeInB > 399000) {
+                    Integer videoDuration = 0;
+                    if(checkBoxCheckDurations.isSelected()) {
+                        videoDuration = durations.get(entry.toFile().getAbsolutePath());
+                        if (videoDuration == null) {
+                            videoDuration = getVideoDuration(entry.toFile().getAbsolutePath());
+                        }
+                        durations.put(entry.toFile().getAbsolutePath(), videoDuration);
+                    }
+
+                    FileInfo fileInfo = new FileInfo(entry.toFile(), sizeInB, videoDuration);
+
+                    if (sizeInB > 566000) { // add only bigger than 566kb
                         allFiles.add(fileInfo);
                         fileCount++;
-                        if (fileCount % 100 == 0) {
+                        if (fileCount % 200 == 0) {
                             System.out.println("Adding item:" + fileInfo.getFile().getAbsolutePath());
                         }
                     }
@@ -361,31 +410,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         } catch (Exception ex) {
             System.out.println("Error while reading folder: " + folderPath.toString());
             ex.printStackTrace();
-
         }
-    }
-
-    private List<FileInfo> getAllFiles(String toString) {
-        List<FileInfo> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(toString))) {
-            for (Path entry : stream) {
-                if (Files.isDirectory(entry)) {
-                    // Recursively call this method on subfolders
-                    files.addAll(getAllFiles(entry.toString()));
-                } else {
-                    // Add regular files to the list
-                    long sizeInBytes = Files.size(entry);
-                    long sizeInB = sizeInBytes;
-
-                    FileInfo fileInfo = new FileInfo(entry.toFile(), sizeInB);
-                    files.add(fileInfo);
-                }
-            }
-        } catch (Exception ex) {
-            System.out.println("Error while reading folder: " + toString);
-            ex.printStackTrace();
-        }
-        return files;
     }
 
     private void applyFilter() {
@@ -394,6 +419,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         String patternString = filterInputField.getText().toLowerCase();
         patternString = patternString.toLowerCase().replaceAll("\\*", ".*");  // Replace wildcard * with regex .*
         patternString = patternString.toLowerCase().replaceAll(" ", ".*");
+        patternString = patternString.toLowerCase().replaceAll("\\+", ".+");
         Pattern pattern = Pattern.compile(patternString);
 
         java.util.List<FileInfo> filteredFiles = new ArrayList<>();
@@ -405,21 +431,21 @@ public class FileExplorerMultipleFolders extends JFrame {
             }
         }
         //fileList.setListData(filteredFiles.toArray(new File[0]));//old version, just filter
-        //automatically sort by size
+        //automatically sort by duration
         filteredFiles.sort((o1, o2) -> {
-            if (o1.getSizeInB() == o2.getSizeInB()) {
+            if (o1.getDuration() == o2.getDuration()) {
                 return 0;
             }
-            if (o1.getSizeInB() > o2.getSizeInB()) {
+            if (o1.getDuration() > o2.getDuration()) {
                 return -1;
             } else {
                 return 1;
             }
         });
-        fileList.setListData(
-                filteredFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB()))
-                        .toArray(File[]::new));
 
+        fileList.setListData(
+                filteredFiles.stream().map(e -> new File(e.getFile().getAbsolutePath() + SPLITTER_METADATA + e.getSizeInB() + " " + e.getDurationInHoursMinutesSeconds() ))
+                        .toArray(File[]::new));
     }
 
     private void resetFilter() {
@@ -456,11 +482,29 @@ public class FileExplorerMultipleFolders extends JFrame {
         File file;
         long sizeInB;
 
+        Integer duration;
+
         // Constructor and getters
 
         public FileInfo(File file, long sizeInB) {
             this.file = file;
             this.sizeInB = sizeInB;
+        }
+
+        public FileInfo(File file, long sizeInB, Integer duration) {
+            this.file = file;
+            this.sizeInB = sizeInB;
+            this.duration = duration;
+        }
+
+        public String getDurationInHoursMinutesSeconds() {
+            if (duration == null) {
+                return "";
+            }
+            int hours = duration / 3600;
+            int minutes = (duration % 3600) / 60;
+            int seconds = duration % 60;
+            return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
         }
 
         public File getFile() {
@@ -477,6 +521,14 @@ public class FileExplorerMultipleFolders extends JFrame {
 
         public void setSizeInB(long sizeInB) {
             this.sizeInB = sizeInB;
+        }
+
+        public Integer getDuration() {
+            return duration;
+        }
+
+        public void setDuration(Integer duration) {
+            this.duration = duration;
         }
     }
 
@@ -538,6 +590,65 @@ public class FileExplorerMultipleFolders extends JFrame {
         return false;
     }
 
+
+    public static Integer getVideoDuration(String filePath) {
+        // Check if file is less than 5MB
+        File file = new File(filePath);
+        long fileSizeInBytes = file.length();
+        if (fileSizeInBytes < 5 * 1024 * 1024) {
+            System.out.println("File is less than 10MB, skipping: " + filePath);
+            return 0;
+        }
+
+        CustomFFMPEGLocator locator = new CustomFFMPEGLocator("C:\\Programs\\ffmpeg\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe");
+
+        try {
+            MultimediaObject multimediaObject = new MultimediaObject(file, locator);
+            MultimediaInfo info = multimediaObject.getInfo();
+            long duration = info.getDuration() / 1000; // Duration in seconds
+            System.out.println("Duration of the video is: " + filePath + " " + duration + " seconds");
+            return (int) duration;
+        } catch (Exception e) {
+            System.err.println("Error during get duration " + filePath + ": " + e.getMessage());
+        }
+        return 0;
+    }
+
+
+    static  class CustomFFMPEGLocator extends ws.schild.jave.FFMPEGLocator {
+
+        public CustomFFMPEGLocator(String ffmpegPath) {
+            super();
+        }
+
+        @Override
+        protected String getFFMPEGExecutablePath() {
+            return "C:\\Programs\\ffmpeg\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe";
+        }
+    }
+
+    public static void writeMapToFile(String filePath, Map<String, Integer> durations) throws IOException {
+        File file = new File(filePath);
+        try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(durations);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Map<String, Integer> readMapFromFile(String filePath) throws IOException, ClassNotFoundException {
+        File file = new File(filePath);
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            @SuppressWarnings("unchecked") // Handle unchecked cast warning
+            Map<String, Integer> durations = (Map<String, Integer>) objectInputStream.readObject();
+            return durations;
+        } catch (IOException | ClassNotFoundException e) {
+           e.printStackTrace();
+        }
+        return new HashMap<>();
+    }
 
 
 }
