@@ -97,7 +97,7 @@ public class FileExplorerMultipleFolders extends JFrame {
         gbc.weightx = 1;
 
         // Text field for folder input
-        folderInputField = new JTextField("J:\\Programming,J:\\Vidokursu_and_Books_From_118a");
+        folderInputField = new JTextField("K:\\Programming,K:\\Vidokursu_and_Books_From_118a");
         gbc.gridx = 0;
         gbc.gridy = 0;
         inputPanel.add(folderInputField, gbc);

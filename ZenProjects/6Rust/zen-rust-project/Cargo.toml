@@ -1,0 +1,15 @@
+[package]
+name = "zen-rust-project"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+
+[[bin]]
+name = "factorial"
+path = "src/1Factorial/main.rs"
+
+[[bin]]
+name = "datatypes"
+path = "src/2DataTypes/main.rs"
