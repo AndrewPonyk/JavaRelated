@@ -1,0 +1,55 @@
+version: '2.1'
+services:
+  database: # PostgreSQL database service
+    image: postgres:latest # Use the latest PostgreSQL image
+    ports: # Expose the database port
+      - "5432:5432" # Map container port 5432 to host port 5432
+    environment: # Set environment variables for PostgreSQL
+      POSTGRES_USER: "postgres" # Database user
+      POSTGRES_PASSWORD: "postgres" # Database password
+      POSTGRES_DB: "ostock_dev" # Database name
+    volumes: # Mount volumes for database initialization and data persistence
+      - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql # Initialize database schema from init.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql # Load initial data from data.sql
+    networks: # Connect the database to the backend network
+      backend:
+        aliases: # Add an alias for easy access from other containers
+          - "database" # Alias as "database"
+    healthcheck: # Configure a healthcheck to ensure the database is ready
+      test: ["CMD-SHELL", "pg_isready -U postgres"] # Check if PostgreSQL is ready
+      interval: 10s # Check every 10 seconds
+      timeout: 5s # Timeout after 5 seconds
+      retries: 5 # Retry up to 5 times
+
+  configserver: # Configuration server service
+    image: ostock/configserver:0.0.1-SNAPSHOT # Use the specified config server image
+    ports: # Expose the config server port
+      - "8071:8071" # Map container port 8071 to host port 8071
+    environment: # Set environment variables for the config server
+      ENCRYPT_KEY: "fje83Ki8403Iod87dne7Yjsl3THueh48jfuO9j4U2hf64Lo" # Encryption key
+    networks: # Connect the config server to the backend network
+      backend:
+        aliases: # Add an alias for easy access from other containers
+          - "configserver" # Alias as "configserver"
+
+  licensingservice: # Licensing service
+    image: ostock/licensing-service:0.0.2-SNAPSHOT # Use the specified licensing service image
+    environment: # Set environment variables for the licensing service
+      PROFILE: "dev" # Set the active profile to "dev"
+      CONFIGSERVER_URI: "http://configserver:8071" # URI of the config server
+      CONFIGSERVER_PORT: "8071" # Port of the config server
+      DATABASESERVER_PORT: "5432" # Port of the database server
+      ENCRYPT_KEY: "IMSYMMETRIC" # Encryption key
+    depends_on: # Define dependencies between services
+      database: # The licensing service depends on the database
+        condition: service_healthy # Only start if the database is healthy
+      configserver: # The licensing service depends on the config server
+        condition: service_started # Only start if the config server is started
+    ports: # Expose the licensing service port
+      - "8080:8080" # Map container port 8080 to host port 8080
+    networks: # Connect the licensing service to the backend network
+      - backend
+
+networks: # Define the networks
+  backend: # Backend network
+    driver: bridge # Use the bridge network driver
