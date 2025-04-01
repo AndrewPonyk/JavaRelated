@@ -119,8 +119,10 @@ public class LicenseService {
 	@Retry(name = "retryLicenseService", fallbackMethod = "buildFallbackLicenseList")
 	@Bulkhead(name = "bulkheadLicenseService", type= Type.THREADPOOL, fallbackMethod = "buildFallbackLicenseList")
 	public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
+		logger.debug("====== getLicensesByOrganization ======");
 		logger.debug("getLicensesByOrganization Correlation id: {}",
 				UserContextHolder.getContext().getCorrelationId());
+		
 		randomlyRunLong();
 		return licenseRepository.findByOrganizationId(organizationId);
 	}
@@ -139,7 +141,11 @@ public class LicenseService {
 	private void randomlyRunLong() throws TimeoutException{
 		Random rand = new Random();
 		int randomNum = rand.nextInt((3 - 1) + 1) + 1;
-		if (randomNum==3) sleep();
+		if (randomNum==3) {
+			sleep();
+		} else {
+			System.out.println("Normal, not sleep");
+		}
 	}
 	private void sleep() throws TimeoutException{
 		try {
