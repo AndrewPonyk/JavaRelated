@@ -24,6 +24,11 @@ public class LicenseController {
 	@Autowired
 	private LicenseService licenseService;
 
+	@RequestMapping(value="/",method = RequestMethod.GET)
+	public ResponseEntity<String> getLicenses() {
+		return ResponseEntity.ok("getLicenses");
+	}
+
 	@RequestMapping(value="/{licenseId}",method = RequestMethod.GET)
 	public ResponseEntity<License> getLicense( @PathVariable("organizationId") String organizationId,
 			@PathVariable("licenseId") String licenseId) {

@@ -6,7 +6,7 @@ public class PermutationsOfString {
 
         String s = "abcde";
         permutation(s);
-
+ 
     }
 
     private static void permutation(String input) {
