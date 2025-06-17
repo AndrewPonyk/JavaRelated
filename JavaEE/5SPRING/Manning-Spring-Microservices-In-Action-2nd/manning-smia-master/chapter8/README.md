@@ -1,5 +1,7 @@
 ## Spring Microservices in Action - Second Edition. Chapter 8
 
+# mvn clean package dockerfile:build  - TO BUILD docker images locally
+
 # Introduction
 Welcome to Spring Microservices in Action, Chapter 8.  Chapter 8 introduces the concept of a API gateway. API gateways are using to enforce consistent policies and actions on all service calls. With this chapter we are going to introduce Spring Cloud Gateway.
 

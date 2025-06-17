@@ -47,3 +47,25 @@ class CanonMP250 implements Printable{
 		System.out.println("Canon mp 250");
 	}
 }
+
+class Box3<T> {
+    private T data;
+
+    public Box3(T data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "Box3{" +
+                "data=" + data +
+                '}';
+    }
+}
+
+public class TestBox3 {
+    public static void main(String[] args) {
+        Box3 emptyBox = new Box3(null);
+        System.out.println(emptyBox.toString());
+    }
+}

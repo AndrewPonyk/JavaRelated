@@ -17,7 +17,19 @@ public class ResponseFilter {
     
     @Autowired
 	FilterUtils filterUtils;
- 
+    
+    /**
+     * This class implements a response filter that adds correlation IDs to outbound requests.
+     * It works as follows:
+     * 1. Intercepts the response after the request is processed
+     * 2. Gets the correlation ID from the incoming request headers
+     * 3. Adds the correlation ID to the outbound response headers
+     * 4. Logs the correlation ID and request completion
+     *
+     * The correlation ID helps with distributed tracing by linking requests as they flow through 
+     * different microservices. This is particularly useful for debugging and monitoring in a 
+     * microservices architecture.
+     */
     @Bean
     public GlobalFilter postGlobalFilter() {
         return (exchange, chain) -> {

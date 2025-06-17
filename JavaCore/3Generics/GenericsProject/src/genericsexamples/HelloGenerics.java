@@ -4,23 +4,30 @@ public class HelloGenerics {
 	public static void main(String[] args) {
 		System.out.println("hello Generics");
 		
-		Box<String> box = new Box<>();
-		
-		box.add("some element");
-		
-		System.out.println(box.getT());
-		
+        // Create a non-empty box
+        Box3 box = new Box3("Hello, World!");
+        System.out.println(box.toString());  // Output: Box3 [content=Hello, World!]
+
+        // Create an empty box
+        Box3 emptyBox = new Box3(null);
+        System.out.println(emptyBox.toString());  // Output: Box3 is currently empty
 	}
 }
 
-class Box <T>{
-	T t;
+class Box3 {
+    private Object content;
+
+    public Box3(Object content) {
+        this.content = content;
+    }
 	
-	public void add(T t){
-		this.t = t;
-	}
-	
-	public T getT(){
-		return this.t;
-	}
+    @Override
+    public String toString() {
+        if (content == null) {
+            return "Box3 is currently empty";
+        } else {
+            return "Box3 [content=" + content.toString() + "]";
+        }
+    }
 }
+

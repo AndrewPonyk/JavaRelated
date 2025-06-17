@@ -100,20 +100,31 @@ services:
     networks:
       - backend
 
+  # image: jboss/keycloak - original from repo - is NOT SUPPORTED
   keycloak:
-    image: jboss/keycloak
+    image: quay.io/keycloak/keycloak:24.0.4
     restart: always
     environment:
-      KEYCLOAK_VERSION: 6.0.1
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-    volumes:
-        - ./realm-export.json:/opt/jboss/keycloak/realm-export.json
+      # New environment variables for modern Keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_FEATURES: scripts
+      KC_FEATURES_PREVIEW: scripts
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_PROXY: edge
+      # Database configuration (optional - uses H2 by default)
+      # KC_DB: postgres
+      # KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      # KC_DB_USERNAME: keycloak
+      # KC_DB_PASSWORD: password
+    #volumes:
+      # Import realm on startup
+    #  - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
     command:
-      - "-b 0.0.0.0"
-      - "-Dkeycloak.import=/opt/jboss/keycloak/realm-export.json"
-      - "-Dkeycloak.profile.feature.scripts=enabled"
-      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      # Start in development mode with import
+      - start-dev
+      #- --import-realm
     ports:
       - "8080:8080"
     networks:

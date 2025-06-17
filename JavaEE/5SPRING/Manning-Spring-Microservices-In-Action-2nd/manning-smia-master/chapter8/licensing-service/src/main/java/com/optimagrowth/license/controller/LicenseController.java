@@ -70,7 +70,7 @@ public class LicenseController {
 		return ResponseEntity.ok(licenseService.deleteLicense(licenseId));
 	}
 
-	@RequestMapping(value="/",method = RequestMethod.GET)
+	@RequestMapping(value="",method = RequestMethod.GET)
 	public List<License> getLicenses( @PathVariable("organizationId") String organizationId) throws TimeoutException {
 		logger.debug("LicenseServiceController Correlation id: {}", UserContextHolder.getContext().getCorrelationId());
 		return licenseService.getLicensesByOrganization(organizationId);

@@ -1,3 +1,13 @@
 {
-    "java.dependency.packagePresentation": "hierarchical"
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-11",
+            "path": "C:/Programs/jdk-11.0.2",
+            "default": true
+        }
+    ],
+    "java.project.referencedLibraries": [
+        "bin/**/*.class"
+    ]
 }

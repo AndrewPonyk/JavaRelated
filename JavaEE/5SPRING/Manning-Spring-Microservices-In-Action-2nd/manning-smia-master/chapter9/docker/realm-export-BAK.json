@@ -1,8 +1,6 @@
 {
   "id": "spmia-realm",
   "realm": "spmia-realm",
-  "displayName": "Spring Microservices in Action Realm",
-  "displayNameHtml": "<h1 style=\"font-size: 36pt; font-weight: 400;\">Spring Microservices in Action</h1>",
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
@@ -25,7 +23,7 @@
   "actionTokenGeneratedByAdminLifespan": 43200,
   "actionTokenGeneratedByUserLifespan": 300,
   "enabled": true,
-  "sslRequired": "none",
+  "sslRequired": "external",
   "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
@@ -809,11 +807,11 @@
             "id": "b509dc76-7595-498c-b317-3ee01c53ff06",
             "name": "Default Policy",
             "description": "A policy that grants access only for users within this realm",
-            "type": "aggregate",
+            "type": "js",
             "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
+            "decisionStrategy": "AFFIRMATIVE",
             "config": {
-              "applyPolicies": "[]"
+              "code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
             }
           },
           {
@@ -1615,14 +1613,14 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "ALTERNATIVE",
           "priority": 20,
           "flowAlias": "Verify Existing Account by Re-authentication",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1639,21 +1637,21 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "basic-auth-otp",
           "requirement": "DISABLED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "auth-spnego",
           "requirement": "DISABLED",
           "priority": 30,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1670,14 +1668,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "auth-otp-form",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1694,14 +1692,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "direct-grant-validate-otp",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1718,14 +1716,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "auth-otp-form",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1742,14 +1740,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "REQUIRED",
           "priority": 20,
           "flowAlias": "Account verification options",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1766,14 +1764,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "reset-otp",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1791,14 +1789,14 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "ALTERNATIVE",
           "priority": 20,
           "flowAlias": "Handle Existing Account",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1815,14 +1813,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "CONDITIONAL",
           "priority": 20,
           "flowAlias": "First broker login - Conditional OTP",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1839,28 +1837,28 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "auth-spnego",
           "requirement": "DISABLED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "identity-provider-redirector",
           "requirement": "ALTERNATIVE",
           "priority": 25,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "ALTERNATIVE",
           "priority": 30,
           "flowAlias": "forms",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1877,28 +1875,28 @@
           "requirement": "ALTERNATIVE",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "client-jwt",
           "requirement": "ALTERNATIVE",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "client-secret-jwt",
           "requirement": "ALTERNATIVE",
           "priority": 30,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "client-x509",
           "requirement": "ALTERNATIVE",
           "priority": 40,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1915,21 +1913,21 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "direct-grant-validate-password",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "CONDITIONAL",
           "priority": 30,
           "flowAlias": "Direct Grant - Conditional OTP",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1946,7 +1944,7 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -1964,14 +1962,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "REQUIRED",
           "priority": 20,
           "flowAlias": "User creation or linking",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -1988,14 +1986,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "CONDITIONAL",
           "priority": 20,
           "flowAlias": "Browser - Conditional OTP",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -2012,14 +2010,14 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "REQUIRED",
           "priority": 20,
           "flowAlias": "Authentication Options",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -2037,7 +2035,7 @@
           "priority": 10,
           "flowAlias": "registration form",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -2054,28 +2052,28 @@
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "registration-profile-action",
           "requirement": "REQUIRED",
           "priority": 40,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "registration-password-action",
           "requirement": "REQUIRED",
           "priority": 50,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "registration-recaptcha-action",
           "requirement": "DISABLED",
           "priority": 60,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     },
@@ -2092,28 +2090,28 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "reset-credential-email",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "authenticator": "reset-password",
           "requirement": "REQUIRED",
           "priority": 30,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         },
         {
           "requirement": "CONDITIONAL",
           "priority": 40,
           "flowAlias": "Reset - Conditional OTP",
           "userSetupAllowed": false,
-          "authenticatorFlow": true
+          "autheticatorFlow": true
         }
       ]
     },
@@ -2130,7 +2128,7 @@
           "requirement": "REQUIRED",
           "priority": 10,
           "userSetupAllowed": false,
-          "authenticatorFlow": false
+          "autheticatorFlow": false
         }
       ]
     }
@@ -2213,10 +2211,7 @@
   "resetCredentialsFlow": "reset credentials",
   "clientAuthenticationFlow": "clients",
   "dockerAuthenticationFlow": "docker auth",
-  "attributes": {
-    "frontendUrl": "",
-    "acr.loa.map": "{}"
-  },
-  "keycloakVersion": "21.1.1",
+  "attributes": {},
+  "keycloakVersion": "11.0.2",
   "userManagedAccessAllowed": false
 }

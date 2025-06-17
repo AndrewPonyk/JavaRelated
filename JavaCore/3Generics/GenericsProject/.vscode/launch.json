@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "HelloGenerics",
+            "request": "launch",
+            "mainClass": "genericsexamples.HelloGenerics",
+            "projectName": "GenericsProject_de223496"
+        },
+        {
+            "type": "java",
+            "name": "HelloGenericMethod",
+            "request": "launch",
+            "mainClass": "genericmethodsexample.HelloGenericMethod",
+            "projectName": "GenericsProject_de223496"
+        },
+        {
+            "type": "java",
+            "name": "Program",
+            "request": "launch",
+            "mainClass": "bridgemethod.Program",
+            "projectName": "GenericsProject_de223496"
+        },
+        {
+            "type": "java",
+            "name": "Launch Program",
+            "request": "launch",
+            "mainClass": "bridgemethod.Program",
+            "projectName": "GenericsProject",
+            "classPaths": [
+                "${workspaceFolder}/bin"
+            ]
+        }
+    ]
+  }

@@ -1,3 +1,20 @@
+#!!!  A lot of TROUBLES WHITE WORKING
+## In realm-export.json file  - CORRECT JSON FOR KEYCLOAK 24
+## In docker-compose.yml file  - CORRECT KEYCLOAK IMAGE
+## Users in keyloack created manually
+## IN HOSTS FILE ADD 
+127.0.0.1 keycloak 
+!!!!!!!!!!!!!!
+
+## Its important, if you geneate token using localhost:8080 - it WILL NOT WORK IN APPLICATION because in config of app we use keycloak:8080
+
+http://localhost:8072/license/v1/organization/d898a142-de44-466c-8c88-9ceb2c2429d3/license/f2a9c9d4-d2c0-44fa-97fe-724d77173c62 - FINALLY AFTER 15 Hours of Troubles
+
+## token generate url: http://keycloak:8080/realms/spmia-realm/protocol/openid-connect/token
+
+# Keycloak jboss/keycloak - original from repo - is NOT SUPPORTED
+
+
 ## Spring Microservices in Action - Second Edition. Chapter 9
 
 # Introduction

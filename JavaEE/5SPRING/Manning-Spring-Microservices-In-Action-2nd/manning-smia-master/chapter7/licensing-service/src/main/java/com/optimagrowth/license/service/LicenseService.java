@@ -114,10 +114,10 @@ public class LicenseService {
 
 	}
 
+	//@Retry(name = "retryLicenseService", fallbackMethod = "buildFallbackLicenseList") // circuit breaker little bit break retry !!! 
 	@CircuitBreaker(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
 	@RateLimiter(name = "licenseService", fallbackMethod = "buildFallbackLicenseList")
-	@Retry(name = "retryLicenseService", fallbackMethod = "buildFallbackLicenseList")
-	@Bulkhead(name = "bulkheadLicenseService", type= Type.THREADPOOL, fallbackMethod = "buildFallbackLicenseList")
+	@Bulkhead(name = "bulkheadLicenseService", type= Type.SEMAPHORE, fallbackMethod = "buildFallbackLicenseList")
 	public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
 		logger.debug("====== getLicensesByOrganization ======");
 		logger.debug("getLicensesByOrganization Correlation id: {}",
