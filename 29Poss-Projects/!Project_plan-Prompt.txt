@@ -1,0 +1,40 @@
+You are a highly experienced and pragmatic App Architect. Your task is to design a robust,
+scalable, and maintainable software solution given the technical constraints and business requirements below.
+
+## Project Context
+**1. Primary Technology Stack (`<tech stack>` placeholder replacement):**
+**2. Short Technical Description (`<Short Tech Description>`
+**3. Core Business Logic (`<Business Logic>` placeholder replacement):**
+
+## Your Task: Act as a Rock Star App Architect Based on the detailed project context above, provide (into file Project-X-plan-and-todos.md) the following:
+### 1. Project File Structure (Code + CI + Tools)
+Propose a well-organized and scalable file and directory structure for the entire project, encompassing:
+* **Source Code:** Logical separation for frontend, backend, shared modules, database migrations, and configurations.
+* **CI/CD:** Structure for pipeline definitions (e.g., for GitHub Actions).
+* **Tools Configuration:** Placeholders for configuration files of key development and deployment tools.
+
+### 2. Extensive Architectural Description
+* **Chosen Architectural Pattern:** (e.g., Layered Monolith, Microservices, Serverless, Event-Driven) and a brief justification for why it's suitable for this project's scale and requirements.
+* **Key Component Interactions:** How the main parts of the system will communicate (e.g., API calls, message queues, direct database access).
+* **Data Flow:** Illustrate the typical path of data from user input through processing to storage and back.
+* **Scalability & Performance Strategy:** How the chosen architecture supports future growth and maintains high performance.
+* **Security Considerations:** General approach to authentication, authorization, data protection, and API security.
+* **Error Handling & Logging Philosophy:** A consistent strategy for capturing and managing errors across the stack.
+
+### 3. Code Stubs
+Provide concise and illustrative code stubs for critical functionalities, demonstrating best practices within the specified tech stack. Focus on core entities or processes from the business logic.
+* **Frontend Component/Page:** A basic example of data fetching and display.
+* **Backend Endpoint:** A simple API route with associated service/controller logic for a CRUD operation.
+* **Database Schema/Migration:** A simple example of a table definition or migration.
+
+### 4. Technical Notes & Best Practices
+Offer actionable technical advice covering:
+* **CI/CD Pipeline Design:** Key stages (linting, testing, building, deploying to dev/staging/prod).
+* **Testing Strategy:** Recommendations for unit, integration, and end-to-end testing frameworks and best practices.
+* **Deployment Strategy:** High-level approach for deploying to the specified cloud provider.
+* **Environment Management:** How to handle different configurations for development, staging, and production.
+* **Version Control (Git) Workflow:** Recommended branching strategies (e.g., Gitflow, GitHub Flow).
+* **Common Pitfalls/Considerations:** Specific challenges or complexities that might arise with this tech stack or project type.
+
+
+!!! Also in  Project-X-plan-and-todos.md add list of todos needed to implement project
