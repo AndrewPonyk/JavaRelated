@@ -1,12 +1,16 @@
-import React, { Component } from 'react';
-export default class AddContacts extends Component {
-    submitContact(event) {
+import React, {useRef} from 'react';
+const AddContacts = () => {
+    const firstNameRef = useRef();
+    const lastNameRef = useRef();
+    const emailRef = useRef();
+
+    const submitContact = (event) => {
         event.preventDefault();
 
         let contact = {
-            firstName: this.refs.firstName.value,
-            lastName: this.refs.lastName.value,
-            email: this.refs.email.value,
+            firstName: firstNameRef.current.value,
+            lastName: lastNameRef.current.value,
+            email: emailRef.current.value,
         }
 
         fetch("http://localhost:8080/api/contacts", {
@@ -19,31 +23,33 @@ export default class AddContacts extends Component {
         .then(response => response.json());
         window.location.reload();
     }
-    render() {
-        return (
+
+    return (
+        <div className="row">
+            <form className="col s12" onSubmit={submitContact}>
             <div className="row">
-                <form className="col s12" onSubmit={this.submitContact.bind(this)}>
-                <div className="row">
-                    <div className="input-field col s6">
-                        <input placeholder="Placeholder" ref="firstName" type="text" className="validate" />
-                    <label htmlFor="firstName">First Name</label>
-                    </div>
-                    <div className="input-field col s6">
-                        <input ref="lastName" type="text" className="validate" />
-                        <label htmlFor="lastName">Last Name</label>
-                    </div>
+                <div className="input-field col s6">
+                    <input placeholder="Placeholder1" ref={firstNameRef} type="text" className="validate" />
+                <label htmlFor="firstName">First Name1</label>
                 </div>
-                <div className="row">
-                    <div className="input-field col s12">
-                        <input ref="email" type="email" className="validate" />
-                        <label htmlFor="email">Email</label>
-                    </div>
+                <div className="input-field col s6">
+                    <input ref={lastNameRef} type="text" className="validate" />
+                    <label htmlFor="lastName">Last Name</label>
                 </div>
-                <div className="row">
-                    <button className="waves-effect waves-light btn" type="submit" name="action">Submit</button>
-                </div>
-                </form>
             </div>
-        )
-    }
+            <div className="row">
+                <div className="input-field col s12">
+                    <input ref={emailRef} type="email" className="validate" />
+                    <label htmlFor="email">Email</label>
+                </div>
+            </div>
+            <div className="row">
+                <button className="waves-effect waves-light btn" type="submit" name="action">Submit</button>
+            </div>
+            </form>
+        </div>
+    )
+
 }
+
+export default AddContacts;
