@@ -10,7 +10,7 @@ scalable, and maintainable software solution given the technical constraints and
 ### 1. Project File Structure (Code + CI + Tools)
 Propose a well-organized and scalable file and directory structure for the entire project, encompassing:
 * **Source Code:** Logical separation for frontend, backend, shared modules, database migrations, and configurations.
-* **CI/CD:** Structure for pipeline definitions (e.g., for GitHub Actions).
+* **CI/CD:** Structure for pipeline definitions (e.g., for GitHub Actions, jenkins, gitlab ci, aws ci, Azure DevOps Pipelines..).
 * **Tools Configuration:** Placeholders for configuration files of key development and deployment tools.
 
 ### 2. Extensive Architectural Description
@@ -31,7 +31,7 @@ Provide concise and illustrative code stubs for critical functionalities, demons
 Offer actionable technical advice covering:
 * **CI/CD Pipeline Design:** Key stages (linting, testing, building, deploying to dev/staging/prod).
 * **Testing Strategy:** Recommendations for unit, integration, and end-to-end testing frameworks and best practices.
-* **Deployment Strategy:** High-level approach for deploying to the specified cloud provider.
+* **!!!!!!!!Important!!! Deployment Strategy:** High-level approach for deploying to the specified cloud provider.
 * **Environment Management:** How to handle different configurations for development, staging, and production.
 * **Version Control (Git) Workflow:** Recommended branching strategies (e.g., Gitflow, GitHub Flow).
 * **Common Pitfalls/Considerations:** Specific challenges or complexities that might arise with this tech stack or project type.
