@@ -1,0 +1,3915 @@
+Database Quiz - 200 Questions
+Tech Stack: Oracle, MySQL, PostgreSQL, SQL Server, MongoDB, Redis, Cassandra, Elasticsearch, Snowflake, Neo4j, Pinecone, Weaviate, Milvus
+
+1. What is the difference between ACID and BASE properties in databases?
+
+Answer: ACID (Atomicity, Consistency, Isolation, Durability) ensures strong consistency in traditional RDBMS. BASE (Basically Available, Soft state, Eventual consistency) prioritizes availability and partition tolerance in distributed systems. ACID for strict consistency, BASE for scalability and availability.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid MySQL storage engines? (Multiple correct)
+A) InnoDB
+B) MyISAM
+C) Memory
+D) Archive
+E) CSV
+F) Federated
+
+Answer: A, B, C, D, E, F - All are valid MySQL storage engines. InnoDB for transactions and foreign keys, MyISAM for read-heavy workloads, Memory for temporary data, Archive for compressed storage, CSV for data exchange, Federated for remote table access.
+
+#@@@@@@@@@@
+
+3. Complete this PostgreSQL query optimization:
+```sql
+-- Slow query
+SELECT u.username, p.title, c.content
+FROM users u
+JOIN posts p ON u.id = p.user_id
+JOIN comments c ON p.id = c.post_id
+WHERE u.created_at > '2023-01-01'
+AND p.published = true
+ORDER BY p.created_at DESC
+LIMIT 100;
+
+-- Add appropriate indexes
+CREATE INDEX idx_users_created_at ON users(_______________);
+CREATE INDEX idx_posts_user_published ON posts(user_id, published, created_at);
+CREATE INDEX idx_comments_post_id ON comments(post_id);
+```
+
+Answer: `created_at` - Index on users.created_at for the WHERE clause filter. The composite index on posts covers user_id (JOIN), published (WHERE), and created_at (ORDER BY) for optimal query performance.
+
+#@@@@@@@@@@
+
+4. What is the purpose of MongoDB sharding?
+
+Answer: Sharding horizontally partitions data across multiple servers (shards) to handle large datasets and high throughput. Uses shard key to distribute documents, provides automatic balancing, enables linear scaling, and maintains high availability through replica sets per shard.
+
+#@@@@@@@@@@
+
+5. Find the bug in this Redis caching implementation:
+```python
+import redis
+import json
+import time
+
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
+
+def get_user_data(user_id):
+    cache_key = f"user:{user_id}"
+    
+    # Try to get from cache
+    cached_data = redis_client.get(cache_key)
+    if cached_data:
+        return json.loads(cached_data)
+    
+    # Get from database
+    user_data = fetch_user_from_db(user_id)
+    
+    # Cache the data - potential issue
+    redis_client.set(cache_key, json.dumps(user_data))
+    
+    return user_data
+
+def fetch_user_from_db(user_id):
+    # Simulate database fetch
+    time.sleep(0.1)
+    return {"id": user_id, "name": f"User {user_id}"}
+```
+
+Answer: Missing cache expiration (TTL). Without expiration, cached data becomes stale and never updates. Should use `redis_client.setex(cache_key, 3600, json.dumps(user_data))` or `redis_client.set(cache_key, json.dumps(user_data), ex=3600)` to set expiration time.
+
+#@@@@@@@@@@
+
+6. How do you implement database connection pooling?
+
+Answer: Use connection pool libraries (HikariCP for Java, pgbouncer for PostgreSQL, connection pooling in application frameworks). Configure pool size, connection timeout, idle timeout, and validation queries. Pools reduce connection overhead, improve performance, and manage database connections efficiently.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid Cassandra consistency levels? (Multiple correct)
+A) ONE
+B) QUORUM
+C) ALL
+D) LOCAL_QUORUM
+E) EACH_QUORUM
+F) ANY
+
+Answer: A, B, C, D, E, F - All are valid Cassandra consistency levels. ONE for fast reads/writes, QUORUM for balance, ALL for strong consistency, LOCAL_QUORUM for multi-datacenter, EACH_QUORUM for cross-datacenter writes, ANY for highest availability.
+
+#@@@@@@@@@@
+
+8. Complete this Elasticsearch mapping:
+```json
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "english"
+      },
+      "tags": {
+        "type": "_______________"
+      },
+      "published_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "text"},
+          "email": {"type": "keyword"}
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: `"keyword"` - Tags are typically exact-match values that shouldn't be analyzed. Keyword type preserves the exact value for filtering, aggregations, and sorting. Text type would tokenize and analyze the tags.
+
+#@@@@@@@@@@
+
+9. What is the difference between SQL and NoSQL databases?
+
+Answer: SQL databases use structured schemas, ACID transactions, and relational model with joins. NoSQL databases offer flexible schemas, horizontal scaling, and various data models (document, key-value, column-family, graph). SQL for complex queries and consistency, NoSQL for scalability and flexibility.
+
+#@@@@@@@@@@
+
+10. Which of the following are valid Oracle database objects? (Multiple correct)
+A) Tables
+B) Views
+C) Sequences
+D) Packages
+E) Triggers
+F) Synonyms
+
+Answer: A, B, C, D, E, F - All are valid Oracle database objects. Tables store data, Views provide virtual tables, Sequences generate unique numbers, Packages group procedures/functions, Triggers execute on events, Synonyms provide alternative names.
+
+#@@@@@@@@@@
+
+11. Predict the output of this SQL query:
+```sql
+WITH RECURSIVE fibonacci(n, fib_n, fib_n1) AS (
+  SELECT 1, 0, 1
+  UNION ALL
+  SELECT n + 1, fib_n1, fib_n + fib_n1
+  FROM fibonacci
+  WHERE n < 10
+)
+SELECT n, fib_n FROM fibonacci;
+```
+
+Answer: Generates Fibonacci sequence: (1,0), (2,1), (3,1), (4,2), (5,3), (6,5), (7,8), (8,13), (9,21), (10,34). Recursive CTE calculates each Fibonacci number by adding the two previous numbers.
+
+#@@@@@@@@@@
+
+12. How do you implement database replication?
+
+Answer: Configure master-slave or master-master replication, set up binary logging (MySQL) or WAL shipping (PostgreSQL), monitor replication lag, implement failover procedures, and consider read replicas for scaling. Choose synchronous for consistency or asynchronous for performance.
+
+#@@@@@@@@@@
+
+13. Which of the following are valid MongoDB aggregation operators? (Multiple correct)
+A) $match
+B) $group
+C) $project
+D) $sort
+E) $lookup
+F) $unwind
+
+Answer: A, B, C, D, E, F - All are valid MongoDB aggregation operators. $match filters documents, $group groups by fields, $project selects fields, $sort orders results, $lookup performs joins, $unwind deconstructs arrays.
+
+#@@@@@@@@@@
+
+14. Find the issue in this SQL Server query:
+```sql
+DECLARE @StartDate DATE = '2023-01-01';
+DECLARE @EndDate DATE = '2023-12-31';
+
+SELECT 
+    p.ProductName,
+    SUM(od.Quantity * od.UnitPrice) AS TotalSales
+FROM Products p
+INNER JOIN OrderDetails od ON p.ProductID = od.ProductID
+INNER JOIN Orders o ON od.OrderID = o.OrderID
+WHERE o.OrderDate BETWEEN @StartDate AND @EndDate
+GROUP BY p.ProductName
+ORDER BY TotalSales DESC;
+
+-- Performance issue: missing indexes
+```
+
+Answer: Missing indexes on join columns and WHERE clause. Should create indexes on Orders.OrderDate, OrderDetails.ProductID, OrderDetails.OrderID, and Products.ProductID. Also consider covering indexes including calculated columns for better performance.
+
+#@@@@@@@@@@
+
+15. What is the purpose of database normalization?
+
+Answer: Normalization reduces data redundancy and improves data integrity by organizing data into related tables. 1NF eliminates repeating groups, 2NF removes partial dependencies, 3NF removes transitive dependencies. Higher normal forms (BCNF, 4NF, 5NF) address specific anomalies.
+
+#@@@@@@@@@@
+
+16. Which of the following are valid Redis data types? (Multiple correct)
+A) String
+B) Hash
+C) List
+D) Set
+E) Sorted Set (ZSet)
+F) Stream
+
+Answer: A, B, C, D, E, F - All are valid Redis data types. String for simple values, Hash for field-value pairs, List for ordered collections, Set for unique values, Sorted Set for ranked data, Stream for append-only logs.
+
+#@@@@@@@@@@
+
+17. Complete this Neo4j Cypher query:
+```cypher
+// Find friends of friends who are not direct friends
+MATCH (user:Person {name: 'Alice'})
+MATCH (user)-[:FRIEND]->(friend)-[:FRIEND]->(fof:Person)
+WHERE NOT (user)-[:FRIEND]-(fof)
+AND user <> fof
+RETURN DISTINCT fof.name AS friend_of_friend,
+       COUNT(*) AS mutual_friends
+ORDER BY mutual_friends DESC
+_______________
+```
+
+Answer: `LIMIT 10` - Limits results to top 10 friend-of-friend recommendations. Neo4j queries often need LIMIT to prevent returning too many results, especially in social network traversals.
+
+#@@@@@@@@@@
+
+18. What is the difference between OLTP and OLAP systems?
+
+Answer: OLTP (Online Transaction Processing) handles real-time transactions with high concurrency, normalized data, and ACID properties. OLAP (Online Analytical Processing) performs complex analytics on historical data, uses denormalized/dimensional models, and optimizes for read performance and aggregations.
+
+#@@@@@@@@@@
+
+19. Find the bug in this MongoDB query:
+```javascript
+// Inefficient aggregation pipeline
+db.orders.aggregate([
+  {
+    $match: {
+      orderDate: {
+        $gte: ISODate("2023-01-01"),
+        $lt: ISODate("2024-01-01")
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: "customers",
+      localField: "customerId",
+      foreignField: "_id",
+      as: "customer"
+    }
+  },
+  {
+    $unwind: "$customer"
+  },
+  {
+    $match: {
+      "customer.country": "USA"
+    }
+  },
+  {
+    $group: {
+      _id: "$customer.state",
+      totalSales: { $sum: "$amount" }
+    }
+  }
+])
+```
+
+Answer: Inefficient pipeline order - $lookup before filtering by customer.country. Should filter customers first or use $lookup with pipeline to reduce documents processed. Better to match customer.country before expensive $lookup operation.
+
+#@@@@@@@@@@
+
+20. How do you implement database backup and recovery?
+
+Answer: Implement regular full backups, incremental/differential backups, transaction log backups, test restore procedures, use point-in-time recovery, implement backup encryption, store backups off-site, automate backup verification, and document recovery procedures with RTO/RPO requirements.
+
+#@@@@@@@@@@
+
+21. Which of the following are valid PostgreSQL data types? (Multiple correct)
+A) SERIAL
+B) UUID
+C) JSONB
+D) ARRAY
+E) ENUM
+F) HSTORE
+
+Answer: A, B, C, D, E, F - All are valid PostgreSQL data types. SERIAL for auto-incrementing integers, UUID for unique identifiers, JSONB for binary JSON, ARRAY for arrays, ENUM for enumerated types, HSTORE for key-value pairs.
+
+#@@@@@@@@@@
+
+22. Complete this Snowflake query optimization:
+```sql
+-- Optimize this query for better performance
+SELECT
+    c.customer_name,
+    SUM(o.order_amount) as total_spent,
+    COUNT(o.order_id) as order_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_date >= DATEADD(month, -12, CURRENT_DATE())
+GROUP BY c.customer_name
+ORDER BY total_spent DESC;
+
+-- Add clustering key for better performance
+ALTER TABLE orders CLUSTER BY (_______________);
+```
+
+Answer: `order_date` - Clustering by order_date improves performance for time-based queries. Snowflake automatically sorts and organizes data by clustering keys, reducing scan time for date range queries.
+
+#@@@@@@@@@@
+
+23. What is the purpose of database indexing?
+
+Answer: Indexes improve query performance by creating sorted data structures that allow fast data retrieval. Types include B-tree (range queries), Hash (equality), Bitmap (low cardinality), and specialized indexes (GIN, GiST in PostgreSQL). Trade-off between query speed and write performance.
+
+#@@@@@@@@@@
+
+24. Which of the following are valid Cassandra data modeling principles? (Multiple correct)
+A) Denormalize data
+B) Design for queries
+C) Avoid joins
+D) Use composite partition keys
+E) Minimize partitions per query
+F) Embrace data duplication
+
+Answer: A, B, C, D, E, F - All are Cassandra data modeling principles. Denormalize for performance, design tables for specific queries, avoid joins (not supported), use composite keys for distribution, minimize partition reads, duplicate data for different access patterns.
+
+#@@@@@@@@@@
+
+25. Find the issue in this database transaction:
+```python
+import psycopg2
+
+def transfer_money(from_account, to_account, amount):
+    conn = psycopg2.connect("dbname=bank user=postgres")
+    cursor = conn.cursor()
+
+    try:
+        # Check balance
+        cursor.execute("SELECT balance FROM accounts WHERE id = %s", (from_account,))
+        balance = cursor.fetchone()[0]
+
+        if balance < amount:
+            raise ValueError("Insufficient funds")
+
+        # Debit from source account
+        cursor.execute(
+            "UPDATE accounts SET balance = balance - %s WHERE id = %s",
+            (amount, from_account)
+        )
+
+        # Credit to destination account
+        cursor.execute(
+            "UPDATE accounts SET balance = balance + %s WHERE id = %s",
+            (amount, to_account)
+        )
+
+        conn.commit()
+
+    except Exception as e:
+        conn.rollback()
+        raise
+    finally:
+        cursor.close()
+        conn.close()
+```
+
+Answer: Race condition - balance check and update are not atomic. Another transaction could modify the balance between SELECT and UPDATE. Should use SELECT FOR UPDATE to lock the row or check balance within the UPDATE statement with WHERE clause.
+
+#@@@@@@@@@@
+
+26. How do you implement database sharding?
+
+Answer: Choose appropriate shard key for even distribution, implement shard routing logic, use consistent hashing for dynamic sharding, handle cross-shard queries, implement shard rebalancing, monitor shard distribution, and consider federation or horizontal partitioning strategies.
+
+#@@@@@@@@@@
+
+27. Which of the following are valid Elasticsearch query types? (Multiple correct)
+A) Match query
+B) Term query
+C) Range query
+D) Bool query
+E) Fuzzy query
+F) Wildcard query
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch query types. Match for full-text search, Term for exact matches, Range for numeric/date ranges, Bool for combining queries, Fuzzy for approximate matches, Wildcard for pattern matching.
+
+#@@@@@@@@@@
+
+28. Complete this SQL Server stored procedure:
+```sql
+CREATE PROCEDURE GetCustomerOrders
+    @CustomerId INT,
+    @StartDate DATE = NULL,
+    @EndDate DATE = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        o.OrderId,
+        o.OrderDate,
+        o.TotalAmount,
+        COUNT(od.OrderDetailId) as ItemCount
+    FROM Orders o
+    LEFT JOIN OrderDetails od ON o.OrderId = od.OrderId
+    WHERE o.CustomerId = @CustomerId
+    AND (@StartDate IS NULL OR o.OrderDate >= @StartDate)
+    AND (@EndDate IS NULL OR o.OrderDate <= @EndDate)
+    GROUP BY o.OrderId, o.OrderDate, o.TotalAmount
+    ORDER BY o.OrderDate DESC;
+
+    -- Return additional info
+    SELECT @@ROWCOUNT AS TotalOrders;
+END
+```
+
+Answer: The stored procedure is complete and functional. It handles optional date parameters, uses LEFT JOIN for order details, groups results properly, and returns row count. Good practices include SET NOCOUNT ON and parameter validation.
+
+#@@@@@@@@@@
+
+29. What is the difference between clustered and non-clustered indexes?
+
+Answer: Clustered index determines physical storage order of data (one per table), leaf nodes contain actual data rows. Non-clustered index is separate structure pointing to data rows, multiple allowed per table. Clustered faster for range queries, non-clustered better for covering queries.
+
+#@@@@@@@@@@
+
+30. Which of the following are valid MongoDB write concerns? (Multiple correct)
+A) w: 1
+B) w: "majority"
+C) j: true
+D) wtimeout: 5000
+E) w: 0
+F) fsync: true
+
+Answer: A, B, C, D, E, F - All are valid MongoDB write concern options. w specifies acknowledgment level, j requires journal confirmation, wtimeout sets timeout, w:0 means no acknowledgment, fsync forces disk write (deprecated, use j:true).
+
+#@@@@@@@@@@
+
+31. Predict the output of this Redis pipeline:
+```python
+import redis
+
+r = redis.Redis()
+pipe = r.pipeline()
+
+pipe.set("counter", 0)
+pipe.incr("counter")
+pipe.incr("counter")
+pipe.get("counter")
+pipe.delete("counter")
+pipe.exists("counter")
+
+results = pipe.execute()
+print(results)
+```
+
+Answer: [True, 1, 2, b'2', 1, 0] - Pipeline executes all commands atomically. SET returns True, INCR returns new values (1, 2), GET returns bytes '2', DELETE returns 1 (deleted), EXISTS returns 0 (doesn't exist).
+
+#@@@@@@@@@@
+
+32. How do you implement database connection security?
+
+Answer: Use SSL/TLS encryption, implement strong authentication (certificates, Kerberos), restrict network access with firewalls, use connection pooling with authentication, enable audit logging, implement least privilege access, rotate credentials regularly, and use VPNs for remote access.
+
+#@@@@@@@@@@
+
+33. Which of the following are valid Oracle PL/SQL constructs? (Multiple correct)
+A) Procedures
+B) Functions
+C) Packages
+D) Triggers
+E) Cursors
+F) Collections
+
+Answer: A, B, C, D, E, F - All are valid Oracle PL/SQL constructs. Procedures for actions, Functions for calculations, Packages for grouping, Triggers for events, Cursors for row processing, Collections for arrays/tables.
+
+#@@@@@@@@@@
+
+34. Find the bug in this database migration script:
+```sql
+-- Migration script with potential issues
+BEGIN TRANSACTION;
+
+-- Add new column
+ALTER TABLE users ADD COLUMN email_verified BOOLEAN DEFAULT FALSE;
+
+-- Update existing records
+UPDATE users SET email_verified = TRUE WHERE email IS NOT NULL;
+
+-- Add constraint
+ALTER TABLE users ADD CONSTRAINT chk_email_format
+CHECK (email LIKE '%@%.%');
+
+-- Drop old column
+ALTER TABLE users DROP COLUMN old_email_field;
+
+COMMIT;
+```
+
+Answer: Multiple issues: 1) No rollback handling for errors, 2) Email regex is too simple and may reject valid emails, 3) No backup before destructive operations, 4) Should validate constraint on existing data first, 5) Missing error handling for constraint violations.
+
+#@@@@@@@@@@
+
+35. What is the purpose of database partitioning?
+
+Answer: Partitioning divides large tables into smaller, manageable pieces while maintaining logical unity. Types include range, hash, list, and composite partitioning. Benefits include improved performance, easier maintenance, parallel processing, and better resource utilization for large datasets.
+
+#@@@@@@@@@@
+
+36. Which of the following are valid vector database operations? (Multiple correct)
+A) Similarity search
+B) Nearest neighbor queries
+C) Vector indexing
+D) Embedding storage
+E) Cosine similarity
+F) Euclidean distance
+
+Answer: A, B, C, D, E, F - All are valid vector database operations. Similarity search finds related vectors, Nearest neighbor for closest matches, Vector indexing for performance, Embedding storage for ML models, Cosine/Euclidean for distance metrics.
+
+#@@@@@@@@@@
+
+37. Complete this Pinecone vector search:
+```python
+import pinecone
+
+# Initialize Pinecone
+pinecone.init(api_key="your-api-key", environment="us-west1-gcp")
+
+# Create index
+index_name = "semantic-search"
+index = pinecone.Index(index_name)
+
+# Search for similar vectors
+query_vector = [0.1, 0.2, 0.3, ...]  # 1536-dimensional vector
+
+results = index.query(
+    vector=query_vector,
+    top_k=10,
+    include_metadata=True,
+    filter={
+        "category": {"$eq": "technology"}
+    }
+)
+
+# Process results
+for match in results['matches']:
+    print(f"ID: {match['id']}, Score: {match['score']:.4f}")
+    print(f"Metadata: {match.get('_______________', {})}")
+```
+
+Answer: `'metadata'` - Pinecone stores metadata alongside vectors for filtering and retrieval. Metadata contains additional information about the vector like text content, categories, timestamps, etc.
+
+#@@@@@@@@@@
+
+38. What is the difference between Weaviate and traditional databases?
+
+Answer: Weaviate is a vector database optimized for semantic search and AI applications, stores objects with vector embeddings, supports GraphQL queries, and enables similarity search. Traditional databases store structured data with exact matches, use SQL, and optimize for transactional operations.
+
+#@@@@@@@@@@
+
+39. Find the issue in this Milvus collection setup:
+```python
+from pymilvus import connections, Collection, FieldSchema, CollectionSchema, DataType
+
+# Connect to Milvus
+connections.connect("default", host="localhost", port="19530")
+
+# Define schema
+fields = [
+    FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
+    FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=128),
+    FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=1000)
+]
+
+schema = CollectionSchema(fields, "Document embeddings collection")
+
+# Create collection
+collection = Collection("documents", schema)
+
+# Create index - potential issue
+index_params = {
+    "metric_type": "L2",
+    "index_type": "IVF_FLAT",
+    "params": {"nlist": 1024}
+}
+
+collection.create_index("embedding", index_params)
+
+# Load collection
+collection.load()
+```
+
+Answer: No explicit issue in the code, but considerations: 1) IVF_FLAT may not be optimal for all use cases (consider HNSW for better performance), 2) nlist=1024 might be too high for small datasets, 3) Should check if collection exists before creating, 4) Missing error handling.
+
+#@@@@@@@@@@
+
+40. How do you implement database monitoring and alerting?
+
+Answer: Monitor key metrics (CPU, memory, disk I/O, connections, query performance), set up alerts for thresholds, use database-specific tools (pg_stat_statements, MySQL Performance Schema), implement log analysis, track slow queries, monitor replication lag, and use APM tools for application-level monitoring.
+
+#@@@@@@@@@@
+
+41. Which of the following are valid SQL window functions? (Multiple correct)
+A) ROW_NUMBER()
+B) RANK()
+C) DENSE_RANK()
+D) LAG()
+E) LEAD()
+F) NTILE()
+
+Answer: A, B, C, D, E, F - All are valid SQL window functions. ROW_NUMBER for unique numbering, RANK/DENSE_RANK for ranking with ties, LAG/LEAD for accessing previous/next rows, NTILE for dividing into buckets.
+
+#@@@@@@@@@@
+
+42. Complete this database performance tuning:
+```sql
+-- Slow query analysis
+EXPLAIN ANALYZE
+SELECT
+    c.customer_name,
+    COUNT(o.order_id) as order_count,
+    AVG(o.total_amount) as avg_order_value
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE c.registration_date >= '2023-01-01'
+GROUP BY c.customer_id, c.customer_name
+HAVING COUNT(o.order_id) > 5
+ORDER BY avg_order_value DESC;
+
+-- Optimization suggestions:
+-- 1. Index on customers.registration_date
+-- 2. Index on orders.customer_id
+-- 3. Consider materialized view for frequent aggregations
+-- 4. _______________
+```
+
+Answer: `Covering index on (customer_id, total_amount)` - A covering index on orders table including both join column and aggregated column would eliminate the need to access the table data, significantly improving performance for this query pattern.
+
+#@@@@@@@@@@
+
+43. What is the purpose of database connection pooling?
+
+Answer: Connection pooling manages a cache of database connections to reduce overhead of creating/destroying connections. Benefits include improved performance, resource management, connection reuse, configurable pool sizes, and better scalability for high-concurrency applications.
+
+#@@@@@@@@@@
+
+44. Which of the following are valid MongoDB index types? (Multiple correct)
+A) Single field
+B) Compound
+C) Multikey
+D) Text
+E) Geospatial
+F) Hashed
+
+Answer: A, B, C, D, E, F - All are valid MongoDB index types. Single field for basic queries, Compound for multiple fields, Multikey for arrays, Text for full-text search, Geospatial for location queries, Hashed for sharding.
+
+#@@@@@@@@@@
+
+45. Find the bug in this database schema design:
+```sql
+-- User management system schema
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_profiles (
+    user_id INTEGER REFERENCES users(id),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    phone VARCHAR(20),
+    address TEXT,
+    PRIMARY KEY (user_id)
+);
+
+CREATE TABLE user_sessions (
+    session_id VARCHAR(128) PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+```
+
+Answer: Missing unique constraint on users.email - emails should be unique for login purposes. Also consider: 1) Adding indexes on frequently queried columns, 2) Adding ON DELETE CASCADE for foreign keys, 3) Consider password policy constraints, 4) Add updated_at timestamps.
+
+#@@@@@@@@@@
+
+46. How do you implement database disaster recovery?
+
+Answer: Implement regular backups (full, incremental, differential), set up replication to secondary sites, test restore procedures, document RTO/RPO requirements, use point-in-time recovery, implement automated failover, maintain offsite backup storage, and regularly test disaster recovery procedures.
+
+#@@@@@@@@@@
+
+47. Which of the following are valid Elasticsearch aggregation types? (Multiple correct)
+A) Terms aggregation
+B) Date histogram
+C) Range aggregation
+D) Cardinality aggregation
+E) Top hits aggregation
+F) Significant terms
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch aggregations. Terms for grouping by field values, Date histogram for time-based grouping, Range for numeric ranges, Cardinality for unique counts, Top hits for sample documents, Significant terms for anomaly detection.
+
+#@@@@@@@@@@
+
+48. Complete this Redis Lua script:
+```lua
+-- Atomic counter with expiration
+local key = KEYS[1]
+local increment = tonumber(ARGV[1])
+local ttl = tonumber(ARGV[2])
+
+-- Get current value
+local current = redis.call('GET', key)
+
+if current == false then
+    -- Key doesn't exist, set initial value
+    redis.call('SET', key, increment)
+    redis.call('EXPIRE', key, ttl)
+    return increment
+else
+    -- Increment existing value
+    local new_value = redis.call('INCRBY', key, increment)
+
+    -- Reset TTL if needed
+    local remaining_ttl = redis.call('TTL', key)
+    if remaining_ttl == -1 then
+        redis.call('_______________', key, ttl)
+    end
+
+    return new_value
+end
+```
+
+Answer: `'EXPIRE'` - Sets expiration time for the key. The script checks if TTL is -1 (no expiration set) and resets it to maintain the expiration policy for the counter.
+
+#@@@@@@@@@@
+
+49. What is the difference between RDBMS and Graph databases?
+
+Answer: RDBMS stores data in tables with relationships via foreign keys, optimized for structured data and complex queries. Graph databases store nodes and edges representing entities and relationships, optimized for traversing connections and finding patterns in highly connected data.
+
+#@@@@@@@@@@
+
+50. Which of the following are valid PostgreSQL extensions? (Multiple correct)
+A) PostGIS
+B) pg_stat_statements
+C) uuid-ossp
+D) hstore
+E) pg_trgm
+F) timescaledb
+
+Answer: A, B, C, D, E, F - All are valid PostgreSQL extensions. PostGIS for geospatial data, pg_stat_statements for query statistics, uuid-ossp for UUID generation, hstore for key-value storage, pg_trgm for trigram matching, timescaledb for time-series data.
+
+#@@@@@@@@@@
+
+51. Predict the output of this SQL query:
+```sql
+WITH sales_data AS (
+  SELECT
+    product_id,
+    sale_date,
+    amount,
+    LAG(amount) OVER (PARTITION BY product_id ORDER BY sale_date) as prev_amount
+  FROM sales
+  WHERE sale_date >= '2023-01-01'
+)
+SELECT
+  product_id,
+  COUNT(*) as total_sales,
+  COUNT(prev_amount) as sales_with_previous,
+  AVG(amount - COALESCE(prev_amount, 0)) as avg_growth
+FROM sales_data
+GROUP BY product_id
+ORDER BY avg_growth DESC;
+```
+
+Answer: Returns product analysis with total sales count, count of sales with previous values (excludes first sale per product), and average growth compared to previous sale. LAG function provides previous amount, COALESCE handles NULL for first sales.
+
+#@@@@@@@@@@
+
+52. How do you implement database security?
+
+Answer: Implement authentication and authorization, use encryption at rest and in transit, apply principle of least privilege, enable audit logging, use database firewalls, implement data masking for sensitive data, regular security updates, and conduct security assessments.
+
+#@@@@@@@@@@
+
+53. Which of the following are valid Cassandra data types? (Multiple correct)
+A) TEXT
+B) INT
+C) UUID
+D) TIMESTAMP
+E) SET
+F) MAP
+
+Answer: A, B, C, D, E, F - All are valid Cassandra data types. TEXT for strings, INT for integers, UUID for unique identifiers, TIMESTAMP for dates, SET for unique collections, MAP for key-value pairs within columns.
+
+#@@@@@@@@@@
+
+54. Find the issue in this database query optimization:
+```sql
+-- Attempting to optimize this query
+SELECT DISTINCT
+    u.username,
+    p.title,
+    c.content
+FROM users u
+JOIN posts p ON u.id = p.user_id
+JOIN comments c ON p.id = c.post_id
+WHERE u.status = 'active'
+AND p.published = true
+AND c.created_at > CURRENT_DATE - INTERVAL '30 days'
+ORDER BY c.created_at DESC
+LIMIT 100;
+
+-- Proposed index
+CREATE INDEX idx_complex ON comments(created_at DESC, post_id)
+WHERE created_at > CURRENT_DATE - INTERVAL '30 days';
+```
+
+Answer: DISTINCT with ORDER BY can be inefficient and may not work as expected. The query returns duplicate rows due to multiple comments per post. Should either remove DISTINCT and accept duplicates, or restructure query to aggregate comments, or use window functions to get latest comment per post.
+
+#@@@@@@@@@@
+
+55. What is the purpose of database views?
+
+Answer: Views provide virtual tables based on query results, offering data abstraction, security (hiding sensitive columns), simplified complex queries, consistent data access patterns, and logical data independence. Can be updatable or read-only depending on complexity.
+
+#@@@@@@@@@@
+
+56. Which of the following are valid MySQL replication types? (Multiple correct)
+A) Master-Slave
+B) Master-Master
+C) Chain replication
+D) Circular replication
+E) Semi-synchronous
+F) Group replication
+
+Answer: A, B, C, D, E, F - All are valid MySQL replication types. Master-Slave for read scaling, Master-Master for high availability, Chain for cascading, Circular for multi-master loops, Semi-synchronous for consistency, Group replication for automatic failover.
+
+#@@@@@@@@@@
+
+57. Complete this Snowflake data loading:
+```sql
+-- Create file format
+CREATE OR REPLACE FILE FORMAT my_csv_format
+  TYPE = 'CSV'
+  FIELD_DELIMITER = ','
+  SKIP_HEADER = 1
+  NULL_IF = ('NULL', 'null', '')
+  EMPTY_FIELD_AS_NULL = TRUE
+  COMPRESSION = 'GZIP';
+
+-- Create stage
+CREATE OR REPLACE STAGE my_stage
+  URL = 's3://my-bucket/data/'
+  CREDENTIALS = (AWS_KEY_ID = 'xxx' AWS_SECRET_KEY = 'yyy')
+  FILE_FORMAT = my_csv_format;
+
+-- Load data
+COPY INTO my_table
+FROM @my_stage/file.csv.gz
+FILE_FORMAT = my_csv_format
+ON_ERROR = '_______________'
+PURGE = TRUE;
+```
+
+Answer: `'CONTINUE'` - Continues loading despite errors, skipping bad records. Other options include 'SKIP_FILE' (skip entire file on error) and 'ABORT_STATEMENT' (stop on first error). CONTINUE is useful for data quality issues.
+
+#@@@@@@@@@@
+
+58. What is the difference between SQL Server clustered and non-clustered indexes?
+
+Answer: Clustered index determines physical row storage order (one per table), leaf pages contain actual data. Non-clustered index is separate structure with pointers to data rows (multiple per table). Clustered index IS the table, non-clustered points TO the table.
+
+#@@@@@@@@@@
+
+59. Find the bug in this MongoDB schema design:
+```javascript
+// User and Order collections
+db.users.insertOne({
+  _id: ObjectId("..."),
+  username: "john_doe",
+  email: "john@example.com",
+  profile: {
+    firstName: "John",
+    lastName: "Doe",
+    address: {
+      street: "123 Main St",
+      city: "Anytown",
+      zipCode: "12345"
+    }
+  }
+});
+
+db.orders.insertOne({
+  _id: ObjectId("..."),
+  userId: "john_doe",  // Potential issue
+  orderDate: new Date(),
+  items: [
+    {
+      productId: ObjectId("..."),
+      quantity: 2,
+      price: 29.99
+    }
+  ],
+  total: 59.98
+});
+```
+
+Answer: Using username string instead of ObjectId for userId reference. Should use `userId: ObjectId("...")` to maintain referential integrity and enable efficient joins with $lookup. String references are fragile and don't benefit from MongoDB's ObjectId indexing.
+
+#@@@@@@@@@@
+
+60. How do you implement database caching strategies?
+
+Answer: Implement cache-aside (lazy loading), write-through (update cache on write), write-behind (async cache updates), refresh-ahead (proactive cache refresh), and cache invalidation strategies. Use Redis, Memcached, or application-level caching with appropriate TTL and eviction policies.
+
+#@@@@@@@@@@
+
+61. Which of the following are valid Oracle database recovery modes? (Multiple correct)
+A) ARCHIVELOG
+B) NOARCHIVELOG
+C) FORCE LOGGING
+D) FLASHBACK
+E) RMAN
+F) Data Guard
+
+Answer: A, B, C, D, E, F - All are Oracle recovery-related features. ARCHIVELOG/NOARCHIVELOG modes for redo log archiving, FORCE LOGGING ensures all operations are logged, FLASHBACK for point-in-time recovery, RMAN for backup/recovery, Data Guard for standby databases.
+
+#@@@@@@@@@@
+
+62. Complete this PostgreSQL partitioning:
+```sql
+-- Create partitioned table
+CREATE TABLE sales (
+    id SERIAL,
+    sale_date DATE NOT NULL,
+    amount DECIMAL(10,2),
+    customer_id INTEGER
+) PARTITION BY RANGE (sale_date);
+
+-- Create partitions
+CREATE TABLE sales_2023_q1 PARTITION OF sales
+    FOR VALUES FROM ('2023-01-01') TO ('2023-04-01');
+
+CREATE TABLE sales_2023_q2 PARTITION OF sales
+    FOR VALUES FROM ('2023-04-01') TO ('2023-07-01');
+
+-- Create default partition
+CREATE TABLE sales_default PARTITION OF sales
+    _______________
+```
+
+Answer: `DEFAULT` - Creates a default partition to catch values that don't match any other partition. Syntax: `CREATE TABLE sales_default PARTITION OF sales DEFAULT;` This prevents errors when inserting data outside defined ranges.
+
+#@@@@@@@@@@
+
+63. What is the purpose of database triggers?
+
+Answer: Triggers automatically execute code in response to database events (INSERT, UPDATE, DELETE). Used for audit trails, data validation, automatic calculations, maintaining derived data, enforcing complex business rules, and logging changes. Can be BEFORE, AFTER, or INSTEAD OF triggers.
+
+#@@@@@@@@@@
+
+64. Which of the following are valid Redis persistence options? (Multiple correct)
+A) RDB snapshots
+B) AOF (Append Only File)
+C) Mixed persistence
+D) No persistence
+E) Replication
+F) Clustering
+
+Answer: A, B, C, D - Redis persistence options: RDB for point-in-time snapshots, AOF for command logging, Mixed for both, No persistence for cache-only. Replication and Clustering are availability features, not persistence methods.
+
+#@@@@@@@@@@
+
+65. Find the issue in this database connection handling:
+```python
+import mysql.connector
+import threading
+import time
+
+# Global connection - problematic
+connection = mysql.connector.connect(
+    host='localhost',
+    user='app_user',
+    password='password',
+    database='myapp'
+)
+
+def process_user_data(user_id):
+    cursor = connection.cursor()
+
+    try:
+        # Query user data
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+
+        # Process data (simulate work)
+        time.sleep(0.1)
+
+        # Update user
+        cursor.execute(
+            "UPDATE users SET last_accessed = NOW() WHERE id = %s",
+            (user_id,)
+        )
+        connection.commit()
+
+    except Exception as e:
+        connection.rollback()
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+
+# Multiple threads using same connection
+threads = []
+for i in range(10):
+    t = threading.Thread(target=process_user_data, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+```
+
+Answer: Sharing single database connection across multiple threads is not thread-safe. MySQL connections are not thread-safe by default. Should use connection pooling or create separate connections per thread. Also missing proper error handling and connection cleanup.
+
+#@@@@@@@@@@
+
+66. How do you implement database load balancing?
+
+Answer: Use read replicas for read scaling, implement connection pooling with load balancing, use database proxies (ProxySQL, PgBouncer), implement application-level routing, use clustering solutions, and monitor database performance to distribute load effectively.
+
+#@@@@@@@@@@
+
+67. Which of the following are valid Elasticsearch index settings? (Multiple correct)
+A) number_of_shards
+B) number_of_replicas
+C) refresh_interval
+D) max_result_window
+E) analysis settings
+F) mapping settings
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch index settings. Shards for horizontal scaling, Replicas for availability, Refresh interval for search visibility, Max result window for deep pagination, Analysis for text processing, Mappings for field definitions.
+
+#@@@@@@@@@@
+
+68. Complete this Neo4j graph traversal:
+```cypher
+// Find shortest path between two users through mutual connections
+MATCH (start:Person {name: 'Alice'}),
+      (end:Person {name: 'Bob'})
+
+MATCH path = shortestPath(
+  (start)-[:KNOWS|:WORKS_WITH|:FRIENDS_WITH*1..6]-(end)
+)
+
+WHERE start <> end
+
+RETURN
+  path,
+  length(path) as path_length,
+  [node in nodes(path) | node.name] as names,
+  [rel in relationships(path) | _______________] as relationship_types
+
+ORDER BY path_length
+LIMIT 1
+```
+
+Answer: `type(rel)` - Returns the relationship type for each relationship in the path. This provides insight into how the two people are connected (through work, friendship, etc.).
+
+#@@@@@@@@@@
+
+69. What is the difference between OLAP and OLTP workloads?
+
+Answer: OLTP (Online Transaction Processing) handles real-time transactions, high concurrency, normalized data, short queries, ACID compliance. OLAP (Online Analytical Processing) performs complex analytics, read-heavy, denormalized data, long-running queries, eventual consistency acceptable.
+
+#@@@@@@@@@@
+
+70. Which of the following are valid MongoDB aggregation stages? (Multiple correct)
+A) $match
+B) $group
+C) $project
+D) $lookup
+E) $facet
+F) $graphLookup
+
+Answer: A, B, C, D, E, F - All are valid MongoDB aggregation stages. $match filters documents, $group aggregates by fields, $project shapes output, $lookup joins collections, $facet creates multiple pipelines, $graphLookup performs recursive searches.
+
+#@@@@@@@@@@
+
+71. Predict the output of this database query:
+```sql
+WITH RECURSIVE employee_hierarchy AS (
+  -- Base case: top-level managers
+  SELECT
+    employee_id,
+    name,
+    manager_id,
+    1 as level,
+    CAST(name AS VARCHAR(1000)) as path
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- Recursive case: subordinates
+  SELECT
+    e.employee_id,
+    e.name,
+    e.manager_id,
+    eh.level + 1,
+    CONCAT(eh.path, ' -> ', e.name)
+  FROM employees e
+  JOIN employee_hierarchy eh ON e.manager_id = eh.employee_id
+  WHERE eh.level < 5
+)
+SELECT level, COUNT(*) as employee_count
+FROM employee_hierarchy
+GROUP BY level
+ORDER BY level;
+```
+
+Answer: Returns count of employees at each organizational level (1=top managers, 2=direct reports, etc.) up to 5 levels deep. Shows organizational structure distribution with level 1 having fewest (top managers) and typically more employees at lower levels.
+
+#@@@@@@@@@@
+
+72. How do you implement database audit logging?
+
+Answer: Enable database audit features (Oracle Audit, SQL Server Audit, PostgreSQL pgAudit), log DDL/DML operations, track user access, implement application-level logging, use triggers for custom auditing, store audit logs securely, and implement log rotation and retention policies.
+
+#@@@@@@@@@@
+
+73. Which of the following are valid Cassandra consistency levels for reads? (Multiple correct)
+A) ONE
+B) TWO
+C) THREE
+D) QUORUM
+E) ALL
+F) LOCAL_ONE
+
+Answer: A, B, C, D, E, F - All are valid Cassandra read consistency levels. ONE for fastest reads, TWO/THREE for specific replica counts, QUORUM for majority, ALL for strongest consistency, LOCAL_ONE for local datacenter reads.
+
+#@@@@@@@@@@
+
+74. Find the bug in this database stored procedure:
+```sql
+DELIMITER //
+
+CREATE PROCEDURE UpdateUserBalance(
+    IN user_id INT,
+    IN amount DECIMAL(10,2),
+    IN transaction_type ENUM('credit', 'debit')
+)
+BEGIN
+    DECLARE current_balance DECIMAL(10,2);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    -- Get current balance
+    SELECT balance INTO current_balance
+    FROM user_accounts
+    WHERE id = user_id;
+
+    -- Update balance
+    IF transaction_type = 'credit' THEN
+        UPDATE user_accounts
+        SET balance = balance + amount
+        WHERE id = user_id;
+    ELSE
+        -- Potential issue: no balance check for debit
+        UPDATE user_accounts
+        SET balance = balance - amount
+        WHERE id = user_id;
+    END IF;
+
+    COMMIT;
+END //
+
+DELIMITER ;
+```
+
+Answer: No validation for sufficient balance on debit transactions. Should check `current_balance >= amount` before allowing debit. Also missing check for user existence and should use SELECT FOR UPDATE to prevent race conditions.
+
+#@@@@@@@@@@
+
+75. What is the purpose of database materialized views?
+
+Answer: Materialized views store query results physically, improving performance for complex aggregations and joins. Benefits include faster query response, reduced computation overhead, and better performance for analytical workloads. Require refresh strategies (immediate, deferred, or manual).
+
+#@@@@@@@@@@
+
+76. Which of the following are valid PostgreSQL JSON operators? (Multiple correct)
+A) ->
+B) ->>
+C) #>
+D) #>>
+E) @>
+F) <@
+
+Answer: A, B, C, D, E, F - All are valid PostgreSQL JSON operators. -> returns JSON object, ->> returns text, #> gets nested object, #>> gets nested text, @> contains, <@ is contained by.
+
+#@@@@@@@@@@
+
+77. Complete this Redis cluster configuration:
+```bash
+# Redis cluster setup
+redis-cli --cluster create \
+  127.0.0.1:7000 \
+  127.0.0.1:7001 \
+  127.0.0.1:7002 \
+  127.0.0.1:7003 \
+  127.0.0.1:7004 \
+  127.0.0.1:7005 \
+  --cluster-replicas _______________
+
+# This creates a cluster with 3 masters and 3 replicas
+```
+
+Answer: `1` - Creates 1 replica for each master node. With 6 nodes and replicas=1, Redis creates 3 master nodes and 3 replica nodes, providing high availability and automatic failover.
+
+#@@@@@@@@@@
+
+78. What is the difference between database replication and clustering?
+
+Answer: Replication copies data to multiple servers for redundancy and read scaling, typically master-slave setup. Clustering distributes data across multiple nodes for horizontal scaling and load distribution. Replication for availability, clustering for scalability.
+
+#@@@@@@@@@@
+
+79. Find the issue in this Elasticsearch query:
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": "database optimization"
+          }
+        },
+        {
+          "range": {
+            "publish_date": {
+              "gte": "2023-01-01",
+              "lte": "2023-12-31"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "status": "published"
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "_score": {"order": "desc"}
+    },
+    {
+      "publish_date": {"order": "desc"}
+    }
+  ],
+  "size": 1000
+}
+```
+
+Answer: Size of 1000 may hit max_result_window limit (default 10,000). For large result sets, should use search_after for pagination or increase max_result_window setting. Also, sorting by _score and date together may not provide consistent results.
+
+#@@@@@@@@@@
+
+80. How do you implement database schema versioning?
+
+Answer: Use migration tools (Flyway, Liquibase, Alembic), version control schema changes, implement rollback procedures, test migrations in staging, use semantic versioning, document schema changes, and implement automated deployment pipelines for database updates.
+
+#@@@@@@@@@@
+
+81. Which of the following are valid SQL Server isolation levels? (Multiple correct)
+A) READ UNCOMMITTED
+B) READ COMMITTED
+C) REPEATABLE READ
+D) SERIALIZABLE
+E) SNAPSHOT
+F) READ COMMITTED SNAPSHOT
+
+Answer: A, B, C, D, E, F - All are valid SQL Server isolation levels. READ UNCOMMITTED allows dirty reads, READ COMMITTED prevents dirty reads, REPEATABLE READ prevents non-repeatable reads, SERIALIZABLE prevents phantom reads, SNAPSHOT uses row versioning.
+
+#@@@@@@@@@@
+
+82. Complete this MongoDB change stream:
+```javascript
+// Watch for changes in orders collection
+const changeStream = db.orders.watch([
+  {
+    $match: {
+      'fullDocument.status': 'completed',
+      'operationType': 'update'
+    }
+  }
+], {
+  fullDocument: '_______________'
+});
+
+changeStream.on('change', (change) => {
+  console.log('Order completed:', change.fullDocument);
+  // Process completed order
+  processCompletedOrder(change.fullDocument);
+});
+
+function processCompletedOrder(order) {
+  // Send notification, update analytics, etc.
+  console.log(`Processing order ${order._id}`);
+}
+```
+
+Answer: `'updateLookup'` - Returns the full document after the update operation. Other options include 'default' (only for insert/replace operations) and 'whenAvailable' (returns full document when available).
+
+#@@@@@@@@@@
+
+83. What is the purpose of database connection strings?
+
+Answer: Connection strings specify database connection parameters including server address, database name, authentication credentials, connection options, and driver-specific settings. They provide a standardized way to configure database connections across different applications and environments.
+
+#@@@@@@@@@@
+
+84. Which of the following are valid Oracle PL/SQL exception types? (Multiple correct)
+A) NO_DATA_FOUND
+B) TOO_MANY_ROWS
+C) ZERO_DIVIDE
+D) VALUE_ERROR
+E) DUP_VAL_ON_INDEX
+F) INVALID_CURSOR
+
+Answer: A, B, C, D, E, F - All are valid Oracle PL/SQL predefined exceptions. NO_DATA_FOUND for empty SELECT INTO, TOO_MANY_ROWS for multiple rows in SELECT INTO, ZERO_DIVIDE for division by zero, VALUE_ERROR for conversion errors, DUP_VAL_ON_INDEX for unique constraint violations, INVALID_CURSOR for cursor operations.
+
+#@@@@@@@@@@
+
+85. Find the bug in this database transaction:
+```python
+import sqlite3
+
+def transfer_funds(from_account, to_account, amount):
+    conn = sqlite3.connect('bank.db')
+    cursor = conn.cursor()
+
+    try:
+        # Start transaction
+        conn.execute('BEGIN TRANSACTION')
+
+        # Check source account balance
+        cursor.execute('SELECT balance FROM accounts WHERE id = ?', (from_account,))
+        balance = cursor.fetchone()[0]
+
+        if balance < amount:
+            raise ValueError('Insufficient funds')
+
+        # Debit source account
+        cursor.execute(
+            'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+            (amount, from_account)
+        )
+
+        # Credit destination account
+        cursor.execute(
+            'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+            (amount, to_account)
+        )
+
+        # Commit transaction
+        conn.commit()
+        print(f'Transfer of ${amount} completed')
+
+    except Exception as e:
+        conn.rollback()
+        print(f'Transfer failed: {e}')
+    finally:
+        conn.close()
+```
+
+Answer: Race condition between balance check and update. Another transaction could modify the balance after the SELECT but before the UPDATE. Should use a single UPDATE with WHERE clause: `UPDATE accounts SET balance = balance - ? WHERE id = ? AND balance >= ?` to ensure atomic check-and-update.
+
+#@@@@@@@@@@
+
+86. How do you implement database performance monitoring?
+
+Answer: Monitor key metrics (query execution time, CPU/memory usage, I/O operations, connection counts), use database-specific tools (Performance Schema, pg_stat_statements), implement slow query logging, set up alerting thresholds, and use APM tools for comprehensive monitoring.
+
+#@@@@@@@@@@
+
+87. Which of the following are valid Cassandra write consistency levels? (Multiple correct)
+A) ANY
+B) ONE
+C) TWO
+D) THREE
+E) QUORUM
+F) ALL
+
+Answer: A, B, C, D, E, F - All are valid Cassandra write consistency levels. ANY for highest availability (allows hinted handoff), ONE for fast writes, TWO/THREE for specific replica counts, QUORUM for majority, ALL for strongest consistency.
+
+#@@@@@@@@@@
+
+88. Complete this database backup script:
+```bash
+#!/bin/bash
+
+# Database backup script
+DB_NAME="production_db"
+DB_USER="backup_user"
+DB_HOST="localhost"
+BACKUP_DIR="/backups"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${DATE}.sql"
+
+# Create backup directory if it doesn't exist
+mkdir -p $BACKUP_DIR
+
+# Perform backup
+mysqldump \
+  --host=$DB_HOST \
+  --user=$DB_USER \
+  --password \
+  --single-transaction \
+  --routines \
+  --triggers \
+  --events \
+  --_______________\
+  $DB_NAME > $BACKUP_FILE
+
+# Compress backup
+gzip $BACKUP_FILE
+
+# Remove backups older than 7 days
+find $BACKUP_DIR -name "${DB_NAME}_*.sql.gz" -mtime +7 -delete
+
+echo "Backup completed: ${BACKUP_FILE}.gz"
+```
+
+Answer: `--lock-tables=false` or `--skip-lock-tables` - Prevents table locking during backup when using --single-transaction. This allows the backup to run without blocking other operations on InnoDB tables.
+
+#@@@@@@@@@@
+
+89. What is the difference between database sharding and partitioning?
+
+Answer: Partitioning divides tables within a single database instance (horizontal/vertical), managed by DBMS. Sharding distributes data across multiple database instances/servers, requires application-level routing. Partitioning for single-server optimization, sharding for distributed scaling.
+
+#@@@@@@@@@@
+
+90. Which of the following are valid MongoDB write operations? (Multiple correct)
+A) insertOne()
+B) insertMany()
+C) updateOne()
+D) updateMany()
+E) replaceOne()
+F) deleteOne()
+
+Answer: A, B, C, D, E, F - All are valid MongoDB write operations. insertOne/insertMany for creating documents, updateOne/updateMany for modifying documents, replaceOne for replacing entire documents, deleteOne/deleteMany for removing documents.
+
+#@@@@@@@@@@
+
+91. Predict the output of this SQL query:
+```sql
+SELECT
+  department,
+  salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) as salary_rank,
+  DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) as dense_rank,
+  ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) as row_num
+FROM employees
+WHERE department IN ('IT', 'Sales')
+ORDER BY department, salary DESC;
+
+-- Sample data:
+-- IT: 90000, 85000, 85000, 80000
+-- Sales: 95000, 90000, 85000
+```
+
+Answer: IT department: (90000,1,1,1), (85000,2,2,2), (85000,2,2,3), (80000,4,3,4). Sales: (95000,1,1,1), (90000,2,2,2), (85000,3,3,3). RANK skips numbers after ties, DENSE_RANK doesn't skip, ROW_NUMBER always unique.
+
+#@@@@@@@@@@
+
+92. How do you implement database high availability?
+
+Answer: Use replication (master-slave, master-master), implement clustering, set up automatic failover, use load balancers, implement health checks, maintain synchronized standby systems, use shared storage solutions, and implement disaster recovery procedures.
+
+#@@@@@@@@@@
+
+93. Which of the following are valid Elasticsearch field data types? (Multiple correct)
+A) text
+B) keyword
+C) integer
+D) date
+E) boolean
+F) geo_point
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch field types. text for full-text search, keyword for exact matches, integer for numbers, date for timestamps, boolean for true/false, geo_point for geographic coordinates.
+
+#@@@@@@@@@@
+
+94. Find the issue in this database index strategy:
+```sql
+-- Table with frequent queries
+CREATE TABLE user_activities (
+    id BIGINT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    activity_type VARCHAR(50) NOT NULL,
+    activity_date TIMESTAMP NOT NULL,
+    data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Proposed indexes
+CREATE INDEX idx_user_activities_user_id ON user_activities(user_id);
+CREATE INDEX idx_user_activities_type ON user_activities(activity_type);
+CREATE INDEX idx_user_activities_date ON user_activities(activity_date);
+CREATE INDEX idx_user_activities_created ON user_activities(created_at);
+
+-- Common query patterns:
+-- 1. SELECT * FROM user_activities WHERE user_id = ? AND activity_date > ?
+-- 2. SELECT * FROM user_activities WHERE user_id = ? AND activity_type = ?
+-- 3. SELECT * FROM user_activities WHERE user_id = ? ORDER BY activity_date DESC
+```
+
+Answer: Too many single-column indexes instead of composite indexes. Should create composite indexes matching query patterns: `(user_id, activity_date)`, `(user_id, activity_type)`, `(user_id, activity_date DESC)`. Single-column indexes are less efficient for multi-column WHERE clauses.
+
+#@@@@@@@@@@
+
+95. What is the purpose of database connection pooling middleware?
+
+Answer: Connection pooling middleware manages database connections between applications and databases, providing connection reuse, load balancing, query routing, connection limits, failover handling, and monitoring. Examples include PgBouncer, ProxySQL, and application-level pools.
+
+#@@@@@@@@@@
+
+96. Which of the following are valid Neo4j relationship directions? (Multiple correct)
+A) Outgoing
+B) Incoming
+C) Undirected
+D) Bidirectional
+E) Self-referencing
+F) Weighted
+
+Answer: A, B, C, E - Neo4j relationships have direction: Outgoing (->), Incoming (<-), Undirected (ignoring direction in queries), Self-referencing (node to itself). Bidirectional requires two relationships, Weighted is a property, not a direction.
+
+#@@@@@@@@@@
+
+97. Complete this Pinecone index management:
+```python
+import pinecone
+
+# Initialize Pinecone
+pinecone.init(api_key="your-api-key", environment="us-west1-gcp")
+
+# Create index with metadata filtering
+pinecone.create_index(
+    name="document-search",
+    dimension=1536,
+    metric="cosine",
+    metadata_config={
+        "indexed": ["category", "author", "published_date"]
+    }
+)
+
+# Upsert vectors with metadata
+index = pinecone.Index("document-search")
+
+vectors_to_upsert = [
+    {
+        "id": "doc1",
+        "values": [0.1, 0.2, ...],  # 1536-dim vector
+        "metadata": {
+            "category": "technology",
+            "author": "John Doe",
+            "published_date": "2023-01-15"
+        }
+    }
+]
+
+index.upsert(vectors=vectors_to_upsert, _______________="default")
+```
+
+Answer: `namespace` - Pinecone uses namespaces to partition vectors within an index. Default namespace is "", but you can specify custom namespaces for logical separation of data.
+
+#@@@@@@@@@@
+
+98. What is the difference between ACID and eventual consistency?
+
+Answer: ACID provides immediate consistency with atomicity, consistency, isolation, and durability guarantees. Eventual consistency allows temporary inconsistencies but guarantees all replicas will converge to the same state eventually. ACID for strong consistency, eventual consistency for availability and partition tolerance.
+
+#@@@@@@@@@@
+
+99. Find the bug in this database query optimization:
+```sql
+-- Original slow query
+SELECT u.username, COUNT(p.id) as post_count
+FROM users u
+LEFT JOIN posts p ON u.id = p.user_id
+WHERE u.created_at > '2023-01-01'
+GROUP BY u.id, u.username
+HAVING COUNT(p.id) > 10
+ORDER BY post_count DESC;
+
+-- Attempted optimization with subquery
+SELECT u.username,
+       (SELECT COUNT(*) FROM posts WHERE user_id = u.id) as post_count
+FROM users u
+WHERE u.created_at > '2023-01-01'
+AND (SELECT COUNT(*) FROM posts WHERE user_id = u.id) > 10
+ORDER BY post_count DESC;
+```
+
+Answer: The "optimized" version is actually worse - it executes the subquery twice per row (once in SELECT, once in WHERE). Better optimization would be to add indexes on users.created_at and posts.user_id, or use a materialized view for post counts.
+
+#@@@@@@@@@@
+
+100. How do you implement database data archiving?
+
+Answer: Implement time-based partitioning, create archive tables with older data, use ETL processes to move historical data, implement data retention policies, compress archived data, maintain referential integrity, and provide archive access methods for compliance and reporting.
+
+#@@@@@@@@@@
+
+101. Which of the following are valid Weaviate vector similarity metrics? (Multiple correct)
+A) cosine
+B) dot
+C) l2-squared
+D) hamming
+E) manhattan
+F) euclidean
+
+Answer: A, B, C, D, E - Weaviate supports cosine similarity, dot product, l2-squared (squared Euclidean), hamming distance, and manhattan distance. Euclidean is not directly supported (use l2-squared instead).
+
+#@@@@@@@@@@
+
+102. Complete this Milvus search operation:
+```python
+from pymilvus import Collection, connections
+
+# Connect to Milvus
+connections.connect("default", host="localhost", port="19530")
+
+# Get collection
+collection = Collection("image_embeddings")
+
+# Search parameters
+search_params = {
+    "metric_type": "L2",
+    "params": {"nprobe": 10}
+}
+
+# Perform search
+results = collection.search(
+    data=[[0.1, 0.2, 0.3, ...]],  # Query vector
+    anns_field="embedding",
+    param=search_params,
+    limit=10,
+    expr="category == 'nature'",
+    output_fields=["id", "filename", "_______________"]
+)
+
+# Process results
+for hits in results:
+    for hit in hits:
+        print(f"ID: {hit.id}, Distance: {hit.distance}")
+```
+
+Answer: `"category"` - Output fields specify which stored fields to return with search results. Common fields include metadata like category, filename, description, etc.
+
+#@@@@@@@@@@
+
+103. What is the purpose of database stored procedures?
+
+Answer: Stored procedures encapsulate business logic in the database, improve performance through precompilation, reduce network traffic, provide security through controlled access, enable code reuse, and allow complex operations with multiple statements and control flow.
+
+#@@@@@@@@@@
+
+104. Which of the following are valid MySQL table types? (Multiple correct)
+A) Temporary tables
+B) Memory tables
+C) Partitioned tables
+D) Federated tables
+E) Merge tables
+F) View tables
+
+Answer: A, B, C, D, E - MySQL supports temporary tables (session-specific), memory tables (MEMORY engine), partitioned tables, federated tables (remote access), and merge tables (MyISAM union). Views are virtual tables, not a table type.
+
+#@@@@@@@@@@
+
+105. Find the issue in this Redis data structure usage:
+```python
+import redis
+import json
+
+r = redis.Redis(decode_responses=True)
+
+def add_user_to_leaderboard(user_id, score):
+    # Add to sorted set
+    r.zadd("leaderboard", {user_id: score})
+
+def get_user_rank(user_id):
+    # Get rank (0-based)
+    rank = r.zrevrank("leaderboard", user_id)
+    return rank + 1 if rank is not None else None
+
+def get_top_users(limit=10):
+    # Get top users with scores
+    top_users = r.zrevrange("leaderboard", 0, limit-1, withscores=True)
+    return [(user, int(score)) for user, score in top_users]
+
+def update_user_profile(user_id, profile_data):
+    # Store user profile - potential issue
+    r.set(f"user:{user_id}:profile", json.dumps(profile_data))
+
+def get_user_profile(user_id):
+    # Get user profile
+    profile_json = r.get(f"user:{user_id}:profile")
+    return json.loads(profile_json) if profile_json else None
+```
+
+Answer: No explicit error handling for JSON operations. If profile_data contains non-serializable objects or if stored JSON is corrupted, json.dumps/loads will raise exceptions. Should add try-catch blocks and validate data before serialization.
+
+#@@@@@@@@@@
+
+106. How do you implement database read replicas?
+
+Answer: Configure master-slave replication, set up read-only replicas, implement read/write splitting in application, monitor replication lag, handle failover scenarios, use connection pooling for replica routing, and implement health checks for replica availability.
+
+#@@@@@@@@@@
+
+107. Which of the following are valid PostgreSQL table inheritance features? (Multiple correct)
+A) Single inheritance
+B) Multiple inheritance
+C) Abstract tables
+D) Polymorphic queries
+E) Constraint inheritance
+F) Index inheritance
+
+Answer: A, B, D, E - PostgreSQL supports single inheritance (one parent), multiple inheritance (multiple parents), polymorphic queries (querying parent includes children), and constraint inheritance. Abstract tables and index inheritance are not standard features.
+
+#@@@@@@@@@@
+
+108. Complete this Elasticsearch index template:
+```json
+{
+  "index_patterns": ["logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "index.lifecycle.name": "logs-policy",
+      "index.lifecycle.rollover_alias": "logs"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "source": {
+          "type": "_______________",
+          "index": false
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: `"keyword"` - Source field should be keyword type with index: false for exact matching without full-text search. This is efficient for filtering and aggregations while saving storage space.
+
+#@@@@@@@@@@
+
+109. What is the difference between database clustering and federation?
+
+Answer: Clustering distributes data across multiple nodes in a single logical database system with automatic load balancing and failover. Federation connects multiple independent databases with a unified query interface. Clustering for scalability, federation for integration.
+
+#@@@@@@@@@@
+
+110. Which of the following are valid Oracle database backup types? (Multiple correct)
+A) Full backup
+B) Incremental backup
+C) Differential backup
+D) Archive log backup
+E) Cold backup
+F) Hot backup
+
+Answer: A, B, C, D, E, F - Oracle supports all backup types: Full (complete database), Incremental (changed blocks since last backup), Differential (changed blocks since last full), Archive log (redo logs), Cold (database shutdown), Hot (database online).
+
+#@@@@@@@@@@
+
+111. Predict the output of this MongoDB aggregation:
+```javascript
+db.sales.aggregate([
+  {
+    $match: {
+      date: {
+        $gte: ISODate("2023-01-01"),
+        $lt: ISODate("2024-01-01")
+      }
+    }
+  },
+  {
+    $group: {
+      _id: {
+        year: { $year: "$date" },
+        month: { $month: "$date" }
+      },
+      totalSales: { $sum: "$amount" },
+      avgSale: { $avg: "$amount" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $sort: { "_id.year": 1, "_id.month": 1 }
+  },
+  {
+    $project: {
+      _id: 0,
+      period: {
+        $concat: [
+          { $toString: "$_id.year" },
+          "-",
+          { $toString: "$_id.month" }
+        ]
+      },
+      totalSales: 1,
+      avgSale: { $round: ["$avgSale", 2] },
+      count: 1
+    }
+  }
+])
+```
+
+Answer: Returns monthly sales summary for 2023 with period (e.g., "2023-1"), totalSales (sum), avgSale (rounded to 2 decimals), and count (number of sales). Results sorted chronologically by year and month.
+
+#@@@@@@@@@@
+
+112. How do you implement database connection security?
+
+Answer: Use SSL/TLS encryption, implement certificate-based authentication, restrict network access with firewalls, use VPNs for remote connections, enable connection logging, implement IP whitelisting, use strong authentication methods, and regularly rotate credentials.
+
+#@@@@@@@@@@
+
+113. Which of the following are valid Cassandra compaction strategies? (Multiple correct)
+A) SizeTieredCompactionStrategy
+B) LeveledCompactionStrategy
+C) TimeWindowCompactionStrategy
+D) DateTieredCompactionStrategy
+E) UniformCompactionStrategy
+F) IncrementalCompactionStrategy
+
+Answer: A, B, C, D - Cassandra compaction strategies: SizeTiered (default, groups similar-sized SSTables), Leveled (creates levels of SSTables), TimeWindow (time-based windows), DateTiered (deprecated, use TimeWindow). Uniform and Incremental are not valid strategies.
+
+#@@@@@@@@@@
+
+114. Find the bug in this database migration:
+```sql
+-- Migration to add email verification
+BEGIN;
+
+-- Add new column
+ALTER TABLE users ADD COLUMN email_verified BOOLEAN DEFAULT FALSE;
+
+-- Update existing users with valid emails
+UPDATE users
+SET email_verified = TRUE
+WHERE email IS NOT NULL
+AND email LIKE '%@%';
+
+-- Make email required
+ALTER TABLE users ALTER COLUMN email SET NOT NULL;
+
+-- Add unique constraint
+ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
+
+COMMIT;
+```
+
+Answer: The migration will fail because making email NOT NULL after the table has existing rows with NULL emails. Should either: 1) Update NULL emails to valid values first, 2) Use a default value, or 3) Handle existing NULL values before adding the constraint.
+
+#@@@@@@@@@@
+
+115. What is the purpose of database query optimization?
+
+Answer: Query optimization improves database performance by analyzing query execution plans, using appropriate indexes, rewriting queries for efficiency, eliminating unnecessary operations, and choosing optimal join algorithms. Goals include reducing execution time, CPU usage, and I/O operations.
+
+#@@@@@@@@@@
+
+116. Which of the following are valid SQL Server database recovery models? (Multiple correct)
+A) Simple
+B) Full
+C) Bulk-logged
+D) Differential
+E) Incremental
+F) Point-in-time
+
+Answer: A, B, C - SQL Server recovery models: Simple (minimal logging, no point-in-time recovery), Full (complete logging, full recovery options), Bulk-logged (minimal logging for bulk operations). Differential, Incremental, and Point-in-time are backup types, not recovery models.
+
+#@@@@@@@@@@
+
+117. Complete this Redis Streams consumer group:
+```python
+import redis
+
+r = redis.Redis(decode_responses=True)
+
+# Create consumer group
+try:
+    r.xgroup_create("events", "processors", id="0", mkstream=True)
+except redis.exceptions.ResponseError:
+    pass  # Group already exists
+
+# Consumer function
+def process_events(consumer_name):
+    while True:
+        # Read from stream
+        messages = r.xreadgroup(
+            "processors",
+            consumer_name,
+            {"events": ">"},
+            count=10,
+            block=1000
+        )
+
+        for stream, msgs in messages:
+            for msg_id, fields in msgs:
+                try:
+                    # Process message
+                    process_event(fields)
+
+                    # Acknowledge message
+                    r.xack("events", "processors", msg_id)
+
+                except Exception as e:
+                    print(f"Error processing {msg_id}: {e}")
+                    # Handle failed message - add to dead letter queue
+                    r.xadd("events:failed", {
+                        "original_id": msg_id,
+                        "error": str(e),
+                        "_______________": fields
+                    })
+
+def process_event(fields):
+    print(f"Processing event: {fields}")
+```
+
+Answer: `"data"` - Store the original message data in the dead letter queue for later reprocessing or analysis. This preserves the original event information along with error details.
+
+#@@@@@@@@@@
+
+118. What is the difference between database normalization and denormalization?
+
+Answer: Normalization reduces redundancy by organizing data into related tables, improving data integrity and reducing storage. Denormalization intentionally introduces redundancy to improve query performance and reduce joins. Normalization for consistency, denormalization for performance.
+
+#@@@@@@@@@@
+
+119. Find the issue in this database connection pool configuration:
+```python
+import psycopg2.pool
+import threading
+import time
+
+# Connection pool configuration
+connection_pool = psycopg2.pool.ThreadedConnectionPool(
+    minconn=1,
+    maxconn=5,  # Very small pool
+    host="localhost",
+    database="myapp",
+    user="app_user",
+    password="password"
+)
+
+def database_operation(operation_id):
+    # Get connection from pool
+    conn = connection_pool.getconn()
+
+    try:
+        cursor = conn.cursor()
+
+        # Simulate long-running operation
+        cursor.execute("SELECT pg_sleep(2)")
+        cursor.execute("SELECT %s", (operation_id,))
+        result = cursor.fetchone()
+
+        print(f"Operation {operation_id} completed: {result}")
+
+    except Exception as e:
+        print(f"Error in operation {operation_id}: {e}")
+    finally:
+        # Return connection to pool
+        connection_pool.putconn(conn)
+
+# Start many concurrent operations
+threads = []
+for i in range(20):  # More threads than pool connections
+    t = threading.Thread(target=database_operation, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+```
+
+Answer: Pool size (maxconn=5) is too small for the workload (20 concurrent operations). This will cause connection starvation and blocking. Should increase pool size or implement timeout handling with getconn(). Also missing proper error handling for pool exhaustion.
+
+#@@@@@@@@@@
+
+120. How do you implement database data encryption?
+
+Answer: Implement encryption at rest (TDE, file-level encryption), encryption in transit (SSL/TLS), column-level encryption for sensitive data, key management with HSM or key vaults, implement proper key rotation, and use application-level encryption for additional security layers.
+
+#@@@@@@@@@@
+
+121. Which of the following are valid MongoDB index properties? (Multiple correct)
+A) unique
+B) sparse
+C) partial
+D) TTL
+E) background
+F) compound
+
+Answer: A, B, C, D, E, F - All are valid MongoDB index properties: unique (enforce uniqueness), sparse (skip null values), partial (conditional indexing), TTL (automatic expiration), background (non-blocking creation), compound (multiple fields).
+
+#@@@@@@@@@@
+
+122. Complete this Snowflake time travel query:
+```sql
+-- Query data as it existed 1 hour ago
+SELECT *
+FROM orders
+AT(OFFSET => -3600)  -- 1 hour ago in seconds
+WHERE order_date = '2023-12-01';
+
+-- Query data before a specific statement
+SELECT *
+FROM orders
+BEFORE(STATEMENT => '01a8c4e5-0000-4b5a-0000-4d8d00000000')
+WHERE customer_id = 12345;
+
+-- Clone table to a specific timestamp
+CREATE TABLE orders_backup
+CLONE orders
+AT(_______________);
+```
+
+Answer: `TIMESTAMP => '2023-12-01 10:00:00'::TIMESTAMP` - Creates a clone of the table as it existed at the specified timestamp. Time travel allows accessing historical data within the retention period.
+
+#@@@@@@@@@@
+
+123. What is the purpose of database foreign keys?
+
+Answer: Foreign keys enforce referential integrity by ensuring values in one table correspond to valid values in another table. They prevent orphaned records, maintain data consistency, enable cascading operations (UPDATE/DELETE), and document relationships between tables.
+
+#@@@@@@@@@@
+
+124. Which of the following are valid Elasticsearch cluster settings? (Multiple correct)
+A) cluster.name
+B) node.name
+C) discovery.seed_hosts
+D) cluster.initial_master_nodes
+E) network.host
+F) http.port
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch cluster settings: cluster.name (cluster identifier), node.name (node identifier), discovery.seed_hosts (discovery configuration), cluster.initial_master_nodes (bootstrap), network.host (binding), http.port (HTTP API port).
+
+#@@@@@@@@@@
+
+125. Find the bug in this database transaction handling:
+```python
+import sqlite3
+
+def transfer_money(db_path, from_account, to_account, amount):
+    conn1 = sqlite3.connect(db_path)
+    conn2 = sqlite3.connect(db_path)
+
+    try:
+        # Start transactions on both connections
+        conn1.execute('BEGIN IMMEDIATE')
+        conn2.execute('BEGIN IMMEDIATE')
+
+        # Debit from source account
+        conn1.execute(
+            'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+            (amount, from_account)
+        )
+
+        # Credit to destination account
+        conn2.execute(
+            'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+            (amount, to_account)
+        )
+
+        # Commit both transactions
+        conn1.commit()
+        conn2.commit()
+
+        print("Transfer completed successfully")
+
+    except Exception as e:
+        conn1.rollback()
+        conn2.rollback()
+        print(f"Transfer failed: {e}")
+    finally:
+        conn1.close()
+        conn2.close()
+```
+
+Answer: Using two separate connections breaks transaction atomicity. If one commit succeeds and the other fails, data becomes inconsistent. Should use a single connection for the entire transaction to ensure atomicity. SQLite doesn't support distributed transactions.
+
+#@@@@@@@@@@
+
+126. How do you implement database performance tuning?
+
+Answer: Analyze query execution plans, optimize indexes, tune database configuration parameters, implement query caching, optimize table structures, use partitioning for large tables, monitor resource usage, and implement connection pooling for better resource utilization.
+
+#@@@@@@@@@@
+
+127. Which of the following are valid Oracle PL/SQL cursor types? (Multiple correct)
+A) Implicit cursors
+B) Explicit cursors
+C) Cursor FOR loops
+D) REF cursors
+E) Bulk collect cursors
+F) Dynamic cursors
+
+Answer: A, B, C, D, E - Oracle PL/SQL cursor types: Implicit (automatic for DML), Explicit (declared cursors), Cursor FOR loops (simplified iteration), REF cursors (cursor variables), Bulk collect (array processing). Dynamic cursors is not a specific type (use dynamic SQL with REF cursors).
+
+#@@@@@@@@@@
+
+128. Complete this Neo4j performance optimization:
+```cypher
+// Slow query - find friends of friends
+MATCH (user:Person {name: 'Alice'})
+MATCH (user)-[:FRIEND]->(friend)-[:FRIEND]->(fof:Person)
+WHERE user <> fof
+AND NOT (user)-[:FRIEND]-(fof)
+RETURN DISTINCT fof.name, COUNT(*) as mutual_friends
+ORDER BY mutual_friends DESC
+LIMIT 10;
+
+// Optimized version with index hint
+MATCH (user:Person {name: 'Alice'})
+USING INDEX user:Person(name)
+MATCH (user)-[:FRIEND]->(friend)-[:FRIEND]->(fof:Person)
+WHERE user <> fof
+AND NOT (user)-[:FRIEND]-(fof)
+WITH fof, COUNT(*) as mutual_friends
+WHERE mutual_friends > _______________
+RETURN fof.name, mutual_friends
+ORDER BY mutual_friends DESC
+LIMIT 10;
+```
+
+Answer: `1` - Filter for friends-of-friends with more than 1 mutual friend to reduce result set size. This eliminates single-connection recommendations and improves query performance by reducing the data processed in later stages.
+
+#@@@@@@@@@@
+
+129. What is the difference between database views and materialized views?
+
+Answer: Views are virtual tables that execute underlying queries each time accessed, providing real-time data but slower performance. Materialized views store query results physically, offering faster access but requiring refresh to update data. Views for real-time, materialized views for performance.
+
+#@@@@@@@@@@
+
+130. Which of the following are valid Redis data expiration policies? (Multiple correct)
+A) EXPIRE
+B) EXPIREAT
+C) TTL
+D) PERSIST
+E) PEXPIRE
+F) PTTL
+
+Answer: A, B, C, D, E, F - All are valid Redis expiration commands: EXPIRE (seconds from now), EXPIREAT (Unix timestamp), TTL (time to live), PERSIST (remove expiration), PEXPIRE (milliseconds), PTTL (milliseconds TTL).
+
+#@@@@@@@@@@
+
+131. Predict the output of this SQL window function:
+```sql
+SELECT
+  employee_id,
+  department,
+  salary,
+  RANK() OVER (ORDER BY salary DESC) as overall_rank,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) as dept_rank,
+  LAG(salary, 1, 0) OVER (PARTITION BY department ORDER BY salary DESC) as prev_salary,
+  salary - LAG(salary, 1, 0) OVER (PARTITION BY department ORDER BY salary DESC) as salary_diff
+FROM employees
+WHERE department IN ('IT', 'Sales')
+ORDER BY department, salary DESC;
+
+-- Sample data:
+-- IT: 90000, 85000, 80000
+-- Sales: 95000, 90000, 85000
+```
+
+Answer: IT department: (90000, rank 2, dept_rank 1, prev_salary 0, diff 90000), (85000, rank 4, dept_rank 2, prev_salary 90000, diff -5000), (80000, rank 6, dept_rank 3, prev_salary 85000, diff -5000). Sales: (95000, rank 1, dept_rank 1, prev_salary 0, diff 95000), etc.
+
+#@@@@@@@@@@
+
+132. How do you implement database disaster recovery?
+
+Answer: Implement regular backups with offsite storage, set up replication to secondary sites, create disaster recovery runbooks, test recovery procedures regularly, implement automated failover, maintain RTO/RPO requirements, and ensure geographic distribution of backup sites.
+
+#@@@@@@@@@@
+
+133. Which of the following are valid PostgreSQL VACUUM operations? (Multiple correct)
+A) VACUUM
+B) VACUUM FULL
+C) VACUUM ANALYZE
+D) AUTOVACUUM
+E) VACUUM FREEZE
+F) VACUUM VERBOSE
+
+Answer: A, B, C, D, E, F - All are valid PostgreSQL VACUUM operations: VACUUM (reclaim space), VACUUM FULL (rebuild table), VACUUM ANALYZE (update statistics), AUTOVACUUM (automatic maintenance), VACUUM FREEZE (prevent wraparound), VACUUM VERBOSE (detailed output).
+
+#@@@@@@@@@@
+
+134. Find the issue in this database indexing strategy:
+```sql
+-- E-commerce product table
+CREATE TABLE products (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category_id INTEGER NOT NULL,
+    brand_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Indexing strategy
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_price ON products(price);
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_brand ON products(brand_id);
+CREATE INDEX idx_products_active ON products(is_active);
+CREATE INDEX idx_products_created ON products(created_at);
+
+-- Common query patterns:
+-- 1. SELECT * FROM products WHERE category_id = ? AND is_active = true ORDER BY price
+-- 2. SELECT * FROM products WHERE brand_id = ? AND price BETWEEN ? AND ? AND is_active = true
+-- 3. SELECT * FROM products WHERE name ILIKE '%search%' AND is_active = true
+```
+
+Answer: Too many single-column indexes instead of composite indexes optimized for query patterns. Should create: `(category_id, is_active, price)` for query 1, `(brand_id, is_active, price)` for query 2, and consider full-text search index for query 3. Single-column indexes are inefficient for multi-column WHERE clauses.
+
+#@@@@@@@@@@
+
+135. What is the purpose of database connection timeouts?
+
+Answer: Connection timeouts prevent resource exhaustion by automatically closing idle connections, handle network failures gracefully, free up database resources, prevent connection leaks in applications, and ensure responsive database performance under load.
+
+#@@@@@@@@@@
+
+136. Which of the following are valid Cassandra data modeling anti-patterns? (Multiple correct)
+A) Using joins
+B) Creating secondary indexes on high-cardinality columns
+C) Storing large blobs
+D) Using counters for exact counts
+E) Querying without partition key
+F) Using transactions
+
+Answer: A, B, C, D, E, F - All are Cassandra anti-patterns: no joins supported, secondary indexes on high-cardinality data are inefficient, large blobs impact performance, counters are eventually consistent, queries need partition keys, no ACID transactions across partitions.
+
+#@@@@@@@@@@
+
+137. Complete this database migration rollback:
+```sql
+-- Migration 001: Add user preferences
+-- UP migration
+ALTER TABLE users ADD COLUMN preferences JSONB DEFAULT '{}';
+CREATE INDEX idx_users_preferences ON users USING GIN (preferences);
+UPDATE users SET preferences = '{"theme": "light", "notifications": true}';
+
+-- DOWN migration (rollback)
+DROP INDEX IF EXISTS idx_users_preferences;
+ALTER TABLE users _______________preferences;
+
+-- Migration tracking
+INSERT INTO schema_migrations (version, applied_at) VALUES ('001', NOW());
+-- For rollback: DELETE FROM schema_migrations WHERE version = '001';
+```
+
+Answer: `DROP COLUMN` - Removes the preferences column during rollback. Complete syntax: `ALTER TABLE users DROP COLUMN preferences;` This reverses the ADD COLUMN operation from the UP migration.
+
+#@@@@@@@@@@
+
+138. What is the difference between database clustering and replication?
+
+Answer: Clustering distributes data across multiple nodes for horizontal scaling and load distribution, with automatic sharding and failover. Replication copies entire datasets to multiple servers for redundancy and read scaling. Clustering for scalability, replication for availability.
+
+#@@@@@@@@@@
+
+139. Find the bug in this MongoDB aggregation pipeline:
+```javascript
+// Aggregation to find top-selling products by category
+db.orders.aggregate([
+  {
+    $unwind: "$items"
+  },
+  {
+    $lookup: {
+      from: "products",
+      localField: "items.productId",
+      foreignField: "_id",
+      as: "product"
+    }
+  },
+  {
+    $unwind: "$product"
+  },
+  {
+    $group: {
+      _id: {
+        category: "$product.category",
+        productId: "$items.productId"
+      },
+      totalQuantity: { $sum: "$items.quantity" },
+      totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } },
+      productName: { $first: "$product.name" }
+    }
+  },
+  {
+    $sort: { totalRevenue: -1 }
+  },
+  {
+    $group: {
+      _id: "$_id.category",
+      topProduct: { $first: "$$ROOT" }
+    }
+  }
+])
+```
+
+Answer: No explicit bug in logic, but performance issue: $lookup without proper indexing can be slow. Should ensure products collection has index on _id field (usually automatic) and consider using $lookup with pipeline for better performance. Also, large datasets might benefit from $match stage early in pipeline.
+
+#@@@@@@@@@@
+
+140. How do you implement database connection retry logic?
+
+Answer: Implement exponential backoff, set maximum retry attempts, handle specific error types (connection timeout, network errors), use circuit breaker pattern, implement jitter to avoid thundering herd, log retry attempts, and provide fallback mechanisms for persistent failures.
+
+#@@@@@@@@@@
+
+141. Which of the following are valid Elasticsearch query contexts? (Multiple correct)
+A) Query context
+B) Filter context
+C) Aggregation context
+D) Sort context
+E) Highlight context
+F) Suggest context
+
+Answer: A, B - Elasticsearch has two main query contexts: Query context (affects relevance scoring) and Filter context (yes/no matching, cached). Aggregation, Sort, Highlight, and Suggest are features that use these contexts but aren't contexts themselves.
+
+#@@@@@@@@@@
+
+142. Complete this Redis pub/sub implementation:
+```python
+import redis
+import threading
+import json
+
+# Publisher
+def publish_events():
+    r = redis.Redis()
+
+    events = [
+        {"type": "user_login", "user_id": 123, "timestamp": "2023-12-01T10:00:00Z"},
+        {"type": "order_placed", "order_id": 456, "amount": 99.99},
+        {"type": "user_logout", "user_id": 123, "timestamp": "2023-12-01T11:00:00Z"}
+    ]
+
+    for event in events:
+        channel = f"events:{event['type']}"
+        r.publish(channel, json.dumps(event))
+
+# Subscriber
+def subscribe_to_events():
+    r = redis.Redis()
+    pubsub = r.pubsub()
+
+    # Subscribe to patterns
+    pubsub.psubscribe("events:*")
+
+    for message in pubsub.listen():
+        if message['type'] == '_______________':
+            channel = message['channel'].decode('utf-8')
+            data = json.loads(message['data'])
+            print(f"Received on {channel}: {data}")
+
+# Start subscriber in background
+subscriber_thread = threading.Thread(target=subscribe_to_events)
+subscriber_thread.daemon = True
+subscriber_thread.start()
+
+# Publish events
+publish_events()
+```
+
+Answer: `'pmessage'` - Pattern message type for pattern subscriptions (psubscribe). Regular subscriptions use 'message' type, but pattern subscriptions use 'pmessage' which includes the matched pattern.
+
+#@@@@@@@@@@
+
+143. What is the purpose of database connection pooling in microservices?
+
+Answer: Connection pooling in microservices manages database connections efficiently across service instances, reduces connection overhead, provides isolation between services, enables horizontal scaling, handles connection failures gracefully, and optimizes resource utilization in distributed architectures.
+
+#@@@@@@@@@@
+
+144. Which of the following are valid SQL Server Always On features? (Multiple correct)
+A) Availability Groups
+B) Failover Cluster Instances
+C) Database Mirroring
+D) Log Shipping
+E) Readable Secondaries
+F) Automatic Failover
+
+Answer: A, B, C, D, E, F - All are SQL Server Always On features: Availability Groups (high availability solution), Failover Cluster Instances (shared storage clustering), Database Mirroring (legacy HA), Log Shipping (disaster recovery), Readable Secondaries (read scaling), Automatic Failover (within availability groups).
+
+#@@@@@@@@@@
+
+145. Find the issue in this database schema design:
+```sql
+-- Social media platform schema
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    profile_data TEXT,  -- JSON stored as text
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id),
+    content TEXT NOT NULL,
+    media_urls TEXT,  -- Comma-separated URLs
+    tags TEXT,        -- Comma-separated tags
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE followers (
+    follower_id BIGINT REFERENCES users(id),
+    following_id BIGINT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, following_id)
+);
+```
+
+Answer: Multiple normalization violations: 1) profile_data as TEXT instead of proper JSON type, 2) media_urls and tags as comma-separated values violate 1NF (should be separate tables), 3) Missing indexes on foreign keys, 4) No check constraint to prevent self-following, 5) Missing ON DELETE CASCADE for referential integrity.
+
+#@@@@@@@@@@
+
+146. How do you implement database data masking?
+
+Answer: Implement static data masking for non-production environments, dynamic data masking for real-time protection, use format-preserving encryption, implement role-based access controls, mask sensitive fields (SSN, credit cards), use tokenization for reversible masking, and audit data access patterns.
+
+#@@@@@@@@@@
+
+147. Which of the following are valid MongoDB change stream operations? (Multiple correct)
+A) insert
+B) update
+C) replace
+D) delete
+E) drop
+F) invalidate
+
+Answer: A, B, C, D, E, F - All are valid MongoDB change stream operation types: insert (new documents), update (document modifications), replace (document replacement), delete (document removal), drop (collection dropped), invalidate (stream invalidated).
+
+#@@@@@@@@@@
+
+148. Complete this database performance monitoring query:
+```sql
+-- PostgreSQL performance monitoring
+SELECT
+    schemaname,
+    tablename,
+    seq_scan,
+    seq_tup_read,
+    idx_scan,
+    idx_tup_fetch,
+    n_tup_ins,
+    n_tup_upd,
+    n_tup_del,
+    CASE
+        WHEN seq_scan + idx_scan > 0
+        THEN ROUND(100.0 * seq_scan / (seq_scan + idx_scan), 2)
+        ELSE 0
+    END as seq_scan_ratio
+FROM pg_stat_user_tables
+WHERE schemaname NOT IN ('information_schema', 'pg_catalog')
+AND (seq_scan + idx_scan) > 1000
+ORDER BY _______________DESC
+LIMIT 20;
+```
+
+Answer: `seq_scan_ratio` - Orders by sequential scan ratio to identify tables with high sequential scan percentages, indicating potential missing indexes or inefficient queries. High ratios suggest need for index optimization.
+
+#@@@@@@@@@@
+
+149. What is the difference between database horizontal and vertical scaling?
+
+Answer: Horizontal scaling (scale-out) adds more database servers to distribute load, using sharding or clustering. Vertical scaling (scale-up) increases resources (CPU, RAM, storage) on existing servers. Horizontal for distributed systems, vertical for single-server optimization.
+
+#@@@@@@@@@@
+
+150. Which of the following are valid Oracle database tablespace types? (Multiple correct)
+A) SYSTEM
+B) SYSAUX
+C) TEMPORARY
+D) UNDO
+E) USERS
+F) BIGFILE
+
+Answer: A, B, C, D, E, F - All are valid Oracle tablespace types: SYSTEM (data dictionary), SYSAUX (auxiliary system data), TEMPORARY (sort operations), UNDO (rollback data), USERS (user data), BIGFILE (single large datafile).
+
+#@@@@@@@@@@
+
+151. Predict the output of this database query:
+```sql
+WITH RECURSIVE category_tree AS (
+  -- Base case: root categories
+  SELECT
+    id,
+    name,
+    parent_id,
+    0 as level,
+    CAST(name AS VARCHAR(1000)) as path
+  FROM categories
+  WHERE parent_id IS NULL
+
+  UNION ALL
+
+  -- Recursive case: child categories
+  SELECT
+    c.id,
+    c.name,
+    c.parent_id,
+    ct.level + 1,
+    CONCAT(ct.path, ' > ', c.name)
+  FROM categories c
+  JOIN category_tree ct ON c.parent_id = ct.id
+  WHERE ct.level < 5
+)
+SELECT
+  level,
+  COUNT(*) as category_count,
+  STRING_AGG(name, ', ') as categories
+FROM category_tree
+GROUP BY level
+ORDER BY level;
+```
+
+Answer: Returns hierarchical category structure with level (0=root, 1=first level, etc.), count of categories at each level, and comma-separated list of category names. Shows organizational depth and distribution of categories across hierarchy levels.
+
+#@@@@@@@@@@
+
+152. How do you implement database audit trails?
+
+Answer: Enable database audit features, implement trigger-based auditing, log all DML/DDL operations, capture user information and timestamps, store audit data in separate tables/databases, implement log rotation and archival, ensure audit log integrity, and provide audit reporting capabilities.
+
+#@@@@@@@@@@
+
+153. Which of the following are valid Cassandra consistency tuning options? (Multiple correct)
+A) Tunable consistency
+B) Hinted handoff
+C) Read repair
+D) Anti-entropy repair
+E) Merkle trees
+F) Gossip protocol
+
+Answer: A, B, C, D, E, F - All are Cassandra consistency mechanisms: Tunable consistency (per-operation levels), Hinted handoff (temporary storage), Read repair (consistency during reads), Anti-entropy repair (background consistency), Merkle trees (efficient comparison), Gossip protocol (cluster state).
+
+#@@@@@@@@@@
+
+154. Find the bug in this database connection management:
+```python
+import mysql.connector
+from contextlib import contextmanager
+
+class DatabaseManager:
+    def __init__(self, config):
+        self.config = config
+        self.connection = None
+
+    def connect(self):
+        if not self.connection or not self.connection.is_connected():
+            self.connection = mysql.connector.connect(**self.config)
+        return self.connection
+
+    @contextmanager
+    def get_cursor(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+        try:
+            yield cursor
+            conn.commit()  # Auto-commit all operations
+        except Exception as e:
+            conn.rollback()
+            raise
+        finally:
+            cursor.close()
+
+    def close(self):
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+
+# Usage
+db = DatabaseManager({
+    'host': 'localhost',
+    'database': 'myapp',
+    'user': 'app_user',
+    'password': 'password'
+})
+
+# Multiple operations
+with db.get_cursor() as cursor:
+    cursor.execute("INSERT INTO users (name) VALUES (%s)", ("John",))
+
+with db.get_cursor() as cursor:
+    cursor.execute("INSERT INTO orders (user_id) VALUES (%s)", (1,))
+```
+
+Answer: Auto-committing every cursor operation breaks transaction atomicity. Each `with` block commits independently, so if the second operation fails, the first is already committed. Should allow explicit transaction control or group related operations in single cursor context.
+
+#@@@@@@@@@@
+
+155. What is the purpose of database connection string encryption?
+
+Answer: Connection string encryption protects sensitive database credentials (passwords, connection details) from unauthorized access, prevents credential exposure in configuration files, enables secure credential storage, supports key rotation, and meets compliance requirements for data protection.
+
+#@@@@@@@@@@
+
+156. Which of the following are valid Elasticsearch index lifecycle management phases? (Multiple correct)
+A) Hot
+B) Warm
+C) Cold
+D) Frozen
+E) Delete
+F) Archive
+
+Answer: A, B, C, D, E - Elasticsearch ILM phases: Hot (active indexing/searching), Warm (read-only, less frequent access), Cold (infrequent access, reduced resources), Frozen (very infrequent access), Delete (remove indices). Archive is not a standard ILM phase.
+
+#@@@@@@@@@@
+
+157. Complete this database backup verification:
+```bash
+#!/bin/bash
+
+BACKUP_FILE="/backups/database_backup_$(date +%Y%m%d).sql"
+TEST_DB="backup_verification_test"
+
+# Create test database
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS $TEST_DB;"
+
+# Restore backup to test database
+mysql -u root -p $TEST_DB < $BACKUP_FILE
+
+# Verify backup integrity
+ORIGINAL_COUNT=$(mysql -u root -p production_db -e "SELECT COUNT(*) FROM users;" | tail -1)
+BACKUP_COUNT=$(mysql -u root -p $TEST_DB -e "SELECT COUNT(*) FROM users;" | tail -1)
+
+if [ "$ORIGINAL_COUNT" -eq "$BACKUP_COUNT" ]; then
+    echo "Backup verification successful: $BACKUP_COUNT records"
+    # Clean up test database
+    mysql -u root -p -e "_______________;"
+else
+    echo "Backup verification failed: Original=$ORIGINAL_COUNT, Backup=$BACKUP_COUNT"
+    exit 1
+fi
+```
+
+Answer: `"DROP DATABASE $TEST_DB"` - Removes the test database after successful verification to clean up resources. Complete command ensures the temporary verification database is properly cleaned up.
+
+#@@@@@@@@@@
+
+158. How do you implement database connection health checks?
+
+Answer: Implement periodic connection validation, use lightweight test queries (SELECT 1), set connection timeouts, monitor connection pool metrics, implement automatic reconnection, use health check endpoints in applications, and set up alerting for connection failures.
+
+#@@@@@@@@@@
+
+159. Which of the following are valid PostgreSQL constraint types? (Multiple correct)
+A) PRIMARY KEY
+B) FOREIGN KEY
+C) UNIQUE
+D) CHECK
+E) NOT NULL
+F) EXCLUSION
+
+Answer: A, B, C, D, E, F - All are valid PostgreSQL constraints: PRIMARY KEY (unique identifier), FOREIGN KEY (referential integrity), UNIQUE (uniqueness), CHECK (custom validation), NOT NULL (required values), EXCLUSION (advanced uniqueness with operators).
+
+#@@@@@@@@@@
+
+160. Find the final issue in this comprehensive database architecture:
+```sql
+-- Multi-tenant SaaS application database design
+CREATE TABLE tenants (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    subdomain VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    plan_type VARCHAR(50) DEFAULT 'basic'
+);
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(tenant_id, email)  -- Email unique per tenant
+);
+
+CREATE TABLE user_data (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    data_type VARCHAR(100) NOT NULL,
+    content JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Row Level Security for multi-tenancy
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_users ON users
+    FOR ALL TO application_role
+    USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+
+CREATE POLICY tenant_isolation_user_data ON user_data
+    FOR ALL TO application_role
+    USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+
+-- Indexes for performance
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX idx_user_data_tenant_user ON user_data(tenant_id, user_id);
+CREATE INDEX idx_user_data_type ON user_data(tenant_id, data_type);
+```
+
+Answer: Missing critical production considerations: 1) No data retention/archival strategy for growing JSONB content, 2) Missing monitoring and alerting for tenant resource usage, 3) No backup strategy per tenant, 4) Missing rate limiting/quota enforcement, 5) No encryption for sensitive JSONB data, 6) Missing audit logging for compliance, 7) No disaster recovery plan for multi-tenant data, 8) Missing performance monitoring per tenant.
+
+#@@@@@@@@@@
+
+161. What is the purpose of database connection string parameterization?
+
+Answer: Parameterization prevents SQL injection attacks, enables dynamic configuration management, supports environment-specific settings, improves security by separating code from configuration, enables credential rotation without code changes, and supports configuration management tools.
+
+#@@@@@@@@@@
+
+162. Which of the following are valid MongoDB aggregation optimization techniques? (Multiple correct)
+A) Use $match early in pipeline
+B) Use indexes for $sort operations
+C) Limit pipeline stages
+D) Use $project to reduce document size
+E) Use allowDiskUse for large datasets
+F) Use $lookup with pipeline
+
+Answer: A, B, C, D, E, F - All are MongoDB aggregation optimizations: Early $match reduces documents processed, indexes improve $sort performance, fewer stages reduce overhead, $project reduces memory usage, allowDiskUse handles large datasets, $lookup with pipeline is more efficient.
+
+#@@@@@@@@@@
+
+163. Complete this database replication monitoring:
+```sql
+-- MySQL replication monitoring
+SELECT
+    SLAVE_IO_STATE,
+    MASTER_LOG_FILE,
+    READ_MASTER_LOG_POS,
+    RELAY_LOG_FILE,
+    RELAY_LOG_POS,
+    RELAY_MASTER_LOG_FILE,
+    SLAVE_IO_RUNNING,
+    SLAVE_SQL_RUNNING,
+    SECONDS_BEHIND_MASTER,
+    LAST_IO_ERROR,
+    LAST_SQL_ERROR
+FROM INFORMATION_SCHEMA.REPLICA_HOST_STATUS;
+
+-- Check for replication lag alert
+SELECT
+    CASE
+        WHEN SECONDS_BEHIND_MASTER > 300 THEN 'CRITICAL'
+        WHEN SECONDS_BEHIND_MASTER > 60 THEN 'WARNING'
+        WHEN SECONDS_BEHIND_MASTER IS NULL THEN '_______________'
+        ELSE 'OK'
+    END as replication_status,
+    SECONDS_BEHIND_MASTER
+FROM INFORMATION_SCHEMA.REPLICA_HOST_STATUS;
+```
+
+Answer: `'ERROR'` - When SECONDS_BEHIND_MASTER is NULL, it typically indicates replication is not running or has encountered an error. This requires immediate attention to restore replication.
+
+#@@@@@@@@@@
+
+164. How do you implement database connection failover?
+
+Answer: Configure multiple database endpoints, implement automatic failover detection, use connection pooling with health checks, implement retry logic with exponential backoff, use load balancers for database connections, monitor database health, and implement graceful degradation for partial failures.
+
+#@@@@@@@@@@
+
+165. Which of the following are valid Cassandra repair operations? (Multiple correct)
+A) nodetool repair
+B) Incremental repair
+C) Full repair
+D) Subrange repair
+E) Parallel repair
+F) Sequential repair
+
+Answer: A, B, C, D, E, F - All are valid Cassandra repair operations: nodetool repair (command), Incremental repair (only unrepaired data), Full repair (all data), Subrange repair (specific token ranges), Parallel repair (multiple nodes), Sequential repair (one node at a time).
+
+#@@@@@@@@@@
+
+166. Find the issue in this database query performance:
+```sql
+-- Slow reporting query
+SELECT
+    DATE_TRUNC('month', order_date) as month,
+    COUNT(*) as order_count,
+    SUM(total_amount) as total_revenue,
+    AVG(total_amount) as avg_order_value,
+    COUNT(DISTINCT customer_id) as unique_customers
+FROM orders o
+JOIN customers c ON o.customer_id = c.id
+WHERE o.order_date >= '2023-01-01'
+AND c.country = 'USA'
+AND o.status = 'completed'
+GROUP BY DATE_TRUNC('month', order_date)
+ORDER BY month;
+
+-- Current indexes:
+-- orders: (customer_id), (order_date), (status)
+-- customers: (id), (country)
+```
+
+Answer: Missing composite indexes for the query pattern. Should create: `orders(order_date, status, customer_id)` for the WHERE clause and JOIN, and `customers(country, id)` for efficient filtering. The query would benefit from covering indexes that include all referenced columns.
+
+#@@@@@@@@@@
+
+167. What is the purpose of database connection encryption?
+
+Answer: Connection encryption protects data in transit between applications and databases, prevents eavesdropping and man-in-the-middle attacks, ensures data confidentiality, meets compliance requirements (PCI-DSS, HIPAA), and provides authentication through certificates.
+
+#@@@@@@@@@@
+
+168. Which of the following are valid Redis cluster configuration options? (Multiple correct)
+A) cluster-enabled
+B) cluster-config-file
+C) cluster-node-timeout
+D) cluster-announce-ip
+E) cluster-announce-port
+F) cluster-require-full-coverage
+
+Answer: A, B, C, D, E, F - All are valid Redis cluster configuration options: cluster-enabled (enable clustering), cluster-config-file (node configuration), cluster-node-timeout (failure detection), cluster-announce-ip/port (external addressing), cluster-require-full-coverage (availability vs consistency).
+
+#@@@@@@@@@@
+
+169. Complete this database migration testing:
+```python
+import unittest
+import psycopg2
+from migration_runner import run_migration, rollback_migration
+
+class TestMigration001(unittest.TestCase):
+    def setUp(self):
+        self.conn = psycopg2.connect("dbname=test_db user=test_user")
+        self.cursor = self.conn.cursor()
+
+    def tearDown(self):
+        self.conn.close()
+
+    def test_migration_up(self):
+        # Run migration
+        run_migration('001_add_user_preferences.sql')
+
+        # Verify column exists
+        self.cursor.execute("""
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = 'users' AND column_name = 'preferences'
+        """)
+        result = self.cursor.fetchone()
+        self.assertIsNotNone(result)
+
+    def test_migration_down(self):
+        # Run migration then rollback
+        run_migration('001_add_user_preferences.sql')
+        rollback_migration('001_add_user_preferences.sql')
+
+        # Verify column doesn't exist
+        self.cursor.execute("""
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = 'users' AND column_name = 'preferences'
+        """)
+        result = self.cursor.fetchone()
+        self._______________()
+
+    def test_data_integrity(self):
+        # Insert test data
+        self.cursor.execute("INSERT INTO users (name, email) VALUES (%s, %s)",
+                          ("Test User", "test@example.com"))
+        self.conn.commit()
+
+        # Run migration
+        run_migration('001_add_user_preferences.sql')
+
+        # Verify existing data preserved
+        self.cursor.execute("SELECT COUNT(*) FROM users WHERE name = %s", ("Test User",))
+        count = self.cursor.fetchone()[0]
+        self.assertEqual(count, 1)
+```
+
+Answer: `assertIsNone(result)` - Verifies that the column doesn't exist after rollback. The query should return None when the preferences column has been successfully removed by the rollback migration.
+
+#@@@@@@@@@@
+
+170. How do you implement database connection monitoring?
+
+Answer: Monitor connection counts, track connection pool utilization, implement connection timeout alerts, log connection errors, monitor query execution times, track database resource usage, implement health check endpoints, and use APM tools for comprehensive monitoring.
+
+#@@@@@@@@@@
+
+171. Which of the following are valid Elasticsearch snapshot repository types? (Multiple correct)
+A) fs (filesystem)
+B) s3
+C) azure
+D) gcs (Google Cloud Storage)
+E) hdfs
+F) url
+
+Answer: A, B, C, D, E, F - All are valid Elasticsearch snapshot repository types: fs for local filesystem, s3 for Amazon S3, azure for Azure Storage, gcs for Google Cloud Storage, hdfs for Hadoop Distributed File System, url for read-only HTTP repositories.
+
+#@@@@@@@@@@
+
+172. Find the bug in this database transaction isolation:
+```python
+import psycopg2
+import threading
+import time
+
+def concurrent_update(thread_id):
+    conn = psycopg2.connect("dbname=test_db user=test_user")
+    conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_READ_COMMITTED)
+
+    cursor = conn.cursor()
+
+    try:
+        # Start transaction
+        cursor.execute("BEGIN")
+
+        # Read current balance
+        cursor.execute("SELECT balance FROM accounts WHERE id = 1")
+        balance = cursor.fetchone()[0]
+        print(f"Thread {thread_id}: Read balance = {balance}")
+
+        # Simulate processing time
+        time.sleep(1)
+
+        # Update balance based on read value
+        new_balance = balance + 100
+        cursor.execute("UPDATE accounts SET balance = %s WHERE id = 1", (new_balance,))
+
+        # Commit transaction
+        cursor.execute("COMMIT")
+        print(f"Thread {thread_id}: Updated balance to {new_balance}")
+
+    except Exception as e:
+        cursor.execute("ROLLBACK")
+        print(f"Thread {thread_id}: Error - {e}")
+    finally:
+        conn.close()
+
+# Start concurrent threads
+threads = []
+for i in range(3):
+    t = threading.Thread(target=concurrent_update, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+```
+
+Answer: Lost update problem due to READ_COMMITTED isolation level. Multiple threads read the same balance value and update based on stale data. Should use SERIALIZABLE isolation level or SELECT FOR UPDATE to lock the row during read-modify-write operations.
+
+#@@@@@@@@@@
+
+173. What is the purpose of database connection string validation?
+
+Answer: Connection string validation ensures proper format and required parameters, prevents connection failures, validates credential formats, checks for security issues (plain text passwords), ensures compatibility with database drivers, and provides early error detection.
+
+#@@@@@@@@@@
+
+174. Which of the following are valid MongoDB sharding strategies? (Multiple correct)
+A) Range-based sharding
+B) Hash-based sharding
+C) Zone-based sharding
+D) Tag-aware sharding
+E) Compound shard keys
+F) Hashed compound keys
+
+Answer: A, B, C, D, E, F - All are valid MongoDB sharding strategies: Range-based (continuous ranges), Hash-based (even distribution), Zone-based (geographic/logical zones), Tag-aware (custom routing), Compound shard keys (multiple fields), Hashed compound keys (hash + range).
+
+#@@@@@@@@@@
+
+175. Complete this database performance baseline:
+```sql
+-- Performance baseline collection
+CREATE TABLE performance_baseline (
+    id SERIAL PRIMARY KEY,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value DECIMAL(15,2) NOT NULL,
+    measurement_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    database_name VARCHAR(100),
+    table_name VARCHAR(100),
+    query_type VARCHAR(50)
+);
+
+-- Collect baseline metrics
+INSERT INTO performance_baseline (metric_name, metric_value, database_name, query_type)
+SELECT
+    'avg_query_time_ms',
+    AVG(total_time),
+    'production',
+    'SELECT'
+FROM pg_stat_statements
+WHERE query LIKE 'SELECT%';
+
+-- Monitor performance deviation
+SELECT
+    metric_name,
+    current_value,
+    baseline_avg,
+    ROUND(((current_value - baseline_avg) / baseline_avg) * 100, 2) as deviation_percent
+FROM (
+    SELECT
+        'avg_query_time_ms' as metric_name,
+        AVG(total_time) as current_value,
+        (SELECT AVG(metric_value) FROM performance_baseline
+         WHERE metric_name = 'avg_query_time_ms'
+         AND measurement_time >= NOW() - INTERVAL '7 days') as baseline_avg
+    FROM pg_stat_statements
+    WHERE query LIKE 'SELECT%'
+) metrics
+WHERE ABS(((current_value - baseline_avg) / baseline_avg) * 100) > _______________;
+```
+
+Answer: `20` - Alert threshold for 20% deviation from baseline performance. This indicates significant performance degradation that requires investigation. Common thresholds are 15-25% depending on application requirements.
+
+#@@@@@@@@@@
+
+176. How do you implement database connection circuit breaker?
+
+Answer: Monitor connection failure rates, implement failure threshold detection, open circuit after consecutive failures, provide fallback mechanisms, implement half-open state for recovery testing, use exponential backoff for retry attempts, and log circuit breaker state changes.
+
+#@@@@@@@@@@
+
+177. Which of the following are valid PostgreSQL logical replication features? (Multiple correct)
+A) Selective table replication
+B) Cross-version replication
+C) Bidirectional replication
+D) Row filtering
+E) Column filtering
+F) Conflict resolution
+
+Answer: A, B, C, D, E - PostgreSQL logical replication supports: Selective table replication, Cross-version replication (within supported range), Bidirectional replication (with careful setup), Row filtering (WHERE clauses), Column filtering (specific columns). Built-in conflict resolution is limited.
+
+#@@@@@@@@@@
+
+178. Find the issue in this database connection pool sizing:
+```python
+import psycopg2.pool
+import concurrent.futures
+import time
+
+# Connection pool configuration
+pool = psycopg2.pool.ThreadedConnectionPool(
+    minconn=5,
+    maxconn=10,
+    host="localhost",
+    database="high_traffic_app",
+    user="app_user",
+    password="password"
+)
+
+def database_operation(operation_id):
+    # Get connection from pool
+    conn = pool.getconn()
+
+    try:
+        cursor = conn.cursor()
+
+        # Simulate database operation
+        cursor.execute("SELECT pg_sleep(0.5)")  # 500ms operation
+        cursor.execute("SELECT %s", (operation_id,))
+        result = cursor.fetchone()
+
+        return f"Operation {operation_id}: {result}"
+
+    finally:
+        # Return connection to pool
+        pool.putconn(conn)
+
+# High concurrency test
+with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+    # Submit 100 concurrent operations
+    futures = [executor.submit(database_operation, i) for i in range(100)]
+
+    # Wait for all operations to complete
+    for future in concurrent.futures.as_completed(futures):
+        try:
+            result = future.result(timeout=10)
+            print(result)
+        except Exception as e:
+            print(f"Operation failed: {e}")
+```
+
+Answer: Pool size (maxconn=10) is too small for the workload (50 concurrent workers, 100 operations). With 500ms operations, the pool will be exhausted quickly, causing blocking and timeouts. Should increase pool size or implement timeout handling with getconn(). Also missing proper error handling for pool exhaustion.
+
+#@@@@@@@@@@
+
+179. What is the purpose of database connection string obfuscation?
+
+Answer: Connection string obfuscation hides sensitive information (passwords, server details) from unauthorized access, prevents credential exposure in logs and configuration files, supports secure configuration management, enables credential rotation, and meets security compliance requirements.
+
+#@@@@@@@@@@
+
+180. Which of the following are valid Cassandra anti-entropy repair types? (Multiple correct)
+A) Full repair
+B) Incremental repair
+C) Subrange repair
+D) Primary range repair
+E) Parallel repair
+F) Sequential repair
+
+Answer: A, B, C, D, E, F - All are valid Cassandra repair types: Full repair (all data), Incremental repair (unrepaired data only), Subrange repair (specific token ranges), Primary range repair (primary ranges only), Parallel repair (multiple nodes), Sequential repair (one node at a time).
+
+#@@@@@@@@@@
+
+181. Complete this database disaster recovery test:
+```bash
+#!/bin/bash
+
+# Disaster recovery testing script
+DR_SITE="dr-database.example.com"
+PRIMARY_SITE="primary-database.example.com"
+TEST_DB="dr_test_$(date +%Y%m%d_%H%M%S)"
+
+echo "Starting DR test at $(date)"
+
+# 1. Verify replication lag
+REPLICATION_LAG=$(mysql -h $DR_SITE -u monitor -p -e "SHOW SLAVE STATUS\G" | grep "Seconds_Behind_Master" | awk '{print $2}')
+
+if [ "$REPLICATION_LAG" -gt 60 ]; then
+    echo "ERROR: Replication lag too high: ${REPLICATION_LAG}s"
+    exit 1
+fi
+
+# 2. Promote DR site to primary
+echo "Promoting DR site to primary..."
+mysql -h $DR_SITE -u admin -p -e "STOP SLAVE; RESET SLAVE ALL;"
+
+# 3. Test application connectivity
+echo "Testing application connectivity..."
+mysql -h $DR_SITE -u app_user -p -e "SELECT 1" > /dev/null
+
+if [ $? -eq 0 ]; then
+    echo "✓ Database connectivity successful"
+else
+    echo "✗ Database connectivity failed"
+    exit 1
+fi
+
+# 4. Verify data integrity
+echo "Verifying data integrity..."
+PRIMARY_COUNT=$(mysql -h $PRIMARY_SITE -u monitor -p -e "SELECT COUNT(*) FROM users" | tail -1)
+DR_COUNT=$(mysql -h $DR_SITE -u monitor -p -e "SELECT COUNT(*) FROM users" | tail -1)
+
+if [ "$PRIMARY_COUNT" -eq "$DR_COUNT" ]; then
+    echo "✓ Data integrity verified: $DR_COUNT records"
+else
+    echo "✗ Data integrity check failed: Primary=$PRIMARY_COUNT, DR=$DR_COUNT"
+fi
+
+# 5. Test write operations
+echo "Testing write operations..."
+mysql -h $DR_SITE -u app_user -p -e "INSERT INTO dr_test_log (test_time, status) VALUES (NOW(), 'DR_TEST_SUCCESS')"
+
+if [ $? -eq 0 ]; then
+    echo "✓ Write operations successful"
+else
+    echo "✗ Write operations failed"
+fi
+
+# 6. Restore replication (cleanup)
+echo "Restoring replication..."
+mysql -h $DR_SITE -u admin -p -e "
+    CHANGE MASTER TO
+    MASTER_HOST='$PRIMARY_SITE',
+    MASTER_USER='replication_user',
+    MASTER_PASSWORD='replication_password',
+    MASTER_AUTO_POSITION=1;
+    _______________;"
+
+echo "DR test completed at $(date)"
+```
+
+Answer: `START SLAVE` - Restarts replication to restore the DR site to its standby role after testing. This re-establishes the master-slave relationship and resumes data synchronization.
+
+#@@@@@@@@@@
+
+182. How do you implement database connection rate limiting?
+
+Answer: Implement connection throttling at application level, use database connection limits, implement token bucket algorithms, set per-user connection limits, use connection pooling with queue management, implement backpressure mechanisms, and monitor connection request rates.
+
+#@@@@@@@@@@
+
+183. Which of the following are valid MongoDB index intersection optimizations? (Multiple correct)
+A) Compound indexes
+B) Partial indexes
+C) Sparse indexes
+D) Text indexes
+E) Wildcard indexes
+F) 2dsphere indexes
+
+Answer: A, B, C, D, E, F - All can be used for optimization: Compound indexes (multiple fields), Partial indexes (conditional), Sparse indexes (skip nulls), Text indexes (full-text search), Wildcard indexes (dynamic fields), 2dsphere indexes (geospatial queries).
+
+#@@@@@@@@@@
+
+184. Find the final bug in this database optimization:
+```sql
+-- Optimization attempt for slow query
+-- Original query (slow)
+SELECT
+    u.username,
+    COUNT(p.id) as post_count,
+    MAX(p.created_at) as last_post_date
+FROM users u
+LEFT JOIN posts p ON u.id = p.user_id
+WHERE u.status = 'active'
+AND u.created_at > '2023-01-01'
+GROUP BY u.id, u.username
+HAVING COUNT(p.id) > 0
+ORDER BY last_post_date DESC
+LIMIT 100;
+
+-- "Optimized" version with subqueries
+SELECT
+    u.username,
+    (SELECT COUNT(*) FROM posts WHERE user_id = u.id) as post_count,
+    (SELECT MAX(created_at) FROM posts WHERE user_id = u.id) as last_post_date
+FROM users u
+WHERE u.status = 'active'
+AND u.created_at > '2023-01-01'
+AND (SELECT COUNT(*) FROM posts WHERE user_id = u.id) > 0
+ORDER BY (SELECT MAX(created_at) FROM posts WHERE user_id = u.id) DESC
+LIMIT 100;
+
+-- Indexes available:
+-- users: (status, created_at), (id)
+-- posts: (user_id, created_at), (user_id)
+```
+
+Answer: The "optimized" version executes the same subquery multiple times per row (4 times total: SELECT, WHERE, ORDER BY). This is much worse than the original JOIN. Better optimization: use window functions or create a materialized view with post statistics, or add covering indexes.
+
+#@@@@@@@@@@
+
+185. What is the purpose of database connection string encryption at rest?
+
+Answer: Encrypts stored connection strings in configuration files, protects credentials from unauthorized file system access, enables secure configuration management, supports key rotation for encrypted configs, meets compliance requirements, and prevents credential exposure in backups.
+
+#@@@@@@@@@@
+
+186. Which of the following are valid Elasticsearch cluster health statuses? (Multiple correct)
+A) green
+B) yellow
+C) red
+D) orange
+E) blue
+F) purple
+
+Answer: A, B, C - Elasticsearch cluster health statuses: green (all primary and replica shards allocated), yellow (all primary shards allocated, some replicas missing), red (some primary shards not allocated). Orange, blue, and purple are not valid health statuses.
+
+#@@@@@@@@@@
+
+187. Complete this database connection leak detection:
+```python
+import psycopg2
+import threading
+import time
+import weakref
+
+class ConnectionTracker:
+    def __init__(self):
+        self.active_connections = weakref.WeakSet()
+        self.connection_count = 0
+        self.lock = threading.Lock()
+
+    def track_connection(self, conn):
+        with self.lock:
+            self.active_connections.add(conn)
+            self.connection_count += 1
+            print(f"Connection created. Total: {len(self.active_connections)}")
+
+    def get_active_count(self):
+        return len(self.active_connections)
+
+    def detect_leaks(self):
+        active_count = self.get_active_count()
+        if active_count > 10:  # Threshold for leak detection
+            print(f"WARNING: Potential connection leak detected. Active connections: {active_count}")
+            return True
+        return False
+
+tracker = ConnectionTracker()
+
+def database_operation_with_leak():
+    conn = psycopg2.connect("dbname=test_db user=test_user")
+    tracker.track_connection(conn)
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1")
+    result = cursor.fetchone()
+
+    # Bug: Not closing connection - causes leak
+    # conn.close()  # This line is commented out
+
+    return result
+
+def database_operation_proper():
+    conn = psycopg2.connect("dbname=test_db user=test_user")
+    tracker.track_connection(conn)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        return result
+    finally:
+        _______________  # Proper cleanup
+
+# Test leak detection
+for i in range(15):
+    if i < 10:
+        database_operation_with_leak()
+    else:
+        database_operation_proper()
+
+    if tracker.detect_leaks():
+        print("Leak detection triggered!")
+        break
+```
+
+Answer: `conn.close()` - Properly closes the database connection in the finally block to prevent connection leaks. This ensures connections are always closed even if exceptions occur.
+
+#@@@@@@@@@@
+
+188. How do you implement database connection string rotation?
+
+Answer: Implement automated credential rotation, use secret management systems (AWS Secrets Manager, HashiCorp Vault), implement graceful connection pool refresh, use blue-green deployment for credential updates, implement rollback mechanisms, monitor connection health during rotation, and automate rotation scheduling.
+
+#@@@@@@@@@@
+
+189. Which of the following are valid database connection pooling patterns? (Multiple correct)
+A) Connection per thread
+B) Connection per request
+C) Shared connection pool
+D) Per-tenant connection pools
+E) Read/write connection pools
+F) Lazy connection initialization
+
+Answer: A, B, C, D, E, F - All are valid connection pooling patterns: Connection per thread (thread-local), Connection per request (short-lived), Shared pool (most common), Per-tenant pools (multi-tenancy), Read/write pools (separation), Lazy initialization (on-demand creation).
+
+#@@@@@@@@@@
+
+190. Find the issue in this database connection configuration:
+```yaml
+# Database configuration
+database:
+  host: "production-db.example.com"
+  port: 5432
+  name: "myapp_production"
+  username: "app_user"
+  password: "super_secret_password_123"  # Security issue
+
+  # Connection pool settings
+  pool:
+    min_connections: 5
+    max_connections: 20
+    connection_timeout: 30
+    idle_timeout: 600
+    max_lifetime: 3600
+
+  # SSL configuration
+  ssl:
+    enabled: true
+    mode: "require"
+    cert_file: "/etc/ssl/client-cert.pem"
+    key_file: "/etc/ssl/client-key.pem"
+    ca_file: "/etc/ssl/ca-cert.pem"
+
+  # Performance settings
+  statement_timeout: 30000
+  lock_timeout: 10000
+
+  # Monitoring
+  log_slow_queries: true
+  slow_query_threshold: 1000
+```
+
+Answer: Password stored in plain text in configuration file is a major security vulnerability. Should use environment variables, secret management systems, or encrypted configuration files. Also missing connection retry configuration and health check settings.
+
+#@@@@@@@@@@
+
+191. What is the purpose of database connection string templating?
+
+Answer: Templating enables dynamic configuration based on environment variables, supports multiple deployment environments, enables parameterized connection settings, improves configuration management, supports secret injection, and enables infrastructure as code practices.
+
+#@@@@@@@@@@
+
+192. Which of the following are valid database connection security measures? (Multiple correct)
+A) SSL/TLS encryption
+B) Certificate authentication
+C) IP whitelisting
+D) Connection rate limiting
+E) Credential rotation
+F) Connection auditing
+
+Answer: A, B, C, D, E, F - All are valid database connection security measures: SSL/TLS for encryption, Certificate authentication for identity, IP whitelisting for access control, Rate limiting for DoS protection, Credential rotation for security, Connection auditing for monitoring.
+
+#@@@@@@@@@@
+
+193. Complete this database connection monitoring dashboard:
+```python
+import psycopg2
+import time
+import json
+from datetime import datetime
+
+class DatabaseConnectionMonitor:
+    def __init__(self, connection_config):
+        self.config = connection_config
+        self.metrics = {
+            'total_connections': 0,
+            'active_connections': 0,
+            'failed_connections': 0,
+            'avg_connection_time': 0,
+            'last_check': None
+        }
+
+    def check_connection_health(self):
+        start_time = time.time()
+
+        try:
+            conn = psycopg2.connect(**self.config)
+            cursor = conn.cursor()
+
+            # Test query
+            cursor.execute("SELECT 1")
+            result = cursor.fetchone()
+
+            # Get connection stats
+            cursor.execute("""
+                SELECT
+                    count(*) as total_connections,
+                    count(*) FILTER (WHERE state = 'active') as active_connections
+                FROM pg_stat_activity
+                WHERE datname = current_database()
+            """)
+
+            stats = cursor.fetchone()
+            connection_time = time.time() - start_time
+
+            # Update metrics
+            self.metrics.update({
+                'total_connections': stats[0],
+                'active_connections': stats[1],
+                'avg_connection_time': connection_time,
+                'last_check': datetime.now().isoformat(),
+                'status': '_______________'
+            })
+
+            conn.close()
+
+        except Exception as e:
+            self.metrics.update({
+                'failed_connections': self.metrics['failed_connections'] + 1,
+                'last_error': str(e),
+                'last_check': datetime.now().isoformat(),
+                'status': 'ERROR'
+            })
+
+    def get_metrics(self):
+        return json.dumps(self.metrics, indent=2)
+
+# Usage
+monitor = DatabaseConnectionMonitor({
+    'host': 'localhost',
+    'database': 'myapp',
+    'user': 'monitor_user',
+    'password': 'monitor_password'
+})
+
+monitor.check_connection_health()
+print(monitor.get_metrics())
+```
+
+Answer: `'HEALTHY'` - Indicates successful connection and query execution. The status field provides a quick health indicator for monitoring dashboards and alerting systems.
+
+#@@@@@@@@@@
+
+194. How do you implement database connection graceful shutdown?
+
+Answer: Implement connection drain procedures, wait for active transactions to complete, set connection pool to reject new connections, implement timeout for forced shutdown, close idle connections first, log shutdown progress, and provide status endpoints for monitoring shutdown state.
+
+#@@@@@@@@@@
+
+195. Which of the following are valid database connection optimization techniques? (Multiple correct)
+A) Connection pooling
+B) Connection multiplexing
+C) Prepared statement caching
+D) Connection compression
+E) Keep-alive mechanisms
+F) Connection batching
+
+Answer: A, B, C, D, E, F - All are valid optimization techniques: Connection pooling (reuse), Connection multiplexing (sharing), Prepared statement caching (performance), Connection compression (bandwidth), Keep-alive (prevent timeouts), Connection batching (reduce overhead).
+
+#@@@@@@@@@@
+
+196. Find the issue in this database connection retry logic:
+```python
+import psycopg2
+import time
+import random
+
+def connect_with_retry(config, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            print(f"Connection attempt {attempt + 1}")
+            conn = psycopg2.connect(**config)
+            print("Connection successful")
+            return conn
+
+        except psycopg2.OperationalError as e:
+            print(f"Connection failed: {e}")
+
+            if attempt < max_retries - 1:
+                # Fixed delay - potential issue
+                time.sleep(2)
+            else:
+                print("Max retries exceeded")
+                raise
+
+        except Exception as e:
+            # Non-retryable error
+            print(f"Non-retryable error: {e}")
+            raise
+
+def database_operation():
+    config = {
+        'host': 'unreliable-db.example.com',
+        'database': 'myapp',
+        'user': 'app_user',
+        'password': 'password',
+        'connect_timeout': 5
+    }
+
+    conn = connect_with_retry(config)
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM users")
+        result = cursor.fetchone()
+        return result[0]
+    finally:
+        conn.close()
+
+# Multiple concurrent operations
+import threading
+
+threads = []
+for i in range(10):
+    t = threading.Thread(target=database_operation)
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+```
+
+Answer: Fixed delay causes thundering herd problem when multiple threads retry simultaneously. Should implement exponential backoff with jitter: `time.sleep(2 ** attempt + random.uniform(0, 1))` to spread out retry attempts and reduce server load.
+
+#@@@@@@@@@@
+
+197. What is the purpose of database connection string validation in CI/CD?
+
+Answer: Validates connection parameters before deployment, prevents deployment of invalid configurations, ensures environment-specific settings are correct, catches configuration errors early, supports automated testing of database connectivity, and prevents production outages from bad configs.
+
+#@@@@@@@@@@
+
+198. Which of the following are valid database connection lifecycle events? (Multiple correct)
+A) Connection created
+B) Connection acquired
+C) Connection released
+D) Connection validated
+E) Connection expired
+F) Connection destroyed
+
+Answer: A, B, C, D, E, F - All are valid connection lifecycle events: Created (new connection), Acquired (taken from pool), Released (returned to pool), Validated (health check), Expired (timeout/TTL), Destroyed (permanently closed).
+
+#@@@@@@@@@@
+
+199. Complete this database connection performance benchmark:
+```python
+import psycopg2
+import psycopg2.pool
+import time
+import statistics
+import concurrent.futures
+
+def benchmark_direct_connections(config, num_operations):
+    """Benchmark direct connections (no pooling)"""
+    times = []
+
+    for i in range(num_operations):
+        start_time = time.time()
+
+        conn = psycopg2.connect(**config)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        conn.close()
+
+        end_time = time.time()
+        times.append(end_time - start_time)
+
+    return times
+
+def benchmark_connection_pool(config, num_operations, pool_size):
+    """Benchmark connection pooling"""
+    pool = psycopg2.pool.ThreadedConnectionPool(1, pool_size, **config)
+    times = []
+
+    def single_operation():
+        start_time = time.time()
+
+        conn = pool.getconn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        result = cursor.fetchone()
+        pool.putconn(conn)
+
+        end_time = time.time()
+        return end_time - start_time
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=pool_size) as executor:
+        futures = [executor.submit(single_operation) for _ in range(num_operations)]
+        times = [future.result() for future in concurrent.futures.as_completed(futures)]
+
+    pool.closeall()
+    return times
+
+# Run benchmarks
+config = {
+    'host': 'localhost',
+    'database': 'benchmark_db',
+    'user': 'benchmark_user',
+    'password': 'password'
+}
+
+print("Benchmarking database connections...")
+
+# Direct connections
+direct_times = benchmark_direct_connections(config, 100)
+direct_avg = statistics.mean(direct_times)
+direct_p95 = statistics.quantiles(direct_times, n=20)[18]  # 95th percentile
+
+# Connection pool
+pool_times = benchmark_connection_pool(config, 100, 10)
+pool_avg = statistics.mean(pool_times)
+pool_p95 = statistics.quantiles(pool_times, n=20)[18]
+
+print(f"Direct connections - Avg: {direct_avg:.4f}s, P95: {direct_p95:.4f}s")
+print(f"Connection pool - Avg: {pool_avg:.4f}s, P95: {pool_p95:.4f}s")
+print(f"Performance improvement: {((direct_avg - pool_avg) / direct_avg) * 100:.1f}%")
+
+# Determine winner
+if pool_avg < direct_avg:
+    print("Winner: Connection pooling")
+else:
+    print("Winner: Direct connections")
+
+print(f"Recommendation: Use connection pooling for _______________")
+```
+
+Answer: `"high-concurrency applications"` - Connection pooling shows significant benefits in high-concurrency scenarios by reusing connections and reducing connection overhead. For low-concurrency applications, direct connections might be simpler.
+
+#@@@@@@@@@@
+
+200. Find the final comprehensive issue in this database architecture:
+```python
+# Complete database management system
+import psycopg2
+import psycopg2.pool
+import redis
+import threading
+import time
+import json
+import logging
+from contextlib import contextmanager
+
+class DatabaseManager:
+    def __init__(self, db_config, redis_config):
+        # Database connection pool
+        self.db_pool = psycopg2.pool.ThreadedConnectionPool(
+            minconn=5,
+            maxconn=20,
+            **db_config
+        )
+
+        # Redis for caching
+        self.redis_client = redis.Redis(**redis_config)
+
+        # Metrics tracking
+        self.metrics = {
+            'queries_executed': 0,
+            'cache_hits': 0,
+            'cache_misses': 0,
+            'connection_errors': 0
+        }
+
+        self.lock = threading.Lock()
+
+    @contextmanager
+    def get_db_connection(self):
+        conn = None
+        try:
+            conn = self.db_pool.getconn()
+            yield conn
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            with self.lock:
+                self.metrics['connection_errors'] += 1
+            raise
+        finally:
+            if conn:
+                self.db_pool.putconn(conn)
+
+    def execute_query(self, query, params=None, cache_key=None, cache_ttl=300):
+        # Try cache first
+        if cache_key:
+            cached_result = self.redis_client.get(cache_key)
+            if cached_result:
+                with self.lock:
+                    self.metrics['cache_hits'] += 1
+                return json.loads(cached_result)
+            else:
+                with self.lock:
+                    self.metrics['cache_misses'] += 1
+
+        # Execute database query
+        with self.get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+
+            if query.strip().upper().startswith('SELECT'):
+                result = cursor.fetchall()
+
+                # Cache the result
+                if cache_key:
+                    self.redis_client.setex(
+                        cache_key,
+                        cache_ttl,
+                        json.dumps(result, default=str)
+                    )
+
+                with self.lock:
+                    self.metrics['queries_executed'] += 1
+
+                return result
+            else:
+                conn.commit()
+                with self.lock:
+                    self.metrics['queries_executed'] += 1
+                return cursor.rowcount
+
+    def get_metrics(self):
+        with self.lock:
+            return self.metrics.copy()
+
+    def health_check(self):
+        try:
+            # Database health
+            with self.get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT 1")
+                db_healthy = cursor.fetchone()[0] == 1
+
+            # Redis health
+            redis_healthy = self.redis_client.ping()
+
+            return {
+                'database': db_healthy,
+                'redis': redis_healthy,
+                'overall': db_healthy and redis_healthy
+            }
+        except Exception as e:
+            return {
+                'database': False,
+                'redis': False,
+                'overall': False,
+                'error': str(e)
+            }
+
+    def close(self):
+        self.db_pool.closeall()
+        self.redis_client.close()
+
+# Usage example with potential issues
+db_manager = DatabaseManager(
+    db_config={
+        'host': 'localhost',
+        'database': 'production_app',
+        'user': 'app_user',
+        'password': 'password'
+    },
+    redis_config={
+        'host': 'localhost',
+        'port': 6379,
+        'db': 0
+    }
+)
+
+# High-concurrency usage
+def worker_function(worker_id):
+    for i in range(100):
+        try:
+            # Query with caching
+            result = db_manager.execute_query(
+                "SELECT * FROM users WHERE status = %s",
+                ('active',),
+                cache_key=f"active_users",
+                cache_ttl=60
+            )
+
+            # Update operation
+            db_manager.execute_query(
+                "UPDATE user_activity SET last_seen = NOW() WHERE user_id = %s",
+                (worker_id,)
+            )
+
+        except Exception as e:
+            print(f"Worker {worker_id} error: {e}")
+
+# Start multiple workers
+threads = []
+for i in range(50):
+    t = threading.Thread(target=worker_function, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+
+print("Metrics:", db_manager.get_metrics())
+print("Health:", db_manager.health_check())
+db_manager.close()
+```
+
+Answer: Multiple critical production issues: 1) No connection timeout handling - threads can block indefinitely waiting for connections, 2) Cache invalidation strategy missing - stale data in cache after updates, 3) No circuit breaker for Redis failures, 4) Missing connection pool monitoring and alerting, 5) No graceful degradation when cache is unavailable, 6) Thread safety issues with cursor usage, 7) No retry logic for transient failures, 8) Missing comprehensive logging and monitoring, 9) No backup/failover strategy, 10) Security vulnerabilities (plain text passwords, no SSL configuration).
+
+#@@@@@@@@@@

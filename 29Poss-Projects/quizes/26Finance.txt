@@ -1,0 +1,221 @@
+Finance Quiz - 200 Questions
+Tech Stack: Loan Origination & Servicing, Credit-Scoring Models, Risk Management & VaR, Portfolio Optimization, Market Prediction/Time-Series Forecasting, Algorithmic Trading, Derivatives Pricing, Asset Allocation & Rebalancing, Treasury/Liquidity Management
+
+1. Which of the following are credit scoring model types? (Multiple correct)
+A) Logistic Regression
+B) Random Forest
+C) Gradient Boosting
+D) Neural Networks
+E) FICO Score
+F) Scorecard models
+
+Answer: A, B, C, D, E, F - All are credit scoring approaches. Logistic Regression (traditional), Random Forest (ensemble), Gradient Boosting (XGBoost/LightGBM), Neural Networks (deep learning), FICO Score (industry standard), Scorecard models (points-based). Each has different accuracy, interpretability, and regulatory compliance tradeoffs.
+
+#@@@@@@@@@@
+
+2. Complete this Value at Risk (VaR) calculation:
+```python
+import numpy as np
+import pandas as pd
+
+def calculate_var(returns, confidence_level=0.95):
+    """
+    Calculate Value at Risk using historical simulation
+    """
+    # Sort returns
+    sorted_returns = np.sort(returns)
+
+    # Find the index for the confidence level
+    index = int((1 - confidence_level) * len(sorted_returns))
+
+    # VaR is the return at this percentile
+    var = _______________
+
+    return abs(var)
+
+# Example usage
+returns = np.random.normal(0.001, 0.02, 1000)
+var_95 = calculate_var(returns, 0.95)
+print(f"95% VaR: {var_95:.4f}")
+```
+
+Answer: `sorted_returns[index]` - Get the return at the specified percentile. VaR measures potential loss at a given confidence level over a time horizon.
+
+#@@@@@@@@@@
+
+3. What is the difference between systematic and unsystematic risk?
+
+Answer: Systematic risk (market risk) affects entire market, cannot be diversified away, measured by beta, examples: recession, interest rates. Unsystematic risk (specific risk) affects individual assets, can be diversified, examples: company bankruptcy, management changes. Portfolio diversification reduces unsystematic risk.
+
+#@@@@@@@@@@
+
+4. Which of the following are portfolio optimization techniques? (Multiple correct)
+A) Mean-Variance Optimization (Markowitz)
+B) Black-Litterman Model
+C) Risk Parity
+D) Maximum Sharpe Ratio
+E) Minimum Variance
+F) Equal Weight
+
+Answer: A, B, C, D, E, F - All are portfolio optimization techniques. Mean-Variance (classic), Black-Litterman (incorporates views), Risk Parity (equal risk contribution), Maximum Sharpe (best risk-adjusted return), Minimum Variance (lowest volatility), Equal Weight (simple diversification).
+
+#@@@@@@@@@@
+
+5. Find the issue in this algorithmic trading strategy:
+```python
+import pandas as pd
+
+def moving_average_crossover(prices, short_window=20, long_window=50):
+    signals = pd.DataFrame(index=prices.index)
+    signals['price'] = prices
+    signals['short_ma'] = prices.rolling(window=short_window).mean()
+    signals['long_ma'] = prices.rolling(window=long_window).mean()
+
+    # Issue: look-ahead bias - using future data
+    signals['signal'] = 0
+    signals['signal'][short_window:] = np.where(
+        signals['short_ma'][short_window:] > signals['long_ma'][short_window:], 1, 0
+    )
+
+    # Generate trading orders
+    signals['positions'] = signals['signal'].diff()
+
+    return signals
+```
+
+Answer: Look-ahead bias - using rolling mean that includes current price. Should use `.shift(1)` to avoid using future information. Also, SettingWithCopyWarning - should use `.loc[]` for assignment. Backtesting must use only past data.
+
+#@@@@@@@@@@
+
+6. How do you implement Black-Scholes option pricing?
+
+Answer: Calculate d1 = (ln(S/K) + (r + σ²/2)T) / (σ√T), d2 = d1 - σ√T, Call = S*N(d1) - K*e^(-rT)*N(d2), Put = K*e^(-rT)*N(-d2) - S*N(-d1). Where S=spot, K=strike, r=risk-free rate, σ=volatility, T=time to maturity, N=cumulative normal distribution.
+
+#@@@@@@@@@@
+
+7. Which of the following are time series forecasting models? (Multiple correct)
+A) ARIMA
+B) GARCH
+C) Prophet
+D) LSTM
+E) Exponential Smoothing
+F) VAR (Vector Autoregression)
+
+Answer: A, B, C, D, E, F - All are time series models. ARIMA (autoregressive integrated moving average), GARCH (volatility modeling), Prophet (Facebook's forecasting), LSTM (deep learning), Exponential Smoothing (weighted averages), VAR (multivariate). Choose based on data characteristics and forecast horizon.
+
+#@@@@@@@@@@
+
+8. Complete this loan amortization calculation:
+```python
+def calculate_monthly_payment(principal, annual_rate, years):
+    """
+    Calculate monthly payment for a loan
+    """
+    monthly_rate = annual_rate / 12
+    num_payments = years * 12
+
+    # Monthly payment formula
+    if monthly_rate == 0:
+        return principal / num_payments
+
+    monthly_payment = principal * (
+        monthly_rate * (1 + monthly_rate) ** num_payments
+    ) / (
+        _______________ - 1
+    )
+
+    return monthly_payment
+
+# Example: $300,000 loan at 4% for 30 years
+payment = calculate_monthly_payment(300000, 0.04, 30)
+print(f"Monthly payment: ${payment:.2f}")
+```
+
+Answer: `(1 + monthly_rate) ** num_payments` - Denominator in amortization formula. This calculates fixed monthly payment for a loan with compound interest.
+
+#@@@@@@@@@@
+
+9. What is the difference between alpha and beta in portfolio management?
+
+Answer: Alpha measures excess return above benchmark, indicates manager skill, goal is positive alpha. Beta measures systematic risk/market sensitivity, beta=1 matches market, beta>1 more volatile, beta<1 less volatile. Alpha is return, beta is risk measure.
+
+#@@@@@@@@@@
+
+10. Which of the following are liquidity risk metrics? (Multiple correct)
+A) Bid-ask spread
+B) Trading volume
+C) Market depth
+D) Turnover ratio
+E) Days to liquidate
+F) Amihud illiquidity ratio
+
+Answer: A, B, C, D, E, F - All are liquidity metrics. Bid-ask spread (transaction cost), Trading volume (market activity), Market depth (order book size), Turnover ratio (trading frequency), Days to liquidate (liquidation time), Amihud ratio (price impact). Critical for risk management and trading.
+
+#@@@@@@@@@@
+
+11. Predict the output of this Sharpe ratio calculation:
+```python
+import numpy as np
+
+returns = np.array([0.12, 0.08, 0.15, -0.05, 0.10])
+risk_free_rate = 0.02
+
+mean_return = np.mean(returns)
+std_return = np.std(returns, ddof=1)
+
+sharpe_ratio = (mean_return - risk_free_rate) / std_return
+
+print(f"Sharpe Ratio: {sharpe_ratio:.4f}")
+```
+
+Answer: Sharpe Ratio: 0.8165 (approximately). Mean return = 0.08, std = 0.0735, Sharpe = (0.08 - 0.02) / 0.0735 ≈ 0.8165. Sharpe ratio measures risk-adjusted return.
+
+#@@@@@@@@@@
+
+12. How do you implement portfolio rebalancing?
+
+Answer: Set target allocations, calculate current weights, determine deviations, identify trades needed, consider transaction costs, implement threshold-based or calendar-based rebalancing, use tax-loss harvesting, minimize turnover. Rebalancing maintains desired risk/return profile.
+
+#@@@@@@@@@@
+
+13. Which of the following are derivatives pricing models? (Multiple correct)
+A) Black-Scholes
+B) Binomial Tree
+C) Monte Carlo Simulation
+D) Finite Difference Methods
+E) Black-76 (futures options)
+F) Heston Model (stochastic volatility)
+
+Answer: A, B, C, D, E, F - All are derivatives pricing models. Black-Scholes (European options), Binomial Tree (American options), Monte Carlo (path-dependent), Finite Difference (PDEs), Black-76 (commodities), Heston (volatility smile). Each suited for different option types and market conditions.
+
+#@@@@@@@@@@
+
+14. Complete this credit risk calculation:
+```python
+def calculate_expected_loss(exposure, probability_of_default, loss_given_default):
+    """
+    Calculate Expected Loss for credit risk
+    EL = EAD × PD × LGD
+    """
+    expected_loss = exposure * probability_of_default * _______________
+
+    return expected_loss
+
+# Example
+ead = 1000000  # Exposure at Default
+pd = 0.02      # Probability of Default (2%)
+lgd = 0.45     # Loss Given Default (45%)
+
+el = calculate_expected_loss(ead, pd, lgd)
+print(f"Expected Loss: ${el:,.2f}")
+```
+
+Answer: `loss_given_default` - Complete the EL formula. Expected Loss = EAD × PD × LGD is fundamental credit risk metric used in Basel regulations.
+
+#@@@@@@@@@@
+
+15. What is the difference between market making and proprietary trading?
+
+Answer: Market making provides liquidity, quotes bid/ask, earns spread, inventory risk, regulatory obligations, lower risk. Proprietary trading uses firm capital, directional bets, seeks alpha, higher risk/reward, no client obligations. Market makers facilitate trading, prop traders seek profits.
+
+#@@@@@@@@@@

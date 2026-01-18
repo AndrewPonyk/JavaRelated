@@ -1,0 +1,1247 @@
+Big Data + ETL Quiz - 200 Questions
+Tech Stack: Spark, Kafka, Hive/Trino, Flink, Airflow, dbt, NiFi, Snowflake, Databricks, AWS Glue, BigQuery, Beam
+
+1. Which of the following are Apache Spark components? (Multiple correct)
+A) Spark Core
+B) Spark SQL
+C) Spark Streaming
+D) MLlib
+E) GraphX
+F) Spark Structured Streaming
+
+Answer: A, B, C, D, E, F - All are Spark components. Spark Core (RDD API), Spark SQL (structured data), Spark Streaming (micro-batches), MLlib (machine learning), GraphX (graph processing), Structured Streaming (continuous processing).
+
+#@@@@@@@@@@
+
+2. Complete this PySpark transformation:
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, avg, count
+
+spark = SparkSession.builder.appName("DataAnalysis").getOrCreate()
+
+df = spark.read.parquet("s3://bucket/data/")
+
+result = df.groupBy("category") \
+    .agg(
+        avg("price").alias("avg_price"),
+        count("*").alias("count")
+    ) \
+    .filter(col("count") > 100) \
+    ._______________("avg_price", ascending=False)
+
+result.show()
+```
+
+Answer: `orderBy` - Sort the results by average price in descending order. PySpark provides SQL-like operations for distributed data processing.
+
+#@@@@@@@@@@
+
+3. What is the difference between Kafka and traditional message queues?
+
+Answer: Kafka is distributed log, persistent storage, high throughput, pull-based consumption, replay capability, partitioned topics. Traditional MQ is transient, lower throughput, push-based, no replay, queue-based. Kafka better for event streaming, MQ better for task queues.
+
+#@@@@@@@@@@
+
+4. Which of the following are Kafka concepts? (Multiple correct)
+A) Topics
+B) Partitions
+C) Producers
+D) Consumers
+E) Consumer Groups
+F) Offsets
+
+Answer: A, B, C, D, E, F - All are Kafka concepts. Topics (message categories), Partitions (scalability units), Producers (message publishers), Consumers (message subscribers), Consumer Groups (parallel consumption), Offsets (message positions).
+
+#@@@@@@@@@@
+
+5. Find the performance issue in this Spark code:
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+# Performance issue: multiple actions on same RDD
+df = spark.read.csv("large_file.csv")
+
+count1 = df.filter(col("status") == "active").count()
+count2 = df.filter(col("status") == "inactive").count()
+count3 = df.filter(col("status") == "pending").count()
+
+# Each count triggers full scan of data
+```
+
+Answer: Multiple actions without caching cause repeated data scans. Fix with `df.cache()` or `df.persist()` before filtering. This stores the DataFrame in memory, avoiding redundant reads and improving performance significantly.
+
+#@@@@@@@@@@
+
+6. How do you implement data partitioning in Spark?
+
+Answer: Use partitionBy() for writing, repartition() or coalesce() for reshuffling, hash partitioning by key, range partitioning for sorted data. Choose partition count based on cluster size and data volume. Proper partitioning improves parallelism and reduces shuffles.
+
+#@@@@@@@@@@
+
+7. Which of the following are Apache Airflow concepts? (Multiple correct)
+A) DAGs
+B) Operators
+C) Tasks
+D) Sensors
+E) Executors
+F) Hooks
+
+Answer: A, B, C, D, E, F - All are Airflow concepts. DAGs (workflow graphs), Operators (task templates), Tasks (work units), Sensors (wait for conditions), Executors (task execution), Hooks (external connections).
+
+#@@@@@@@@@@
+
+8. Complete this dbt model:
+```sql
+-- models/staging/stg_orders.sql
+{{
+    config(
+        materialized='view'
+    )
+}}
+
+with source as (
+    select * from {{ source('raw', 'orders') }}
+),
+
+renamed as (
+    select
+        order_id,
+        customer_id,
+        order_date,
+        total_amount,
+        status,
+        created_at,
+        updated_at
+    from source
+    where status != '_______________'
+)
+
+select * from renamed
+```
+
+Answer: `cancelled` or `deleted` - Filter out cancelled/deleted orders in staging layer. dbt models transform raw data into analytics-ready datasets with SQL and Jinja templating.
+
+#@@@@@@@@@@
+
+9. What is the difference between batch and stream processing?
+
+Answer: Batch processing handles bounded data, scheduled execution, higher latency, complete dataset analysis, simpler implementation. Stream processing handles unbounded data, continuous execution, low latency, incremental processing, complex state management. Choose based on latency requirements.
+
+#@@@@@@@@@@
+
+10. Which of the following are Snowflake features? (Multiple correct)
+A) Separation of storage and compute
+B) Time travel
+C) Zero-copy cloning
+D) Data sharing
+E) Multi-cluster warehouses
+F) Automatic scaling
+
+Answer: A, B, C, D, E, F - All are Snowflake features. Separation of storage/compute (independent scaling), Time travel (historical queries), Zero-copy cloning (instant copies), Data sharing (secure sharing), Multi-cluster warehouses (concurrency), Automatic scaling (elastic compute).
+
+#@@@@@@@@@@
+
+11. Predict the output of this Spark SQL query:
+```python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum
+
+spark = SparkSession.builder.getOrCreate()
+
+data = [
+    ("A", 100),
+    ("B", 200),
+    ("A", 150),
+    ("B", 250),
+    ("C", 300)
+]
+
+df = spark.createDataFrame(data, ["category", "amount"])
+
+result = df.groupBy("category") \
+    .agg(sum("amount").alias("total")) \
+    .orderBy("category")
+
+result.show()
+```
+
+Answer: +--------+-----+, |category|total|, +--------+-----+, |       A|  250|, |       B|  450|, |       C|  300|, +--------+-----+. Groups by category and sums amounts, ordered alphabetically.
+
+#@@@@@@@@@@
+
+12. How do you implement CDC (Change Data Capture) in data pipelines?
+
+Answer: Use database logs (binlog, WAL), implement triggers, use CDC tools (Debezium, AWS DMS), capture INSERT/UPDATE/DELETE operations, stream changes to Kafka, apply changes to target systems. Enables real-time data synchronization and event-driven architectures.
+
+#@@@@@@@@@@
+
+13. Which of the following are Apache Flink features? (Multiple correct)
+A) Event time processing
+B) Stateful computations
+C) Exactly-once semantics
+D) Low latency
+E) Windowing
+F) Savepoints
+
+Answer: A, B, C, D, E, F - All are Flink features. Event time processing (out-of-order events), Stateful computations (maintain state), Exactly-once semantics (consistency), Low latency (milliseconds), Windowing (time-based aggregations), Savepoints (state snapshots).
+
+#@@@@@@@@@@
+
+14. Complete this AWS Glue ETL script:
+```python
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.job import Job
+
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+# Read from Glue catalog
+datasource = glueContext.create_dynamic_frame.from_catalog(
+    database = "my_database",
+    table_name = "my_table"
+)
+
+# Transform
+transformed = ApplyMapping.apply(
+    frame = datasource,
+    mappings = [
+        ("id", "long", "id", "long"),
+        ("name", "string", "name", "string"),
+        ("price", "double", "price", "double")
+    ]
+)
+
+# Write to S3
+glueContext.write_dynamic_frame.from_options(
+    frame = transformed,
+    connection_type = "s3",
+    connection_options = {"path": "s3://bucket/output/"},
+    format = "_______________"
+)
+
+job.commit()
+```
+
+Answer: `parquet` or `orc` - Use columnar format for efficient storage and querying. AWS Glue provides serverless ETL with Apache Spark.
+
+#@@@@@@@@@@
+
+15. What is the difference between Hive and Trino (formerly Presto)?
+
+Answer: Hive uses MapReduce/Tez, batch processing, higher latency, metadata store. Trino is distributed SQL engine, in-memory processing, low latency, interactive queries, federated queries across sources. Use Hive for batch ETL, Trino for interactive analytics.
+
+#@@@@@@@@@@
+
+16. Which of the following are big data storage formats? (Multiple correct)
+A) Parquet
+B) ORC (Optimized Row Columnar)
+C) Avro
+D) JSON
+E) CSV
+F) Sequence File
+
+Answer: A, B, C, D, E, F - All are big data formats. Parquet (columnar, efficient), ORC (columnar, Hive), Avro (row-based, schema evolution), JSON (semi-structured), CSV (simple), Sequence File (Hadoop binary). Choose based on use case.
+
+#@@@@@@@@@@
+
+17. Complete this Apache Kafka producer code:
+```python
+from kafka import KafkaProducer
+import json
+
+producer = KafkaProducer(
+    bootstrap_servers=['localhost:9092'],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+# Send message
+producer.send(
+    '_______________',
+    {'user_id': 123, 'action': 'click', 'timestamp': 1234567890}
+)
+
+producer.flush()
+```
+
+Answer: `topic_name` or `events` - Kafka topic name. Kafka is distributed streaming platform for real-time data pipelines. Producer sends messages to topics.
+
+#@@@@@@@@@@
+
+18. What is the purpose of data partitioning in big data systems?
+
+Answer: Data partitioning divides data into smaller chunks for parallel processing. Improves query performance, enables distributed processing. Partition by date, region, hash key. Examples: Hive partitions, Spark partitions, Kafka partitions. Essential for scalability.
+
+#@@@@@@@@@@
+
+19. How do you implement slowly changing dimensions (SCD) Type 2?
+
+Answer: SCD Type 2 tracks historical changes with new rows. Add effective_date, end_date, is_current columns. On update: set old row is_current=false, end_date=now; insert new row with is_current=true. Preserves full history. Used in data warehousing.
+
+#@@@@@@@@@@
+
+20. Which of the following are data lake technologies? (Multiple correct)
+A) AWS S3
+B) Azure Data Lake Storage
+C) Google Cloud Storage
+D) HDFS
+E) Delta Lake
+F) Apache Iceberg
+
+Answer: A, B, C, D, E, F - All are data lake technologies. S3/GCS/ADLS (cloud storage), HDFS (Hadoop), Delta Lake (ACID on data lake), Iceberg (table format). Data lakes store raw data at scale.
+
+#@@@@@@@@@@
+
+21. Complete this PySpark window function:
+```python
+from pyspark.sql import Window
+from pyspark.sql.functions import row_number, rank
+
+windowSpec = Window.partitionBy("department").orderBy(col("salary").desc())
+
+df_ranked = df.withColumn(
+    "rank",
+    _______________().over(windowSpec)
+)
+```
+
+Answer: `row_number` or `rank` or `dense_rank` - Window ranking function. row_number (unique), rank (gaps), dense_rank (no gaps). Window functions for analytics.
+
+#@@@@@@@@@@
+
+22. What is the difference between batch and stream processing?
+
+Answer: Batch processing processes bounded data sets, high latency, high throughput (Hadoop, Spark batch). Stream processing processes unbounded data, low latency, continuous (Kafka Streams, Flink, Spark Streaming). Batch for historical analysis, stream for real-time. Lambda/Kappa architectures combine both.
+
+#@@@@@@@@@@
+
+23. How do you implement data deduplication in ETL?
+
+Answer: Deduplication removes duplicate records. Methods: 1) Hash-based (MD5/SHA of record), 2) Key-based (group by key, keep first/last), 3) Window-based (dedupe within time window). Spark: `df.dropDuplicates(['key'])`. SQL: `ROW_NUMBER() OVER (PARTITION BY key ORDER BY timestamp DESC) = 1`.
+
+#@@@@@@@@@@
+
+24. Which of the following are data warehouse schemas? (Multiple correct)
+A) Star schema
+B) Snowflake schema
+C) Galaxy schema
+D) Fact constellation
+E) Data vault
+F) Anchor modeling
+
+Answer: A, B, C, D, E, F - All are warehouse schemas. Star (denormalized, simple), Snowflake (normalized dimensions), Galaxy (multiple fact tables), Fact constellation (shared dimensions), Data vault (historical tracking), Anchor modeling (highly normalized). Choose based on requirements.
+
+#@@@@@@@@@@
+
+25. Complete this Apache Airflow DAG:
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+dag = DAG(
+    'etl_pipeline',
+    start_date=datetime(2024, 1, 1),
+    schedule_interval='_______________'
+)
+
+extract_task = PythonOperator(
+    task_id='extract',
+    python_callable=extract_data,
+    dag=dag
+)
+
+transform_task = PythonOperator(
+    task_id='transform',
+    python_callable=transform_data,
+    dag=dag
+)
+
+extract_task >> transform_task
+```
+
+Answer: `@daily` or `0 0 * * *` - Cron schedule. Airflow orchestrates ETL workflows. DAGs define task dependencies.
+
+#@@@@@@@@@@
+
+26. What is the purpose of data catalog in big data?
+
+Answer: Data catalog provides metadata management, data discovery, lineage tracking. Stores schema, location, owner, tags. Examples: AWS Glue Catalog, Apache Atlas, Alation. Enables data governance, self-service analytics. Essential for data lakes.
+
+#@@@@@@@@@@
+
+27. How do you implement incremental data loading?
+
+Answer: Incremental loading loads only new/changed data. Methods: 1) Timestamp-based (WHERE updated_at > last_load), 2) Change Data Capture (CDC), 3) Watermark tracking. More efficient than full load. Track high watermark for next load.
+
+#@@@@@@@@@@
+
+28. Which of the following are big data processing frameworks? (Multiple correct)
+A) Apache Spark
+B) Apache Flink
+C) Apache Beam
+D) Apache Storm
+E) Apache Samza
+F) Apache Hadoop MapReduce
+
+Answer: A, B, C, D, E, F - All are processing frameworks. Spark (batch/stream, popular), Flink (stream-first, stateful), Beam (unified API), Storm (stream, real-time), Samza (stream, Kafka-based), MapReduce (batch, legacy). Different strengths.
+
+#@@@@@@@@@@
+
+29. Complete this data quality check:
+```python
+def validate_data(df):
+    # Check for nulls
+    null_counts = df.select([
+        count(when(col(c).isNull(), c)).alias(c)
+        for c in df.columns
+    ])
+
+    # Check for duplicates
+    duplicate_count = df.count() - df._______________().count()
+
+    # Check data types
+    schema_valid = validate_schema(df.schema)
+
+    return null_counts, duplicate_count, schema_valid
+```
+
+Answer: `dropDuplicates` or `distinct` - Remove duplicates to count. Data quality checks ensure data integrity. Validate nulls, duplicates, types, ranges.
+
+#@@@@@@@@@@
+
+30. What is the difference between OLTP and OLAP?
+
+Answer: OLTP (Online Transaction Processing) handles transactions, normalized, row-oriented, low latency, high concurrency (MySQL, PostgreSQL). OLAP (Online Analytical Processing) handles analytics, denormalized, columnar, complex queries, aggregations (Redshift, Snowflake). Different optimization strategies.
+
+#@@@@@@@@@@
+
+31. How do you implement data masking for PII?
+
+Answer: Data masking protects sensitive data. Techniques: 1) Redaction (replace with ***), 2) Hashing (one-way), 3) Encryption (reversible), 4) Tokenization (replace with token), 5) Generalization (age -> age_range). Apply in ETL pipeline. Comply with GDPR, HIPAA.
+
+#@@@@@@@@@@
+
+32. Which of the following are data integration patterns? (Multiple correct)
+A) ETL (Extract, Transform, Load)
+B) ELT (Extract, Load, Transform)
+C) CDC (Change Data Capture)
+D) Data replication
+E) Data federation
+F) Data virtualization
+
+Answer: A, B, C, D, E, F - All are integration patterns. ETL (traditional), ELT (modern, cloud), CDC (real-time changes), Replication (copy data), Federation (query multiple sources), Virtualization (unified view). Choose based on requirements.
+
+#@@@@@@@@@@
+
+33. Complete this Apache Hive query optimization:
+```sql
+-- Enable optimization
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+SET hive.optimize.ppd=true;
+SET hive.vectorized.execution.enabled=_______________;
+
+-- Partitioned insert
+INSERT OVERWRITE TABLE sales PARTITION(year, month)
+SELECT *, year(sale_date), month(sale_date)
+FROM staging_sales;
+```
+
+Answer: `true` - Enable vectorized execution. Hive optimizations: dynamic partitioning, predicate pushdown, vectorization. Improves query performance.
+
+#@@@@@@@@@@
+
+34. What is the purpose of data lineage tracking?
+
+Answer: Data lineage tracks data flow from source to destination. Shows transformations, dependencies, impact analysis. Helps debugging, compliance, trust. Tools: Apache Atlas, AWS Glue, Informatica. Essential for data governance.
+
+#@@@@@@@@@@
+
+35. How do you implement upsert (merge) operations?
+
+Answer: Upsert updates existing records or inserts new ones. SQL MERGE: `MERGE INTO target USING source ON key WHEN MATCHED THEN UPDATE WHEN NOT MATCHED THEN INSERT`. Spark: `deltaTable.merge(source, "key").whenMatched().update().whenNotMatched().insert()`. Essential for CDC.
+
+#@@@@@@@@@@
+
+36. Which of the following are data compression algorithms? (Multiple correct)
+A) Snappy
+B) Gzip
+C) LZO
+D) Zstandard (Zstd)
+E) Bzip2
+F) LZ4
+
+Answer: A, B, C, D, E, F - All are compression algorithms. Snappy (fast, moderate compression), Gzip (balanced), LZO (fast), Zstd (excellent ratio), Bzip2 (high compression, slow), LZ4 (very fast). Trade-off: speed vs ratio.
+
+#@@@@@@@@@@
+
+37. Complete this data validation with Great Expectations:
+```python
+import great_expectations as ge
+
+df = ge.read_csv('data.csv')
+
+# Validate expectations
+df.expect_column_values_to_not_be_null('user_id')
+df.expect_column_values_to_be_between('age', min_value=0, max_value=120)
+df.expect_column_values_to_be_in_set('status', ['active', 'inactive'])
+
+# Get validation results
+results = df._______________()
+```
+
+Answer: `validate` or `get_expectation_suite_validation_result` - Validate expectations. Great Expectations for data quality testing. Define expectations, validate data.
+
+#@@@@@@@@@@
+
+38. What is the difference between data lake and data warehouse?
+
+Answer: Data lake stores raw data (structured, semi-structured, unstructured), schema-on-read, flexible, cheaper (S3, HDFS). Data warehouse stores processed data, schema-on-write, structured, optimized for queries (Redshift, Snowflake). Lake for exploration, warehouse for analytics. Modern: lakehouse combines both.
+
+#@@@@@@@@@@
+
+39. How do you implement data sampling for testing?
+
+Answer: Data sampling creates representative subset. Methods: 1) Random sampling (`df.sample(0.1)`), 2) Stratified sampling (maintain proportions), 3) Systematic sampling (every nth row), 4) Reservoir sampling (streaming). Use for testing, development, profiling.
+
+#@@@@@@@@@@
+
+40. Which of the following are streaming platforms? (Multiple correct)
+A) Apache Kafka
+B) Apache Pulsar
+C) Amazon Kinesis
+D) Azure Event Hubs
+E) Google Pub/Sub
+F) RabbitMQ
+
+Answer: A, B, C, D, E, F - All are streaming platforms. Kafka (popular, distributed), Pulsar (multi-tenancy), Kinesis (AWS managed), Event Hubs (Azure), Pub/Sub (GCP), RabbitMQ (message broker). Different features, use cases.
+
+#@@@@@@@@@@
+
+41. Complete this Delta Lake table creation:
+```python
+from delta.tables import DeltaTable
+
+# Create Delta table
+df.write.format("delta") \
+    .mode("overwrite") \
+    .partitionBy("date") \
+    .option("overwriteSchema", "true") \
+    .save("/path/to/delta-table")
+
+# Read Delta table
+delta_df = spark.read.format("_______________").load("/path/to/delta-table")
+
+# Time travel
+old_df = spark.read.format("delta").option("versionAsOf", 0).load("/path/to/delta-table")
+```
+
+Answer: `delta` - Delta Lake format. Delta Lake provides ACID transactions, time travel, schema evolution on data lakes.
+
+#@@@@@@@@@@
+
+42. What is the purpose of data partitioning strategies?
+
+Answer: Partitioning strategies optimize query performance. Strategies: 1) Range partitioning (date ranges), 2) Hash partitioning (even distribution), 3) List partitioning (discrete values), 4) Composite partitioning (multiple columns). Choose based on query patterns. Enables partition pruning.
+
+#@@@@@@@@@@
+
+43. How do you implement error handling in ETL pipelines?
+
+Answer: Error handling strategies: 1) Dead letter queue (failed records), 2) Retry logic (transient failures), 3) Circuit breaker (prevent cascading failures), 4) Logging and monitoring, 5) Data quality checks, 6) Graceful degradation. Track errors, alert on failures.
+
+#@@@@@@@@@@
+
+44. Which of the following are data serialization formats? (Multiple correct)
+A) JSON
+B) Avro
+C) Protocol Buffers (Protobuf)
+D) Thrift
+E) MessagePack
+F) BSON
+
+Answer: A, B, C, D, E, F - All are serialization formats. JSON (human-readable), Avro (schema evolution), Protobuf (compact, fast), Thrift (RPC), MessagePack (binary JSON), BSON (MongoDB). Choose based on requirements.
+
+#@@@@@@@@@@
+
+45. Complete this data profiling query:
+```sql
+SELECT
+    COUNT(*) as total_rows,
+    COUNT(DISTINCT user_id) as unique_users,
+    COUNT(*) - COUNT(email) as null_emails,
+    MIN(created_at) as earliest_date,
+    MAX(created_at) as latest_date,
+    AVG(_______________) as avg_age,
+    STDDEV(age) as stddev_age
+FROM users;
+```
+
+Answer: `age` - Average age. Data profiling analyzes data characteristics. Profile before ETL to understand data.
+
+#@@@@@@@@@@
+
+46. What is the difference between horizontal and vertical scaling?
+
+Answer: Horizontal scaling adds more nodes (scale out), distributed processing, better fault tolerance, complex (Hadoop, Spark). Vertical scaling adds more resources to single node (scale up), simpler, limited by hardware (traditional databases). Big data uses horizontal scaling.
+
+#@@@@@@@@@@
+
+47. How do you implement data archival strategies?
+
+Answer: Data archival moves old data to cheaper storage. Strategies: 1) Time-based (archive after 90 days), 2) Access-based (cold data), 3) Tiered storage (hot/warm/cold), 4) Compression, 5) Partitioning. Use S3 Glacier, Azure Archive. Reduce costs while maintaining access.
+
+#@@@@@@@@@@
+
+48. Which of the following are data governance tools? (Multiple correct)
+A) Apache Atlas
+B) Collibra
+C) Alation
+D) Informatica
+E) Talend
+F) AWS Glue Data Catalog
+
+Answer: A, B, C, D, E, F - All support data governance. Atlas (open-source metadata), Collibra (enterprise governance), Alation (data catalog), Informatica (MDM), Talend (data integration), Glue Catalog (AWS). Governance ensures data quality, compliance.
+
+#@@@@@@@@@@
+
+49. Complete this Spark structured streaming:
+```python
+from pyspark.sql.functions import window
+
+# Read stream
+stream_df = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "localhost:9092") \
+    .option("subscribe", "events") \
+    .load()
+
+# Process stream
+windowed_counts = stream_df \
+    .groupBy(window(col("timestamp"), "_______________")) \
+    .count()
+
+# Write stream
+query = windowed_counts.writeStream \
+    .outputMode("update") \
+    .format("console") \
+    .start()
+```
+
+Answer: `10 minutes` or `1 hour` - Window duration. Structured Streaming for real-time processing. Window functions for time-based aggregations.
+
+#@@@@@@@@@@
+
+50. What is the purpose of data lake zones (bronze/silver/gold)?
+
+Answer: Data lake zones organize data by quality. Bronze (raw data, landing zone), Silver (cleaned, validated, deduplicated), Gold (aggregated, business-level, curated). Medallion architecture. Progressive refinement. Enables different use cases at each layer.
+
+#@@@@@@@@@@
+
+51. How do you implement data skew handling in Spark?
+
+Answer: Data skew causes uneven partition sizes. Solutions: 1) Salting (add random prefix to key), 2) Broadcast join (small table), 3) Repartition with more partitions, 4) Adaptive query execution, 5) Custom partitioner. Monitor task execution times to detect skew.
+
+#@@@@@@@@@@
+
+52. Which of the following are cloud data warehouse solutions? (Multiple correct)
+A) Amazon Redshift
+B) Google BigQuery
+C) Snowflake
+D) Azure Synapse Analytics
+E) Databricks SQL
+F) Teradata Vantage
+
+Answer: A, B, C, D, E, F - All are cloud data warehouses. Redshift (AWS), BigQuery (GCP, serverless), Snowflake (multi-cloud), Synapse (Azure), Databricks SQL (lakehouse), Teradata Vantage (hybrid). Different pricing, features.
+
+#@@@@@@@@@@
+
+53. Complete this data pipeline monitoring:
+```python
+import logging
+from datetime import datetime
+
+def monitor_pipeline(pipeline_name, metrics):
+    logger = logging.getLogger(pipeline_name)
+
+    # Log metrics
+    logger.info(f"Pipeline: {pipeline_name}")
+    logger.info(f"Records processed: {metrics['records_processed']}")
+    logger.info(f"Duration: {metrics['duration']}")
+    logger.info(f"Errors: {metrics['errors']}")
+
+    # Alert on failures
+    if metrics['errors'] > _______________:
+        send_alert(pipeline_name, metrics)
+
+    # Store metrics
+    store_metrics(pipeline_name, metrics, datetime.now())
+```
+
+Answer: `threshold` or `0` - Error threshold for alerting. Pipeline monitoring tracks performance, errors. Alert on failures, track SLAs.
+
+#@@@@@@@@@@
+
+54. What is the difference between star schema and snowflake schema?
+
+Answer: Star schema has denormalized dimensions, simpler queries, faster, more storage. Snowflake schema has normalized dimensions, complex queries, slower, less storage. Star for performance, snowflake for storage efficiency. Star more common in practice.
+
+#@@@@@@@@@@
+
+55. How do you implement data retention policies?
+
+Answer: Data retention defines how long to keep data. Implement: 1) Partition by date, 2) Automated deletion (DROP PARTITION), 3) Archival to cold storage, 4) Compliance tracking. Example: `DELETE FROM table WHERE created_at < NOW() - INTERVAL '90 days'`. Comply with regulations (GDPR).
+
+#@@@@@@@@@@
+
+56. Which of the following are ETL testing types? (Multiple correct)
+A) Data completeness
+B) Data accuracy
+C) Data transformation
+D) Performance testing
+E) Data quality
+F) Regression testing
+
+Answer: A, B, C, D, E, F - All are ETL testing types. Completeness (all records), Accuracy (correct values), Transformation (logic correct), Performance (meets SLA), Quality (valid data), Regression (no breaks). Comprehensive testing essential.
+
+#@@@@@@@@@@
+
+57. Complete this Apache Beam pipeline:
+```python
+import apache_beam as beam
+
+with beam.Pipeline() as pipeline:
+    (pipeline
+     | 'Read' >> beam.io.ReadFromText('input.txt')
+     | 'Parse' >> beam.Map(parse_line)
+     | 'Filter' >> beam.Filter(lambda x: x['value'] > 100)
+     | 'Transform' >> beam._______________( lambda x: (x['key'], x['value']))
+     | 'Group' >> beam.GroupByKey()
+     | 'Sum' >> beam.Map(lambda kv: (kv[0], sum(kv[1])))
+     | 'Write' >> beam.io.WriteToText('output.txt'))
+```
+
+Answer: `Map` or `ParDo` - Transform elements. Apache Beam provides unified batch/stream processing API. Portable across runners (Spark, Flink, Dataflow).
+
+#@@@@@@@@@@
+
+58. What is the purpose of data lake table formats?
+
+Answer: Table formats add structure to data lakes. Features: ACID transactions, schema evolution, time travel, partition evolution. Formats: Delta Lake, Apache Iceberg, Apache Hudi. Enable reliable data lakes (lakehouses). Bridge gap between lakes and warehouses.
+
+#@@@@@@@@@@
+
+59. How do you implement change data capture (CDC)?
+
+Answer: CDC captures database changes in real-time. Methods: 1) Log-based (read transaction logs), 2) Trigger-based (database triggers), 3) Timestamp-based (updated_at column), 4) Snapshot-based (compare snapshots). Tools: Debezium, AWS DMS, Fivetran. Enables real-time data integration.
+
+#@@@@@@@@@@
+
+60. Which of the following are data pipeline orchestration tools? (Multiple correct)
+A) Apache Airflow
+B) Luigi
+C) Prefect
+D) Dagster
+E) AWS Step Functions
+F) Azure Data Factory
+
+Answer: A, B, C, D, E, F - All are orchestration tools. Airflow (popular, Python), Luigi (Spotify), Prefect (modern Airflow), Dagster (data-aware), Step Functions (AWS serverless), Data Factory (Azure). Orchestrate complex workflows.
+
+#@@@@@@@@@@
+
+61. Complete this data validation framework:
+```python
+class DataValidator:
+    def __init__(self, df):
+        self.df = df
+        self.errors = []
+
+    def check_nulls(self, columns):
+        for col in columns:
+            null_count = self.df.filter(col(col).isNull()).count()
+            if null_count > 0:
+                self.errors.append(f"{col} has {null_count} nulls")
+
+    def check_range(self, column, min_val, max_val):
+        invalid = self.df.filter(
+            (col(column) < min_val) | (col(column) > max_val)
+        ).count()
+        if invalid > 0:
+            self.errors.append(f"{column} has {invalid} out-of-range values")
+
+    def _______________( self):
+        return len(self.errors) == 0, self.errors
+```
+
+Answer: `validate` or `get_results` - Return validation results. Data validation framework ensures data quality. Reusable validation logic.
+
+#@@@@@@@@@@
+
+62. What is the difference between batch window and sliding window?
+
+Answer: Batch window (tumbling window) non-overlapping, fixed size (every 5 minutes). Sliding window overlapping, moves by slide interval (5-minute window, 1-minute slide). Batch for distinct periods, sliding for continuous monitoring. Session window for activity-based grouping.
+
+#@@@@@@@@@@
+
+63. How do you implement data lineage in ETL?
+
+Answer: Data lineage tracks data flow. Implement: 1) Metadata capture (source, target, transformations), 2) Lineage graph (nodes=datasets, edges=transformations), 3) Impact analysis (downstream effects), 4) Automated extraction from code. Tools: Apache Atlas, OpenLineage, Marquez.
+
+#@@@@@@@@@@
+
+64. Which of the following are data quality dimensions? (Multiple correct)
+A) Accuracy
+B) Completeness
+C) Consistency
+D) Timeliness
+E) Validity
+F) Uniqueness
+
+Answer: A, B, C, D, E, F - All are quality dimensions. Accuracy (correct values), Completeness (no missing data), Consistency (no contradictions), Timeliness (up-to-date), Validity (conforms to rules), Uniqueness (no duplicates). Measure and improve quality.
+
+#@@@@@@@@@@
+
+65. Complete this Spark optimization:
+```python
+from pyspark.sql.functions import broadcast
+
+# Broadcast join for small table
+large_df = spark.read.parquet("large_table")
+small_df = spark.read.parquet("small_table")
+
+result = large_df.join(
+    _______________( small_df),
+    "key"
+)
+
+# Cache frequently used dataframe
+result.cache()
+
+# Repartition for better parallelism
+result = result.repartition(200, "partition_key")
+```
+
+Answer: `broadcast` - Broadcast small table to all executors. Spark optimizations: broadcast joins, caching, repartitioning, predicate pushdown.
+
+#@@@@@@@@@@
+
+66. What is the purpose of data mesh architecture?
+
+Answer: Data mesh decentralizes data ownership. Principles: 1) Domain-oriented ownership, 2) Data as a product, 3) Self-serve platform, 4) Federated governance. Contrasts with centralized data lake/warehouse. Scales with organization. Emerging paradigm.
+
+#@@@@@@@@@@
+
+67. How do you implement idempotent ETL pipelines?
+
+Answer: Idempotent pipelines produce same result when run multiple times. Techniques: 1) Upsert instead of insert, 2) Partition overwrite, 3) Deduplication, 4) Transaction IDs, 5) Deterministic transformations. Enables safe retries. Critical for reliability.
+
+#@@@@@@@@@@
+
+68. Which of the following are data ingestion patterns? (Multiple correct)
+A) Full load
+B) Incremental load
+C) CDC (Change Data Capture)
+D) Streaming ingestion
+E) Micro-batch
+F) Event-driven
+
+Answer: A, B, C, D, E, F - All are ingestion patterns. Full load (complete refresh), Incremental (new/changed only), CDC (real-time changes), Streaming (continuous), Micro-batch (small batches), Event-driven (triggered). Choose based on latency, volume.
+
+#@@@@@@@@@@
+
+69. Complete this data pipeline SLA monitoring:
+```python
+from datetime import datetime, timedelta
+
+def check_sla(pipeline_name, start_time, end_time, sla_minutes):
+    duration = (end_time - start_time).total_seconds() / 60
+
+    if duration > sla_minutes:
+        alert = {
+            'pipeline': pipeline_name,
+            'duration': duration,
+            'sla': sla_minutes,
+            'breach': duration - sla_minutes,
+            'timestamp': datetime.now()
+        }
+        _______________( alert)
+        return False
+
+    return True
+```
+
+Answer: `send_sla_alert` or `log_sla_breach` - Alert on SLA breach. SLA monitoring ensures pipelines meet performance requirements.
+
+#@@@@@@@@@@
+
+70. What is the difference between data lake and lakehouse?
+
+Answer: Data lake stores raw data, no ACID, schema-on-read, limited governance. Lakehouse adds ACID transactions, schema enforcement, governance on data lake. Combines lake flexibility with warehouse reliability. Technologies: Delta Lake, Iceberg, Hudi. Modern architecture.
+
+#@@@@@@@@@@
+
+71. How do you implement data versioning?
+
+Answer: Data versioning tracks data changes over time. Methods: 1) Time travel (Delta Lake, Iceberg), 2) Snapshot tables, 3) Version columns, 4) Git-like versioning (lakeFS). Enables rollback, reproducibility, debugging. Essential for ML pipelines.
+
+#@@@@@@@@@@
+
+72. Which of the following are distributed file systems? (Multiple correct)
+A) HDFS (Hadoop Distributed File System)
+B) Amazon S3
+C) Google Cloud Storage
+D) Azure Blob Storage
+E) Ceph
+F) GlusterFS
+
+Answer: A, B, C, D, E, F - All are distributed file systems. HDFS (Hadoop), S3/GCS/Azure (cloud object storage), Ceph (open-source), GlusterFS (scale-out NAS). Store big data across multiple nodes.
+
+#@@@@@@@@@@
+
+73. Complete this data pipeline backfill:
+```python
+from datetime import datetime, timedelta
+
+def backfill_pipeline(start_date, end_date, pipeline_func):
+    current_date = start_date
+
+    while current_date <= end_date:
+        try:
+            print(f"Processing {current_date}")
+            pipeline_func(_______________)
+            current_date += timedelta(days=1)
+        except Exception as e:
+            print(f"Error on {current_date}: {e}")
+            # Log error and continue or stop
+            raise
+```
+
+Answer: `current_date` - Pass date to pipeline function. Backfilling reprocesses historical data. Handle failures gracefully.
+
+#@@@@@@@@@@
+
+74. What is the purpose of data partitioning vs bucketing?
+
+Answer: Partitioning divides data into directories by column values (date, region), enables partition pruning. Bucketing divides data into fixed number of files by hash, enables bucket joins. Partitioning for filtering, bucketing for joins. Can combine both.
+
+#@@@@@@@@@@
+
+75. How do you implement data reconciliation?
+
+Answer: Data reconciliation validates data consistency between source and target. Checks: 1) Row count match, 2) Sum/aggregation match, 3) Sample record comparison, 4) Hash comparison. Run after ETL. Alert on mismatches. Ensures data integrity.
+
+#@@@@@@@@@@
+
+76. Which of the following are data transformation operations? (Multiple correct)
+A) Filtering
+B) Aggregation
+C) Joining
+D) Pivoting
+E) Normalization
+F) Denormalization
+
+Answer: A, B, C, D, E, F - All are transformation operations. Filtering (select rows), Aggregation (group by), Joining (combine tables), Pivoting (rows to columns), Normalization (split tables), Denormalization (combine tables). Core ETL operations.
+
+#@@@@@@@@@@
+
+77. Complete this Kafka consumer:
+```python
+from kafka import KafkaConsumer
+import json
+
+consumer = KafkaConsumer(
+    'events',
+    bootstrap_servers=['localhost:9092'],
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='_______________',
+    value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+)
+
+for message in consumer:
+    process_event(message.value)
+```
+
+Answer: `my-consumer-group` - Consumer group ID. Kafka consumers read from topics. Consumer groups enable parallel processing.
+
+#@@@@@@@@@@
+
+78. What is the difference between micro-batch and true streaming?
+
+Answer: Micro-batch processes small batches at intervals (Spark Streaming, seconds latency), simpler, higher throughput. True streaming processes events individually (Flink, Kafka Streams, milliseconds latency), complex, lower latency. Micro-batch for near-real-time, true streaming for real-time.
+
+#@@@@@@@@@@
+
+79. How do you implement data pipeline testing?
+
+Answer: Pipeline testing strategies: 1) Unit tests (individual functions), 2) Integration tests (end-to-end), 3) Data quality tests (Great Expectations), 4) Performance tests (load testing), 5) Regression tests (compare outputs). Use test data, mock sources. CI/CD integration.
+
+#@@@@@@@@@@
+
+80. Which of the following are data modeling techniques? (Multiple correct)
+A) Dimensional modeling
+B) Data vault modeling
+C) Anchor modeling
+D) Normalized modeling (3NF)
+E) Denormalized modeling
+F) Graph modeling
+
+Answer: A, B, C, D, E, F - All are modeling techniques. Dimensional (star/snowflake), Data vault (historical tracking), Anchor (highly normalized), 3NF (normalized), Denormalized (performance), Graph (relationships). Choose based on use case.
+
+#@@@@@@@@@@
+
+81. Complete this data pipeline cost optimization:
+```python
+def optimize_pipeline_cost(df, output_path):
+    # Partition by date for efficient queries
+    df = df.repartition("date")
+
+    # Use columnar format
+    df.write.format("_______________") \
+        .mode("overwrite") \
+        .partitionBy("date") \
+        .option("compression", "snappy") \
+        .save(output_path)
+
+    # Lifecycle policy: move to cold storage after 90 days
+    # Implemented at storage level (S3 lifecycle, etc.)
+```
+
+Answer: `parquet` - Columnar format for efficient storage. Cost optimization: columnar formats, compression, partitioning, lifecycle policies, spot instances.
+
+#@@@@@@@@@@
+
+82. What is the purpose of data catalog metadata?
+
+Answer: Data catalog metadata describes datasets. Includes: schema, location, owner, tags, lineage, quality metrics, access controls. Enables discovery, governance, compliance. Searchable, browsable. Examples: AWS Glue Catalog, Apache Atlas, Alation.
+
+#@@@@@@@@@@
+
+83. How do you implement data pipeline observability?
+
+Answer: Observability provides visibility into pipeline health. Components: 1) Metrics (throughput, latency, errors), 2) Logs (detailed events), 3) Traces (request flow), 4) Alerts (anomalies). Tools: Prometheus, Grafana, ELK stack, Datadog. Monitor, debug, optimize.
+
+#@@@@@@@@@@
+
+84. Which of the following are data security practices? (Multiple correct)
+A) Encryption at rest
+B) Encryption in transit
+C) Access control (IAM)
+D) Data masking
+E) Audit logging
+F) Network isolation
+
+Answer: A, B, C, D, E, F - All are security practices. Encryption at rest (storage), in transit (network), Access control (who can access), Data masking (PII protection), Audit logging (compliance), Network isolation (VPC). Multi-layered security.
+
+#@@@@@@@@@@
+
+85. Complete this data pipeline error handling:
+```python
+def process_with_retry(record, max_retries=3):
+    retries = 0
+
+    while retries < max_retries:
+        try:
+            result = process_record(record)
+            return result
+        except TransientError as e:
+            retries += 1
+            if retries >= max_retries:
+                # Send to dead letter queue
+                _______________( record, str(e))
+                raise
+            time.sleep(2 ** retries)  # Exponential backoff
+        except PermanentError as e:
+            send_to_dlq(record, str(e))
+            raise
+```
+
+Answer: `send_to_dlq` - Send failed record to dead letter queue. Error handling: retries with backoff, DLQ for failed records, distinguish transient vs permanent errors.
+
+#@@@@@@@@@@
+
+86. What is the difference between data pipeline and data workflow?
+
+Answer: Data pipeline is series of data processing steps (ETL), focuses on data flow. Data workflow is broader, includes dependencies, scheduling, error handling, orchestration. Pipeline is component of workflow. Airflow DAG is workflow containing multiple pipelines.
+
+#@@@@@@@@@@
+
+87. How do you implement data pipeline checkpointing?
+
+Answer: Checkpointing saves pipeline state for recovery. Methods: 1) Offset tracking (Kafka offsets), 2) Watermark tracking (last processed timestamp), 3) State snapshots (Flink checkpoints), 4) Idempotent writes. Enables exactly-once processing, fault tolerance.
+
+#@@@@@@@@@@
+
+88. Which of the following are data pipeline patterns? (Multiple correct)
+A) Lambda architecture
+B) Kappa architecture
+C) Medallion architecture
+D) Hub-and-spoke
+E) Event sourcing
+F) CQRS (Command Query Responsibility Segregation)
+
+Answer: A, B, C, D, E, F - All are pipeline patterns. Lambda (batch + stream), Kappa (stream only), Medallion (bronze/silver/gold), Hub-and-spoke (centralized), Event sourcing (event log), CQRS (separate read/write). Different trade-offs.
+
+#@@@@@@@@@@
+
+89. Complete this data quality framework:
+```python
+class DataQualityCheck:
+    def __init__(self, name, check_func, threshold):
+        self.name = name
+        self.check_func = check_func
+        self.threshold = threshold
+
+    def run(self, df):
+        result = self.check_func(df)
+        passed = result >= self.threshold
+
+        return {
+            'check': self.name,
+            'result': result,
+            'threshold': self.threshold,
+            'passed': passed,
+            'timestamp': _______________
+        }
+
+# Example checks
+checks = [
+    DataQualityCheck("completeness", lambda df: df.count() / expected_count, 0.95),
+    DataQualityCheck("uniqueness", lambda df: df.dropDuplicates().count() / df.count(), 0.99)
+]
+```
+
+Answer: `datetime.now()` or `time.time()` - Current timestamp. Data quality framework defines reusable checks with thresholds.
+
+#@@@@@@@@@@
+
+90. What is the purpose of data pipeline metadata?
+
+Answer: Pipeline metadata tracks pipeline execution. Includes: run ID, start/end time, status, records processed, errors, lineage. Enables monitoring, debugging, auditing, SLA tracking. Store in metadata database. Query for analytics on pipeline performance.
+
+#@@@@@@@@@@
+
+91. How do you implement data pipeline parallelization?
+
+Answer: Parallelization improves throughput. Techniques: 1) Partition data (process partitions in parallel), 2) Multi-threading (I/O bound), 3) Multi-processing (CPU bound), 4) Distributed processing (Spark, Flink), 5) Async I/O. Balance parallelism with resource limits.
+
+#@@@@@@@@@@
+
+92. Which of the following are data lake best practices? (Multiple correct)
+A) Organize with zones (bronze/silver/gold)
+B) Use columnar formats (Parquet, ORC)
+C) Partition data appropriately
+D) Implement data catalog
+E) Apply access controls
+F) Enable versioning
+
+Answer: A, B, C, D, E, F - All are best practices. Zones (organization), Columnar formats (efficiency), Partitioning (performance), Catalog (discovery), Access controls (security), Versioning (reliability). Well-architected data lake.
+
+#@@@@@@@@@@
+
+93. Complete this data pipeline dependency management:
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.sensors.external_task import ExternalTaskSensor
+
+dag = DAG('downstream_pipeline', ...)
+
+# Wait for upstream pipeline
+wait_for_upstream = ExternalTaskSensor(
+    task_id='wait_for_upstream',
+    external_dag_id='_______________',
+    external_task_id='final_task',
+    dag=dag
+)
+
+process_task = PythonOperator(
+    task_id='process',
+    python_callable=process_data,
+    dag=dag
+)
+
+wait_for_upstream >> process_task
+```
+
+Answer: `upstream_pipeline` - Upstream DAG ID. Dependency management ensures correct execution order across pipelines.
+
+#@@@@@@@@@@
+
+94. What is the difference between data pipeline and data integration?
+
+Answer: Data integration is broader concept, combining data from multiple sources. Data pipeline is implementation, series of processing steps. Integration includes pipelines, but also federation, virtualization, replication. Pipeline is technical implementation of integration strategy.
+
+#@@@@@@@@@@
+
+95. How do you implement data pipeline schema evolution?
+
+Answer: Schema evolution handles schema changes over time. Strategies: 1) Backward compatible (add optional columns), 2) Forward compatible (ignore unknown fields), 3) Schema registry (Confluent Schema Registry), 4) Versioned schemas. Avro, Protobuf support evolution. Plan for change.
+
+#@@@@@@@@@@
+
+96. Which of the following are data warehouse optimization techniques? (Multiple correct)
+A) Materialized views
+B) Partitioning
+C) Clustering/Sorting
+D) Compression
+E) Distribution keys
+F) Vacuuming/Compaction
+
+Answer: A, B, C, D, E, F - All are optimization techniques. Materialized views (pre-aggregated), Partitioning (pruning), Clustering (co-location), Compression (storage), Distribution keys (even distribution), Vacuuming (reclaim space). Improve query performance.
+
+#@@@@@@@@@@
+
+97. Complete this data pipeline performance tuning:
+```python
+# Spark performance tuning
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")
+spark.conf.set("spark.sql.shuffle.partitions", "_______________")
+spark.conf.set("spark.default.parallelism", "200")
+
+# Enable broadcast join threshold
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", "10485760")  # 10MB
+
+# Cache frequently used data
+df.cache()
+```
+
+Answer: `200` or `auto` - Number of shuffle partitions. Performance tuning: adaptive execution, partition tuning, broadcast joins, caching.
+
+#@@@@@@@@@@
+
+98. What is the purpose of data pipeline lineage?
+
+Answer: Data lineage tracks data flow through pipeline. Shows: source -> transformations -> destination. Enables: impact analysis (what breaks if source changes), root cause analysis (where did bad data come from), compliance (data provenance). Tools: Apache Atlas, OpenLineage.
+
+#@@@@@@@@@@
+
+99. How do you implement data pipeline data quality gates?
+
+Answer: Data quality gates block pipeline on quality failures. Implement: 1) Run quality checks, 2) If checks fail, stop pipeline, 3) Alert data team, 4) Prevent bad data propagation. Example: `if not quality_check.passed: raise DataQualityException`. Shift-left quality.
+
+#@@@@@@@@@@
+
+100. Which of the following are data pipeline deployment strategies? (Multiple correct)
+A) Blue-green deployment
+B) Canary deployment
+C) Rolling deployment
+D) Feature flags
+E) A/B testing
+F) Shadow mode
+
+Answer: A, B, C, D, E, F - All are deployment strategies. Blue-green (switch environments), Canary (gradual rollout), Rolling (incremental), Feature flags (toggle features), A/B testing (compare versions), Shadow mode (parallel run). Reduce deployment risk.
+
+#@@@@@@@@@@

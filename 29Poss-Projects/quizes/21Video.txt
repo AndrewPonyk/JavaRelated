@@ -1,0 +1,2321 @@
+Video Processing Quiz - 200 Questions
+Tech Stack: Video processing, optimization, video algorithms, ffmpeg, opencv
+
+1. Which of the following are video codecs? (Multiple correct)
+A) H.264/AVC
+B) H.265/HEVC
+C) VP9
+D) AV1
+E) MPEG-4
+F) ProRes
+
+Answer: A, B, C, D, E, F - All are video codecs. H.264/AVC (widely supported), H.265/HEVC (better compression), VP9 (Google), AV1 (royalty-free), MPEG-4 (older standard), ProRes (Apple professional). Each has different compression efficiency and compatibility.
+
+#@@@@@@@@@@
+
+2. Complete this FFmpeg command:
+```bash
+ffmpeg -i input.mp4 \
+       -c:v libx264 \
+       -preset medium \
+       -crf 23 \
+       -c:a aac \
+       -b:a 128k \
+       _______________
+```
+
+Answer: `output.mp4` - Specify the output filename. This command transcodes video to H.264 with CRF 23 quality and AAC audio at 128k bitrate.
+
+#@@@@@@@@@@
+
+3. What is the difference between lossy and lossless video compression?
+
+Answer: Lossy compression reduces file size by discarding some data, smaller files, quality loss, suitable for streaming/storage. Lossless compression preserves all original data, larger files, no quality loss, suitable for editing/archival. Choose based on use case and quality requirements.
+
+#@@@@@@@@@@
+
+4. Which of the following are OpenCV video processing functions? (Multiple correct)
+A) cv2.VideoCapture()
+B) cv2.VideoWriter()
+C) cv2.resize()
+D) cv2.cvtColor()
+E) cv2.GaussianBlur()
+F) cv2.Canny()
+
+Answer: A, B, C, D, E, F - All are OpenCV functions. VideoCapture (read video), VideoWriter (write video), resize (scale frames), cvtColor (color conversion), GaussianBlur (noise reduction), Canny (edge detection). Essential for video processing pipelines.
+
+#@@@@@@@@@@
+
+5. Find the performance issue in this video processing code:
+```python
+import cv2
+
+cap = cv2.VideoCapture('input.mp4')
+out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (640, 480))
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Performance issue: expensive operation on every frame
+    frame = cv2.resize(frame, (640, 480))
+    frame = cv2.GaussianBlur(frame, (15, 15), 0)
+    frame = cv2.Canny(frame, 50, 150)
+
+    out.write(frame)
+
+cap.release()
+out.release()
+```
+
+Answer: Processing every frame sequentially is slow. Optimize with: multi-threading, GPU acceleration (CUDA), batch processing, skip frames for preview, use optimized algorithms, or hardware-accelerated codecs for better performance.
+
+#@@@@@@@@@@
+
+6. How do you implement video streaming with adaptive bitrate?
+
+Answer: Create multiple quality versions (resolutions/bitrates), segment videos (HLS/DASH), use manifest files, implement bandwidth detection, switch quality based on network conditions. Use CDN for distribution, buffer management for smooth playback.
+
+#@@@@@@@@@@
+
+7. Which of the following are video container formats? (Multiple correct)
+A) MP4
+B) AVI
+C) MKV
+D) WebM
+E) MOV
+F) FLV
+
+Answer: A, B, C, D, E, F - All are container formats. MP4 (widely compatible), AVI (older Windows), MKV (open source), WebM (web optimized), MOV (QuickTime), FLV (Flash). Containers hold video/audio streams and metadata.
+
+#@@@@@@@@@@
+
+8. Complete this video quality assessment:
+```python
+import cv2
+import numpy as np
+
+def calculate_psnr(original, compressed):
+    mse = np.mean((original - compressed) ** 2)
+    if mse == 0:
+        return float('inf')
+
+    max_pixel = 255.0
+    psnr = 20 * np.log10(max_pixel / np.sqrt(_______________))
+    return psnr
+```
+
+Answer: `mse` - Use Mean Squared Error in PSNR calculation. PSNR (Peak Signal-to-Noise Ratio) measures video quality, higher values indicate better quality.
+
+#@@@@@@@@@@
+
+9. What is the difference between interlaced and progressive video?
+
+Answer: Interlaced displays odd/even lines alternately (fields), 50/60 fields per second, reduces bandwidth, can cause artifacts. Progressive displays all lines simultaneously, smoother motion, higher bandwidth, better for modern displays. Progressive is preferred for digital content.
+
+#@@@@@@@@@@
+
+10. Which of the following are video processing algorithms? (Multiple correct)
+A) Motion estimation
+B) Temporal filtering
+C) Deinterlacing
+D) Color correction
+E) Noise reduction
+F) Super resolution
+
+Answer: A, B, C, D, E, F - All are video processing algorithms. Motion estimation (compression/stabilization), Temporal filtering (noise reduction), Deinterlacing (convert interlaced), Color correction (color grading), Noise reduction (quality improvement), Super resolution (upscaling).
+
+#@@@@@@@@@@
+
+11. Predict the output of this FFmpeg command:
+```bash
+ffmpeg -i input.mp4 -vf "scale=1920:1080,fps=30" -c:v libx264 -crf 18 output.mp4
+```
+
+Answer: Scales video to 1920x1080 resolution, sets framerate to 30fps, encodes with H.264 codec at CRF 18 (high quality). Output is Full HD video with consistent framerate and high quality encoding.
+
+#@@@@@@@@@@
+
+12. How do you implement real-time video processing?
+
+Answer: Use hardware acceleration (GPU/FPGA), optimize algorithms, parallel processing, reduce latency with streaming protocols, use efficient codecs, implement frame dropping, buffer management, and low-latency encoding settings.
+
+#@@@@@@@@@@
+
+13. Which of the following are video analysis techniques? (Multiple correct)
+A) Object detection
+B) Motion tracking
+C) Scene segmentation
+D) Activity recognition
+E) Face detection
+F) Optical flow
+
+Answer: A, B, C, D, E, F - All are video analysis techniques. Object detection (identify objects), Motion tracking (follow objects), Scene segmentation (divide scenes), Activity recognition (classify actions), Face detection (find faces), Optical flow (motion vectors).
+
+#@@@@@@@@@@
+
+14. Complete this video stabilization algorithm:
+```python
+import cv2
+import numpy as np
+
+def stabilize_video(input_path, output_path):
+    cap = cv2.VideoCapture(input_path)
+
+    # Read first frame
+    ret, prev_frame = cap.read()
+    prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+
+    transforms = []
+
+    while True:
+        ret, curr_frame = cap.read()
+        if not ret:
+            break
+
+        curr_gray = cv2.cvtColor(curr_frame, cv2.COLOR_BGR2GRAY)
+
+        # Calculate optical flow
+        flow = cv2.calcOpticalFlowPyrLK(prev_gray, curr_gray, None, None)
+
+        # Estimate transformation
+        transform = cv2._______________()
+        transforms.append(transform)
+
+        prev_gray = curr_gray
+```
+
+Answer: `estimateRigidTransform` or `getAffineTransform` - Estimate transformation matrix between frames for stabilization. This calculates the camera motion to apply inverse transformation for stabilization.
+
+#@@@@@@@@@@
+
+15. What is the difference between CBR and VBR encoding?
+
+Answer: CBR (Constant Bitrate) maintains fixed bitrate, predictable file size, may waste bits on simple scenes, good for streaming. VBR (Variable Bitrate) adjusts bitrate based on complexity, better quality, unpredictable size, good for storage. Choose based on use case requirements.
+
+#@@@@@@@@@@
+
+16. Which of the following are video container formats? (Multiple correct)
+A) MP4
+B) MKV (Matroska)
+C) AVI
+D) MOV
+E) WebM
+F) FLV
+
+Answer: A, B, C, D, E, F - All are container formats. MP4 (MPEG-4), MKV (Matroska), AVI (Audio Video Interleave), MOV (QuickTime), WebM (web), FLV (Flash). Containers hold video, audio, subtitles, metadata.
+
+#@@@@@@@@@@
+
+17. Complete this FFmpeg command for video transcoding:
+```bash
+ffmpeg -i input.mp4 \
+  -c:v libx264 \
+  -preset medium \
+  -crf 23 \
+  -c:a aac \
+  -b:a 128k \
+  -movflags _______________ \
+  output.mp4
+```
+
+Answer: `+faststart` - Move moov atom to beginning for web streaming. Enables progressive download. Essential for web video playback.
+
+#@@@@@@@@@@
+
+18. What is the purpose of GOP (Group of Pictures) in video compression?
+
+Answer: GOP is sequence of frames between keyframes. Contains I-frames (intra), P-frames (predicted), B-frames (bidirectional). GOP size affects compression ratio, seek performance, error resilience. Shorter GOP: better seeking, larger file. Longer GOP: better compression, slower seeking.
+
+#@@@@@@@@@@
+
+19. How do you implement video watermarking with FFmpeg?
+
+Answer: Use overlay filter: `ffmpeg -i video.mp4 -i watermark.png -filter_complex "overlay=W-w-10:H-h-10" output.mp4` Position watermark at bottom-right. Adjust opacity with format filter. Burn-in watermark permanently.
+
+#@@@@@@@@@@
+
+20. Which of the following are video quality metrics? (Multiple correct)
+A) PSNR (Peak Signal-to-Noise Ratio)
+B) SSIM (Structural Similarity Index)
+C) VMAF (Video Multimethod Assessment Fusion)
+D) MSE (Mean Squared Error)
+E) Bitrate
+F) Resolution
+
+Answer: A, B, C, D - PSNR, SSIM, VMAF, MSE are quality metrics. Bitrate and resolution are encoding parameters, not quality metrics. VMAF is most accurate for perceptual quality.
+
+#@@@@@@@@@@
+
+21. Complete this OpenCV video writer:
+```python
+import cv2
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('output.mp4', fourcc, 30.0, (640, 480))
+
+cap = cv2.VideoCapture('input.mp4')
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Process frame
+    processed = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    processed = cv2.cvtColor(processed, cv2.COLOR_GRAY2BGR)
+
+    out._______________(processed)
+
+cap.release()
+out.release()
+```
+
+Answer: `write` - Write processed frame to output video. VideoWriter for creating videos. Match resolution and FPS.
+
+#@@@@@@@@@@
+
+22. What is the difference between interlaced and progressive video?
+
+Answer: Interlaced video displays odd/even lines alternately (fields), 1080i, legacy broadcast, combing artifacts. Progressive video displays all lines simultaneously (frames), 1080p, modern standard, better quality. Deinterlacing converts interlaced to progressive.
+
+#@@@@@@@@@@
+
+23. How do you extract audio from video using FFmpeg?
+
+Answer: `ffmpeg -i video.mp4 -vn -acodec copy audio.aac` or `ffmpeg -i video.mp4 -vn -acodec libmp3lame audio.mp3`. -vn disables video. -acodec copy for lossless, specify codec for transcode.
+
+#@@@@@@@@@@
+
+24. Which of the following are video codec families? (Multiple correct)
+A) H.26x (H.264, H.265, H.266)
+B) MPEG (MPEG-2, MPEG-4)
+C) VP (VP8, VP9)
+D) AV1
+E) ProRes
+F) DNxHD
+
+Answer: A, B, C, D, E, F - All are codec families. H.26x (ITU-T), MPEG (ISO), VP (Google), AV1 (AOMedia), ProRes (Apple), DNxHD (Avid). Different use cases: streaming, editing, archival.
+
+#@@@@@@@@@@
+
+25. Complete this video frame interpolation with OpenCV:
+```python
+import cv2
+
+cap = cv2.VideoCapture('input.mp4')
+fps = cap.get(cv2.CAP_PROP_FPS)
+
+ret, frame1 = cap.read()
+ret, frame2 = cap.read()
+
+# Create optical flow
+flow = cv2.calcOpticalFlowFarneback(
+    cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY),
+    cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY),
+    None, 0.5, 3, 15, 3, 5, 1.2, _______________
+)
+```
+
+Answer: `0` - Last parameter is flags. Farneback optical flow for motion estimation. Use for frame interpolation, slow motion, stabilization.
+
+#@@@@@@@@@@
+
+26. What is the purpose of chroma subsampling in video?
+
+Answer: Chroma subsampling reduces color information to save bandwidth. Human eye more sensitive to luminance than chrominance. 4:4:4 (no subsampling), 4:2:2 (half horizontal), 4:2:0 (half both). 4:2:0 common for streaming, 4:4:4 for professional.
+
+#@@@@@@@@@@
+
+27. How do you create video thumbnails with FFmpeg?
+
+Answer: `ffmpeg -i video.mp4 -ss 00:00:05 -vframes 1 thumbnail.jpg` Extract single frame at 5 seconds. Or multiple: `ffmpeg -i video.mp4 -vf fps=1/60 thumb%04d.jpg` One frame per minute.
+
+#@@@@@@@@@@
+
+28. Which of the following are video streaming protocols? (Multiple correct)
+A) HLS (HTTP Live Streaming)
+B) DASH (Dynamic Adaptive Streaming over HTTP)
+C) RTMP (Real-Time Messaging Protocol)
+D) WebRTC
+E) RTSP (Real Time Streaming Protocol)
+F) SRT (Secure Reliable Transport)
+
+Answer: A, B, C, D, E, F - All are streaming protocols. HLS (Apple), DASH (MPEG), RTMP (Adobe), WebRTC (peer-to-peer), RTSP (cameras), SRT (low-latency). Choose based on latency, compatibility requirements.
+
+#@@@@@@@@@@
+
+29. Complete this video concatenation with FFmpeg:
+```bash
+# Create file list
+echo "file 'video1.mp4'" > list.txt
+echo "file 'video2.mp4'" >> list.txt
+echo "file 'video3.mp4'" >> list.txt
+
+# Concatenate
+ffmpeg -f concat -safe 0 -i list.txt -c _______________ output.mp4
+```
+
+Answer: `copy` - Copy streams without re-encoding. Fast concatenation. Videos must have same codec, resolution, framerate.
+
+#@@@@@@@@@@
+
+30. What is the difference between lossy and lossless video compression?
+
+Answer: Lossy compression discards data, smaller files, quality loss (H.264, H.265). Lossless compression preserves all data, larger files, perfect quality (FFV1, HuffYUV). Use lossy for distribution, lossless for archival/editing.
+
+#@@@@@@@@@@
+
+31. How do you implement adaptive bitrate streaming?
+
+Answer: Create multiple quality versions (360p, 480p, 720p, 1080p). Generate HLS/DASH manifest. Client selects quality based on bandwidth. FFmpeg: `ffmpeg -i input.mp4 -c:v libx264 -b:v 1M -s 1280x720 720p.mp4`. Use tools like Bento4, Shaka Packager.
+
+#@@@@@@@@@@
+
+32. Which of the following are video editing operations? (Multiple correct)
+A) Trimming/Cutting
+B) Concatenation
+C) Overlay/Picture-in-Picture
+D) Speed change (slow-mo/time-lapse)
+E) Color grading
+F) Transitions
+
+Answer: A, B, C, D, E, F - All are editing operations. Trimming (remove parts), Concatenation (join), Overlay (composite), Speed change (temporal), Color grading (color correction), Transitions (effects between clips).
+
+#@@@@@@@@@@
+
+33. Complete this video rotation with FFmpeg:
+```bash
+# Rotate 90 degrees clockwise
+ffmpeg -i input.mp4 -vf "transpose=_______________" output.mp4
+
+# Rotate 180 degrees
+ffmpeg -i input.mp4 -vf "transpose=2,transpose=2" output.mp4
+```
+
+Answer: `1` - transpose values: 0=90° CCW+vflip, 1=90° CW, 2=90° CCW, 3=90° CW+vflip. Chain transposes for 180°.
+
+#@@@@@@@@@@
+
+34. What is the purpose of keyframes in video compression?
+
+Answer: Keyframes (I-frames) are complete frames, reference for P/B-frames. Enable seeking, error recovery. Keyframe interval affects compression, seek performance. More keyframes: better seeking, larger file. Fewer keyframes: better compression, slower seeking. Set with -g flag in FFmpeg.
+
+#@@@@@@@@@@
+
+35. How do you extract subtitles from video using FFmpeg?
+
+Answer: `ffmpeg -i video.mkv -map 0:s:0 subtitles.srt` Extract first subtitle stream. List streams: `ffmpeg -i video.mkv`. Burn subtitles into video: `ffmpeg -i video.mp4 -vf subtitles=subs.srt output.mp4`.
+
+#@@@@@@@@@@
+
+36. Which of the following are video color spaces? (Multiple correct)
+A) RGB
+B) YUV/YCbCr
+C) HSV
+D) Rec.709
+E) Rec.2020
+F) DCI-P3
+
+Answer: A, B, C, D, E, F - All are color spaces. RGB (red/green/blue), YUV (luma/chroma), HSV (hue/saturation/value), Rec.709 (HD standard), Rec.2020 (UHD/HDR), DCI-P3 (cinema). Different gamuts and transfer functions.
+
+#@@@@@@@@@@
+
+37. Complete this video denoising with OpenCV:
+```python
+import cv2
+
+cap = cv2.VideoCapture('noisy_video.mp4')
+denoiser = cv2.createBackgroundSubtractorMOG2()
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Denoise
+    denoised = cv2.fastNlMeansDenoisingColored(frame, None, _______________, 10, 7, 21)
+    cv2.imshow('Denoised', denoised)
+```
+
+Answer: `10` - Filter strength parameter. fastNlMeansDenoising for grayscale, fastNlMeansDenoisingColored for color. Higher values = more denoising but may blur details.
+
+#@@@@@@@@@@
+
+38. What is the difference between frame rate and refresh rate?
+
+Answer: Frame rate is video capture/playback rate (24fps, 30fps, 60fps), content property. Refresh rate is display update rate (60Hz, 120Hz, 144Hz), hardware property. Mismatch causes judder. Match for smooth playback.
+
+#@@@@@@@@@@
+
+39. How do you create slow motion video with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -filter:v "setpts=2.0*PTS" slow.mp4` 2x slower (0.5x speed). For audio: `ffmpeg -i input.mp4 -filter_complex "[0:v]setpts=2*PTS[v];[0:a]atempo=0.5[a]" -map "[v]" -map "[a]" slow.mp4`.
+
+#@@@@@@@@@@
+
+40. Which of the following are video aspect ratios? (Multiple correct)
+A) 4:3 (Standard Definition)
+B) 16:9 (HD/Widescreen)
+C) 21:9 (Ultrawide)
+D) 1:1 (Square)
+E) 9:16 (Vertical/Mobile)
+F) 2.39:1 (Cinemascope)
+
+Answer: A, B, C, D, E, F - All are aspect ratios. 4:3 (old TV), 16:9 (modern standard), 21:9 (ultrawide), 1:1 (Instagram), 9:16 (TikTok/Stories), 2.39:1 (cinema). Letterboxing/pillarboxing for conversion.
+
+#@@@@@@@@@@
+
+41. Complete this video scaling with FFmpeg:
+```bash
+# Scale to 720p maintaining aspect ratio
+ffmpeg -i input.mp4 -vf "scale=-1:720" output.mp4
+
+# Scale to exact size (may distort)
+ffmpeg -i input.mp4 -vf "scale=1280:720" output.mp4
+
+# Scale with padding
+ffmpeg -i input.mp4 -vf "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2" output.mp4
+```
+
+Answer: This is complete - scale filter for resizing. -1 maintains aspect ratio. pad adds black bars. force_original_aspect_ratio controls fitting.
+
+#@@@@@@@@@@
+
+42. What is the purpose of motion estimation in video compression?
+
+Answer: Motion estimation finds similar blocks between frames for prediction. Reduces temporal redundancy. P-frames reference previous, B-frames reference both directions. Motion vectors describe block movement. Better motion estimation = better compression. Computationally expensive.
+
+#@@@@@@@@@@
+
+43. How do you add watermark to video with OpenCV?
+
+Answer: `roi = frame[y:y+h, x:x+w]; blended = cv2.addWeighted(roi, 0.7, watermark, 0.3, 0); frame[y:y+h, x:x+w] = blended` Blend watermark with frame region. Adjust alpha for transparency. Position at desired location.
+
+#@@@@@@@@@@
+
+44. Which of the following are video metadata standards? (Multiple correct)
+A) ID3 (audio metadata)
+B) XMP (Extensible Metadata Platform)
+C) EXIF (Exchangeable Image File Format)
+D) IPTC
+E) Dublin Core
+F) Custom metadata
+
+Answer: B, C, D, E, F - XMP, EXIF, IPTC, Dublin Core, Custom are video metadata standards. ID3 is primarily for audio. Metadata includes title, author, copyright, creation date, GPS, camera settings.
+
+#@@@@@@@@@@
+
+45. Complete this video trimming with FFmpeg:
+```bash
+# Trim from 00:01:30 to 00:02:45
+ffmpeg -i input.mp4 -ss 00:01:30 -to 00:02:45 -c copy output.mp4
+
+# Trim 30 seconds starting at 1 minute
+ffmpeg -i input.mp4 -ss 00:01:00 -t _______________ -c copy output.mp4
+```
+
+Answer: `00:00:30` or `30` - -t specifies duration. -ss start time, -to end time. -c copy for fast trimming without re-encoding. Place -ss before -i for faster seeking.
+
+#@@@@@@@@@@
+
+46. What is the difference between constant and variable frame rate?
+
+Answer: Constant frame rate (CFR) has fixed time between frames, predictable, standard for playback. Variable frame rate (VFR) has varying intervals, efficient for screen recording, complex editing. Convert VFR to CFR for compatibility: `ffmpeg -i input.mp4 -vsync cfr output.mp4`.
+
+#@@@@@@@@@@
+
+47. How do you implement video object detection with OpenCV?
+
+Answer: Use pre-trained models (YOLO, SSD, Faster R-CNN). Load model: `net = cv2.dnn.readNet('yolov3.weights', 'yolov3.cfg')`. Process frames: `blob = cv2.dnn.blobFromImage(frame); net.setInput(blob); detections = net.forward()`. Draw bounding boxes on detections.
+
+#@@@@@@@@@@
+
+48. Which of the following are video compression techniques? (Multiple correct)
+A) Spatial compression (intra-frame)
+B) Temporal compression (inter-frame)
+C) Entropy coding
+D) Quantization
+E) Transform coding (DCT, Wavelet)
+F) Motion compensation
+
+Answer: A, B, C, D, E, F - All are compression techniques. Spatial (within frame), Temporal (between frames), Entropy (Huffman, arithmetic), Quantization (reduce precision), Transform (frequency domain), Motion compensation (predict from previous).
+
+#@@@@@@@@@@
+
+49. Complete this video color correction with FFmpeg:
+```bash
+# Adjust brightness, contrast, saturation
+ffmpeg -i input.mp4 -vf "eq=brightness=0.1:contrast=1.2:saturation=_______________" output.mp4
+
+# Color balance
+ffmpeg -i input.mp4 -vf "colorbalance=rs=0.1:gs=-0.1:bs=0.05" output.mp4
+```
+
+Answer: `1.5` or any value - saturation multiplier. eq filter for basic corrections. colorbalance for tint adjustments. curves/colorlevels for advanced grading.
+
+#@@@@@@@@@@
+
+50. What is the purpose of B-frames in video compression?
+
+Answer: B-frames (bidirectional) reference both previous and future frames. Better compression than P-frames. Increase encoding complexity, latency. Not all decoders support. Configure with -bf flag: `ffmpeg -i input.mp4 -bf 2 output.mp4`. Trade-off between compression and latency.
+
+#@@@@@@@@@@
+
+51. How do you create video from images with FFmpeg?
+
+Answer: `ffmpeg -framerate 30 -pattern_type glob -i '*.jpg' -c:v libx264 -pix_fmt yuv420p output.mp4` or `ffmpeg -framerate 30 -i img%04d.jpg output.mp4`. Specify framerate, image pattern. Add audio: `-i audio.mp3`.
+
+#@@@@@@@@@@
+
+52. Which of the following are video processing libraries? (Multiple correct)
+A) FFmpeg
+B) OpenCV
+C) GStreamer
+D) MoviePy (Python)
+E) AviSynth
+F) VapourSynth
+
+Answer: A, B, C, D, E, F - All are video processing libraries. FFmpeg (command-line/library), OpenCV (computer vision), GStreamer (pipeline), MoviePy (Python), AviSynth (scripting), VapourSynth (Python scripting).
+
+#@@@@@@@@@@
+
+53. Complete this video face detection with OpenCV:
+```python
+import cv2
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+cap = cv2.VideoCapture(0)
+
+while True:
+    ret, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=_______________)
+
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+```
+
+Answer: `5` - minNeighbors parameter for detection quality. Higher values = fewer false positives. Haar cascades for real-time detection. Use DNN models for better accuracy.
+
+#@@@@@@@@@@
+
+54. What is the purpose of video transcoding?
+
+Answer: Transcoding converts video from one format/codec to another. Change resolution, bitrate, codec for compatibility, size, quality. Re-encoding process, quality loss. Use for device compatibility, streaming optimization, archival. FFmpeg primary tool.
+
+#@@@@@@@@@@
+
+55. How do you merge video and audio with FFmpeg?
+
+Answer: `ffmpeg -i video.mp4 -i audio.mp3 -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 output.mp4` Map video from first input, audio from second. -c copy to avoid re-encoding. Replace audio: same command.
+
+#@@@@@@@@@@
+
+56. Which of the following are video analysis techniques? (Multiple correct)
+A) Motion detection
+B) Object tracking
+C) Scene detection
+D) Shot boundary detection
+E) Video summarization
+F) Action recognition
+
+Answer: A, B, C, D, E, F - All are analysis techniques. Motion detection (movement), Object tracking (follow objects), Scene detection (scene changes), Shot boundary (cuts), Video summarization (highlights), Action recognition (activity classification).
+
+#@@@@@@@@@@
+
+57. Complete this video scene detection with FFmpeg:
+```bash
+# Detect scene changes
+ffmpeg -i input.mp4 -filter:v "select='gt(scene,_______________)',showinfo" -vsync vfr scene%04d.jpg
+
+# Or use blackdetect for black frames
+ffmpeg -i input.mp4 -vf blackdetect=d=0.5:pix_th=0.10 -f null -
+```
+
+Answer: `0.4` or `0.3` - Scene change threshold (0-1). Higher = fewer detections. select filter extracts frames. showinfo displays frame info. Use for chapter detection, highlight extraction.
+
+#@@@@@@@@@@
+
+58. What is the difference between encoding and muxing?
+
+Answer: Encoding compresses raw video/audio to codec format (H.264, AAC), computationally intensive. Muxing combines encoded streams into container (MP4, MKV), fast operation. Demuxing extracts streams. Transcoding = decode + encode. Remuxing = demux + mux (no encoding).
+
+#@@@@@@@@@@
+
+59. How do you implement video background subtraction with OpenCV?
+
+Answer: `bg_subtractor = cv2.createBackgroundSubtractorMOG2(); fg_mask = bg_subtractor.apply(frame)` MOG2 for Gaussian mixture. KNN alternative: `createBackgroundSubtractorKNN()`. Use for motion detection, object segmentation, surveillance.
+
+#@@@@@@@@@@
+
+60. Which of the following are video file properties? (Multiple correct)
+A) Resolution (width x height)
+B) Frame rate (fps)
+C) Bitrate (bps)
+D) Duration
+E) Codec
+F) Color depth (bit depth)
+
+Answer: A, B, C, D, E, F - All are video properties. Resolution (1920x1080), Frame rate (30fps), Bitrate (5Mbps), Duration (2:30:15), Codec (H.264), Color depth (8-bit, 10-bit). Query with ffprobe.
+
+#@@@@@@@@@@
+
+61. Complete this FFprobe command for video info:
+```bash
+# Get JSON format info
+ffprobe -v quiet -print_format json -show_format -show_streams input.mp4
+
+# Get specific property
+ffprobe -v error -select_streams v:0 -show_entries stream=_______________ -of default=noprint_wrappers=1:nokey=1 input.mp4
+```
+
+Answer: `width,height` or `duration` or `codec_name` - Extract specific stream properties. -select_streams for stream type. -show_entries for fields. Useful for automation.
+
+#@@@@@@@@@@
+
+62. What is the purpose of video deinterlacing?
+
+Answer: Deinterlacing converts interlaced video (fields) to progressive (frames). Removes combing artifacts. Methods: bob (double framerate), weave (merge fields), yadif (adaptive). FFmpeg: `ffmpeg -i interlaced.mp4 -vf yadif output.mp4`. Essential for modern displays.
+
+#@@@@@@@@@@
+
+63. How do you create GIF from video with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" output.gif` Generate palette for better colors. Reduce fps and size for smaller file. Alternative: use gifski for high quality.
+
+#@@@@@@@@@@
+
+64. Which of the following are video streaming architectures? (Multiple correct)
+A) Progressive download
+B) Adaptive bitrate streaming
+C) Live streaming
+D) Video on demand (VOD)
+E) Peer-to-peer streaming
+F) CDN-based delivery
+
+Answer: A, B, C, D, E, F - All are streaming architectures. Progressive (simple HTTP), Adaptive (HLS/DASH), Live (real-time), VOD (pre-recorded), P2P (distributed), CDN (edge caching). Choose based on requirements.
+
+#@@@@@@@@@@
+
+65. Complete this video overlay with FFmpeg:
+```bash
+# Picture-in-picture
+ffmpeg -i main.mp4 -i overlay.mp4 -filter_complex "[0:v][1:v]overlay=_______________:10[out]" -map "[out]" output.mp4
+
+# Watermark with transparency
+ffmpeg -i video.mp4 -i logo.png -filter_complex "overlay=W-w-10:H-h-10" output.mp4
+```
+
+Answer: `W-w-10` or `10` - Position overlay. W=main width, w=overlay width, H=height, h=overlay height. W-w-10 = 10px from right edge. Overlay filter for compositing.
+
+#@@@@@@@@@@
+
+66. What is the difference between video bitrate and quality?
+
+Answer: Bitrate is data rate (Mbps), affects file size and quality. Higher bitrate generally better quality but not linear. Quality also depends on codec efficiency, resolution, content complexity. Use CRF (Constant Rate Factor) for quality-based encoding: `ffmpeg -i input.mp4 -crf 23 output.mp4` (18-28 range).
+
+#@@@@@@@@@@
+
+67. How do you implement video motion tracking with OpenCV?
+
+Answer: Use optical flow (Lucas-Kanade, Farneback) or object trackers (CSRT, KCF, MOSSE). `tracker = cv2.TrackerCSRT_create(); tracker.init(frame, bbox); success, bbox = tracker.update(frame)`. Track objects across frames. Re-initialize on failure.
+
+#@@@@@@@@@@
+
+68. Which of the following are video encoding presets in x264? (Multiple correct)
+A) ultrafast
+B) superfast
+C) veryfast
+D) faster
+E) fast
+F) medium
+
+Answer: A, B, C, D, E, F - All are x264 presets. Also: slow, slower, veryslow, placebo. Faster presets = quicker encoding, larger files. Slower presets = better compression, longer encoding. medium is default balance.
+
+#@@@@@@@@@@
+
+69. Complete this video reverse with FFmpeg:
+```bash
+# Reverse video
+ffmpeg -i input.mp4 -vf reverse output.mp4
+
+# Reverse video and audio
+ffmpeg -i input.mp4 -vf reverse -af _______________ output.mp4
+```
+
+Answer: `areverse` - Reverse audio filter. reverse for video. Load entire video into memory. For large files, use two-pass approach or split into chunks.
+
+#@@@@@@@@@@
+
+70. What is the purpose of video pixel format?
+
+Answer: Pixel format defines how color data is stored. YUV420p (most common, 4:2:0 subsampling), YUV422p (4:2:2), YUV444p (4:4:4), RGB24. Affects compatibility, quality, file size. Convert: `ffmpeg -i input.mp4 -pix_fmt yuv420p output.mp4`. Check with ffprobe.
+
+#@@@@@@@@@@
+
+71. How do you extract frames from video with OpenCV?
+
+Answer: `cap = cv2.VideoCapture('video.mp4'); ret, frame = cap.read(); cv2.imwrite(f'frame_{count}.jpg', frame)` Loop through all frames. Or specific frame: `cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)`. Release with cap.release().
+
+#@@@@@@@@@@
+
+72. Which of the following are video quality degradation factors? (Multiple correct)
+A) Low bitrate
+B) Excessive compression
+C) Upscaling
+D) Multiple re-encodings
+E) Noise
+F) Motion blur
+
+Answer: A, B, C, D, E, F - All degrade quality. Low bitrate (blocking), Excessive compression (artifacts), Upscaling (pixelation), Re-encodings (generation loss), Noise (grain), Motion blur (fast movement). Minimize re-encoding, use high bitrate for masters.
+
+#@@@@@@@@@@
+
+73. Complete this video speed change with OpenCV:
+```python
+import cv2
+
+cap = cv2.VideoCapture('input.mp4')
+fps = cap.get(cv2.CAP_PROP_FPS)
+speed_factor = 2.0  # 2x faster
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('output.mp4', fourcc, fps * speed_factor, (width, height))
+
+frame_count = 0
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    if frame_count % int(1/speed_factor) == 0:
+        out.write(frame)
+    frame_count += _______________
+```
+
+Answer: `1` - Increment frame counter. Skip frames for speed up. For slow motion, duplicate frames or use interpolation. Adjust output FPS accordingly.
+
+#@@@@@@@@@@
+
+74. What is the difference between video resolution and video size?
+
+Answer: Resolution is dimensions in pixels (1920x1080, 3840x2160), affects quality. Video size is file size in bytes/MB/GB, affected by resolution, bitrate, duration, codec. Higher resolution generally larger file but depends on compression. 4K can be smaller than 1080p with better codec.
+
+#@@@@@@@@@@
+
+75. How do you add subtitles to video with FFmpeg?
+
+Answer: Burn-in (hardcode): `ffmpeg -i video.mp4 -vf subtitles=subs.srt output.mp4` Permanently embedded. Soft subtitles: `ffmpeg -i video.mp4 -i subs.srt -c copy -c:s mov_text output.mp4` Can be toggled. Format: SRT, ASS, VTT.
+
+#@@@@@@@@@@
+
+76. Which of the following are video codec parameters? (Multiple correct)
+A) Bitrate
+B) GOP size
+C) B-frames count
+D) Profile/Level
+E) Preset
+F) CRF (Constant Rate Factor)
+
+Answer: A, B, C, D, E, F - All are codec parameters. Bitrate (quality/size), GOP (keyframe interval), B-frames (compression), Profile/Level (compatibility), Preset (speed/efficiency), CRF (quality-based). Configure for optimal encoding.
+
+#@@@@@@@@@@
+
+77. Complete this video crop with FFmpeg:
+```bash
+# Crop to 1280x720 from top-left
+ffmpeg -i input.mp4 -vf "crop=1280:720:0:0" output.mp4
+
+# Crop center
+ffmpeg -i input.mp4 -vf "crop=1280:720:_______________:_______________" output.mp4
+```
+
+Answer: `(in_w-out_w)/2:(in_h-out_h)/2` or `(iw-1280)/2:(ih-720)/2` - Center crop. Format: crop=width:height:x:y. Use expressions for dynamic values. Remove black bars, change aspect ratio.
+
+#@@@@@@@@@@
+
+78. What is the purpose of video buffering in streaming?
+
+Answer: Buffering pre-loads video data to prevent playback interruptions. Compensates for network fluctuations. Buffer size affects startup time vs smoothness. Adaptive streaming adjusts quality based on buffer level. Too small = stuttering, too large = slow start.
+
+#@@@@@@@@@@
+
+79. How do you implement video edge detection with OpenCV?
+
+Answer: `edges = cv2.Canny(gray_frame, threshold1=100, threshold2=200)` Canny edge detection. Or Sobel: `sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)`. Apply to each frame. Combine with morphological operations for cleanup.
+
+#@@@@@@@@@@
+
+80. Which of the following are video production stages? (Multiple correct)
+A) Pre-production (planning)
+B) Production (shooting)
+C) Post-production (editing)
+D) Color grading
+E) Audio mixing
+F) Distribution/Delivery
+
+Answer: A, B, C, D, E, F - All are production stages. Pre-production (script, storyboard), Production (filming), Post-production (editing, VFX), Color grading (color correction), Audio mixing (sound design), Distribution (encoding, delivery). Complete workflow.
+
+#@@@@@@@@@@
+
+81. Complete this video histogram equalization with OpenCV:
+```python
+import cv2
+import numpy as np
+
+cap = cv2.VideoCapture('dark_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Convert to YUV
+    yuv = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
+    yuv[:,:,0] = cv2._______________( yuv[:,:,0])
+    result = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR)
+```
+
+Answer: `equalizeHist` - Histogram equalization for brightness enhancement. Apply to Y channel only to preserve colors. CLAHE for adaptive equalization: `cv2.createCLAHE(clipLimit=2.0)`.
+
+#@@@@@@@@@@
+
+82. What is the purpose of video GOP (Group of Pictures) structure?
+
+Answer: GOP structure defines I/P/B frame pattern. Common patterns: IBBPBBP, IBPBP. Affects compression efficiency, random access, error resilience. Closed GOP (self-contained) vs Open GOP (references across). Configure with -g (GOP size) and -bf (B-frames).
+
+#@@@@@@@@@@
+
+83. How do you implement video time-lapse with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -filter:v "setpts=0.1*PTS" timelapse.mp4` 10x faster. Or from images: `ffmpeg -framerate 30 -pattern_type glob -i 'img*.jpg' -c:v libx264 timelapse.mp4`. Adjust framerate for speed.
+
+#@@@@@@@@@@
+
+84. Which of the following are video encoding profiles? (Multiple correct)
+A) Baseline (H.264)
+B) Main (H.264)
+C) High (H.264)
+D) Main10 (H.265)
+E) Main (VP9)
+F) Main (AV1)
+
+Answer: A, B, C, D, E, F - All are encoding profiles. Baseline (simple devices), Main (standard), High (best quality), Main10 (10-bit), profiles define feature sets. Higher profiles = better compression but more complex decoding.
+
+#@@@@@@@@@@
+
+85. Complete this video blur with FFmpeg:
+```bash
+# Gaussian blur
+ffmpeg -i input.mp4 -vf "gblur=sigma=_______________" output.mp4
+
+# Box blur
+ffmpeg -i input.mp4 -vf "boxblur=5:1" output.mp4
+
+# Motion blur
+ffmpeg -i input.mp4 -vf "minterpolate='mi_mode=mci:mc_mode=aobmc:vsbmc=1'" output.mp4
+```
+
+Answer: `5` or any value - Sigma controls blur strength. gblur for Gaussian, boxblur for box filter. Use for privacy (face blur), artistic effects.
+
+#@@@@@@@@@@
+
+86. What is the difference between video encoding time and decoding time?
+
+Answer: Encoding time is compression duration, computationally intensive, one-time process. Decoding time is playback decompression, must be real-time, repeated process. Encoding can be slow (hours), decoding must be fast (< frame time). Asymmetric codecs optimize for fast decoding.
+
+#@@@@@@@@@@
+
+87. How do you extract video metadata with FFmpeg?
+
+Answer: `ffmpeg -i video.mp4 -f ffmetadata metadata.txt` Extract to file. Or `ffprobe -show_format -show_streams video.mp4`. Metadata includes title, artist, date, GPS, camera model. Edit and re-embed: `ffmpeg -i video.mp4 -i metadata.txt -map_metadata 1 -c copy output.mp4`.
+
+#@@@@@@@@@@
+
+88. Which of the following are video filter categories in FFmpeg? (Multiple correct)
+A) Video filters (vf)
+B) Audio filters (af)
+C) Complex filters (filter_complex)
+D) Subtitle filters
+E) Bitstream filters
+F) Source filters
+
+Answer: A, B, C, E, F - Video filters (scale, crop), Audio filters (volume, equalizer), Complex filters (overlay, split), Bitstream filters (h264_mp4toannexb), Source filters (color, testsrc). Subtitle handling separate.
+
+#@@@@@@@@@@
+
+89. Complete this video sharpening with OpenCV:
+```python
+import cv2
+import numpy as np
+
+kernel = np.array([[-1,-1,-1],
+                   [-1, _______________, -1],
+                   [-1,-1,-1]])
+
+cap = cv2.VideoCapture('blurry.mp4')
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    sharpened = cv2.filter2D(frame, -1, kernel)
+```
+
+Answer: `9` - Center value for sharpening kernel. Unsharp mask alternative: `cv2.addWeighted(frame, 1.5, blurred, -0.5, 0)`. Enhance edges and details.
+
+#@@@@@@@@@@
+
+90. What is the purpose of video levels (black/white point)?
+
+Answer: Video levels define brightness range. Full range (0-255 for 8-bit) vs Limited range (16-235). Broadcast uses limited, computer uses full. Mismatch causes washed out or crushed blacks. Convert: `ffmpeg -i input.mp4 -vf scale=in_range=full:out_range=limited output.mp4`.
+
+#@@@@@@@@@@
+
+91. How do you create split-screen video with FFmpeg?
+
+Answer: `ffmpeg -i left.mp4 -i right.mp4 -filter_complex "[0:v]pad=iw*2:ih[bg];[bg][1:v]overlay=w" output.mp4` Horizontal split. Vertical: `pad=iw:ih*2` and `overlay=0:h`. Grid: combine multiple overlays. Scale inputs to match.
+
+#@@@@@@@@@@
+
+92. Which of the following are video streaming latency types? (Multiple correct)
+A) Ultra-low latency (< 1 second)
+B) Low latency (1-5 seconds)
+C) Standard latency (5-30 seconds)
+D) High latency (> 30 seconds)
+E) Glass-to-glass latency
+F) End-to-end latency
+
+Answer: A, B, C, D, E, F - All are latency types. Ultra-low (WebRTC, SRT), Low (RTMP), Standard (HLS, DASH), High (traditional broadcast), Glass-to-glass (camera to display), End-to-end (total system). Choose protocol based on latency requirements.
+
+#@@@@@@@@@@
+
+93. Complete this video noise addition with FFmpeg:
+```bash
+# Add grain/noise
+ffmpeg -i input.mp4 -vf "noise=alls=_______________:allf=t+u" output.mp4
+
+# Film grain
+ffmpeg -i input.mp4 -vf "noise=c0s=10:c0f=t" output.mp4
+```
+
+Answer: `20` or any value - Noise strength. alls (all strength), allf (all flags). Add for artistic effect, hide compression artifacts. t=temporal, u=uniform.
+
+#@@@@@@@@@@
+
+94. What is the difference between video transcoding and transmuxing?
+
+Answer: Transcoding changes codec (decode + encode), quality loss, slow, changes compression. Transmuxing changes container only (demux + mux), no quality loss, fast, same streams. Use transmuxing when possible: `ffmpeg -i input.avi -c copy output.mp4`.
+
+#@@@@@@@@@@
+
+95. How do you implement video segmentation with OpenCV?
+
+Answer: Use GrabCut, watershed, or deep learning (Mask R-CNN). `mask = np.zeros(frame.shape[:2], np.uint8); cv2.grabCut(frame, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)`. Segment foreground/background or objects.
+
+#@@@@@@@@@@
+
+96. Which of the following are video compression artifacts? (Multiple correct)
+A) Blocking/Macroblocking
+B) Mosquito noise
+C) Banding
+D) Ringing
+E) Aliasing
+F) Posterization
+
+Answer: A, B, C, D, E, F - All are compression artifacts. Blocking (DCT blocks visible), Mosquito noise (edges), Banding (gradients), Ringing (edge halos), Aliasing (jagged edges), Posterization (reduced colors). Reduce with higher bitrate, better codec.
+
+#@@@@@@@@@@
+
+97. Complete this video fade effect with FFmpeg:
+```bash
+# Fade in first 2 seconds
+ffmpeg -i input.mp4 -vf "fade=t=in:st=0:d=2" output.mp4
+
+# Fade out last 2 seconds
+ffmpeg -i input.mp4 -vf "fade=t=out:st=_______________:d=2" output.mp4
+
+# Fade in and out
+ffmpeg -i input.mp4 -vf "fade=in:0:30,fade=out:270:30" output.mp4
+```
+
+Answer: `$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 input.mp4)-2` or duration-2 - Start fade 2 seconds before end. st=start time, d=duration. Combine multiple fades.
+
+#@@@@@@@@@@
+
+98. What is the purpose of video alpha channel?
+
+Answer: Alpha channel stores transparency information. RGBA format (RGB + Alpha). Use for overlays, compositing, green screen keying. Not all codecs support (ProRes, PNG sequence, WebM with VP9). Remove background: `ffmpeg -i input.mov -vf chromakey=green:0.1:0.1 output.mov`.
+
+#@@@@@@@@@@
+
+99. How do you implement video object removal with OpenCV?
+
+Answer: Use inpainting: `mask = create_mask_for_object(); result = cv2.inpaint(frame, mask, 3, cv2.INPAINT_TELEA)`. Or background subtraction and fill. For moving objects, use temporal information. Deep learning (video inpainting networks) for complex cases.
+
+#@@@@@@@@@@
+
+100. Which of the following are video delivery methods? (Multiple correct)
+A) HTTP download
+B) Progressive download
+C) Streaming (HLS/DASH)
+D) P2P delivery
+E) Broadcast
+F) Physical media (DVD/Blu-ray)
+
+Answer: A, B, C, D, E, F - All are delivery methods. HTTP download (complete file), Progressive (play while downloading), Streaming (adaptive), P2P (distributed), Broadcast (TV/satellite), Physical (disc). Choose based on use case, audience, infrastructure.
+
+#@@@@@@@@@@
+
+101. Complete this video vignette effect with FFmpeg:
+```bash
+# Add vignette (darkened edges)
+ffmpeg -i input.mp4 -vf "vignette=angle=_______________:mode=forward" output.mp4
+
+# Reverse vignette (brightened edges)
+ffmpeg -i input.mp4 -vf "vignette=angle=PI/4:mode=backward" output.mp4
+```
+
+Answer: `PI/3` or `PI/4` - Vignette angle in radians. mode=forward (darken), backward (brighten). Artistic effect, focus attention on center.
+
+#@@@@@@@@@@
+
+102. What is the difference between video frame and field?
+
+Answer: Frame is complete image (progressive). Field is half image (interlaced), odd or even lines. Two fields = one frame. Interlaced video (1080i) has 60 fields/sec = 30 frames/sec. Progressive (1080p) has 60 frames/sec. Modern displays use progressive.
+
+#@@@@@@@@@@
+
+103. How do you create video mosaic/pixelation with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "scale=iw/10:ih/10,scale=iw*10:ih*10:flags=neighbor" output.mp4` Scale down then up with nearest neighbor. Or selective: `ffmpeg -i input.mp4 -vf "boxblur=10:enable='between(t,5,10)'" output.mp4` for privacy.
+
+#@@@@@@@@@@
+
+104. Which of the following are video encoding modes? (Multiple correct)
+A) CBR (Constant Bitrate)
+B) VBR (Variable Bitrate)
+C) CRF (Constant Rate Factor)
+D) CQ (Constant Quality)
+E) 2-pass encoding
+F) 3-pass encoding
+
+Answer: A, B, C, D, E - CBR (fixed bitrate), VBR (variable), CRF (quality-based), CQ (constant quality), 2-pass (analyze then encode). 3-pass not standard. CRF recommended for most cases.
+
+#@@@@@@@@@@
+
+105. Complete this video drawtext with FFmpeg:
+```bash
+# Add text overlay
+ffmpeg -i input.mp4 -vf "drawtext=text='Hello World':fontsize=24:fontcolor=white:x=10:y=10" output.mp4
+
+# Add timestamp
+ffmpeg -i input.mp4 -vf "drawtext=text='%{pts\\:hms}':fontsize=20:x=10:y=10:fontcolor=white:box=1:boxcolor=black@0.5" output.mp4
+
+# Add dynamic text from file
+ffmpeg -i input.mp4 -vf "drawtext=textfile=_______________:reload=1:fontsize=24:x=10:y=10" output.mp4
+```
+
+Answer: `text.txt` - Load text from file. reload=1 for dynamic updates. Use for subtitles, watermarks, timestamps. Escape special characters.
+
+#@@@@@@@@@@
+
+106. What is the purpose of video look-up tables (LUTs)?
+
+Answer: LUTs map input colors to output colors for color grading. 1D LUT (brightness/contrast), 3D LUT (complex color transforms). Apply cinematic looks, color correction. FFmpeg: `ffmpeg -i input.mp4 -vf lut3d=file.cube output.mp4`. Common formats: .cube, .3dl.
+
+#@@@@@@@@@@
+
+107. How do you implement video super-resolution with deep learning?
+
+Answer: Use models like ESRGAN, Real-ESRGAN, EDVR. OpenCV DNN: `sr = cv2.dnn_superres.DnnSuperResImpl_create(); sr.readModel('model.pb'); sr.setModel('edsr', 4); upscaled = sr.upsample(frame)`. Upscale low-res to high-res with AI.
+
+#@@@@@@@@@@
+
+108. Which of the following are video editing software? (Multiple correct)
+A) Adobe Premiere Pro
+B) DaVinci Resolve
+C) Final Cut Pro
+D) Avid Media Composer
+E) Sony Vegas Pro
+F) Kdenlive
+
+Answer: A, B, C, D, E, F - All are video editing software. Premiere (Adobe), Resolve (Blackmagic), Final Cut (Apple), Avid (professional), Vegas (Sony), Kdenlive (open-source). Choose based on workflow, platform, budget.
+
+#@@@@@@@@@@
+
+109. Complete this video stabilization with OpenCV:
+```python
+import cv2
+import numpy as np
+
+cap = cv2.VideoCapture('shaky.mp4')
+transforms = []
+
+ret, prev = cap.read()
+prev_gray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
+
+while True:
+    ret, curr = cap.read()
+    if not ret:
+        break
+
+    curr_gray = cv2.cvtColor(curr, cv2.COLOR_BGR2GRAY)
+
+    # Detect features
+    prev_pts = cv2.goodFeaturesToTrack(prev_gray, maxCorners=200, qualityLevel=0.01, minDistance=30)
+
+    # Calculate optical flow
+    curr_pts, status, err = cv2.calcOpticalFlowPyrLK(prev_gray, curr_gray, prev_pts, None)
+
+    # Estimate transform
+    m = cv2.estimateAffinePartial2D(prev_pts, curr_pts)[0]
+
+    # Extract translation
+    dx = m[0,2]
+    dy = m[1,2]
+    da = np.arctan2(m[1,0], m[0,0])
+
+    transforms.append([dx, dy, da])
+    prev_gray = curr_gray
+
+# Smooth trajectory
+trajectory = np.cumsum(transforms, axis=0)
+smoothed = _______________( trajectory, window_len=30)
+```
+
+Answer: `smooth_trajectory` or `moving_average` - Smooth camera path. Apply inverse of smoothed transforms to stabilize. Use Kalman filter for better results. VidStab library for production.
+
+#@@@@@@@@@@
+
+110. What is the difference between video encoding speed and compression efficiency?
+
+Answer: Encoding speed is how fast video is encoded (fps, real-time factor). Compression efficiency is how well codec compresses (bitrate for given quality). Trade-off: slower encoding = better compression. Presets control this: ultrafast (fast, poor compression) to veryslow (slow, excellent compression).
+
+#@@@@@@@@@@
+
+111. How do you create video slideshow with FFmpeg?
+
+Answer: `ffmpeg -framerate 1/3 -i img%03d.jpg -i audio.mp3 -c:v libx264 -pix_fmt yuv420p -shortest slideshow.mp4` 3 seconds per image. Add transitions: `ffmpeg -i img1.jpg -i img2.jpg -filter_complex xfade=transition=fade:duration=1 output.mp4`.
+
+#@@@@@@@@@@
+
+112. Which of the following are video color grading operations? (Multiple correct)
+A) White balance
+B) Exposure adjustment
+C) Contrast/Saturation
+D) Color wheels (shadows/midtones/highlights)
+E) Curves
+F) LUT application
+
+Answer: A, B, C, D, E, F - All are color grading operations. White balance (temperature), Exposure (brightness), Contrast/Saturation (intensity), Color wheels (selective), Curves (tonal mapping), LUTs (presets). DaVinci Resolve industry standard.
+
+#@@@@@@@@@@
+
+113. Complete this video chroma key (green screen) with FFmpeg:
+```bash
+# Remove green background
+ffmpeg -i greenscreen.mp4 -vf "chromakey=green:_______________:0.1" -c:v prores_ks -pix_fmt yuva444p10le output.mov
+
+# Composite over background
+ffmpeg -i background.mp4 -i greenscreen.mp4 -filter_complex "[1:v]chromakey=green:0.1:0.1[fg];[0:v][fg]overlay" output.mp4
+```
+
+Answer: `0.1` or `0.2` - Similarity threshold (0-1). Lower = stricter keying. Blend parameter for edge softness. Use even lighting, proper green screen for best results.
+
+#@@@@@@@@@@
+
+114. What is the purpose of video timecode?
+
+Answer: Timecode identifies specific frames (HH:MM:SS:FF). Essential for editing, synchronization, collaboration. Types: SMPTE, drop-frame, non-drop-frame. Embedded in video or separate. FFmpeg: `ffmpeg -i input.mp4 -vf "drawtext=timecode='00\\:00\\:00\\:00':rate=30:fontsize=24" output.mp4`.
+
+#@@@@@@@@@@
+
+115. How do you implement video style transfer with deep learning?
+
+Answer: Use neural style transfer models. Load style and content: `model = load_model('style_transfer.h5'); stylized = model.predict([content_frame, style_image])`. Apply artistic styles to video. Process frame-by-frame with temporal consistency. Tools: DeepArt, Runway ML.
+
+#@@@@@@@@@@
+
+116. Which of the following are video broadcast standards? (Multiple correct)
+A) NTSC (North America)
+B) PAL (Europe)
+C) SECAM (France/Russia)
+D) ATSC (Digital TV)
+E) DVB (Digital Video Broadcasting)
+F) ISDB (Japan)
+
+Answer: A, B, C, D, E, F - All are broadcast standards. NTSC (29.97fps, 525 lines), PAL (25fps, 625 lines), SECAM (25fps), ATSC (US digital), DVB (European digital), ISDB (Japanese digital). Legacy analog vs modern digital.
+
+#@@@@@@@@@@
+
+117. Complete this video audio sync with FFmpeg:
+```bash
+# Delay audio by 0.5 seconds
+ffmpeg -i input.mp4 -itsoffset 0.5 -i input.mp4 -map 0:v -map 1:a -c copy output.mp4
+
+# Advance audio by 0.5 seconds
+ffmpeg -i input.mp4 -itsoffset _______________ -i input.mp4 -map 1:v -map 0:a -c copy output.mp4
+```
+
+Answer: `-0.5` - Negative offset advances audio. Positive delays. Use for fixing sync issues. Alternative: `-af adelay=500` for audio delay in milliseconds.
+
+#@@@@@@@@@@
+
+118. What is the difference between video intra-frame and inter-frame compression?
+
+Answer: Intra-frame compresses within single frame (I-frames), spatial redundancy, like JPEG. Inter-frame compresses across frames (P/B-frames), temporal redundancy, motion compensation. Intra = larger but independent, Inter = smaller but dependent. Combine for efficient compression.
+
+#@@@@@@@@@@
+
+119. How do you create video loop with FFmpeg?
+
+Answer: `ffmpeg -stream_loop 3 -i input.mp4 -c copy output.mp4` Loop 3 times. Infinite: `-stream_loop -1`. Or concat: `ffmpeg -f concat -i <(for i in {1..5}; do echo "file 'input.mp4'"; done) -c copy output.mp4`. Seamless loops need matching start/end frames.
+
+#@@@@@@@@@@
+
+120. Which of the following are video machine learning applications? (Multiple correct)
+A) Object detection/tracking
+B) Action recognition
+C) Video summarization
+D) Super-resolution
+E) Deepfakes/Face swap
+F) Automated editing
+
+Answer: A, B, C, D, E, F - All are ML applications. Object detection (YOLO), Action recognition (I3D), Summarization (highlights), Super-resolution (ESRGAN), Deepfakes (GANs), Automated editing (AI tools). Growing field with many applications.
+
+#@@@@@@@@@@
+
+121. Complete this video HDR tone mapping with FFmpeg:
+```bash
+# Convert HDR to SDR
+ffmpeg -i hdr_input.mp4 -vf "zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=_______________:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p" sdr_output.mp4
+```
+
+Answer: `hable` or `mobius` or `reinhard` - Tone mapping algorithm. hable (filmic), mobius (preserves colors), reinhard (simple). Convert HDR (Rec.2020, PQ/HLG) to SDR (Rec.709) for compatibility.
+
+#@@@@@@@@@@
+
+122. What is the purpose of video motion vectors?
+
+Answer: Motion vectors describe block movement between frames. Used in P/B-frame prediction, motion estimation, video compression. Also useful for effects (motion blur, interpolation), analysis (tracking, stabilization). Extract with FFmpeg: `ffmpeg -flags2 +export_mvs -i input.mp4 -vf codecview=mv=pf+bf+bb output.mp4`.
+
+#@@@@@@@@@@
+
+123. How do you implement video panorama stitching with OpenCV?
+
+Answer: `stitcher = cv2.Stitcher_create(); status, pano = stitcher.stitch(images)` Stitch multiple views. Or `cv2.Stitcher.create(cv2.Stitcher_PANORAMA)` for panorama mode. Detect features, match, warp, blend. For video, stitch first frame then track.
+
+#@@@@@@@@@@
+
+124. Which of the following are video codec licensing models? (Multiple correct)
+A) Royalty-free (AV1, VP9)
+B) Patent-encumbered (H.264, H.265)
+C) Open-source implementation
+D) Proprietary (ProRes, DNxHD)
+E) MPEG-LA pool
+F) Free for end users
+
+Answer: A, B, C, D, E, F - All are licensing models. Royalty-free (no fees), Patent-encumbered (licensing fees), Open-source (free implementation), Proprietary (vendor-specific), MPEG-LA (patent pool), Free for end users (encoder pays). Consider licensing for commercial use.
+
+#@@@@@@@@@@
+
+125. Complete this video audio normalization with FFmpeg:
+```bash
+# Two-pass loudness normalization
+ffmpeg -i input.mp4 -af loudnorm=I=-16:TP=-1.5:LRA=11:print_format=summary -f null -
+
+# Apply normalization
+ffmpeg -i input.mp4 -af loudnorm=I=-16:TP=-1.5:LRA=11:measured_I=_______________:measured_LRA=7.0:measured_TP=-2.0:measured_thresh=-26.0:offset=0.0 output.mp4
+```
+
+Answer: `-23.0` or measured value from first pass - Integrated loudness. Two-pass for accurate normalization. I=target integrated, TP=true peak, LRA=loudness range. EBU R128 standard.
+
+#@@@@@@@@@@
+
+126. What is the difference between video encoding latency and decoding latency?
+
+Answer: Encoding latency is delay from capture to encoded output, affects live streaming. Decoding latency is delay from encoded input to display, affects playback. Low-latency encoding uses fewer B-frames, smaller GOP. Hardware encoding/decoding reduces latency. Critical for real-time applications.
+
+#@@@@@@@@@@
+
+127. How do you create video contact sheet (thumbnail grid) with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "select='not(mod(n,100))',scale=160:120,tile=4x3" -frames:v 1 contact_sheet.jpg` Select every 100th frame, scale, arrange in 4x3 grid. Useful for video preview, cataloging.
+
+#@@@@@@@@@@
+
+128. Which of the following are video quality assessment methods? (Multiple correct)
+A) Subjective (human viewing)
+B) Objective (PSNR, SSIM, VMAF)
+C) No-reference (blind quality)
+D) Full-reference (compare to original)
+E) Reduced-reference (partial original)
+F) Perceptual quality metrics
+
+Answer: A, B, C, D, E, F - All are assessment methods. Subjective (MOS - Mean Opinion Score), Objective (automated metrics), No-reference (no original needed), Full-reference (compare to source), Reduced-reference (features only), Perceptual (human vision model). VMAF most accurate objective metric.
+
+#@@@@@@@@@@
+
+129. Complete this video delogo (remove logo) with FFmpeg:
+```bash
+# Remove logo with delogo filter
+ffmpeg -i input.mp4 -vf "delogo=x=10:y=10:w=100:h=50:show=0" output.mp4
+
+# Remove logo with inpainting
+ffmpeg -i input.mp4 -vf "delogo=x=10:y=10:w=100:h=50:band=_______________" output.mp4
+```
+
+Answer: `10` - Band width for blending. delogo blurs logo area. For better results, use inpainting or object removal. Specify logo position and size.
+
+#@@@@@@@@@@
+
+130. What is the purpose of video field order in interlaced video?
+
+Answer: Field order defines which field comes first: Top Field First (TFF) or Bottom Field First (BFF). Incorrect order causes combing, jitter. Check with ffprobe. Set with FFmpeg: `ffmpeg -i input.mp4 -vf setfield=tff output.mp4`. Important for interlaced workflows.
+
+#@@@@@@@@@@
+
+131. How do you implement video optical character recognition (OCR)?
+
+Answer: Use Tesseract with OpenCV: `import pytesseract; text = pytesseract.image_to_string(frame)` Extract text from video frames. Preprocess (grayscale, threshold, denoise) for better accuracy. Track text regions across frames. Use for subtitle extraction, content analysis.
+
+#@@@@@@@@@@
+
+132. Which of the following are video streaming CDN providers? (Multiple correct)
+A) Cloudflare
+B) Akamai
+C) Amazon CloudFront
+D) Fastly
+E) Cloudinary
+F) Wowza
+
+Answer: A, B, C, D, E - Cloudflare, Akamai, CloudFront, Fastly, Cloudinary are CDNs. Wowza is streaming server software, not CDN. CDNs cache and deliver video from edge locations, reduce latency, handle scale.
+
+#@@@@@@@@@@
+
+133. Complete this video frame blending with FFmpeg:
+```bash
+# Motion blur effect with frame blending
+ffmpeg -i input.mp4 -vf "tmix=frames=_______________:weights='1 1 1'" output.mp4
+
+# Blend consecutive frames
+ffmpeg -i input.mp4 -vf "tblend=all_mode=average" output.mp4
+```
+
+Answer: `3` - Number of frames to blend. tmix for temporal mixing, tblend for frame blending. Create motion blur, smooth transitions, reduce noise.
+
+#@@@@@@@@@@
+
+134. What is the difference between video sample rate and frame rate?
+
+Answer: Frame rate is video frames per second (24, 30, 60 fps), visual property. Sample rate is audio samples per second (44.1kHz, 48kHz), audio property. Different concepts for different streams. Both affect quality and file size.
+
+#@@@@@@@@@@
+
+135. How do you extract dominant colors from video with OpenCV?
+
+Answer: `pixels = frame.reshape(-1, 3); kmeans = KMeans(n_clusters=5); kmeans.fit(pixels); colors = kmeans.cluster_centers_` Use K-means clustering. Or histogram analysis. Useful for color grading, thumbnails, scene detection.
+
+#@@@@@@@@@@
+
+136. Which of the following are video encoding tools? (Multiple correct)
+A) FFmpeg
+B) HandBrake
+C) x264/x265 encoders
+D) Adobe Media Encoder
+E) Compressor (Apple)
+F) Sorenson Squeeze
+
+Answer: A, B, C, D, E, F - All are encoding tools. FFmpeg (command-line), HandBrake (GUI), x264/x265 (libraries), Adobe Media Encoder (professional), Compressor (Mac), Sorenson Squeeze (legacy). Choose based on workflow, features, platform.
+
+#@@@@@@@@@@
+
+137. Complete this video deflicker with FFmpeg:
+```bash
+# Remove flicker from timelapse
+ffmpeg -i input.mp4 -vf "deflicker=mode=_______________:size=10" output.mp4
+
+# Alternative with histogram equalization
+ffmpeg -i input.mp4 -vf "histeq=strength=0.2" output.mp4
+```
+
+Answer: `pm` or `am` - Mode: pm (preserve mean), am (average mean). deflicker smooths brightness variations. Common in timelapse, old film. size parameter controls temporal window.
+
+#@@@@@@@@@@
+
+138. What is the purpose of video reference frames in compression?
+
+Answer: Reference frames are frames used for prediction (I and P-frames). More reference frames = better compression but more memory. H.264 supports multiple references. Configure with -refs: `ffmpeg -i input.mp4 -c:v libx264 -refs 3 output.mp4`. Trade-off between compression and decoding complexity.
+
+#@@@@@@@@@@
+
+139. How do you create video cinemagraph (living photo) with FFmpeg?
+
+Answer: Isolate moving region, freeze rest. `ffmpeg -i video.mp4 -i mask.png -filter_complex "[0:v]split[bg][fg];[bg]select='eq(n,0)',loop=-1:1[still];[fg][1:v]alphamerge[moving];[still][moving]overlay" output.mp4` Combine still background with moving foreground.
+
+#@@@@@@@@@@
+
+140. Which of the following are video metadata types? (Multiple correct)
+A) Technical (codec, resolution, bitrate)
+B) Descriptive (title, description, tags)
+C) Administrative (copyright, license)
+D) Temporal (timecode, duration)
+E) Spatial (GPS, location)
+F) Rights management (DRM)
+
+Answer: A, B, C, D, E, F - All are metadata types. Technical (format info), Descriptive (content), Administrative (ownership), Temporal (time), Spatial (location), Rights (protection). Embedded in container or sidecar files.
+
+#@@@@@@@@@@
+
+141. Complete this video perspective correction with FFmpeg:
+```bash
+# Correct perspective distortion
+ffmpeg -i input.mp4 -vf "perspective=x0=0:y0=0:x1=1920:y1=0:x2=_______________:y2=1080:x3=0:y3=1080:interpolation=linear" output.mp4
+```
+
+Answer: `1920` - Bottom-right corner x coordinate. Define four corners for perspective transform. Correct lens distortion, keystone effect. Use for document scanning, architectural video.
+
+#@@@@@@@@@@
+
+142. What is the difference between video streaming and progressive download?
+
+Answer: Streaming uses protocols (HLS, DASH, RTMP), adaptive bitrate, live or VOD, requires streaming server. Progressive download is simple HTTP, plays while downloading, fixed quality, no special server. Streaming better for long content, adaptive quality. Progressive simpler, works anywhere.
+
+#@@@@@@@@@@
+
+143. How do you implement video anomaly detection?
+
+Answer: Train model on normal video, detect deviations. Use autoencoders, one-class SVM, or statistical methods. `model.fit(normal_frames); anomaly_score = model.score(test_frame)` High score = anomaly. Applications: surveillance, quality control, sports analysis.
+
+#@@@@@@@@@@
+
+144. Which of the following are video compression standards organizations? (Multiple correct)
+A) ITU-T (H.26x)
+B) ISO/IEC (MPEG)
+C) AOMedia (AV1)
+D) Google (VP8/VP9)
+E) SMPTE (Professional)
+F) Alliance for Open Media
+
+Answer: A, B, C, E, F - ITU-T (H.264/H.265), ISO/IEC (MPEG-2/4), AOMedia (AV1), SMPTE (broadcast standards), Alliance for Open Media (same as AOMedia). Google developed VP8/VP9 but not standards org. Different organizations, different focus areas.
+
+#@@@@@@@@@@
+
+145. Complete this video datamoshing effect with FFmpeg:
+```bash
+# Remove I-frames for glitch effect
+ffmpeg -i input.mp4 -c:v mpeg4 -q:v 1 -g 999 -vf "select='not(eq(pict_type,I))'" -vsync vfr output.mp4
+
+# Or manipulate bitstream
+ffmpeg -i input.mp4 -c:v libx264 -g _______________ -bf 2 glitch.mp4
+```
+
+Answer: `999` or large value - Large GOP size (keyframe interval). Fewer I-frames = more glitch potential. Datamoshing creates artistic glitch effects by manipulating compression artifacts.
+
+#@@@@@@@@@@
+
+146. What is the purpose of video scan type (progressive vs interlaced)?
+
+Answer: Scan type defines how frames are displayed. Progressive scans all lines sequentially (p), better quality, modern standard. Interlaced alternates odd/even lines (i), legacy broadcast, bandwidth efficient. 1080p vs 1080i. Progressive preferred for digital, interlaced for broadcast compatibility.
+
+#@@@@@@@@@@
+
+147. How do you create video ASCII art with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "scale=80:24,format=gray,curves=all='0/0 1/1'" -f rawvideo - | jp2a --width=80 --height=24 -` Convert to grayscale, scale down, pipe to ASCII converter. Or use libcaca: `ffplay -vf "scale=80:24" -f caca input.mp4`.
+
+#@@@@@@@@@@
+
+148. Which of the following are video workflow stages? (Multiple correct)
+A) Ingestion/Capture
+B) Transcoding/Encoding
+C) Editing/Post-production
+D) Quality control
+E) Distribution/Delivery
+F) Archival/Storage
+
+Answer: A, B, C, D, E, F - All are workflow stages. Ingestion (import), Transcoding (format conversion), Editing (creative), QC (verification), Distribution (delivery), Archival (long-term storage). Complete production pipeline.
+
+#@@@@@@@@@@
+
+149. Complete this video telecine removal (inverse telecine) with FFmpeg:
+```bash
+# Remove 3:2 pulldown (convert 29.97fps to 23.976fps)
+ffmpeg -i input.mp4 -vf "fieldmatch,decimate" -r _______________ output.mp4
+
+# Or use pullup filter
+ffmpeg -i input.mp4 -vf "pullup,fps=24000/1001" output.mp4
+```
+
+Answer: `24000/1001` or `23.976` - Film frame rate. Telecine converts 24fps film to 29.97fps video. Inverse telecine reverses process. fieldmatch finds matching fields, decimate removes duplicates.
+
+#@@@@@@@@@@
+
+150. What is the difference between video encoding preset and tune?
+
+Answer: Preset controls encoding speed vs compression (ultrafast to veryslow), affects all parameters. Tune optimizes for specific content type (film, animation, grain, stillimage, fastdecode, zerolatency), adjusts subset of parameters. Use both: `ffmpeg -i input.mp4 -preset slow -tune film output.mp4`.
+
+#@@@@@@@@@@
+
+151. How do you implement video depth estimation with deep learning?
+
+Answer: Use models like MiDaS, DPT. `model = torch.hub.load('intel-isl/MiDaS', 'MiDaS'); depth = model(frame)` Estimate depth from monocular video. Applications: 3D reconstruction, AR/VR, bokeh effects, scene understanding.
+
+#@@@@@@@@@@
+
+152. Which of the following are video testing patterns? (Multiple correct)
+A) SMPTE color bars
+B) EBU color bars
+C) Checkerboard
+D) Zone plate
+E) Gray scale
+F) Test card
+
+Answer: A, B, C, D, E, F - All are test patterns. SMPTE (US standard), EBU (European), Checkerboard (geometry), Zone plate (frequency response), Gray scale (levels), Test card (comprehensive). Generate with FFmpeg: `ffmpeg -f lavfi -i smptebars -t 10 bars.mp4`.
+
+#@@@@@@@@@@
+
+153. Complete this video audio ducking with FFmpeg:
+```bash
+# Lower music volume when speech detected
+ffmpeg -i music.mp3 -i speech.mp3 -filter_complex "[0:a][1:a]sidechaincompress=threshold=0.1:ratio=20:attack=1:release=_______________[out]" -map "[out]" output.mp3
+```
+
+Answer: `1000` or `2000` - Release time in milliseconds. Sidechain compression lowers music when speech present. threshold (dB), ratio (compression), attack/release (timing). Essential for podcasts, voiceovers.
+
+#@@@@@@@@@@
+
+154. What is the purpose of video edit decision list (EDL)?
+
+Answer: EDL is text file describing edit sequence (cuts, transitions, effects). Interchange format between editing systems. Contains timecodes, source files, edit points. CMX 3600 format common. Export from NLE, import to another. Enables collaboration, archival, conform.
+
+#@@@@@@@@@@
+
+155. How do you create video kaleidoscope effect with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "crop=iw/2:ih/2:0:0,split=4[a][b][c][d];[b]hflip[b];[c]vflip[c];[d]hflip,vflip[d];[a][b][c][d]xstack=inputs=4:layout=0_0|w0_0|0_h0|w0_h0" output.mp4` Crop quarter, mirror, arrange in grid. Adjust for different patterns.
+
+#@@@@@@@@@@
+
+156. Which of the following are video frame types in MPEG compression? (Multiple correct)
+A) I-frame (Intra)
+B) P-frame (Predicted)
+C) B-frame (Bidirectional)
+D) D-frame (DC-coded)
+E) S-frame (Switching)
+F) SI/SP frames
+
+Answer: A, B, C, F - I-frame (keyframe), P-frame (forward prediction), B-frame (bidirectional), SI/SP frames (switching, H.264). D-frame obsolete (MPEG-1). S-frame not standard term. GOP structure uses I/P/B frames.
+
+#@@@@@@@@@@
+
+157. Complete this video 3D LUT application with FFmpeg:
+```bash
+# Apply color grading LUT
+ffmpeg -i input.mp4 -vf "lut3d=_______________" output.mp4
+
+# Generate identity LUT
+ffmpeg -f lavfi -i haldclutsrc=8 -vf "curves=all='0/0 1/1'" identity.png
+```
+
+Answer: `file.cube` or `lut.3dl` - LUT file path. Formats: .cube, .3dl, .dat. Apply cinematic looks, color correction. Create custom LUTs in DaVinci Resolve, export, apply with FFmpeg.
+
+#@@@@@@@@@@
+
+158. What is the difference between video mezzanine and distribution formats?
+
+Answer: Mezzanine format is high-quality intermediate for editing, archival (ProRes, DNxHD, lossless). Distribution format is optimized for delivery, smaller size (H.264, H.265). Mezzanine preserves quality through multiple edits. Distribution balances quality and size for end users.
+
+#@@@@@@@@@@
+
+159. How do you implement video pose estimation with deep learning?
+
+Answer: Use models like OpenPose, MediaPipe. `import mediapipe as mp; pose = mp.solutions.pose.Pose(); results = pose.process(frame); landmarks = results.pose_landmarks` Detect body keypoints. Applications: fitness tracking, animation, sports analysis, AR filters.
+
+#@@@@@@@@@@
+
+160. Which of the following are video synchronization methods? (Multiple correct)
+A) Timecode sync
+B) Audio waveform sync
+C) Clapperboard/Slate
+D) Genlock (hardware sync)
+E) PluralEyes (software)
+F) Flash sync
+
+Answer: A, B, C, D, E, F - All are sync methods. Timecode (embedded), Audio waveform (match peaks), Clapperboard (visual/audio marker), Genlock (hardware), PluralEyes (automated software), Flash (visual marker). Essential for multi-camera, separate audio.
+
+#@@@@@@@@@@
+
+161. Complete this video interlace with FFmpeg:
+```bash
+# Convert progressive to interlaced
+ffmpeg -i progressive.mp4 -vf "interlace=mode=_______________" interlaced.mp4
+
+# Modes: tff (top field first), bff (bottom field first)
+```
+
+Answer: `tff` or `bff` - Interlace mode. tff for top field first, bff for bottom field first. Rarely needed (legacy broadcast). Most workflows deinterlace instead.
+
+#@@@@@@@@@@
+
+162. What is the purpose of video proxy files in editing?
+
+Answer: Proxy files are low-resolution copies for smooth editing. Edit with proxies, conform with originals for final output. Reduces system requirements, enables remote editing. Create with FFmpeg: `ffmpeg -i original.mp4 -s 960x540 -c:v prores_proxy proxy.mov`. Link proxies in NLE.
+
+#@@@@@@@@@@
+
+163. How do you create video reaction video layout with FFmpeg?
+
+Answer: `ffmpeg -i main.mp4 -i reaction.mp4 -filter_complex "[1:v]scale=320:240[pip];[0:v][pip]overlay=W-w-10:10[v];[0:a][1:a]amerge=inputs=2[a]" -map "[v]" -map "[a]" output.mp4` Main video with reaction in corner. Mix both audio tracks.
+
+#@@@@@@@@@@
+
+164. Which of the following are video encoding parameters affecting quality? (Multiple correct)
+A) Bitrate
+B) CRF value
+C) Quantization parameter (QP)
+D) GOP size
+E) B-frames count
+F) Motion estimation method
+
+Answer: A, B, C, D, E, F - All affect quality. Bitrate (data rate), CRF (quality target), QP (compression level), GOP (keyframe interval), B-frames (temporal compression), Motion estimation (prediction accuracy). Balance quality, size, encoding time.
+
+#@@@@@@@@@@
+
+165. Complete this video film grain synthesis with FFmpeg:
+```bash
+# Add film grain
+ffmpeg -i input.mp4 -vf "noise=alls=10:allf=t+u,unsharp" output.mp4
+
+# Or use grain filter
+ffmpeg -i input.mp4 -vf "grain=strength=_______________:type=gaussian" output.mp4
+```
+
+Answer: `20` or any value - Grain strength. Add for cinematic look, hide compression artifacts, match footage. Gaussian or uniform distribution. Adjust strength for subtlety.
+
+#@@@@@@@@@@
+
+166. What is the difference between video encoding profile and level?
+
+Answer: Profile defines feature set (Baseline, Main, High), what tools encoder can use. Level defines performance limits (resolution, bitrate, framerate), decoder capabilities. Example: High Profile Level 4.1 supports 1080p@30fps. Higher profile/level = more features/capability but requires better decoder.
+
+#@@@@@@@@@@
+
+167. How do you implement video semantic segmentation with deep learning?
+
+Answer: Use models like DeepLab, Mask R-CNN. `model = load_model('deeplabv3'); segmentation = model.predict(frame)` Classify each pixel. Applications: background removal, scene understanding, autonomous vehicles, AR effects. Real-time with optimized models.
+
+#@@@@@@@@@@
+
+168. Which of the following are video archival formats? (Multiple correct)
+A) FFV1 (lossless)
+B) JPEG2000
+C) ProRes 4444
+D) DNxHR 444
+E) Uncompressed
+F) H.264 High Profile
+
+Answer: A, B, C, D, E - FFV1, JPEG2000, ProRes 4444, DNxHR 444, Uncompressed are archival formats. H.264 is lossy distribution format, not ideal for archival. Archival needs lossless or visually lossless, open standards, long-term support.
+
+#@@@@@@@@@@
+
+169. Complete this video audio visualization with FFmpeg:
+```bash
+# Create waveform visualization
+ffmpeg -i audio.mp3 -filter_complex "showwaves=s=1280x720:mode=line:rate=25" waveform.mp4
+
+# Create spectrum visualization
+ffmpeg -i audio.mp3 -filter_complex "showspectrum=s=1280x720:mode=combined:color=_______________:scale=log" spectrum.mp4
+```
+
+Answer: `rainbow` or `fire` or `cool` - Color scheme. showwaves (waveform), showspectrum (frequency), showcqt (constant Q). Useful for music videos, podcasts, audio analysis.
+
+#@@@@@@@@@@
+
+170. What is the purpose of video closed captions vs subtitles?
+
+Answer: Closed captions include dialogue and sound effects, for deaf/hard-of-hearing, can be toggled. Subtitles are dialogue translation only, for language, always visible or toggleable. Captions: CEA-608/708. Subtitles: SRT, VTT, ASS. Different purposes, different formats.
+
+#@@@@@@@@@@
+
+171. How do you create video zoom effect with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "zoompan=z='min(zoom+0.0015,1.5)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1280x720" output.mp4` Gradual zoom in. z=zoom factor, d=duration, x/y=position. Ken Burns effect for photos.
+
+#@@@@@@@@@@
+
+172. Which of the following are video streaming metrics? (Multiple correct)
+A) Startup time
+B) Buffering ratio
+C) Bitrate adaptation
+D) Video quality (VMAF)
+E) Rebuffering events
+F) Concurrent viewers
+
+Answer: A, B, C, D, E, F - All are streaming metrics. Startup time (time to first frame), Buffering ratio (% time buffering), Bitrate adaptation (quality switches), Video quality (objective), Rebuffering (interruptions), Concurrent viewers (scale). Monitor for QoS/QoE.
+
+#@@@@@@@@@@
+
+173. Complete this video denoise with FFmpeg:
+```bash
+# Temporal denoise (hqdn3d)
+ffmpeg -i noisy.mp4 -vf "hqdn3d=_______________:1.5:6:4.5" output.mp4
+
+# Or use nlmeans (slow but high quality)
+ffmpeg -i noisy.mp4 -vf "nlmeans=s=3.0" output.mp4
+```
+
+Answer: `4` or any value - Luma spatial strength. hqdn3d (fast), nlmeans (quality), vaguedenoiser (wavelet). Parameters: luma_spatial:chroma_spatial:luma_temporal:chroma_temporal. Balance noise reduction and detail preservation.
+
+#@@@@@@@@@@
+
+174. What is the difference between video streaming latency types?
+
+Answer: Glass-to-glass latency is total delay (camera to display). Encoding latency (compression), transmission latency (network), decoding latency (decompression), buffering latency (playback buffer). Each adds delay. Ultra-low latency (WebRTC) minimizes all. Standard streaming (HLS) has 10-30s total latency.
+
+#@@@@@@@@@@
+
+175. How do you implement video crowd counting with deep learning?
+
+Answer: Use models like CSRNet, MCNN. `model = load_model('csrnet'); density_map = model.predict(frame); count = np.sum(density_map)` Estimate crowd density and count. Applications: surveillance, event management, retail analytics, safety monitoring.
+
+#@@@@@@@@@@
+
+176. Which of the following are video container capabilities? (Multiple correct)
+A) Multiple video streams
+B) Multiple audio streams
+C) Subtitles/Captions
+D) Chapters/Markers
+E) Metadata
+F) Attachments (fonts, images)
+
+Answer: A, B, C, D, E, F - All are container capabilities. MKV supports all. MP4 supports most. Containers multiplex streams, store metadata. Choose container based on required features, compatibility.
+
+#@@@@@@@@@@
+
+177. Complete this video thumbnail extraction with FFmpeg:
+```bash
+# Extract thumbnail at specific time
+ffmpeg -ss 00:01:30 -i input.mp4 -vframes 1 -q:v 2 thumbnail.jpg
+
+# Extract best quality frame (largest size)
+ffmpeg -i input.mp4 -vf "thumbnail=_______________,scale=640:-1" -frames:v 1 best_thumb.jpg
+```
+
+Answer: `300` or any value - Number of frames to analyze. thumbnail filter selects most representative frame. Useful for video previews, cataloging. Adjust n for analysis window.
+
+#@@@@@@@@@@
+
+178. What is the purpose of video bit depth?
+
+Answer: Bit depth defines color precision per channel. 8-bit (256 levels, 16.7M colors), 10-bit (1024 levels, 1.07B colors), 12-bit (4096 levels). Higher bit depth = smoother gradients, less banding, better color grading. HDR requires 10-bit minimum. Trade-off: larger files, more processing.
+
+#@@@@@@@@@@
+
+179. How do you create video mirror effect with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "crop=iw/2:ih:0:0,split[left][tmp];[tmp]hflip[right];[left][right]hstack" output.mp4` Crop half, mirror, stack. Vertical: `crop=iw:ih/2:0:0` and `vflip`, `vstack`. Create symmetrical kaleidoscope effects.
+
+#@@@@@@@@@@
+
+180. Which of the following are video production roles? (Multiple correct)
+A) Director
+B) Cinematographer/DP
+C) Editor
+D) Colorist
+E) Sound designer
+F) VFX artist
+
+Answer: A, B, C, D, E, F - All are production roles. Director (creative vision), Cinematographer (camera/lighting), Editor (post-production), Colorist (color grading), Sound designer (audio), VFX artist (visual effects). Collaborative process.
+
+#@@@@@@@@@@
+
+181. Complete this video letterbox/pillarbox with FFmpeg:
+```bash
+# Add letterbox (black bars top/bottom) to 16:9 video for 21:9
+ffmpeg -i 16x9.mp4 -vf "pad=iw:iw*9/21:(ow-iw)/2:(oh-ih)/2" 21x9.mp4
+
+# Add pillarbox (black bars left/right) to 4:3 video for 16:9
+ffmpeg -i 4x3.mp4 -vf "pad=ih*16/9:ih:_______________:(oh-ih)/2" 16x9.mp4
+```
+
+Answer: `(ow-iw)/2` - Center horizontally. pad=width:height:x:y. ow=output width, iw=input width. Maintain aspect ratio, add bars for different display ratios.
+
+#@@@@@@@@@@
+
+182. What is the difference between video streaming protocols for latency?
+
+Answer: WebRTC (< 500ms, peer-to-peer, interactive), SRT (1-2s, reliable UDP, contribution), RTMP (2-5s, TCP, legacy), Low-Latency HLS (2-4s, HTTP), Standard HLS/DASH (10-30s, HTTP, adaptive). Choose based on latency requirements vs compatibility.
+
+#@@@@@@@@@@
+
+183. How do you implement video license plate recognition with deep learning?
+
+Answer: Two-stage: detect plates, recognize characters. `plate_detector.detect(frame); text = ocr_model.recognize(plate_image)` Use YOLO for detection, CRNN for OCR. Applications: parking, toll collection, law enforcement, access control.
+
+#@@@@@@@@@@
+
+184. Which of the following are video editing techniques? (Multiple correct)
+A) J-cut/L-cut
+B) Match cut
+C) Jump cut
+D) Cross dissolve
+E) Montage
+F) Parallel editing
+
+Answer: A, B, C, D, E, F - All are editing techniques. J-cut (audio before video), L-cut (audio after), Match cut (visual similarity), Jump cut (time jump), Cross dissolve (transition), Montage (sequence), Parallel editing (intercutting). Creative storytelling tools.
+
+#@@@@@@@@@@
+
+185. Complete this video EQ (equalization) with FFmpeg:
+```bash
+# Adjust brightness, contrast, gamma, saturation
+ffmpeg -i input.mp4 -vf "eq=brightness=0.1:contrast=1.2:gamma=1.1:saturation=_______________:gamma_r=1.0:gamma_g=1.0:gamma_b=1.0" output.mp4
+```
+
+Answer: `1.3` or any value - Saturation multiplier. eq filter for color correction. brightness (-1 to 1), contrast (0-3), gamma (0.1-10), saturation (0-3). Per-channel gamma for color balance.
+
+#@@@@@@@@@@
+
+186. What is the purpose of video SMPTE timecode?
+
+Answer: SMPTE timecode is standard for frame identification (HH:MM:SS:FF). Types: LTC (Linear, audio track), VITC (Vertical Interval, video), embedded metadata. Drop-frame (29.97fps) vs non-drop-frame. Essential for editing, synchronization, broadcast. Generate: `ffmpeg -i input.mp4 -vf "drawtext=timecode='01\\:00\\:00\\:00':rate=30" output.mp4`.
+
+#@@@@@@@@@@
+
+187. How do you create video boomerang (loop forward/backward) with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -filter_complex "[0:v]reverse[r];[0:v][r]concat=n=2:v=1[v]" -map "[v]" boomerang.mp4` Concatenate original and reversed. Or: `ffmpeg -i input.mp4 -vf "loop=loop=2:size=1:start=0" output.mp4` for simple loop.
+
+#@@@@@@@@@@
+
+188. Which of the following are video AI/ML frameworks? (Multiple correct)
+A) TensorFlow
+B) PyTorch
+C) OpenCV DNN
+D) ONNX Runtime
+E) MediaPipe
+F) Detectron2
+
+Answer: A, B, C, D, E, F - All are AI/ML frameworks for video. TensorFlow (Google), PyTorch (Facebook), OpenCV DNN (inference), ONNX Runtime (cross-platform), MediaPipe (Google, real-time), Detectron2 (Facebook, detection). Choose based on model, performance, deployment.
+
+#@@@@@@@@@@
+
+189. Complete this video audio extraction with FFmpeg:
+```bash
+# Extract audio without re-encoding
+ffmpeg -i video.mp4 -vn -acodec copy audio.m4a
+
+# Extract and convert to MP3
+ffmpeg -i video.mp4 -vn -acodec libmp3lame -q:a _______________ audio.mp3
+```
+
+Answer: `2` or `0-9` - MP3 quality (0=best, 9=worst). -vn disables video. -acodec copy for lossless extraction. Specify codec for conversion. Extract for audio editing, podcasts.
+
+#@@@@@@@@@@
+
+190. What is the difference between video streaming ABR ladder?
+
+Answer: ABR (Adaptive Bitrate) ladder is set of quality levels (renditions). Example: 360p@800kbps, 480p@1.5Mbps, 720p@3Mbps, 1080p@6Mbps. Client switches based on bandwidth. More rungs = smoother adaptation but more storage/encoding. Optimize ladder for target devices, network conditions.
+
+#@@@@@@@@@@
+
+191. How do you implement video emotion recognition with deep learning?
+
+Answer: Use models like FER, DeepFace. `detector = FER(); emotions = detector.detect_emotions(frame)` Classify facial expressions (happy, sad, angry, neutral, etc.). Applications: market research, healthcare, education, gaming, customer service.
+
+#@@@@@@@@@@
+
+192. Which of the following are video post-production effects? (Multiple correct)
+A) Color grading
+B) Visual effects (VFX)
+C) Motion graphics
+D) Compositing
+E) Rotoscoping
+F) Keying (green screen)
+
+Answer: A, B, C, D, E, F - All are post-production effects. Color grading (color correction), VFX (CGI, simulations), Motion graphics (animated text/graphics), Compositing (layer combination), Rotoscoping (frame-by-frame masking), Keying (background removal). Professional finishing.
+
+#@@@@@@@@@@
+
+193. Complete this video histogram with FFmpeg:
+```bash
+# Display histogram overlay
+ffmpeg -i input.mp4 -vf "split[a][b];[b]histogram=mode=_______________:level_height=200[hh];[a][hh]overlay" output.mp4
+
+# Modes: levels, waveform, color, color2, parade
+```
+
+Answer: `levels` or `waveform` or `parade` - Histogram mode. levels (RGB levels), waveform (luminance), color (vectorscope), parade (RGB parade). Useful for exposure analysis, color correction.
+
+#@@@@@@@@@@
+
+194. What is the purpose of video streaming manifest files?
+
+Answer: Manifest files describe available streams, qualities, segments. HLS uses M3U8 (playlist), DASH uses MPD (Media Presentation Description). Contains URLs, bitrates, resolutions, codecs. Client parses manifest, selects appropriate quality, downloads segments. Dynamic manifests for live, static for VOD.
+
+#@@@@@@@@@@
+
+195. How do you create video picture-in-picture with rounded corners using FFmpeg?
+
+Answer: `ffmpeg -i main.mp4 -i pip.mp4 -filter_complex "[1:v]scale=320:240,format=yuva420p,geq=lum='p(X,Y)':a='if(gt(abs(W/2-X),W/2-10)*gt(abs(H/2-Y),H/2-10),if(lte(hypot(W/2-abs(W/2-X),H/2-abs(H/2-Y)),10),255,0),255)'[pip];[0:v][pip]overlay=W-w-10:10" output.mp4` Complex alpha mask for rounded corners.
+
+#@@@@@@@@@@
+
+196. Which of the following are video camera settings affecting output? (Multiple correct)
+A) Shutter speed
+B) Aperture (f-stop)
+C) ISO/Gain
+D) White balance
+E) Frame rate
+F) Resolution
+
+Answer: A, B, C, D, E, F - All affect output. Shutter speed (motion blur), Aperture (depth of field, exposure), ISO (sensitivity, noise), White balance (color temperature), Frame rate (motion smoothness), Resolution (detail). Understand for proper video acquisition.
+
+#@@@@@@@@@@
+
+197. Complete this video crossfade transition with FFmpeg:
+```bash
+# Crossfade between two videos
+ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v][1:v]xfade=transition=fade:duration=_______________:offset=5" output.mp4
+
+# Transitions: fade, wipeleft, wiperight, slideup, slidedown, etc.
+```
+
+Answer: `1` or `2` - Transition duration in seconds. offset=when to start transition. Many transition types available. Create smooth video transitions, montages.
+
+#@@@@@@@@@@
+
+198. What is the difference between video encoding passes?
+
+Answer: 1-pass encoding encodes once, fast, less optimal. 2-pass encoding analyzes first (collect stats), encodes second (use stats), slower, better quality/compression. 2-pass distributes bitrate optimally. Use 2-pass for final delivery, 1-pass for quick previews. CRF is alternative to 2-pass.
+
+#@@@@@@@@@@
+
+199. How do you implement video gaze tracking with deep learning?
+
+Answer: Use models like OpenFace, GazeML. `gaze_estimator.estimate(frame, face_landmarks); gaze_point = calculate_gaze_point()` Track eye movement, estimate gaze direction. Applications: UX research, accessibility, driver monitoring, VR/AR, attention analysis.
+
+#@@@@@@@@@@
+
+200. Which principles lead to successful video processing workflows? (Multiple correct)
+A) Preserve quality (use mezzanine formats)
+B) Automate repetitive tasks (scripting)
+C) Validate output (QC checks)
+D) Optimize for target platform
+E) Document settings and processes
+F) Test before production deployment
+
+Answer: A, B, C, D, E, F - All are best practices. Preserve quality (avoid generation loss), Automate (FFmpeg scripts, batch processing), Validate (automated QC), Optimize (right codec/settings for platform), Document (reproducibility), Test (verify before scale). Professional video processing requires systematic approach, technical knowledge, and attention to detail.
+
+#@@@@@@@@@@
+
+51. How do you create GIF from video with FFmpeg?
+
+Answer: `ffmpeg -i video.mp4 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" output.gif` Generate palette for better colors. Reduce FPS and resolution for smaller file. Alternative: `ffmpeg -i video.mp4 -vf "fps=10,scale=320:-1" output.gif`.
+
+#@@@@@@@@@@
+
+52. Which of the following are video processing libraries? (Multiple correct)
+A) FFmpeg
+B) OpenCV
+C) GStreamer
+D) libav
+E) MoviePy (Python)
+F) VideoToolbox (Apple)
+
+Answer: A, B, C, D, E, F - All are video processing libraries. FFmpeg (command-line/library), OpenCV (computer vision), GStreamer (pipeline), libav (FFmpeg fork), MoviePy (Python wrapper), VideoToolbox (hardware acceleration).
+
+#@@@@@@@@@@
+
+53. Complete this video face detection with OpenCV:
+```python
+import cv2
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+cap = cv2.VideoCapture(0)
+
+while True:
+    ret, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    faces = face_cascade._______________(gray, scaleFactor=1.1, minNeighbors=5)
+
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+```
+
+Answer: `detectMultiScale` - Detect faces at multiple scales. Haar cascades for object detection. Adjust scaleFactor and minNeighbors for accuracy/performance trade-off.
+
+#@@@@@@@@@@
+
+54. What is the difference between encoding and transcoding?
+
+Answer: Encoding converts raw video to compressed format (RAW → H.264). Transcoding converts between compressed formats (H.264 → H.265) or changes parameters (resolution, bitrate). Transcoding involves decode then encode. Both lossy processes.
+
+#@@@@@@@@@@
+
+55. How do you implement video reverse with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf reverse output.mp4` Reverse video only. For audio too: `ffmpeg -i input.mp4 -vf reverse -af areverse output.mp4`. Memory intensive for long videos. Consider splitting into chunks.
+
+#@@@@@@@@@@
+
+56. Which of the following are video analysis techniques? (Multiple correct)
+A) Scene detection
+B) Shot boundary detection
+C) Motion detection
+D) Object tracking
+E) Activity recognition
+F) Quality assessment
+
+Answer: A, B, C, D, E, F - All are analysis techniques. Scene detection (content changes), Shot boundary (cuts), Motion detection (movement), Object tracking (follow objects), Activity recognition (actions), Quality assessment (PSNR, SSIM).
+
+#@@@@@@@@@@
+
+57. Complete this video mosaic/blur with FFmpeg:
+```bash
+# Blur entire video
+ffmpeg -i input.mp4 -vf "boxblur=10:1" output.mp4
+
+# Blur specific region (face)
+ffmpeg -i input.mp4 -vf "crop=100:100:50:50,boxblur=10[blurred];[0:v][blurred]overlay=50:50" output.mp4
+
+# Pixelate region
+ffmpeg -i input.mp4 -vf "crop=w:h:x:y,scale=iw/10:ih/10,scale=iw*10:ih*10:flags=_______________[pixelated];[0:v][pixelated]overlay=x:y" output.mp4
+```
+
+Answer: `neighbor` - Nearest neighbor scaling for pixelation effect. boxblur for blur. crop and overlay for region-specific effects.
+
+#@@@@@@@@@@
+
+58. What is the purpose of video buffering in streaming?
+
+Answer: Buffering pre-loads video data to prevent playback interruptions. Compensates for network variability. Buffer size affects startup time vs resilience. Adaptive streaming adjusts quality based on buffer level. Too small: rebuffering, too large: startup delay.
+
+#@@@@@@@@@@
+
+59. How do you extract frames from video with OpenCV?
+
+Answer: `cap = cv2.VideoCapture('video.mp4'); ret, frame = cap.read(); cv2.imwrite(f'frame_{count}.jpg', frame)` Read frames in loop. Or with FFmpeg: `ffmpeg -i video.mp4 frame%04d.jpg` Extract all frames. Specify FPS: `ffmpeg -i video.mp4 -vf fps=1 frame%04d.jpg`.
+
+#@@@@@@@@@@
+
+60. Which of the following are video editing software? (Multiple correct)
+A) Adobe Premiere Pro
+B) Final Cut Pro
+C) DaVinci Resolve
+D) Avid Media Composer
+E) Sony Vegas Pro
+F) Kdenlive
+
+Answer: A, B, C, D, E, F - All are video editing software. Premiere (Adobe), Final Cut (Apple), DaVinci Resolve (Blackmagic), Avid (professional), Vegas (Sony), Kdenlive (open-source). Different features, workflows, price points.
+
+#@@@@@@@@@@
+
+61. Complete this video overlay with FFmpeg:
+```bash
+# Picture-in-picture
+ffmpeg -i main.mp4 -i overlay.mp4 -filter_complex "[1:v]scale=320:240[ovrl];[0:v][ovrl]overlay=W-w-10:H-h-10" output.mp4
+
+# Side-by-side
+ffmpeg -i left.mp4 -i right.mp4 -filter_complex "[0:v][1:v]hstack=inputs=_______________" output.mp4
+```
+
+Answer: `2` - Number of inputs to stack. hstack for horizontal, vstack for vertical. xstack for grid layouts. Inputs must have same height (hstack) or width (vstack).
+
+#@@@@@@@@@@
+
+62. What is the difference between hardware and software encoding?
+
+Answer: Hardware encoding uses GPU/dedicated chip (NVENC, QuickSync, VideoToolbox), faster, lower CPU usage, slightly lower quality. Software encoding uses CPU (x264, x265), slower, higher quality, more control. Choose based on speed vs quality requirements.
+
+#@@@@@@@@@@
+
+63. How do you implement video stabilization with OpenCV?
+
+Answer: Track features between frames with optical flow. Estimate transformation matrices. Smooth trajectories. Apply inverse transformations. `flow = cv2.calcOpticalFlowPyrLK(); transform = cv2.estimateAffinePartial2D(); smoothed = smooth_trajectory(transforms); stabilized = cv2.warpAffine(frame, smoothed)`.
+
+#@@@@@@@@@@
+
+64. Which of the following are video broadcast standards? (Multiple correct)
+A) NTSC (National Television System Committee)
+B) PAL (Phase Alternating Line)
+C) SECAM (Séquentiel couleur à mémoire)
+D) ATSC (Advanced Television Systems Committee)
+E) DVB (Digital Video Broadcasting)
+F) ISDB (Integrated Services Digital Broadcasting)
+
+Answer: A, B, C, D, E, F - All are broadcast standards. NTSC (North America, 29.97fps), PAL (Europe, 25fps), SECAM (France/Russia), ATSC (US digital), DVB (European digital), ISDB (Japanese digital).
+
+#@@@@@@@@@@
+
+65. Complete this video audio sync with FFmpeg:
+```bash
+# Delay audio by 2 seconds
+ffmpeg -i input.mp4 -itsoffset 2 -i input.mp4 -map 0:v -map 1:a -c copy output.mp4
+
+# Advance audio by 1 second (delay video)
+ffmpeg -i input.mp4 -itsoffset _______________ -i input.mp4 -map 1:v -map 0:a -c copy output.mp4
+```
+
+Answer: `1` - Positive offset delays, use on video stream to advance audio. -map selects streams. -c copy avoids re-encoding.
+
+#@@@@@@@@@@
+
+66. What is the purpose of video segmentation?
+
+Answer: Video segmentation divides video into chunks for adaptive streaming (HLS, DASH). Enables seeking, quality switching. Typical segment duration: 2-10 seconds. FFmpeg: `ffmpeg -i input.mp4 -c copy -f segment -segment_time 6 output%03d.mp4`. Balance segment size vs overhead.
+
+#@@@@@@@@@@
+
+67. How do you change video speed with OpenCV?
+
+Answer: Skip frames for faster playback: `if frame_count % 2 == 0: out.write(frame)` 2x speed. Duplicate frames for slower: `for _ in range(2): out.write(frame)` 0.5x speed. Better with FFmpeg setpts filter for smooth results.
+
+#@@@@@@@@@@
+
+68. Which of the following are video compression artifacts? (Multiple correct)
+A) Blocking
+B) Mosquito noise
+C) Banding
+D) Ringing
+E) Aliasing
+F) Motion blur
+
+Answer: A, B, C, D, E - Blocking, Mosquito noise, Banding, Ringing, Aliasing are compression artifacts. Motion blur is camera/motion artifact, not compression. Artifacts from quantization, insufficient bitrate, poor encoding settings.
+
+#@@@@@@@@@@
+
+69. Complete this video crop with FFmpeg:
+```bash
+# Crop to 1280x720 from center
+ffmpeg -i input.mp4 -vf "crop=1280:720:(iw-1280)/2:(ih-720)/2" output.mp4
+
+# Crop to 16:9 aspect ratio
+ffmpeg -i input.mp4 -vf "crop=ih*16/9:ih" output.mp4
+
+# Remove black bars (auto-detect)
+ffmpeg -i input.mp4 -vf "cropdetect=24:16:0" -f null -
+# Then use detected values
+ffmpeg -i input.mp4 -vf "crop=_______________" output.mp4
+```
+
+Answer: `w:h:x:y` - Use values from cropdetect output. cropdetect analyzes frames to find crop parameters. Apply detected crop for final output.
+
+#@@@@@@@@@@
+
+70. What is the difference between video resolution and video quality?
+
+Answer: Resolution is pixel dimensions (1920x1080), affects detail capacity. Quality is perceptual fidelity, affected by bitrate, codec, compression. High resolution doesn't guarantee high quality. Low bitrate 4K can look worse than high bitrate 1080p. Balance resolution and bitrate.
+
+#@@@@@@@@@@
+
+71. How do you implement video background subtraction with OpenCV?
+
+Answer: `bg_subtractor = cv2.createBackgroundSubtractorMOG2(); fg_mask = bg_subtractor.apply(frame)` MOG2 for Gaussian mixture model. KNN alternative: `cv2.createBackgroundSubtractorKNN()`. Use for motion detection, object tracking, surveillance.
+
+#@@@@@@@@@@
+
+72. Which of the following are video file properties? (Multiple correct)
+A) Duration
+B) Bitrate
+C) Frame rate
+D) Resolution
+E) Codec
+F) File size
+
+Answer: A, B, C, D, E, F - All are video properties. Duration (length), Bitrate (data rate), Frame rate (fps), Resolution (dimensions), Codec (compression), File size (storage). Query with: `ffprobe -v error -show_entries format=duration,bit_rate input.mp4`.
+
+#@@@@@@@@@@
+
+73. Complete this video fade effect with FFmpeg:
+```bash
+# Fade in first 2 seconds
+ffmpeg -i input.mp4 -vf "fade=t=in:st=0:d=2" output.mp4
+
+# Fade out last 3 seconds
+ffmpeg -i input.mp4 -vf "fade=t=out:st=_______________:d=3" output.mp4
+
+# Both
+ffmpeg -i input.mp4 -vf "fade=t=in:st=0:d=2,fade=t=out:st=27:d=3" output.mp4
+```
+
+Answer: `27` or `duration-3` - Start fade-out 3 seconds before end. Get duration with ffprobe. Chain multiple fades with comma.
+
+#@@@@@@@@@@
+
+74. What is the purpose of video timecode?
+
+Answer: Timecode uniquely identifies each frame for editing, synchronization. Formats: SMPTE (HH:MM:SS:FF), drop-frame vs non-drop-frame. Embedded in video or separate. Essential for professional workflows, multi-camera sync, EDL (Edit Decision List).
+
+#@@@@@@@@@@
+
+75. How do you add text overlay to video with FFmpeg?
+
+Answer: `ffmpeg -i input.mp4 -vf "drawtext=text='Hello':fontfile=/path/to/font.ttf:fontsize=24:fontcolor=white:x=10:y=10" output.mp4` Customize position, color, size. Dynamic text: `drawtext=textfile=subs.txt:reload=1`. Burn-in subtitles, watermarks, timestamps.
+
+#@@@@@@@@@@
+
+76. Which of the following are video streaming services? (Multiple correct)
+A) YouTube
+B) Twitch
+C) Netflix
+D) Vimeo
+E) Facebook Live
+F) Amazon Prime Video
+
+Answer: A, B, C, D, E, F - All are streaming services. YouTube (user-generated), Twitch (live gaming), Netflix (on-demand), Vimeo (professional), Facebook Live (social), Prime Video (subscription). Different content, business models.
+
+#@@@@@@@@@@
+
+77. Complete this video histogram equalization with OpenCV:
+```python
+import cv2
+import numpy as np
+
+cap = cv2.VideoCapture('dark_video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Convert to YUV
+    yuv = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
+
+    # Equalize Y channel
+    yuv[:,:,0] = cv2._______________(yuv[:,:,0])
+
+    # Convert back
+    result = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR)
+```
+
+Answer: `equalizeHist` - Histogram equalization for contrast enhancement. Apply to luminance channel only. CLAHE for adaptive equalization: `cv2.createCLAHE(clipLimit=2.0).apply()`.
+
+#@@@@@@@@@@
+
+78. What is the difference between video bitrate and video bandwidth?
+
+Answer: Bitrate is encoded data rate (Mbps), file property. Bandwidth is network capacity (Mbps), transmission property. Bitrate must be less than bandwidth for smooth streaming. Adaptive streaming adjusts bitrate to available bandwidth. Buffer absorbs temporary bandwidth drops.
+
+#@@@@@@@@@@
+
+79. How do you implement video loop with FFmpeg?
+
+Answer: `ffmpeg -stream_loop 3 -i input.mp4 -c copy output.mp4` Loop 3 times. Infinite loop: `-stream_loop -1`. For seamless loop, ensure first and last frames match. Concatenate with itself: `ffmpeg -f concat -i list.txt -c copy output.mp4`.
+
+#@@@@@@@@@@
+
+80. Which of the following are video capture devices? (Multiple correct)
+A) Webcam
+B) DSLR/Mirrorless camera
+C) Camcorder
+D) Smartphone
+E) Screen recorder
+F) Capture card
+
+Answer: A, B, C, D, E, F - All are capture devices. Webcam (computer), DSLR (high quality), Camcorder (dedicated), Smartphone (portable), Screen recorder (software), Capture card (external sources). Different use cases, quality levels.
+
+#@@@@@@@@@@

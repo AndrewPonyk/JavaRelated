@@ -1,0 +1,2408 @@
+Flutter Quiz - 200 Questions
+Tech Stack: Dart, Hot Reload, Widgets, Material Design, Cupertino, BLoC, Provider, Riverpod, FlutterFlow, Firebase
+
+1. Which of the following are Flutter widget types? (Multiple correct)
+A) StatelessWidget
+B) StatefulWidget
+C) InheritedWidget
+D) RenderObjectWidget
+E) ProxyWidget
+F) MultiChildRenderObjectWidget
+
+Answer: A, B, C, D, E, F - All are Flutter widget types. StatelessWidget (immutable), StatefulWidget (mutable state), InheritedWidget (data propagation), RenderObjectWidget (custom rendering), ProxyWidget (widget wrapper), MultiChildRenderObjectWidget (multiple children rendering).
+
+#@@@@@@@@@@
+
+2. Complete this Flutter StatefulWidget:
+```dart
+class CounterWidget extends StatefulWidget {
+  @override
+  _CounterWidgetState createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    _______________(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('Counter: $_counter'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+```
+
+Answer: `setState` - Call setState to notify Flutter that the widget's state has changed and needs to be rebuilt. This triggers a rebuild of the widget tree.
+
+#@@@@@@@@@@
+
+3. What is the difference between Hot Reload and Hot Restart in Flutter?
+
+Answer: Hot Reload preserves app state, injects updated source code, faster (~1 second), maintains current screen and data. Hot Restart destroys app state, restarts app completely, slower (~4 seconds), returns to initial screen. Use Hot Reload for UI changes, Hot Restart for state model changes.
+
+#@@@@@@@@@@
+
+4. Which of the following are Dart language features? (Multiple correct)
+A) Null safety
+B) Async/await
+C) Mixins
+D) Extension methods
+E) Generics
+F) Optional parameters
+
+Answer: A, B, C, D, E, F - All are Dart features. Null safety (sound null safety), Async/await (asynchronous programming), Mixins (code reuse), Extension methods (add functionality), Generics (type parameters), Optional parameters (named/positional).
+
+#@@@@@@@@@@
+
+5. Find the issue in this Flutter widget tree:
+```dart
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Container(
+            height: 200,
+            child: ListView(
+              children: [
+                // Many list items...
+                for (int i = 0; i < 1000; i++)
+                  ListTile(title: Text('Item $i')),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+Answer: Performance issue with ListView in fixed height container. Use ListView.builder() for large lists to create items on-demand. Current code creates all 1000 widgets at once, causing memory and performance problems.
+
+#@@@@@@@@@@
+
+6. How do you implement navigation in Flutter?
+
+Answer: Use Navigator.push() for forward navigation, Navigator.pop() for back navigation, named routes with Navigator.pushNamed(), route generation with onGenerateRoute. Define routes in MaterialApp, use Navigator 2.0 for complex navigation, pass data with arguments.
+
+#@@@@@@@@@@
+
+7. Which of the following are Material Design widgets? (Multiple correct)
+A) AppBar
+B) FloatingActionButton
+C) Card
+D) Drawer
+E) BottomNavigationBar
+F) Snackbar
+
+Answer: A, B, C, D, E, F - All are Material Design widgets. AppBar (top app bar), FloatingActionButton (primary action), Card (elevated surface), Drawer (side navigation), BottomNavigationBar (bottom tabs), Snackbar (brief messages).
+
+#@@@@@@@@@@
+
+8. Complete this BLoC pattern implementation:
+```dart
+abstract class CounterEvent {}
+
+class IncrementEvent extends CounterEvent {}
+class DecrementEvent extends CounterEvent {}
+
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc() : super(0);
+
+  @override
+  Stream<int> mapEventToState(CounterEvent event) async* {
+    if (event is IncrementEvent) {
+      yield state + 1;
+    } else if (event is DecrementEvent) {
+      yield _______________
+    }
+  }
+}
+```
+
+Answer: `state - 1` - Yield the current state minus 1 for decrement event. BLoC pattern uses events to trigger state changes and yields new states.
+
+#@@@@@@@@@@
+
+9. What is the difference between Provider and Riverpod in Flutter?
+
+Answer: Provider is older, uses InheritedWidget, requires BuildContext, can have runtime errors. Riverpod is newer, compile-time safe, no BuildContext needed, better testing support, auto-dispose, family/autoDispose modifiers. Riverpod is Provider's evolution with improved API.
+
+#@@@@@@@@@@
+
+10. Which of the following are Cupertino (iOS-style) widgets? (Multiple correct)
+A) CupertinoNavigationBar
+B) CupertinoButton
+C) CupertinoSwitch
+D) CupertinoSlider
+E) CupertinoActionSheet
+F) CupertinoTabBar
+
+Answer: A, B, C, D, E, F - All are Cupertino widgets. CupertinoNavigationBar (iOS nav bar), CupertinoButton (iOS button), CupertinoSwitch (iOS toggle), CupertinoSlider (iOS slider), CupertinoActionSheet (iOS action sheet), CupertinoTabBar (iOS tab bar).
+
+#@@@@@@@@@@
+
+11. Predict the output of this Dart code:
+```dart
+void main() {
+  List<int> numbers = [1, 2, 3, 4, 5];
+
+  var doubled = numbers
+      .where((n) => n % 2 == 0)
+      .map((n) => n * 2)
+      .toList();
+
+  print(doubled);
+
+  var sum = numbers
+      .fold(0, (prev, curr) => prev + curr);
+
+  print(sum);
+}
+```
+
+Answer: [4, 8], 15 - First: filter even numbers (2, 4), double them (4, 8). Second: fold sums all numbers (1+2+3+4+5=15).
+
+#@@@@@@@@@@
+
+12. How do you integrate Firebase with Flutter?
+
+Answer: Add firebase_core dependency, configure with FlutterFire CLI, initialize Firebase in main(), add platform-specific config files (google-services.json/GoogleService-Info.plist), use Firebase services (Auth, Firestore, Storage, etc.) with respective packages.
+
+#@@@@@@@@@@
+
+13. Which of the following are Flutter layout widgets? (Multiple correct)
+A) Row
+B) Column
+C) Stack
+D) Wrap
+E) Flex
+F) Positioned
+
+Answer: A, B, C, D, E, F - All are layout widgets. Row (horizontal layout), Column (vertical layout), Stack (overlay layout), Wrap (flowing layout), Flex (flexible layout), Positioned (absolute positioning in Stack).
+
+#@@@@@@@@@@
+
+14. Complete this Riverpod provider:
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final counterProvider = StateProvider<int>((ref) => 0);
+
+class CounterWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final counter = ref.watch(counterProvider);
+
+    return Scaffold(
+      body: Center(
+        child: Text('Counter: $counter'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => ref.read(counterProvider._______________).state++,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+```
+
+Answer: `notifier` - Access the StateController to modify the state. ref.read(counterProvider.notifier).state++ increments the counter value.
+
+#@@@@@@@@@@
+
+15. What is the difference between FlutterFlow and traditional Flutter development?
+
+Answer: FlutterFlow is visual, drag-and-drop builder, generates Flutter code, faster prototyping, limited customization. Traditional Flutter is code-first, full control, unlimited customization, steeper learning curve. FlutterFlow good for rapid prototyping, traditional Flutter for complex apps.
+
+#@@@@@@@@@@
+
+16. Which of the following are Flutter layout widgets? (Multiple correct)
+A) Row
+B) Column
+C) Stack
+D) Container
+E) Padding
+F) Center
+
+Answer: A, B, C, D, E, F - All are layout widgets. Row (horizontal), Column (vertical), Stack (overlay), Container (box model), Padding (spacing), Center (centering).
+
+#@@@@@@@@@@
+
+17. Complete this Dart async/await code:
+```dart
+Future<String> fetchData() async {
+  await Future.delayed(Duration(seconds: 2));
+  return 'Data loaded';
+}
+
+void main() async {
+  print('Loading...');
+  String data = _______________ fetchData();
+  print(data);
+}
+```
+
+Answer: `await` - Use await to wait for Future completion. async functions return Future. await pauses execution until Future completes.
+
+#@@@@@@@@@@
+
+18. What is the difference between StatelessWidget and StatefulWidget in Flutter?
+
+Answer: StatelessWidget is immutable, no internal state, rebuild only when parent changes. StatefulWidget has mutable state, can rebuild itself, uses State object. Use Stateless for static UI, Stateful for dynamic UI.
+
+#@@@@@@@@@@
+
+19. How do you implement navigation in Flutter?
+
+Answer: Use Navigator.push/pop for imperative navigation: `Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen()));` Or named routes with Navigator.pushNamed. Use Navigator 2.0 for declarative navigation.
+
+#@@@@@@@@@@
+
+20. Which of the following are Dart collection types? (Multiple correct)
+A) List
+B) Set
+C) Map
+D) Queue
+E) LinkedHashMap
+F) SplayTreeMap
+
+Answer: A, B, C, D, E, F - All are Dart collections. List (ordered), Set (unique), Map (key-value), Queue (FIFO), LinkedHashMap (insertion order), SplayTreeMap (sorted).
+
+#@@@@@@@@@@
+
+21. Complete this Flutter form validation:
+```dart
+final _formKey = GlobalKey<FormState>();
+
+TextFormField(
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter some text';
+    }
+    if (value.length < 6) {
+      return _______________;
+    }
+    return null;
+  },
+)
+
+ElevatedButton(
+  onPressed: () {
+    if (_formKey.currentState!._______________) {
+      // Process data
+    }
+  },
+)
+```
+
+Answer: `'Must be at least 6 characters'` and `validate()` - Return error message for validation failure, null for success. Call validate() to trigger all validators.
+
+#@@@@@@@@@@
+
+22. What is the purpose of keys in Flutter?
+
+Answer: Keys preserve state when widgets move in tree. Types: ValueKey (value-based), ObjectKey (object-based), UniqueKey (unique), GlobalKey (access widget/state). Use for lists, animations, preserving state across rebuilds.
+
+#@@@@@@@@@@
+
+23. How do you use StreamBuilder in Flutter?
+
+Answer: StreamBuilder rebuilds on stream events: `StreamBuilder<T>(stream: myStream, builder: (context, snapshot) { if (snapshot.hasData) return Text(snapshot.data); })` Check snapshot.connectionState, hasData, hasError.
+
+#@@@@@@@@@@
+
+24. Which of the following are Flutter animation widgets? (Multiple correct)
+A) AnimatedContainer
+B) AnimatedOpacity
+C) Hero
+D) AnimatedBuilder
+E) TweenAnimationBuilder
+F) AnimatedList
+
+Answer: A, B, C, D, E, F - All are animation widgets. AnimatedContainer (implicit), AnimatedOpacity (fade), Hero (shared element), AnimatedBuilder (custom), TweenAnimationBuilder (tween), AnimatedList (list animations).
+
+#@@@@@@@@@@
+
+25. Complete this Dart class with mixins:
+```dart
+mixin CanFly {
+  void fly() => print('Flying');
+}
+
+mixin CanSwim {
+  void swim() => print('Swimming');
+}
+
+class Duck _______________ CanFly, CanSwim {
+  void quack() => print('Quack');
+}
+```
+
+Answer: `with` - Use 'with' keyword to apply mixins. Mixins add functionality without inheritance. Multiple mixins allowed.
+
+#@@@@@@@@@@
+
+26. What is the difference between mainAxisAlignment and crossAxisAlignment in Flutter?
+
+Answer: mainAxisAlignment aligns children along main axis (horizontal for Row, vertical for Column). crossAxisAlignment aligns along cross axis (perpendicular). Values: start, end, center, spaceBetween, spaceAround, spaceEvenly.
+
+#@@@@@@@@@@
+
+27. How do you implement dependency injection in Flutter?
+
+Answer: Use Provider, Riverpod, GetIt, or InheritedWidget. Provider: `Provider<T>(create: (_) => T())`, access with `context.read<T>()`. GetIt: service locator pattern. Riverpod: compile-safe providers.
+
+#@@@@@@@@@@
+
+28. Which of the following are Dart null safety operators? (Multiple correct)
+A) ?
+B) !
+C) ??
+D) ??=
+E) ?.
+F) ...?
+
+Answer: A, B, C, D, E, F - All are null safety operators. ? (nullable type), ! (null assertion), ?? (null coalescing), ??= (null-aware assignment), ?. (null-aware access), ...? (null-aware spread).
+
+#@@@@@@@@@@
+
+29. Complete this Flutter ListView.builder:
+```dart
+ListView.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) {
+    return ListTile(
+      title: Text(items[index].title),
+      subtitle: Text(items[index].subtitle),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(item: _______________),
+          ),
+        );
+      },
+    );
+  },
+)
+```
+
+Answer: `items[index]` - Pass the item at current index to detail screen. ListView.builder creates items lazily for performance.
+
+#@@@@@@@@@@
+
+30. What is the purpose of BuildContext in Flutter?
+
+Answer: BuildContext represents widget's location in widget tree. Used to access InheritedWidgets, Theme, MediaQuery, Navigator. Each widget has its own context. Don't store context, use it immediately or in callbacks.
+
+#@@@@@@@@@@
+
+31. How do you handle errors in Flutter?
+
+Answer: Use try-catch for synchronous code. For async: try-catch with await, or .catchError() on Future. FlutterError.onError for framework errors. runZonedGuarded for uncaught errors. ErrorWidget.builder for custom error widgets.
+
+#@@@@@@@@@@
+
+32. Which of the following are Flutter gesture detectors? (Multiple correct)
+A) GestureDetector
+B) InkWell
+C) Dismissible
+D) Draggable
+E) LongPressDraggable
+F) InkResponse
+
+Answer: A, B, C, D, E, F - All handle gestures. GestureDetector (general), InkWell (Material ripple), Dismissible (swipe to dismiss), Draggable (drag), LongPressDraggable (long press drag), InkResponse (customizable ripple).
+
+#@@@@@@@@@@
+
+33. Complete this Flutter theme configuration:
+```dart
+MaterialApp(
+  theme: ThemeData(
+    primarySwatch: Colors.blue,
+    brightness: Brightness.light,
+    textTheme: TextTheme(
+      headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    ),
+  ),
+  darkTheme: ThemeData(
+    brightness: _______________,
+    primarySwatch: Colors.indigo,
+  ),
+  themeMode: ThemeMode.system,
+)
+```
+
+Answer: `Brightness.dark` - Define dark theme. ThemeMode.system uses device setting. Access with Theme.of(context).
+
+#@@@@@@@@@@
+
+34. What is the difference between Expanded and Flexible in Flutter?
+
+Answer: Expanded forces child to fill available space (flex: 1, fit: FlexFit.tight). Flexible allows child to be smaller (fit: FlexFit.loose). Both use flex factor for space distribution. Expanded is Flexible with tight fit.
+
+#@@@@@@@@@@
+
+35. How do you implement localization in Flutter?
+
+Answer: Use flutter_localizations package. Define ARB files for translations. MaterialApp.localizationsDelegates and supportedLocales. Access with AppLocalizations.of(context). Use intl package for formatting.
+
+#@@@@@@@@@@
+
+36. Which of the following are Flutter state management solutions? (Multiple correct)
+A) Provider
+B) Riverpod
+C) BLoC
+D) GetX
+E) MobX
+F) Redux
+
+Answer: A, B, C, D, E, F - All are state management solutions. Provider (simple), Riverpod (improved Provider), BLoC (streams), GetX (reactive), MobX (observable), Redux (unidirectional).
+
+#@@@@@@@@@@
+
+37. Complete this Dart extension method:
+```dart
+extension StringExtension on String {
+  String capitalize() {
+    if (this.isEmpty) return this;
+    return this[0].toUpperCase() + this.substring(1);
+  }
+
+  bool get isValidEmail {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')._______________);
+  }
+}
+```
+
+Answer: `hasMatch(this)` - Use RegExp.hasMatch() to test pattern. Extensions add methods to existing types without inheritance.
+
+#@@@@@@@@@@
+
+38. What is the purpose of InheritedWidget in Flutter?
+
+Answer: InheritedWidget propagates data down widget tree efficiently. Widgets rebuild when inherited data changes. Base for Provider, Theme, MediaQuery. Use context.dependOnInheritedWidgetOfExactType<T>() to access.
+
+#@@@@@@@@@@
+
+39. How do you implement custom painting in Flutter?
+
+Answer: Extend CustomPainter, override paint() and shouldRepaint(). Use Canvas and Paint objects. CustomPaint widget: `CustomPaint(painter: MyPainter())`. Draw shapes, paths, text, images.
+
+#@@@@@@@@@@
+
+40. Which of the following are Dart async features? (Multiple correct)
+A) Future
+B) Stream
+C) async/await
+D) Completer
+E) StreamController
+F) Isolate
+
+Answer: A, B, C, D, E, F - All are async features. Future (single async value), Stream (async sequence), async/await (syntax), Completer (manual Future), StreamController (manual Stream), Isolate (parallel execution).
+
+#@@@@@@@@@@
+
+41. Complete this Flutter GridView:
+```dart
+GridView.builder(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    crossAxisSpacing: 10,
+    mainAxisSpacing: 10,
+    childAspectRatio: _______________,
+  ),
+  itemCount: items.length,
+  itemBuilder: (context, index) {
+    return Card(child: Center(child: Text(items[index])));
+  },
+)
+```
+
+Answer: `1.0` or `16/9` or any ratio - childAspectRatio controls item width/height ratio. 1.0 for square items, 16/9 for landscape.
+
+#@@@@@@@@@@
+
+42. What is the difference between hot reload and hot restart in Flutter?
+
+Answer: Hot reload injects updated code, preserves state, fast (~1s). Hot restart resets state, reinitializes app, slower (~3s). Hot reload for UI changes, hot restart for state/initialization changes.
+
+#@@@@@@@@@@
+
+43. How do you use SharedPreferences in Flutter?
+
+Answer: `final prefs = await SharedPreferences.getInstance(); await prefs.setString('key', 'value'); String? value = prefs.getString('key');` Stores key-value pairs persistently. For simple data only.
+
+#@@@@@@@@@@
+
+44. Which of the following are Flutter input widgets? (Multiple correct)
+A) TextField
+B) TextFormField
+C) Checkbox
+D) Radio
+E) Switch
+F) Slider
+
+Answer: A, B, C, D, E, F - All are input widgets. TextField (text input), TextFormField (with validation), Checkbox (boolean), Radio (single choice), Switch (toggle), Slider (range).
+
+#@@@@@@@@@@
+
+45. Complete this Dart factory constructor:
+```dart
+class Logger {
+  static final Logger _instance = Logger._internal();
+
+  factory Logger() {
+    return _______________;
+  }
+
+  Logger._internal();
+
+  void log(String message) => print(message);
+}
+```
+
+Answer: `_instance` - Factory constructor returns singleton instance. Factory can return cached instances or subclasses.
+
+#@@@@@@@@@@
+
+46. What is the purpose of MediaQuery in Flutter?
+
+Answer: MediaQuery provides device information: screen size, orientation, padding, text scale. Access with MediaQuery.of(context). Properties: size, orientation, devicePixelRatio, padding, viewInsets. Essential for responsive design.
+
+#@@@@@@@@@@
+
+47. How do you implement pull-to-refresh in Flutter?
+
+Answer: Wrap scrollable in RefreshIndicator: `RefreshIndicator(onRefresh: () async { await fetchData(); }, child: ListView(...))` onRefresh returns Future. Shows Material loading indicator.
+
+#@@@@@@@@@@
+
+48. Which of the following are Flutter Material widgets? (Multiple correct)
+A) Scaffold
+B) AppBar
+C) FloatingActionButton
+D) Drawer
+E) BottomNavigationBar
+F) SnackBar
+
+Answer: A, B, C, D, E, F - All are Material Design widgets. Scaffold (structure), AppBar (top bar), FloatingActionButton (FAB), Drawer (side menu), BottomNavigationBar (bottom tabs), SnackBar (toast).
+
+#@@@@@@@@@@
+
+49. Complete this Dart stream transformation:
+```dart
+Stream<int> numberStream = Stream.periodic(
+  Duration(seconds: 1),
+  (count) => count,
+).take(10);
+
+Stream<String> stringStream = numberStream
+  ._______________(( num) => 'Number: $num')
+  .where((str) => str.contains('5'));
+```
+
+Answer: `map` - Use map() to transform stream values. Other operators: where (filter), expand (flatten), distinct (unique), take (limit).
+
+#@@@@@@@@@@
+
+50. What is the difference between SizedBox and Container in Flutter?
+
+Answer: SizedBox is lightweight, only size constraints, const constructor. Container is feature-rich: padding, margin, decoration, alignment, constraints. Use SizedBox for spacing/sizing, Container for styling.
+
+#@@@@@@@@@@
+
+51. How do you implement platform-specific code in Flutter?
+
+Answer: Use MethodChannel for platform communication. Dart: `const platform = MethodChannel('channel_name'); await platform.invokeMethod('method');` Native: implement method handler. Or use Platform.isAndroid/isIOS for conditional logic.
+
+#@@@@@@@@@@
+
+52. Which of the following are Cupertino (iOS-style) widgets? (Multiple correct)
+A) CupertinoNavigationBar
+B) CupertinoButton
+C) CupertinoSwitch
+D) CupertinoAlertDialog
+E) CupertinoTabScaffold
+F) CupertinoSlider
+
+Answer: A, B, C, D, E, F - All are Cupertino widgets for iOS design. CupertinoNavigationBar (iOS nav bar), CupertinoButton (iOS button), CupertinoSwitch (iOS toggle), CupertinoAlertDialog (iOS dialog), CupertinoTabScaffold (iOS tabs), CupertinoSlider (iOS slider).
+
+#@@@@@@@@@@
+
+53. Complete this Flutter animation controller:
+```dart
+class _MyWidgetState extends State<MyWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: _______________,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+Answer: `this` - vsync prevents offscreen animations from consuming resources. SingleTickerProviderStateMixin provides Ticker. Always dispose controllers.
+
+#@@@@@@@@@@
+
+54. What is the purpose of FutureBuilder in Flutter?
+
+Answer: FutureBuilder rebuilds based on Future state: `FutureBuilder<T>(future: myFuture, builder: (context, snapshot) {...})` Check snapshot.connectionState (waiting, done), hasData, hasError. Handles async UI updates.
+
+#@@@@@@@@@@
+
+55. How do you implement deep linking in Flutter?
+
+Answer: Configure Android (intent-filter) and iOS (URL schemes). Use uni_links or go_router package. Handle incoming links in initState. Parse URL parameters. Navigate to appropriate screen.
+
+#@@@@@@@@@@
+
+56. Which of the following are Flutter scrollable widgets? (Multiple correct)
+A) ListView
+B) GridView
+C) SingleChildScrollView
+D) CustomScrollView
+E) PageView
+F) NestedScrollView
+
+Answer: A, B, C, D, E, F - All are scrollable widgets. ListView (list), GridView (grid), SingleChildScrollView (single child), CustomScrollView (slivers), PageView (pages), NestedScrollView (nested scrolling).
+
+#@@@@@@@@@@
+
+57. Complete this Dart generic class:
+```dart
+class Cache<T> {
+  final Map<String, T> _cache = {};
+
+  void put(String key, T value) {
+    _cache[key] = value;
+  }
+
+  T? get(String key) {
+    return _______________;
+  }
+
+  void clear() {
+    _cache.clear();
+  }
+}
+```
+
+Answer: `_cache[key]` - Generics provide type safety. T is type parameter. Use Cache<String>, Cache<int>, etc.
+
+#@@@@@@@@@@
+
+58. What is the difference between const and final in Dart?
+
+Answer: const is compile-time constant, deeply immutable, canonical. final is runtime constant, assigned once, can hold mutable objects. const for literals/compile-time values, final for runtime values.
+
+#@@@@@@@@@@
+
+59. How do you implement image caching in Flutter?
+
+Answer: Use cached_network_image package: `CachedNetworkImage(imageUrl: url, placeholder: (context, url) => CircularProgressIndicator())` Or Image.network with cacheWidth/cacheHeight. Flutter caches images automatically.
+
+#@@@@@@@@@@
+
+60. Which of the following are Flutter dialog widgets? (Multiple correct)
+A) AlertDialog
+B) SimpleDialog
+C) Dialog
+D) CupertinoAlertDialog
+E) BottomSheet
+F) ModalBottomSheet
+
+Answer: A, B, C, D, E, F - All show dialogs/sheets. AlertDialog (Material alert), SimpleDialog (list options), Dialog (custom), CupertinoAlertDialog (iOS alert), BottomSheet (bottom panel), ModalBottomSheet (modal bottom).
+
+#@@@@@@@@@@
+
+61. Complete this Firebase integration:
+```dart
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase._______________();
+  runApp(MyApp());
+}
+
+Future<void> addUser(String name, String email) async {
+  await FirebaseFirestore.instance.collection('users').add({
+    'name': name,
+    'email': email,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
+}
+```
+
+Answer: `initializeApp` - Initialize Firebase before using services. WidgetsFlutterBinding.ensureInitialized() required for async main.
+
+#@@@@@@@@@@
+
+62. What is the purpose of Isolates in Dart?
+
+Answer: Isolates are independent workers with separate memory. No shared state, communicate via messages (SendPort/ReceivePort). Use for CPU-intensive tasks. compute() function for simple cases. True parallelism.
+
+#@@@@@@@@@@
+
+63. How do you implement infinite scrolling in Flutter?
+
+Answer: Use ListView.builder with ScrollController. Listen to scroll position: `controller.addListener(() { if (controller.position.pixels == controller.position.maxScrollExtent) loadMore(); })` Load more data when reaching bottom.
+
+#@@@@@@@@@@
+
+64. Which of the following are Flutter testing types? (Multiple correct)
+A) Unit tests
+B) Widget tests
+C) Integration tests
+D) Golden tests
+E) Performance tests
+F) Accessibility tests
+
+Answer: A, B, C, D - Unit (logic), Widget (UI components), Integration (full app), Golden (screenshot comparison) are standard. Performance and accessibility testing available but not primary types.
+
+#@@@@@@@@@@
+
+65. Complete this Dart callable class:
+```dart
+class Multiplier {
+  final int factor;
+
+  Multiplier(this.factor);
+
+  int _______________(int value) {
+    return value * factor;
+  }
+}
+
+void main() {
+  var triple = Multiplier(3);
+  print(triple(5)); // 15
+}
+```
+
+Answer: `call` - Implement call() method to make class callable like function. Enables functional programming patterns.
+
+#@@@@@@@@@@
+
+66. What is the difference between ListView and ListView.builder in Flutter?
+
+Answer: ListView creates all children at once, simple but memory-intensive. ListView.builder creates children lazily on demand, efficient for large lists. Use ListView for small lists, builder for large/infinite lists.
+
+#@@@@@@@@@@
+
+67. How do you implement biometric authentication in Flutter?
+
+Answer: Use local_auth package: `final auth = LocalAuthentication(); bool canAuth = await auth.canCheckBiometrics; bool authenticated = await auth.authenticate(localizedReason: 'Authenticate');` Supports fingerprint, face ID.
+
+#@@@@@@@@@@
+
+68. Which of the following are Dart operators? (Multiple correct)
+A) ??
+B) ?.
+C) ..
+D) =>
+E) as
+F) is
+
+Answer: A, B, C, D, E, F - All are Dart operators. ?? (null coalescing), ?. (null-aware), .. (cascade), => (arrow function), as (type cast), is (type check).
+
+#@@@@@@@@@@
+
+69. Complete this Flutter responsive design:
+```dart
+class ResponsiveWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 600) {
+      return MobileLayout();
+    } else if (screenWidth < 1200) {
+      return _______________;
+    } else {
+      return DesktopLayout();
+    }
+  }
+}
+```
+
+Answer: `TabletLayout()` - Implement different layouts for screen sizes. Breakpoints: mobile (<600), tablet (600-1200), desktop (>1200).
+
+#@@@@@@@@@@
+
+70. What is the purpose of ValueNotifier in Flutter?
+
+Answer: ValueNotifier is lightweight observable for single value. Extends ChangeNotifier. Use with ValueListenableBuilder for efficient rebuilds. `ValueNotifier<int> counter = ValueNotifier(0); counter.value++;`
+
+#@@@@@@@@@@
+
+71. How do you implement search functionality in Flutter?
+
+Answer: Use SearchDelegate: `showSearch(context: context, delegate: MySearchDelegate())` Override buildSuggestions, buildResults, buildLeading, buildActions. Or custom TextField with filtering logic.
+
+#@@@@@@@@@@
+
+72. Which of the following are Flutter plugin channels? (Multiple correct)
+A) MethodChannel
+B) EventChannel
+C) BasicMessageChannel
+D) PlatformChannel
+E) StreamChannel
+F) BinaryChannel
+
+Answer: A, B, C - MethodChannel (method calls), EventChannel (event streams), BasicMessageChannel (messages) are standard platform channels. Others don't exist in Flutter.
+
+#@@@@@@@@@@
+
+73. Complete this Dart sealed class pattern (Dart 3):
+```dart
+sealed class Result<T> {}
+
+class Success<T> extends Result<T> {
+  final T data;
+  Success(this.data);
+}
+
+class Error<T> extends Result<T> {
+  final String message;
+  Error(this.message);
+}
+
+String handleResult(Result<String> result) {
+  return switch (result) {
+    Success(data: var d) => 'Success: $d',
+    Error(message: var m) => 'Error: $m',
+  };
+}
+```
+
+Answer: This is complete - Sealed classes enable exhaustive pattern matching. All subclasses must be in same library. Dart 3 feature.
+
+#@@@@@@@@@@
+
+74. What is the difference between Opacity and AnimatedOpacity in Flutter?
+
+Answer: Opacity rebuilds child every frame, expensive. AnimatedOpacity animates opacity changes implicitly, more efficient. Use Opacity for static transparency, AnimatedOpacity for transitions.
+
+#@@@@@@@@@@
+
+75. How do you implement pagination in Flutter?
+
+Answer: Track page number, load data in chunks. Use ListView.builder with ScrollController. Detect scroll end, increment page, fetch next batch. Show loading indicator at bottom. Handle errors and end of data.
+
+#@@@@@@@@@@
+
+76. Which of the following are Flutter rendering concepts? (Multiple correct)
+A) RenderObject
+B) RenderBox
+C) Layer
+D) Semantics
+E) Constraints
+F) Paint
+
+Answer: A, B, C, D, E, F - All are rendering concepts. RenderObject (render tree node), RenderBox (2D layout), Layer (compositing), Semantics (accessibility), Constraints (layout constraints), Paint (drawing).
+
+#@@@@@@@@@@
+
+77. Complete this Dart record type (Dart 3):
+```dart
+(String, int) getUserInfo() {
+  return ('Alice', 25);
+}
+
+void main() {
+  var (name, age) = getUserInfo();
+  print('$name is $age years old');
+
+  // Named records
+  ({String name, int age}) user = (name: 'Bob', age: _______________);
+  print(user.name);
+}
+```
+
+Answer: `30` or any integer - Records are immutable, anonymous compound types. Positional or named fields. Dart 3 feature.
+
+#@@@@@@@@@@
+
+78. What is the purpose of RepaintBoundary in Flutter?
+
+Answer: RepaintBoundary creates separate layer, isolates repaints. Improves performance by preventing unnecessary repaints of parent/siblings. Use around frequently changing widgets. Automatic in some widgets (ListView items).
+
+#@@@@@@@@@@
+
+79. How do you implement drag and drop in Flutter?
+
+Answer: Use Draggable and DragTarget. Draggable: `Draggable<T>(data: item, child: widget, feedback: dragWidget)` DragTarget: `DragTarget<T>(onAccept: (data) {...})` Handle onWillAccept, onAccept, onLeave.
+
+#@@@@@@@@@@
+
+80. Which of the following are Flutter performance optimization techniques? (Multiple correct)
+A) const constructors
+B) ListView.builder
+C) RepaintBoundary
+D) Cached images
+E) Code splitting
+F) Tree shaking
+
+Answer: A, B, C, D, E, F - All optimize performance. const (compile-time), builder (lazy loading), RepaintBoundary (isolate repaints), cached images (reduce network), code splitting (reduce size), tree shaking (remove unused code).
+
+#@@@@@@@@@@
+
+81. Complete this GetX state management:
+```dart
+import 'package:get/get.dart';
+
+class CounterController extends GetxController {
+  var count = 0.obs;
+
+  void increment() => count++;
+}
+
+class CounterView extends StatelessWidget {
+  final CounterController controller = Get._______________();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => Text('${controller.count}'));
+  }
+}
+```
+
+Answer: `put(CounterController())` - GetX dependency injection. Get.put() creates and registers controller. Obx() rebuilds on observable changes.
+
+#@@@@@@@@@@
+
+82. What is the difference between LayoutBuilder and MediaQuery in Flutter?
+
+Answer: LayoutBuilder provides parent constraints, rebuilds on constraint changes. MediaQuery provides device info, rebuilds on device changes. Use LayoutBuilder for responsive to parent, MediaQuery for responsive to device.
+
+#@@@@@@@@@@
+
+83. How do you implement WebSocket communication in Flutter?
+
+Answer: Use web_socket_channel package: `final channel = WebSocketChannel.connect(Uri.parse('ws://...'));` Send: `channel.sink.add(message);` Receive: `StreamBuilder(stream: channel.stream)` Close: `channel.sink.close();`
+
+#@@@@@@@@@@
+
+84. Which of the following are Flutter app lifecycle states? (Multiple correct)
+A) resumed
+B) inactive
+C) paused
+D) detached
+E) suspended
+F) hidden
+
+Answer: A, B, C, D, F - resumed (foreground), inactive (transitioning), paused (background), detached (destroyed), hidden (not visible) are AppLifecycleState values. suspended doesn't exist.
+
+#@@@@@@@@@@
+
+85. Complete this BLoC pattern implementation:
+```dart
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc() : super(0) {
+    on<IncrementEvent>((event, emit) {
+      emit(state + 1);
+    });
+    on<DecrementEvent>((event, emit) {
+      emit(_______________);
+    });
+  }
+}
+
+class CounterView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CounterBloc, int>(
+      builder: (context, state) => Text('$state'),
+    );
+  }
+}
+```
+
+Answer: `state - 1` - BLoC uses events and states. emit() updates state. BlocBuilder rebuilds on state changes.
+
+#@@@@@@@@@@
+
+86. What is the purpose of Slivers in Flutter?
+
+Answer: Slivers are scrollable areas that can be composed. Used in CustomScrollView. Types: SliverList, SliverGrid, SliverAppBar, SliverPadding. Enable complex scrolling effects, collapsing headers, mixed layouts.
+
+#@@@@@@@@@@
+
+87. How do you implement offline-first architecture in Flutter?
+
+Answer: Use local database (sqflite, Hive, Isar). Cache data locally, sync with server. Check connectivity, queue operations when offline. Use StreamBuilder for reactive updates. Implement conflict resolution.
+
+#@@@@@@@@@@
+
+88. Which of the following are Flutter navigation packages? (Multiple correct)
+A) go_router
+B) auto_route
+C) fluro
+D) beamer
+E) routemaster
+F) navigator
+
+Answer: A, B, C, D, E - go_router, auto_route, fluro, beamer, routemaster are navigation packages. navigator is built-in Navigator class, not package.
+
+#@@@@@@@@@@
+
+89. Complete this Dart pattern matching (Dart 3):
+```dart
+String describeNumber(int number) {
+  return switch (number) {
+    0 => 'zero',
+    1 => 'one',
+    < 0 => 'negative',
+    > 0 && < 10 => 'single digit',
+    >= 10 && < 100 => _______________,
+    _ => 'large number',
+  };
+}
+```
+
+Answer: `'double digit'` - Switch expressions with patterns. Guards (&&), relational patterns (<, >), wildcard (_). Dart 3 feature.
+
+#@@@@@@@@@@
+
+90. What is the difference between StatefulWidget and ChangeNotifier in Flutter?
+
+Answer: StatefulWidget manages local widget state, rebuilds widget tree. ChangeNotifier manages shared state, notifies listeners. Use StatefulWidget for UI state, ChangeNotifier for business logic/shared state with Provider.
+
+#@@@@@@@@@@
+
+91. How do you implement custom transitions in Flutter?
+
+Answer: Use PageRouteBuilder: `PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => NextPage(), transitionsBuilder: (context, animation, secondaryAnimation, child) { return FadeTransition(opacity: animation, child: child); })`
+
+#@@@@@@@@@@
+
+92. Which of the following are Flutter database options? (Multiple correct)
+A) sqflite
+B) Hive
+C) Isar
+D) Drift (Moor)
+E) ObjectBox
+F) Realm
+
+Answer: A, B, C, D, E, F - All are Flutter databases. sqflite (SQLite), Hive (NoSQL key-value), Isar (NoSQL fast), Drift (type-safe SQL), ObjectBox (object database), Realm (mobile database).
+
+#@@@@@@@@@@
+
+93. Complete this Flutter custom widget:
+```dart
+class CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color? color;
+
+  const CustomButton({
+    Key? key,
+    required this.text,
+    required this.onPressed,
+    this.color,
+  }) : super(key: _______________);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(backgroundColor: color),
+      child: Text(text),
+    );
+  }
+}
+```
+
+Answer: `key` - Pass key to super constructor. Keys help Flutter identify widgets in tree. Required for const constructors.
+
+#@@@@@@@@@@
+
+94. What is the purpose of Ticker in Flutter?
+
+Answer: Ticker calls callback every frame. Used by AnimationController. Provided by TickerProviderStateMixin. Pauses when widget not visible. Essential for smooth animations at 60fps.
+
+#@@@@@@@@@@
+
+95. How do you implement code generation in Flutter?
+
+Answer: Use build_runner with packages like json_serializable, freezed, injectable. Add build.yaml, annotate classes. Run `flutter pub run build_runner build`. Generates .g.dart files. Automates boilerplate.
+
+#@@@@@@@@@@
+
+96. Which of the following are Flutter HTTP packages? (Multiple correct)
+A) http
+B) dio
+C) chopper
+D) retrofit
+E) http_interceptor
+F) alice
+
+Answer: A, B, C, D, E, F - All are HTTP packages. http (official), dio (feature-rich), chopper (declarative), retrofit (type-safe), http_interceptor (middleware), alice (inspector).
+
+#@@@@@@@@@@
+
+97. Complete this Dart mixin:
+```dart
+mixin LoggerMixin {
+  void log(String message) {
+    print('[${DateTime.now()}] $message');
+  }
+}
+
+mixin ValidationMixin {
+  bool validateEmail(String email) {
+    return email.contains('@');
+  }
+}
+
+class UserService _______________ LoggerMixin, ValidationMixin {
+  void createUser(String email) {
+    if (validateEmail(email)) {
+      log('Creating user: $email');
+    }
+  }
+}
+```
+
+Answer: `with` - Apply multiple mixins with 'with' keyword. Mixins provide reusable functionality without inheritance.
+
+#@@@@@@@@@@
+
+98. What is the difference between showDialog and showModalBottomSheet in Flutter?
+
+Answer: showDialog shows centered dialog, blocks interaction with background. showModalBottomSheet shows bottom sheet, slides up from bottom. Both return Future. Use dialog for alerts, bottom sheet for options/forms.
+
+#@@@@@@@@@@
+
+99. How do you implement fingerprint authentication in Flutter?
+
+Answer: Use local_auth package: `final auth = LocalAuthentication(); List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics(); bool authenticated = await auth.authenticate(localizedReason: 'Scan fingerprint');`
+
+#@@@@@@@@@@
+
+100. Which of the following are Flutter animation curves? (Multiple correct)
+A) Curves.easeIn
+B) Curves.easeOut
+C) Curves.bounceIn
+D) Curves.elasticOut
+E) Curves.linear
+F) Curves.decelerate
+
+Answer: A, B, C, D, E, F - All are animation curves. easeIn (slow start), easeOut (slow end), bounceIn (bounce), elasticOut (elastic), linear (constant), decelerate (slow down).
+
+#@@@@@@@@@@
+
+101. Complete this Flutter Hero animation:
+```dart
+// First screen
+Hero(
+  tag: 'imageHero',
+  child: Image.network(imageUrl),
+)
+
+// Second screen
+Hero(
+  tag: _______________,
+  child: Image.network(imageUrl),
+)
+```
+
+Answer: `'imageHero'` - Same tag connects Hero widgets across screens. Creates shared element transition. Tag must be unique per route.
+
+#@@@@@@@@@@
+
+102. What is the purpose of GlobalKey in Flutter?
+
+Answer: GlobalKey uniquely identifies widget across entire app. Access widget state: `key.currentState`. Access context: `key.currentContext`. Access widget: `key.currentWidget`. Use sparingly, prefer local keys.
+
+#@@@@@@@@@@
+
+103. How do you implement camera functionality in Flutter?
+
+Answer: Use camera package: `final cameras = await availableCameras(); CameraController controller = CameraController(cameras[0], ResolutionPreset.high); await controller.initialize(); CameraPreview(controller)` Take picture: `controller.takePicture();`
+
+#@@@@@@@@@@
+
+104. Which of the following are Flutter form widgets? (Multiple correct)
+A) Form
+B) TextFormField
+C) DropdownButtonFormField
+D) CheckboxListTile
+E) RadioListTile
+F) FormField
+
+Answer: A, B, C, D, E, F - All are form widgets. Form (container), TextFormField (text input), DropdownButtonFormField (dropdown), CheckboxListTile (checkbox), RadioListTile (radio), FormField (custom field).
+
+#@@@@@@@@@@
+
+105. Complete this Dart async generator:
+```dart
+Stream<int> countStream(int max) async* {
+  for (int i = 1; i <= max; i++) {
+    await Future.delayed(Duration(seconds: 1));
+    _______________ i;
+  }
+}
+
+void main() async {
+  await for (int value in countStream(5)) {
+    print(value);
+  }
+}
+```
+
+Answer: `yield` - Use yield in async* generator to emit stream values. await for consumes stream. async* creates Stream, sync* creates Iterable.
+
+#@@@@@@@@@@
+
+106. What is the difference between WillPopScope and PopScope in Flutter?
+
+Answer: WillPopScope (deprecated) intercepts back button. PopScope (Flutter 3.12+) is replacement with better API. Both prevent navigation pop. Use for unsaved changes warning, custom back behavior.
+
+#@@@@@@@@@@
+
+107. How do you implement QR code scanning in Flutter?
+
+Answer: Use qr_code_scanner or mobile_scanner package: `QRView(key: qrKey, onQRViewCreated: (controller) { controller.scannedDataStream.listen((scanData) { print(scanData.code); }); })` Request camera permission.
+
+#@@@@@@@@@@
+
+108. Which of the following are Flutter testing utilities? (Multiple correct)
+A) testWidgets
+B) find
+C) expect
+D) pump
+E) pumpAndSettle
+F) mockito
+
+Answer: A, B, C, D, E, F - All are testing utilities. testWidgets (widget test), find (locator), expect (assertion), pump (frame), pumpAndSettle (wait animations), mockito (mocking).
+
+#@@@@@@@@@@
+
+109. Complete this Dart typedef:
+```dart
+typedef IntOperation = int Function(int, int);
+
+int add(int a, int b) => a + b;
+int multiply(int a, int b) => a * b;
+
+int calculate(int x, int y, IntOperation operation) {
+  return _______________(x, y);
+}
+
+void main() {
+  print(calculate(5, 3, add)); // 8
+  print(calculate(5, 3, multiply)); // 15
+}
+```
+
+Answer: `operation` - Call the function parameter. typedef creates function type alias. Enables functional programming.
+
+#@@@@@@@@@@
+
+110. What is the purpose of Semantics widget in Flutter?
+
+Answer: Semantics provides accessibility information for screen readers. Describe UI elements for visually impaired users. Properties: label, hint, value, button, enabled. Essential for inclusive apps.
+
+#@@@@@@@@@@
+
+111. How do you implement push notifications in Flutter?
+
+Answer: Use firebase_messaging package: `FirebaseMessaging.onMessage.listen((message) { print(message.notification?.title); });` Configure Android/iOS. Handle foreground, background, terminated states. Request permission.
+
+#@@@@@@@@@@
+
+112. Which of the following are Flutter image widgets? (Multiple correct)
+A) Image.asset
+B) Image.network
+C) Image.file
+D) Image.memory
+E) FadeInImage
+F) CachedNetworkImage
+
+Answer: A, B, C, D, E, F - All display images. Image.asset (bundled), Image.network (URL), Image.file (file system), Image.memory (bytes), FadeInImage (placeholder), CachedNetworkImage (cached network).
+
+#@@@@@@@@@@
+
+113. Complete this Flutter Dismissible widget:
+```dart
+Dismissible(
+  key: Key(item.id),
+  background: Container(color: Colors.red),
+  direction: DismissDirection.endToStart,
+  onDismissed: (direction) {
+    setState(() {
+      items.removeAt(index);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.name} _______________')),
+    );
+  },
+  child: ListTile(title: Text(item.name)),
+)
+```
+
+Answer: `dismissed` or `deleted` or `removed` - Dismissible enables swipe-to-dismiss. Unique key required. background shows during swipe.
+
+#@@@@@@@@@@
+
+114. What is the difference between Navigator 1.0 and Navigator 2.0 in Flutter?
+
+Answer: Navigator 1.0 is imperative (push/pop), simple, limited control. Navigator 2.0 is declarative, complex, full control over navigation stack. Navigator 2.0 enables deep linking, web URL sync, custom transitions.
+
+#@@@@@@@@@@
+
+115. How do you implement video playback in Flutter?
+
+Answer: Use video_player package: `VideoPlayerController controller = VideoPlayerController.network(url); await controller.initialize(); VideoPlayer(controller); controller.play();` Handle lifecycle, dispose controller.
+
+#@@@@@@@@@@
+
+116. Which of the following are Flutter text widgets? (Multiple correct)
+A) Text
+B) RichText
+C) SelectableText
+D) TextField
+E) TextSpan
+F) DefaultTextStyle
+
+Answer: A, B, C, D, E, F - All are text-related widgets. Text (simple), RichText (styled), SelectableText (selectable), TextField (input), TextSpan (styled span), DefaultTextStyle (default style).
+
+#@@@@@@@@@@
+
+117. Complete this Flutter Chip widget:
+```dart
+Wrap(
+  spacing: 8.0,
+  children: tags.map((tag) => Chip(
+    label: Text(tag),
+    onDeleted: () {
+      setState(() {
+        tags.remove(_______________);
+      });
+    },
+    deleteIcon: Icon(Icons.close),
+  )).toList(),
+)
+```
+
+Answer: `tag` - Remove the tag from list. Chip displays compact information. Wrap arranges chips in rows.
+
+#@@@@@@@@@@
+
+118. What is the purpose of WidgetsBindingObserver in Flutter?
+
+Answer: WidgetsBindingObserver observes app lifecycle, keyboard, metrics changes. Implement didChangeAppLifecycleState, didChangeMetrics, didChangeAccessibilityFeatures. Add observer in initState, remove in dispose.
+
+#@@@@@@@@@@
+
+119. How do you implement maps in Flutter?
+
+Answer: Use google_maps_flutter package: `GoogleMap(initialCameraPosition: CameraPosition(target: LatLng(lat, lng), zoom: 14), markers: markers, onMapCreated: (controller) {})` Configure API keys for Android/iOS.
+
+#@@@@@@@@@@
+
+120. Which of the following are Flutter icon widgets? (Multiple correct)
+A) Icon
+B) IconButton
+C) ImageIcon
+D) Icons (class)
+E) CupertinoIcons
+F) FontAwesomeIcons
+
+Answer: A, B, C, D, E - Icon (display), IconButton (clickable), ImageIcon (custom), Icons (Material icons), CupertinoIcons (iOS icons) are built-in. FontAwesomeIcons requires package.
+
+#@@@@@@@@@@
+
+121. Complete this Flutter TabBar:
+```dart
+DefaultTabController(
+  length: 3,
+  child: Scaffold(
+    appBar: AppBar(
+      bottom: TabBar(
+        tabs: [
+          Tab(icon: Icon(Icons.home), text: 'Home'),
+          Tab(icon: Icon(Icons.search), text: 'Search'),
+          Tab(icon: Icon(Icons.person), text: 'Profile'),
+        ],
+      ),
+    ),
+    body: TabBarView(
+      children: [
+        HomeTab(),
+        SearchTab(),
+        _______________,
+      ],
+    ),
+  ),
+)
+```
+
+Answer: `ProfileTab()` - TabBarView children match TabBar tabs. DefaultTabController manages tab state. Use TabController for manual control.
+
+#@@@@@@@@@@
+
+122. What is the purpose of Completer in Dart?
+
+Answer: Completer manually creates and completes Future. `Completer<T> completer = Completer(); completer.complete(value);` or `completer.completeError(error);` Access Future: `completer.future`. Used for custom async operations.
+
+#@@@@@@@@@@
+
+123. How do you implement file picking in Flutter?
+
+Answer: Use file_picker package: `FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: true);` Access files: `result.files`. Handle permissions, platform differences.
+
+#@@@@@@@@@@
+
+124. Which of the following are Flutter card widgets? (Multiple correct)
+A) Card
+B) ListTile
+C) ExpansionTile
+D) ExpansionPanel
+E) Chip
+F) Material
+
+Answer: A, B, C, D, E, F - All create card-like UI. Card (Material card), ListTile (list item), ExpansionTile (expandable), ExpansionPanel (panel), Chip (compact), Material (base Material widget).
+
+#@@@@@@@@@@
+
+125. Complete this Dart late variable:
+```dart
+class UserProfile {
+  late String username;
+  late final String userId;
+
+  UserProfile() {
+    // Initialize later
+  }
+
+  void initialize(String name, String id) {
+    username = name;
+    userId = _______________; // Can only be set once
+  }
+}
+```
+
+Answer: `id` - late final can be set once after declaration. late defers initialization. Throws if accessed before initialization.
+
+#@@@@@@@@@@
+
+126. What is the difference between Align and Center in Flutter?
+
+Answer: Center centers child (alignment: Alignment.center). Align positions child with custom alignment. Center is Align with center alignment. Use Center for centering, Align for custom positioning.
+
+#@@@@@@@@@@
+
+127. How do you implement audio playback in Flutter?
+
+Answer: Use audioplayers or just_audio package: `final player = AudioPlayer(); await player.play(UrlSource(url));` Control: play, pause, stop, seek. Listen to state, position, duration changes.
+
+#@@@@@@@@@@
+
+128. Which of the following are Flutter progress indicators? (Multiple correct)
+A) CircularProgressIndicator
+B) LinearProgressIndicator
+C) RefreshIndicator
+D) CupertinoActivityIndicator
+E) ProgressBar
+F) LoadingIndicator
+
+Answer: A, B, C, D - CircularProgressIndicator (circular), LinearProgressIndicator (linear), RefreshIndicator (pull-to-refresh), CupertinoActivityIndicator (iOS spinner) are built-in. ProgressBar, LoadingIndicator don't exist.
+
+#@@@@@@@@@@
+
+129. Complete this Flutter Stepper widget:
+```dart
+Stepper(
+  currentStep: _currentStep,
+  onStepContinue: () {
+    if (_currentStep < 2) {
+      setState(() => _currentStep++);
+    }
+  },
+  onStepCancel: () {
+    if (_currentStep > 0) {
+      setState(() => _______________);
+    }
+  },
+  steps: [
+    Step(title: Text('Step 1'), content: Text('Content 1')),
+    Step(title: Text('Step 2'), content: Text('Content 2')),
+    Step(title: Text('Step 3'), content: Text('Content 3')),
+  ],
+)
+```
+
+Answer: `_currentStep--` - Decrement step on cancel. Stepper shows multi-step process. Control with currentStep, onStepContinue, onStepCancel.
+
+#@@@@@@@@@@
+
+130. What is the purpose of Listenable in Flutter?
+
+Answer: Listenable is interface for objects that notify listeners. ChangeNotifier implements Listenable. ValueNotifier extends ChangeNotifier. Use addListener/removeListener. Base for reactive patterns.
+
+#@@@@@@@@@@
+
+131. How do you implement barcode scanning in Flutter?
+
+Answer: Use barcode_scan2 or mobile_scanner package: `var result = await BarcodeScanner.scan();` or `MobileScanner(onDetect: (capture) { print(capture.barcodes); })` Supports QR, EAN, UPC, etc.
+
+#@@@@@@@@@@
+
+132. Which of the following are Flutter decoration widgets? (Multiple correct)
+A) DecoratedBox
+B) BoxDecoration
+C) ShapeDecoration
+D) UnderlineTabIndicator
+E) Border
+F) BorderRadius
+
+Answer: A, B, C, D - DecoratedBox (widget), BoxDecoration (box decoration), ShapeDecoration (shape decoration), UnderlineTabIndicator (tab indicator) are decorations. Border, BorderRadius are decoration properties.
+
+#@@@@@@@@@@
+
+133. Complete this Dart enum with methods (Dart 2.17+):
+```dart
+enum Status {
+  pending,
+  approved,
+  rejected;
+
+  String get displayName {
+    switch (this) {
+      case Status.pending:
+        return 'Pending';
+      case Status.approved:
+        return 'Approved';
+      case Status.rejected:
+        return _______________;
+    }
+  }
+
+  bool get isCompleted => this != Status.pending;
+}
+```
+
+Answer: `'Rejected'` - Enhanced enums can have methods, getters, fields. Use switch for exhaustive matching.
+
+#@@@@@@@@@@
+
+134. What is the difference between FittedBox and AspectRatio in Flutter?
+
+Answer: FittedBox scales child to fit parent, maintains aspect ratio. AspectRatio forces specific aspect ratio, may not fill parent. Use FittedBox for scaling, AspectRatio for fixed ratio.
+
+#@@@@@@@@@@
+
+135. How do you implement share functionality in Flutter?
+
+Answer: Use share_plus package: `await Share.share('Check this out!');` Share files: `await Share.shareFiles(['path/to/file']);` Share with subject: `Share.share(text, subject: 'Subject');`
+
+#@@@@@@@@@@
+
+136. Which of the following are Flutter visibility widgets? (Multiple correct)
+A) Visibility
+B) Offstage
+C) Opacity
+D) IgnorePointer
+E) AbsorbPointer
+F) ExcludeSemantics
+
+Answer: A, B, C, D, E, F - All control visibility/interaction. Visibility (show/hide), Offstage (layout but not paint), Opacity (transparency), IgnorePointer (ignore touches), AbsorbPointer (absorb touches), ExcludeSemantics (hide from accessibility).
+
+#@@@@@@@@@@
+
+137. Complete this Flutter Tooltip widget:
+```dart
+Tooltip(
+  message: 'This is a helpful tooltip',
+  child: IconButton(
+    icon: Icon(Icons.info),
+    onPressed: () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Info button _______________')),
+      );
+    },
+  ),
+)
+```
+
+Answer: `pressed` or `clicked` or `tapped` - Tooltip shows on long press. Provides accessibility hint. Customizable with decoration, textStyle.
+
+#@@@@@@@@@@
+
+138. What is the purpose of TickerMode in Flutter?
+
+Answer: TickerMode enables/disables tickers in subtree. Pauses animations when false. Used by PageView, TabBarView to pause offscreen animations. Improves performance by stopping invisible animations.
+
+#@@@@@@@@@@
+
+139. How do you implement in-app purchases in Flutter?
+
+Answer: Use in_app_purchase package: `final available = await InAppPurchase.instance.isAvailable(); ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(productIds);` Handle purchase flow, verify receipts.
+
+#@@@@@@@@@@
+
+140. Which of the following are Flutter sizing widgets? (Multiple correct)
+A) SizedBox
+B) ConstrainedBox
+C) LimitedBox
+D) FractionallySizedBox
+E) AspectRatio
+F) IntrinsicHeight
+
+Answer: A, B, C, D, E, F - All control sizing. SizedBox (fixed size), ConstrainedBox (constraints), LimitedBox (limit unconstrained), FractionallySizedBox (percentage), AspectRatio (ratio), IntrinsicHeight (intrinsic size).
+
+#@@@@@@@@@@
+
+141. Complete this Flutter Autocomplete widget:
+```dart
+Autocomplete<String>(
+  optionsBuilder: (TextEditingValue textEditingValue) {
+    if (textEditingValue.text.isEmpty) {
+      return const Iterable<String>.empty();
+    }
+    return options.where((String option) {
+      return option.toLowerCase().contains(textEditingValue.text._______________);
+    });
+  },
+  onSelected: (String selection) {
+    print('Selected: $selection');
+  },
+)
+```
+
+Answer: `toLowerCase()` - Case-insensitive filtering. Autocomplete shows suggestions as user types. Customizable with fieldViewBuilder, optionsViewBuilder.
+
+#@@@@@@@@@@
+
+142. What is the difference between Transform and RotatedBox in Flutter?
+
+Answer: Transform applies matrix transformation, doesn't affect layout. RotatedBox rotates in 90° increments, affects layout. Transform for visual effects, RotatedBox for layout rotation.
+
+#@@@@@@@@@@
+
+143. How do you implement splash screen in Flutter?
+
+Answer: Use flutter_native_splash package or native configuration. Configure in pubspec.yaml: `flutter_native_splash: image: assets/splash.png`. Run `flutter pub run flutter_native_splash:create`. Or use FlutterNativeSplash.preserve/remove.
+
+#@@@@@@@@@@
+
+144. Which of the following are Flutter clip widgets? (Multiple correct)
+A) ClipRect
+B) ClipRRect
+C) ClipOval
+D) ClipPath
+E) ClipPolygon
+F) CustomClipper
+
+Answer: A, B, C, D, F - ClipRect (rectangle), ClipRRect (rounded rectangle), ClipOval (oval), ClipPath (custom path), CustomClipper (custom clipper) exist. ClipPolygon doesn't exist.
+
+#@@@@@@@@@@
+
+145. Complete this Dart cascade notation:
+```dart
+var paint = Paint()
+  ..color = Colors.blue
+  ..strokeWidth = 5.0
+  ..style = PaintingStyle.stroke
+  ..strokeCap = _______________;
+```
+
+Answer: `StrokeCap.round` or `StrokeCap.square` or `StrokeCap.butt` - Cascade (..) calls multiple methods on same object. Cleaner than separate statements.
+
+#@@@@@@@@@@
+
+146. What is the purpose of NotificationListener in Flutter?
+
+Answer: NotificationListener listens to notifications bubbling up tree. Scroll notifications, layout notifications, etc. `NotificationListener<ScrollNotification>(onNotification: (notification) { return true; })` Return true to stop bubbling.
+
+#@@@@@@@@@@
+
+147. How do you implement admob ads in Flutter?
+
+Answer: Use google_mobile_ads package: `MobileAds.instance.initialize(); BannerAd ad = BannerAd(adUnitId: id, size: AdSize.banner, request: AdRequest(), listener: listener); await ad.load(); AdWidget(ad: ad)`
+
+#@@@@@@@@@@
+
+148. Which of the following are Flutter padding widgets? (Multiple correct)
+A) Padding
+B) EdgeInsets
+C) SliverPadding
+D) MediaQuery.padding
+E) SafeArea
+F) Spacer
+
+Answer: A, C, E, F - Padding (widget), SliverPadding (sliver), SafeArea (system padding), Spacer (flexible space) are widgets. EdgeInsets is padding value class. MediaQuery.padding is property.
+
+#@@@@@@@@@@
+
+149. Complete this Flutter ReorderableListView:
+```dart
+ReorderableListView(
+  onReorder: (oldIndex, newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = items.removeAt(oldIndex);
+      items._______________(newIndex, item);
+    });
+  },
+  children: items.map((item) => ListTile(
+    key: ValueKey(item),
+    title: Text(item),
+  )).toList(),
+)
+```
+
+Answer: `insert` - Insert item at new position. ReorderableListView enables drag-to-reorder. Each child needs unique key.
+
+#@@@@@@@@@@
+
+150. What is the difference between AnimatedWidget and AnimatedBuilder in Flutter?
+
+Answer: AnimatedWidget rebuilds itself on animation changes, extend it. AnimatedBuilder rebuilds child on animation changes, composition. Use AnimatedWidget for reusable animated widgets, AnimatedBuilder for one-off animations.
+
+#@@@@@@@@@@
+
+151. How do you implement location services in Flutter?
+
+Answer: Use geolocator package: `Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);` Stream location: `Geolocator.getPositionStream()` Request permissions, handle errors.
+
+#@@@@@@@@@@
+
+152. Which of the following are Flutter border widgets? (Multiple correct)
+A) Border
+B) BorderSide
+C) BorderRadius
+D) RoundedRectangleBorder
+E) CircleBorder
+F) StadiumBorder
+
+Answer: A, B, C, D, E, F - All are border-related. Border (box border), BorderSide (side), BorderRadius (rounded corners), RoundedRectangleBorder (shape), CircleBorder (circle), StadiumBorder (stadium).
+
+#@@@@@@@@@@
+
+153. Complete this Flutter Draggable widget:
+```dart
+Draggable<String>(
+  data: 'Item data',
+  child: Container(
+    width: 100,
+    height: 100,
+    color: Colors.blue,
+    child: Center(child: Text('Drag me')),
+  ),
+  feedback: Material(
+    child: Container(
+      width: 100,
+      height: 100,
+      color: Colors.blue.withOpacity(0.5),
+      child: Center(child: Text('_______________')),
+    ),
+  ),
+  childWhenDragging: Container(
+    width: 100,
+    height: 100,
+    color: Colors.grey,
+  ),
+)
+```
+
+Answer: `'Dragging'` or `'Drag me'` - feedback shows during drag. childWhenDragging shows in original position. data passed to DragTarget.
+
+#@@@@@@@@@@
+
+154. What is the purpose of KeepAlive in Flutter?
+
+Answer: KeepAlive preserves widget state when scrolled offscreen. Use AutomaticKeepAliveClientMixin, override wantKeepAlive. Prevents expensive rebuilds. Used in TabBarView, PageView.
+
+#@@@@@@@@@@
+
+155. How do you implement charts in Flutter?
+
+Answer: Use fl_chart, charts_flutter, or syncfusion_flutter_charts packages. Example: `LineChart(LineChartData(lineBarsData: [LineChartBarData(spots: spots)]))` Supports line, bar, pie, scatter charts.
+
+#@@@@@@@@@@
+
+156. Which of the following are Flutter gradient types? (Multiple correct)
+A) LinearGradient
+B) RadialGradient
+C) SweepGradient
+D) ConicGradient
+E) AngularGradient
+F) BoxGradient
+
+Answer: A, B, C - LinearGradient (linear), RadialGradient (radial), SweepGradient (sweep/conic) are built-in. ConicGradient, AngularGradient, BoxGradient don't exist.
+
+#@@@@@@@@@@
+
+157. Complete this Flutter IndexedStack:
+```dart
+class TabScreen extends StatefulWidget {
+  @override
+  _TabScreenState createState() => _TabScreenState();
+}
+
+class _TabScreenState extends State<TabScreen> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _______________,
+        children: [
+          HomeScreen(),
+          SearchScreen(),
+          ProfileScreen(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        items: [...],
+      ),
+    );
+  }
+}
+```
+
+Answer: `_selectedIndex` - IndexedStack shows only one child, preserves state of all. Efficient for tab navigation.
+
+#@@@@@@@@@@
+
+158. What is the difference between ListView.separated and ListView.builder in Flutter?
+
+Answer: ListView.separated adds separator between items, requires separatorBuilder. ListView.builder creates items without separators. Use separated for dividers, builder for plain lists.
+
+#@@@@@@@@@@
+
+159. How do you implement PDF viewing in Flutter?
+
+Answer: Use flutter_pdfview or syncfusion_flutter_pdfviewer package: `SfPdfViewer.network(url)` or `SfPdfViewer.asset('assets/document.pdf')` Supports zoom, navigation, search.
+
+#@@@@@@@@@@
+
+160. Which of the following are Flutter shadow properties? (Multiple correct)
+A) BoxShadow
+B) elevation
+C) shadowColor
+D) Shadow
+E) PhysicalModel
+F) Material.elevation
+
+Answer: A, B, C, D, E, F - All create shadows. BoxShadow (box decoration), elevation (Material property), shadowColor (shadow color), Shadow (text shadow), PhysicalModel (3D shadow), Material.elevation (Material elevation).
+
+#@@@@@@@@@@
+
+161. Complete this Flutter Wrap widget:
+```dart
+Wrap(
+  spacing: 8.0,
+  runSpacing: 4.0,
+  direction: Axis.horizontal,
+  alignment: WrapAlignment.start,
+  children: items.map((item) => Chip(
+    label: Text(item),
+    onDeleted: () {
+      setState(() {
+        items.remove(item);
+      });
+    },
+  ))._______________,
+)
+```
+
+Answer: `toList()` - Convert Iterable to List. Wrap arranges children in rows/columns, wraps to next line when needed.
+
+#@@@@@@@@@@
+
+162. What is the purpose of RenderObjectWidget in Flutter?
+
+Answer: RenderObjectWidget creates RenderObject for custom rendering. Base class for low-level widgets. Implement createRenderObject, updateRenderObject. Used for custom layout, painting. Advanced use case.
+
+#@@@@@@@@@@
+
+163. How do you implement markdown rendering in Flutter?
+
+Answer: Use flutter_markdown package: `Markdown(data: markdownText)` or `MarkdownBody(data: markdownText)` Supports headers, lists, links, images, code blocks. Customizable with styleSheet.
+
+#@@@@@@@@@@
+
+164. Which of the following are Flutter alignment values? (Multiple correct)
+A) Alignment.topLeft
+B) Alignment.center
+C) Alignment.bottomRight
+D) Alignment(0.5, 0.5)
+E) FractionalOffset(0.5, 0.5)
+F) AlignmentDirectional.centerStart
+
+Answer: A, B, C, D, E, F - All are alignment values. Alignment uses (-1,-1) to (1,1). FractionalOffset uses (0,0) to (1,1). AlignmentDirectional respects text direction.
+
+#@@@@@@@@@@
+
+165. Complete this Flutter CustomScrollView:
+```dart
+CustomScrollView(
+  slivers: [
+    SliverAppBar(
+      expandedHeight: 200,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text('Title'),
+        background: Image.network(imageUrl, fit: BoxFit.cover),
+      ),
+      pinned: true,
+    ),
+    SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => ListTile(title: Text('Item $index')),
+        childCount: _______________,
+      ),
+    ),
+  ],
+)
+```
+
+Answer: `items.length` or a number - Specify number of items. CustomScrollView composes slivers for complex scrolling effects.
+
+#@@@@@@@@@@
+
+166. What is the difference between showMenu and PopupMenuButton in Flutter?
+
+Answer: showMenu programmatically shows menu at position. PopupMenuButton is widget that shows menu on tap. showMenu for custom triggers, PopupMenuButton for standard button.
+
+#@@@@@@@@@@
+
+167. How do you implement animations with Rive in Flutter?
+
+Answer: Use rive package: `RiveAnimation.network(url)` or `RiveAnimation.asset('assets/animation.riv')` Control with RiveAnimationController. Rive provides vector animations, interactive graphics.
+
+#@@@@@@@@@@
+
+168. Which of the following are Flutter gesture callbacks? (Multiple correct)
+A) onTap
+B) onDoubleTap
+C) onLongPress
+D) onPanUpdate
+E) onScaleUpdate
+F) onHover
+
+Answer: A, B, C, D, E, F - All are gesture callbacks. onTap (tap), onDoubleTap (double tap), onLongPress (long press), onPanUpdate (drag), onScaleUpdate (pinch), onHover (mouse hover).
+
+#@@@@@@@@@@
+
+169. Complete this Flutter Placeholder widget:
+```dart
+class MyWidget extends StatelessWidget {
+  final bool isLoading;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return Placeholder(
+        color: Colors.grey,
+        strokeWidth: 2.0,
+        fallbackHeight: _______________,
+        fallbackWidth: 200,
+      );
+    }
+    return child;
+  }
+}
+```
+
+Answer: `100` or any number - Placeholder shows during development. fallbackHeight/Width used when unconstrained. Useful for UI prototyping.
+
+#@@@@@@@@@@
+
+170. What is the purpose of OverlayEntry in Flutter?
+
+Answer: OverlayEntry displays widget above other widgets. Insert into Overlay: `Overlay.of(context).insert(entry)`. Used for tooltips, dropdowns, modals. Remove with entry.remove().
+
+#@@@@@@@@@@
+
+171. How do you implement bluetooth in Flutter?
+
+Answer: Use flutter_blue_plus package: `FlutterBluePlus.startScan(); FlutterBluePlus.scanResults.listen((results) { for (ScanResult r in results) { print(r.device.name); } });` Connect, discover services, read/write characteristics.
+
+#@@@@@@@@@@
+
+172. Which of the following are Flutter box fit values? (Multiple correct)
+A) BoxFit.fill
+B) BoxFit.contain
+C) BoxFit.cover
+D) BoxFit.fitWidth
+E) BoxFit.fitHeight
+F) BoxFit.scaleDown
+
+Answer: A, B, C, D, E, F - All are BoxFit values. fill (stretch), contain (fit inside), cover (fill box), fitWidth (fit width), fitHeight (fit height), scaleDown (scale down only).
+
+#@@@@@@@@@@
+
+173. Complete this Flutter Flow widget:
+```dart
+Flow(
+  delegate: MyFlowDelegate(),
+  children: items.map((item) => Container(
+    width: 50,
+    height: 50,
+    color: item.color,
+  )).toList(),
+)
+
+class MyFlowDelegate extends FlowDelegate {
+  @override
+  void paintChildren(FlowPaintingContext context) {
+    for (int i = 0; i < context.childCount; i++) {
+      context.paintChild(i, transform: Matrix4.translationValues(i * 60.0, 0, 0));
+    }
+  }
+
+  @override
+  bool shouldRepaint(MyFlowDelegate oldDelegate) => _______________;
+}
+```
+
+Answer: `false` or `true` - Return true if layout changed. Flow provides custom layout with transformations. Advanced widget for complex layouts.
+
+#@@@@@@@@@@
+
+174. What is the difference between showGeneralDialog and showDialog in Flutter?
+
+Answer: showGeneralDialog is low-level, fully customizable (transition, barrier, duration). showDialog is high-level, uses Material transitions. Use showDialog for standard dialogs, showGeneralDialog for custom.
+
+#@@@@@@@@@@
+
+175. How do you implement AR in Flutter?
+
+Answer: Use arcore_flutter_plugin (Android) or ar_flutter_plugin packages: `ARView(onARViewCreated: (controller) { controller.addNode(...); })` Place 3D objects, detect planes, handle gestures.
+
+#@@@@@@@@@@
+
+176. Which of the following are Flutter text input formatters? (Multiple correct)
+A) FilteringTextInputFormatter
+B) LengthLimitingTextInputFormatter
+C) MaskTextInputFormatter
+D) TextInputFormatter
+E) NumberTextInputFormatter
+F) DateTextInputFormatter
+
+Answer: A, B, D - FilteringTextInputFormatter (filter characters), LengthLimitingTextInputFormatter (limit length), TextInputFormatter (base class) are built-in. Others require packages.
+
+#@@@@@@@@@@
+
+177. Complete this Flutter ShaderMask widget:
+```dart
+ShaderMask(
+  shaderCallback: (Rect bounds) {
+    return LinearGradient(
+      colors: [Colors.transparent, Colors.black],
+      stops: [0.0, 0.5],
+    ).createShader(bounds);
+  },
+  blendMode: _______________,
+  child: Image.network(imageUrl),
+)
+```
+
+Answer: `BlendMode.dstIn` or `BlendMode.srcATop` - ShaderMask applies shader to child. Common blend modes: dstIn (mask), srcATop (overlay). Creates gradient effects.
+
+#@@@@@@@@@@
+
+178. What is the purpose of AnnotatedRegion in Flutter?
+
+Answer: AnnotatedRegion sets system UI overlay style (status bar, navigation bar). `AnnotatedRegion<SystemUiOverlayStyle>(value: SystemUiOverlayStyle.light, child: ...)` Controls bar colors, brightness.
+
+#@@@@@@@@@@
+
+179. How do you implement speech recognition in Flutter?
+
+Answer: Use speech_to_text package: `SpeechToText speech = SpeechToText(); bool available = await speech.initialize(); speech.listen(onResult: (result) { print(result.recognizedWords); });` Request microphone permission.
+
+#@@@@@@@@@@
+
+180. Which of the following are Flutter physics simulations? (Multiple correct)
+A) SpringSimulation
+B) GravitySimulation
+C) FrictionSimulation
+D) BounceSimulation
+E) ClampedSimulation
+F) ScrollSimulation
+
+Answer: A, B, C, E - SpringSimulation (spring), GravitySimulation (gravity), FrictionSimulation (friction), ClampedSimulation (clamped) are built-in. BounceSimulation, ScrollSimulation don't exist as separate classes.
+
+#@@@@@@@@@@
+
+181. Complete this Flutter BackdropFilter:
+```dart
+Stack(
+  children: [
+    Image.network(imageUrl),
+    BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+      child: Container(
+        color: Colors.black.withOpacity(_______________),
+        child: Center(child: Text('Blurred Background')),
+      ),
+    ),
+  ],
+)
+```
+
+Answer: `0.3` or `0.5` - BackdropFilter applies filter to background. Common filters: blur, matrix. Requires opacity for visibility.
+
+#@@@@@@@@@@
+
+182. What is the difference between ModalRoute and PageRoute in Flutter?
+
+Answer: ModalRoute is base class for routes that block interaction with previous routes. PageRoute extends ModalRoute for full-screen pages. MaterialPageRoute, CupertinoPageRoute extend PageRoute.
+
+#@@@@@@@@@@
+
+183. How do you implement text-to-speech in Flutter?
+
+Answer: Use flutter_tts package: `FlutterTts tts = FlutterTts(); await tts.setLanguage('en-US'); await tts.speak('Hello World');` Control rate, pitch, volume. Listen to completion.
+
+#@@@@@@@@@@
+
+184. Which of the following are Flutter scroll physics? (Multiple correct)
+A) BouncingScrollPhysics
+B) ClampingScrollPhysics
+C) AlwaysScrollableScrollPhysics
+D) NeverScrollableScrollPhysics
+E) RangeMaintainingScrollPhysics
+F) PageScrollPhysics
+
+Answer: A, B, C, D, E, F - All are scroll physics. BouncingScrollPhysics (iOS bounce), ClampingScrollPhysics (Android), AlwaysScrollableScrollPhysics (always), NeverScrollableScrollPhysics (never), RangeMaintainingScrollPhysics (maintain range), PageScrollPhysics (page snapping).
+
+#@@@@@@@@@@
+
+185. Complete this Flutter InteractiveViewer:
+```dart
+InteractiveViewer(
+  boundaryMargin: EdgeInsets.all(20),
+  minScale: 0.5,
+  maxScale: 4.0,
+  onInteractionEnd: (ScaleEndDetails details) {
+    print('Interaction ended');
+  },
+  child: Image.network(_______________),
+)
+```
+
+Answer: `imageUrl` or any URL - InteractiveViewer enables pan and zoom. Useful for images, maps, diagrams. Customizable boundaries, scale limits.
+
+#@@@@@@@@@@
+
+186. What is the purpose of LayoutId in Flutter?
+
+Answer: LayoutId identifies children in CustomMultiChildLayout. Assign id to each child: `LayoutId(id: 'header', child: ...)` Access in delegate: `layoutChild('header', constraints)`. Enables custom multi-child layouts.
+
+#@@@@@@@@@@
+
+187. How do you implement face detection in Flutter?
+
+Answer: Use google_ml_kit package: `final faceDetector = FaceDetector(); final faces = await faceDetector.processImage(inputImage);` Detect faces, landmarks, contours. Works offline.
+
+#@@@@@@@@@@
+
+188. Which of the following are Flutter curve types? (Multiple correct)
+A) Cubic
+B) Interval
+C) Threshold
+D) SawTooth
+E) ElasticInOutCurve
+F) Curve2D
+
+Answer: A, B, C, D, E - Cubic (cubic bezier), Interval (sub-range), Threshold (step), SawTooth (sawtooth), ElasticInOutCurve (elastic) are curve types. Curve2D doesn't exist.
+
+#@@@@@@@@@@
+
+189. Complete this Flutter ColorFiltered widget:
+```dart
+ColorFiltered(
+  colorFilter: ColorFilter.mode(
+    Colors.red.withOpacity(0.5),
+    _______________,
+  ),
+  child: Image.network(imageUrl),
+)
+```
+
+Answer: `BlendMode.color` or `BlendMode.multiply` or other blend mode - ColorFiltered applies color filter. Blend modes: color, multiply, overlay, screen, etc.
+
+#@@@@@@@@@@
+
+190. What is the difference between PreferredSize and PreferredSizeWidget in Flutter?
+
+Answer: PreferredSizeWidget is interface for widgets with preferred size (AppBar, TabBar). PreferredSize is widget that wraps child with preferred size. Use PreferredSize to give custom widgets preferred size.
+
+#@@@@@@@@@@
+
+191. How do you implement OCR in Flutter?
+
+Answer: Use google_ml_kit package: `final textRecognizer = TextRecognizer(); final recognizedText = await textRecognizer.processImage(inputImage);` Extract text from images. Supports multiple languages.
+
+#@@@@@@@@@@
+
+192. Which of the following are Flutter matrix transformations? (Multiple correct)
+A) Matrix4.identity()
+B) Matrix4.rotationZ()
+C) Matrix4.translationValues()
+D) Matrix4.diagonal3Values()
+E) Matrix4.skew()
+F) Matrix4.compose()
+
+Answer: A, B, C, D, E, F - All are Matrix4 methods. identity (no transform), rotationZ (rotate), translationValues (translate), diagonal3Values (scale), skew (skew), compose (combine transformations).
+
+#@@@@@@@@@@
+
+193. Complete this Flutter Listener widget:
+```dart
+Listener(
+  onPointerDown: (PointerDownEvent event) {
+    print('Pointer down at ${event.position}');
+  },
+  onPointerMove: (PointerMoveEvent event) {
+    print('Pointer move: ${event.delta}');
+  },
+  onPointerUp: (_______________) {
+    print('Pointer up');
+  },
+  child: Container(
+    width: 200,
+    height: 200,
+    color: Colors.blue,
+  ),
+)
+```
+
+Answer: `PointerUpEvent event` - Listener detects low-level pointer events. More primitive than GestureDetector. Use for custom gesture recognition.
+
+#@@@@@@@@@@
+
+194. What is the purpose of Directionality widget in Flutter?
+
+Answer: Directionality sets text direction for subtree (LTR or RTL). `Directionality(textDirection: TextDirection.rtl, child: ...)` Affects layout, text rendering. Essential for internationalization.
+
+#@@@@@@@@@@
+
+195. How do you implement image editing in Flutter?
+
+Answer: Use image_editor or image package: `final editedImage = await ImageEditor.editImage(image: imageBytes, imageEditorOption: option);` Crop, rotate, flip, adjust colors. Or use image_picker with cropping.
+
+#@@@@@@@@@@
+
+196. Which of the following are Flutter scroll controllers? (Multiple correct)
+A) ScrollController
+B) TrackingScrollController
+C) PageController
+D) TabController
+E) AnimationController
+F) TextEditingController
+
+Answer: A, B, C - ScrollController (scroll), TrackingScrollController (tracking), PageController (page) control scrolling. TabController controls tabs. AnimationController, TextEditingController are different types.
+
+#@@@@@@@@@@
+
+197. Complete this Flutter FadeTransition:
+```dart
+class FadeInWidget extends StatefulWidget {
+  final Widget child;
+
+  @override
+  _FadeInWidgetState createState() => _FadeInWidgetState();
+}
+
+class _FadeInWidgetState extends State<FadeInWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(duration: Duration(seconds: 2), vsync: this);
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _______________,
+      child: widget.child,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+```
+
+Answer: `_animation` - FadeTransition animates opacity. Pass Animation<double> to opacity parameter. Efficient implicit animation.
+
+#@@@@@@@@@@
+
+198. What is the difference between RawGestureDetector and GestureDetector in Flutter?
+
+Answer: GestureDetector is high-level, recognizes common gestures. RawGestureDetector is low-level, customizable gesture recognizers. Use GestureDetector for standard gestures, RawGestureDetector for custom.
+
+#@@@@@@@@@@
+
+199. How do you implement app rating in Flutter?
+
+Answer: Use in_app_review package: `final InAppReview inAppReview = InAppReview.instance; if (await inAppReview.isAvailable()) { inAppReview.requestReview(); }` Shows native rating dialog. Use sparingly.
+
+#@@@@@@@@@@
+
+200. Which Flutter concepts are essential for building production apps? (Multiple correct)
+A) State management (Provider/Riverpod/BLoC)
+B) Navigation (Navigator 2.0/go_router)
+C) Dependency injection
+D) Error handling and logging
+E) Testing (unit/widget/integration)
+F) Performance optimization
+
+Answer: A, B, C, D, E, F - All are essential. State management (app state), Navigation (routing), Dependency injection (architecture), Error handling (reliability), Testing (quality), Performance optimization (user experience). Master these for production-ready Flutter apps.
+
+#@@@@@@@@@@

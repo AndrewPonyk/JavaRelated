@@ -1,0 +1,2545 @@
+C Quiz - 200 Questions
+Tech Stack: GCC, Clang/LLVM, Make/CMake, Valgrind, GDB, Embedded C, OpenMP, GTK
+
+1. Which of the following are GCC compiler flags? (Multiple correct)
+A) -Wall
+B) -O2
+C) -g
+D) -std=c99
+E) -pthread
+F) -fPIC
+
+Answer: A, B, C, D, E, F - All are GCC flags. -Wall (enable warnings), -O2 (optimization level), -g (debug info), -std=c99 (C standard), -pthread (threading), -fPIC (position independent code).
+
+#@@@@@@@@@@
+
+2. Complete this Makefile:
+```makefile
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -g
+TARGET = myprogram
+SOURCES = main.c utils.c
+OBJECTS = $(SOURCES:.c=.o)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	_______________
+```
+
+Answer: `rm -f $(OBJECTS) $(TARGET)` - Remove object files and target executable. This is the standard clean rule pattern in Makefiles.
+
+#@@@@@@@@@@
+
+3. What is the difference between malloc() and calloc() in C?
+
+Answer: malloc() allocates uninitialized memory, takes one argument (size). calloc() allocates zero-initialized memory, takes two arguments (count, size). calloc() is safer as it initializes memory to zero, but malloc() is slightly faster. Both require free() for cleanup.
+
+#@@@@@@@@@@
+
+4. Which of the following are Valgrind tools? (Multiple correct)
+A) Memcheck
+B) Cachegrind
+C) Callgrind
+D) Helgrind
+E) Massif
+F) DRD
+
+Answer: A, B, C, D, E, F - All are Valgrind tools. Memcheck (memory errors), Cachegrind (cache profiling), Callgrind (call graph profiling), Helgrind (thread errors), Massif (heap profiling), DRD (data race detection).
+
+#@@@@@@@@@@
+
+5. Find the buffer overflow vulnerability in this C code:
+```c
+#include <stdio.h>
+#include <string.h>
+
+void vulnerable_function(char *input) {
+    char buffer[10];
+    strcpy(buffer, input); // Buffer overflow here
+    printf("Input: %s\n", buffer);
+}
+
+int main() {
+    char user_input[100];
+    printf("Enter input: ");
+    gets(user_input); // Also vulnerable
+    vulnerable_function(user_input);
+    return 0;
+}
+```
+
+Answer: Two vulnerabilities: strcpy() doesn't check buffer bounds, gets() is unsafe. Fix with strncpy(buffer, input, sizeof(buffer)-1) and fgets(user_input, sizeof(user_input), stdin). Always validate input length.
+
+#@@@@@@@@@@
+
+6. How do you debug a C program with GDB?
+
+Answer: Compile with -g flag, start with `gdb ./program`, set breakpoints with `break function_name`, run with `run`, step through with `step`/`next`, examine variables with `print variable`, examine memory with `x/format address`, backtrace with `bt`.
+
+#@@@@@@@@@@
+
+7. Which of the following are C memory management functions? (Multiple correct)
+A) malloc()
+B) calloc()
+C) realloc()
+D) free()
+E) alloca()
+F) mmap()
+
+Answer: A, B, C, D, E, F - All are memory management functions. malloc/calloc/realloc/free (heap allocation), alloca (stack allocation), mmap (memory mapping). Use malloc family for general allocation, mmap for large allocations or file mapping.
+
+#@@@@@@@@@@
+
+8. Complete this OpenMP parallel loop:
+```c
+#include <omp.h>
+#include <stdio.h>
+
+int main() {
+    int i, sum = 0;
+    int array[1000];
+
+    // Initialize array
+    for (i = 0; i < 1000; i++) {
+        array[i] = i + 1;
+    }
+
+    #pragma omp parallel for _______________
+    for (i = 0; i < 1000; i++) {
+        sum += array[i];
+    }
+
+    printf("Sum: %d\n", sum);
+    return 0;
+}
+```
+
+Answer: `reduction(+:sum)` - Use reduction clause to safely accumulate sum across threads. OpenMP will create private copies of sum and combine them at the end.
+
+#@@@@@@@@@@
+
+9. What is the difference between static and dynamic linking in C?
+
+Answer: Static linking includes library code in executable, larger file size, no runtime dependencies, faster execution. Dynamic linking uses shared libraries at runtime, smaller executable, requires libraries at runtime, allows library updates without recompilation.
+
+#@@@@@@@@@@
+
+10. Which of the following are embedded C considerations? (Multiple correct)
+A) Memory constraints
+B) Real-time requirements
+C) Power consumption
+D) Hardware registers
+E) Interrupt handling
+F) Code size optimization
+
+Answer: A, B, C, D, E, F - All are embedded C considerations. Memory constraints (limited RAM/ROM), Real-time requirements (deterministic timing), Power consumption (battery life), Hardware registers (direct hardware access), Interrupt handling (ISRs), Code size optimization (flash memory limits).
+
+#@@@@@@@@@@
+
+11. Predict the output of this C code:
+```c
+#include <stdio.h>
+
+int main() {
+    int x = 5;
+    int *p = &x;
+    int **pp = &p;
+
+    printf("x = %d\n", x);
+    printf("*p = %d\n", *p);
+    printf("**pp = %d\n", **pp);
+
+    **pp = 10;
+
+    printf("x = %d\n", x);
+
+    return 0;
+}
+```
+
+Answer: x = 5, *p = 5, **pp = 5, x = 10 - Pointer to pointer allows indirect modification. **pp modifies the value that pp points to through p, which is x.
+
+#@@@@@@@@@@
+
+12. How do you create a shared library in C?
+
+Answer: Compile with -fPIC flag: `gcc -fPIC -c source.c`, create shared library: `gcc -shared -o libname.so object.o`, link with -l flag: `gcc -lname program.c`, set LD_LIBRARY_PATH for runtime. Use -Wl,-soname for versioning.
+
+#@@@@@@@@@@
+
+13. Which of the following are GTK+ widgets? (Multiple correct)
+A) GtkWindow
+B) GtkButton
+C) GtkLabel
+D) GtkEntry
+E) GtkTreeView
+F) GtkNotebook
+
+Answer: A, B, C, D, E, F - All are GTK+ widgets. GtkWindow (top-level window), GtkButton (clickable button), GtkLabel (text display), GtkEntry (text input), GtkTreeView (list/tree display), GtkNotebook (tabbed interface).
+
+#@@@@@@@@@@
+
+14. Complete this CMake configuration for C:
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(MyProject C)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+add_executable(myprogram
+    main.c
+    utils.c
+    math_ops.c
+)
+
+target_link_libraries(myprogram
+    _______________
+)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(myprogram PRIVATE -g -Wall)
+endif()
+```
+
+Answer: `m` or `pthread` or other libraries - Link required libraries. `m` for math library, `pthread` for threading, or other system/third-party libraries needed by the program.
+
+#@@@@@@@@@@
+
+15. What is the difference between stack and heap memory in C?
+
+Answer: Stack is automatic, fast, limited size, LIFO order, automatic cleanup, stores local variables and function calls. Heap is manual, slower, larger size, random access, manual cleanup with free(), stores dynamically allocated memory. Stack overflow vs memory leaks are common issues.
+
+#@@@@@@@@@@
+
+16. Complete this C code to read a file line by line:
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file = fopen("data.txt", "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = _______________(_______________)) != -1) {
+        printf("%s", line);
+    }
+
+    free(line);
+    fclose(file);
+    return 0;
+}
+```
+
+Answer: `getline(&line, &len, file)` - getline() reads entire line including newline, automatically allocates/reallocates buffer, returns -1 on EOF. Must free() the allocated buffer.
+
+#@@@@@@@@@@
+
+17. Which of the following are C standard library headers? (Multiple correct)
+A) stdio.h
+B) stdlib.h
+C) string.h
+D) math.h
+E) time.h
+F) pthread.h
+
+Answer: A, B, C, D, E - stdio.h, stdlib.h, string.h, math.h, time.h are C standard library headers. pthread.h is POSIX, not C standard (though widely available).
+
+#@@@@@@@@@@
+
+18. What is the purpose of the volatile keyword in C?
+
+Answer: volatile tells compiler variable can change unexpectedly (hardware registers, signal handlers, multi-threaded code). Prevents compiler optimizations that assume variable doesn't change. Essential for embedded systems and concurrent programming.
+
+#@@@@@@@@@@
+
+19. Find the memory leak in this C code:
+```c
+#include <stdlib.h>
+#include <string.h>
+
+char* create_string(const char *input) {
+    char *result = malloc(strlen(input) + 1);
+    strcpy(result, input);
+    return result;
+}
+
+int main() {
+    for (int i = 0; i < 1000; i++) {
+        char *str = create_string("Hello");
+        // Memory leak: str is never freed
+    }
+    return 0;
+}
+```
+
+Answer: Memory leak in loop - allocated strings are never freed. Fix: add `free(str);` before loop ends. Always pair malloc/calloc/realloc with free().
+
+#@@@@@@@@@@
+
+20. How do you use function pointers in C?
+
+Answer: Declare: `return_type (*ptr_name)(param_types);`, Assign: `ptr_name = function_name;`, Call: `ptr_name(args)` or `(*ptr_name)(args)`. Used for callbacks, polymorphism, jump tables. Example: `int (*compare)(int, int) = &max;`
+
+#@@@@@@@@@@
+
+21. Which of the following are C preprocessor directives? (Multiple correct)
+A) #include
+B) #define
+C) #ifdef
+D) #ifndef
+E) #pragma
+F) #error
+
+Answer: A, B, C, D, E, F - All are preprocessor directives. #include (file inclusion), #define (macro definition), #ifdef/#ifndef (conditional compilation), #pragma (compiler-specific), #error (compilation error).
+
+#@@@@@@@@@@
+
+22. Complete this C code for bit manipulation:
+```c
+#include <stdio.h>
+
+int main() {
+    unsigned int x = 0b10110100;
+
+    // Set bit 2
+    x |= (1 << 2);
+
+    // Clear bit 5
+    x &= ~(1 << 5);
+
+    // Toggle bit 3
+    x ^= _______________;
+
+    // Check if bit 4 is set
+    if (x & (1 << 4)) {
+        printf("Bit 4 is set\n");
+    }
+
+    return 0;
+}
+```
+
+Answer: `(1 << 3)` - XOR with bit mask toggles the bit. Use | for set, & ~ for clear, ^ for toggle, & for check.
+
+#@@@@@@@@@@
+
+23. What is the difference between struct and union in C?
+
+Answer: struct allocates memory for all members (sum of sizes + padding), all members accessible simultaneously. union allocates memory for largest member only, only one member accessible at a time. Use struct for related data, union for memory efficiency or type punning.
+
+#@@@@@@@@@@
+
+24. How do you implement a linked list in C?
+
+Answer: Define node struct with data and next pointer. Implement insert, delete, search, traverse functions. Example: `struct Node { int data; struct Node *next; };`. Manage memory with malloc/free. Handle edge cases (empty list, single node).
+
+#@@@@@@@@@@
+
+25. Which of the following are C data types? (Multiple correct)
+A) char
+B) int
+C) float
+D) double
+E) void
+F) size_t
+
+Answer: A, B, C, D, E, F - All are C data types. char, int, float, double are basic types. void is incomplete type. size_t is typedef (usually unsigned long) for sizes.
+
+#@@@@@@@@@@
+
+26. Complete this C code for signal handling:
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+void signal_handler(int signum) {
+    printf("Caught signal %d\n", signum);
+}
+
+int main() {
+    signal(_______________, signal_handler);
+
+    while (1) {
+        printf("Running...\n");
+        sleep(1);
+    }
+
+    return 0;
+}
+```
+
+Answer: `SIGINT` or `SIGTERM` or other signals - Register signal handler for specific signal. SIGINT (Ctrl+C), SIGTERM (termination), SIGSEGV (segfault), etc.
+
+#@@@@@@@@@@
+
+27. What is the purpose of const keyword in C?
+
+Answer: const makes variables read-only, prevents modification. Used for: constant values, function parameters (prevent modification), return values, pointers (const data, const pointer, or both). Helps catch errors at compile time, enables optimizations.
+
+#@@@@@@@@@@
+
+28. Find the undefined behavior in this C code:
+```c
+#include <stdio.h>
+
+int main() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    int *p = arr;
+
+    for (int i = 0; i <= 5; i++) {  // Undefined behavior
+        printf("%d ", p[i]);
+    }
+
+    return 0;
+}
+```
+
+Answer: Array out of bounds access - loop condition should be `i < 5`, not `i <= 5`. Accessing arr[5] is undefined behavior (array indices 0-4 only).
+
+#@@@@@@@@@@
+
+29. How do you use variadic functions in C?
+
+Answer: Use stdarg.h macros: va_list, va_start, va_arg, va_end. Example: `int sum(int count, ...) { va_list args; va_start(args, count); ... va_end(args); }`. Used in printf, scanf. Must know number/types of arguments.
+
+#@@@@@@@@@@
+
+30. Which of the following are C storage classes? (Multiple correct)
+A) auto
+B) register
+C) static
+D) extern
+E) typedef
+F) const
+
+Answer: A, B, C, D - auto, register, static, extern are storage classes. typedef is type definition, const is type qualifier (not storage class).
+
+#@@@@@@@@@@
+
+31. Complete this C code for dynamic 2D array allocation:
+```c
+#include <stdlib.h>
+
+int main() {
+    int rows = 5, cols = 10;
+    int **matrix = malloc(rows * sizeof(int *));
+
+    for (int i = 0; i < rows; i++) {
+        matrix[i] = malloc(cols * sizeof(int));
+    }
+
+    // Use matrix[i][j]
+
+    // Free memory
+    for (int i = 0; i < rows; i++) {
+        _______________;
+    }
+    free(matrix);
+
+    return 0;
+}
+```
+
+Answer: `free(matrix[i])` - Free each row before freeing the array of pointers. Always free in reverse order of allocation.
+
+#@@@@@@@@@@
+
+32. What is the difference between ++i and i++ in C?
+
+Answer: ++i (pre-increment) increments then returns new value. i++ (post-increment) returns current value then increments. Pre-increment is slightly more efficient (no temporary). In loops, both work the same.
+
+#@@@@@@@@@@
+
+33. How do you use enums in C?
+
+Answer: Define: `enum Color { RED, GREEN, BLUE };` Values start at 0 by default. Can assign: `enum Color { RED = 1, GREEN = 5, BLUE };` Use: `enum Color c = RED;` Improves readability over magic numbers.
+
+#@@@@@@@@@@
+
+34. Which of the following are valid C comments? (Multiple correct)
+A) // Single line comment
+B) /* Multi-line comment */
+C) <!-- HTML comment -->
+D) # Python comment
+E) /* Nested /* comment */ */
+F) // Comment to end of line
+
+Answer: A, B, F - // and /* */ are valid C comments. HTML and Python comments don't work. Nested /* */ comments are not allowed in C (but allowed in C++).
+
+#@@@@@@@@@@
+
+35. Find the bug in this C code:
+```c
+#include <stdio.h>
+#include <string.h>
+
+char* get_name() {
+    char name[50] = "John Doe";
+    return name;  // Bug: returning pointer to local variable
+}
+
+int main() {
+    char *n = get_name();
+    printf("Name: %s\n", n);  // Undefined behavior
+    return 0;
+}
+```
+
+Answer: Returning pointer to local variable - name is destroyed when function returns. Fix: use static, malloc, or pass buffer as parameter.
+
+#@@@@@@@@@@
+
+36. How do you use typedef in C?
+
+Answer: typedef creates type aliases. Examples: `typedef unsigned long ulong;`, `typedef struct { int x, y; } Point;`, `typedef int (*func_ptr)(int, int);` Improves readability, portability, and abstraction.
+
+#@@@@@@@@@@
+
+37. What is the purpose of sizeof operator in C?
+
+Answer: sizeof returns size in bytes of type or variable at compile time. Examples: `sizeof(int)`, `sizeof(arr)`, `sizeof(struct)`. Used for memory allocation, array size calculation, portability. Returns size_t type.
+
+#@@@@@@@@@@
+
+38. Which of the following are C operators? (Multiple correct)
+A) &
+B) |
+C) ^
+D) ~
+E) <<
+F) >>
+
+Answer: A, B, C, D, E, F - All are C operators. & (bitwise AND), | (bitwise OR), ^ (bitwise XOR), ~ (bitwise NOT), << (left shift), >> (right shift).
+
+#@@@@@@@@@@
+
+39. Complete this C code for string tokenization:
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char str[] = "apple,banana,cherry,date";
+    char *token = strtok(str, ",");
+
+    while (token != NULL) {
+        printf("%s\n", token);
+        token = strtok(_______________, ",");
+    }
+
+    return 0;
+}
+```
+
+Answer: `NULL` - strtok() uses NULL for subsequent calls to continue tokenizing the same string. First call uses string pointer, subsequent calls use NULL.
+
+#@@@@@@@@@@
+
+40. What is the difference between = and == in C?
+
+Answer: = is assignment operator (assigns value). == is equality comparison operator (compares values, returns 1 or 0). Common bug: using = in if condition instead of ==. Example: `if (x = 5)` always true, `if (x == 5)` compares.
+
+#@@@@@@@@@@
+
+41. How do you implement a circular buffer in C?
+
+Answer: Use array with read/write indices. Wrap indices using modulo: `write_idx = (write_idx + 1) % size`. Track full/empty states. Used in embedded systems, producer-consumer. Efficient for fixed-size FIFO.
+
+#@@@@@@@@@@
+
+42. Which of the following are C string functions? (Multiple correct)
+A) strlen()
+B) strcpy()
+C) strcat()
+D) strcmp()
+E) strstr()
+F) strtok()
+
+Answer: A, B, C, D, E, F - All are C string functions from string.h. strlen (length), strcpy (copy), strcat (concatenate), strcmp (compare), strstr (find substring), strtok (tokenize).
+
+#@@@@@@@@@@
+
+43. Complete this C code for file writing:
+```c
+#include <stdio.h>
+
+int main() {
+    FILE *file = fopen("output.txt", "w");
+    if (file == NULL) {
+        return 1;
+    }
+
+    fprintf(file, "Hello, World!\n");
+    fprintf(file, "Number: %d\n", 42);
+
+    _______________;
+    return 0;
+}
+```
+
+Answer: `fclose(file)` - Always close files to flush buffers and release resources. Failure to close can cause data loss or resource leaks.
+
+#@@@@@@@@@@
+
+44. What is the purpose of inline keyword in C99?
+
+Answer: inline suggests compiler to insert function code at call site instead of calling. Reduces function call overhead for small functions. Compiler may ignore hint. Defined in header or same translation unit.
+
+#@@@@@@@@@@
+
+45. Find the race condition in this C code:
+```c
+#include <pthread.h>
+
+int counter = 0;
+
+void* increment(void *arg) {
+    for (int i = 0; i < 100000; i++) {
+        counter++;  // Race condition
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t t1, t2;
+    pthread_create(&t1, NULL, increment, NULL);
+    pthread_create(&t2, NULL, increment, NULL);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    return 0;
+}
+```
+
+Answer: Race condition on counter - multiple threads modify without synchronization. Fix: use mutex, atomic operations, or semaphore. counter++ is not atomic (read-modify-write).
+
+#@@@@@@@@@@
+
+46. How do you use command line arguments in C?
+
+Answer: `int main(int argc, char *argv[])` - argc is argument count, argv is array of strings. argv[0] is program name, argv[1] to argv[argc-1] are arguments. Always check argc before accessing argv.
+
+#@@@@@@@@@@
+
+47. What is the difference between fgets() and gets() in C?
+
+Answer: fgets() is safe, takes buffer size, stops at newline or size-1, includes newline. gets() is unsafe (removed in C11), no size limit, buffer overflow risk. Always use fgets() instead of gets().
+
+#@@@@@@@@@@
+
+48. Which of the following are C99 features? (Multiple correct)
+A) Variable-length arrays (VLA)
+B) inline functions
+C) // comments
+D) _Bool type
+E) designated initializers
+F) compound literals
+
+Answer: A, B, C, D, E, F - All are C99 features. VLA (runtime-sized arrays), inline, // comments, _Bool (boolean), designated initializers `{.x = 1}`, compound literals `(Point){1, 2}`.
+
+#@@@@@@@@@@
+
+49. Complete this C code for binary file I/O:
+```c
+#include <stdio.h>
+
+struct Record {
+    int id;
+    char name[50];
+    float salary;
+};
+
+int main() {
+    struct Record r = {1, "John", 50000.0};
+    FILE *file = fopen("data.bin", "wb");
+
+    fwrite(&r, _______________, _______________, file);
+
+    fclose(file);
+    return 0;
+}
+```
+
+Answer: `sizeof(struct Record), 1` - fwrite(ptr, size, count, file). Write one record of size sizeof(struct Record). For arrays, swap size and count.
+
+#@@@@@@@@@@
+
+50. What is the purpose of restrict keyword in C99?
+
+Answer: restrict is pointer qualifier indicating no aliasing - only this pointer accesses the object. Enables compiler optimizations. Example: `void copy(int *restrict dest, const int *restrict src, size_t n)`. Programmer's promise to compiler.
+
+#@@@@@@@@@@
+
+51. How do you implement a hash table in C?
+
+Answer: Array of linked lists (chaining) or open addressing. Hash function maps keys to indices. Handle collisions with chaining or probing. Implement insert, search, delete. Consider load factor, resizing. Use good hash function for distribution.
+
+#@@@@@@@@@@
+
+52. Which of the following are C type qualifiers? (Multiple correct)
+A) const
+B) volatile
+C) restrict
+D) static
+E) extern
+F) register
+
+Answer: A, B, C - const, volatile, restrict are type qualifiers. static, extern, register are storage class specifiers (not qualifiers).
+
+#@@@@@@@@@@
+
+53. Complete this C code for error handling:
+```c
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+
+int main() {
+    FILE *file = fopen("nonexistent.txt", "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error: %s\n", _______________);
+        return 1;
+    }
+    fclose(file);
+    return 0;
+}
+```
+
+Answer: `strerror(errno)` - strerror() converts errno to error message string. errno is set by system calls on error. Always check return values and handle errors.
+
+#@@@@@@@@@@
+
+54. What is the difference between array and pointer in C?
+
+Answer: Array is contiguous memory block, fixed size, name is constant pointer. Pointer is variable holding address, can be reassigned, can point anywhere. sizeof(array) gives total size, sizeof(pointer) gives pointer size. Array decays to pointer in most contexts.
+
+#@@@@@@@@@@
+
+55. How do you use assert() in C?
+
+Answer: `#include <assert.h>`, `assert(condition)` - Aborts program if condition false (debug mode). Disabled with NDEBUG macro. Use for sanity checks, preconditions, postconditions. Not for error handling (use if/return instead).
+
+#@@@@@@@@@@
+
+56. Which of the following are valid C escape sequences? (Multiple correct)
+A) \n
+B) \t
+C) \\
+D) \"
+E) \0
+F) \x41
+
+Answer: A, B, C, D, E, F - All are valid escape sequences. \n (newline), \t (tab), \\ (backslash), \" (quote), \0 (null), \x41 (hex 'A').
+
+#@@@@@@@@@@
+
+57. Find the integer overflow in this C code:
+```c
+#include <stdio.h>
+#include <limits.h>
+
+int main() {
+    int x = INT_MAX;
+    int y = x + 1;  // Integer overflow (undefined behavior)
+
+    printf("x = %d, y = %d\n", x, y);
+
+    return 0;
+}
+```
+
+Answer: Signed integer overflow is undefined behavior. y wraps around to INT_MIN on most systems. Fix: check before operation, use unsigned, or use larger type. Use INT_MAX from limits.h for bounds checking.
+
+#@@@@@@@@@@
+
+58. How do you use conditional compilation in C?
+
+Answer: Use #ifdef, #ifndef, #if, #else, #elif, #endif. Example: `#ifdef DEBUG ... #endif`. Define macros with -D flag or #define. Used for platform-specific code, debug/release builds, feature flags.
+
+#@@@@@@@@@@
+
+59. What is the purpose of setjmp() and longjmp() in C?
+
+Answer: setjmp() saves execution context, longjmp() restores it (non-local goto). Used for error handling, exception simulation. Dangerous - can skip cleanup code. Modern C prefers error codes or goto for cleanup.
+
+#@@@@@@@@@@
+
+60. Which of the following are C standard I/O functions? (Multiple correct)
+A) printf()
+B) scanf()
+C) fprintf()
+D) fscanf()
+E) fgets()
+F) fputs()
+
+Answer: A, B, C, D, E, F - All are standard I/O functions from stdio.h. printf/scanf (console), fprintf/fscanf (file formatted), fgets/fputs (file strings).
+
+#@@@@@@@@@@
+
+61. Complete this C code for memory alignment:
+```c
+#include <stdio.h>
+#include <stddef.h>
+
+struct Data {
+    char c;
+    int i;
+    char d;
+};
+
+int main() {
+    printf("Size: %zu\n", sizeof(struct Data));
+    printf("Offset of i: %zu\n", _______________);
+    return 0;
+}
+```
+
+Answer: `offsetof(struct Data, i)` - offsetof() macro returns byte offset of member in struct. Padding added for alignment. Size may be larger than sum of members.
+
+#@@@@@@@@@@
+
+62. What is the difference between memcpy() and memmove() in C?
+
+Answer: memcpy() copies memory, assumes no overlap, faster. memmove() handles overlapping regions safely, slightly slower. Both copy n bytes. Use memmove() when source and destination might overlap.
+
+#@@@@@@@@@@
+
+63. How do you create a binary search tree in C?
+
+Answer: Define node struct with data, left, right pointers. Implement insert (recursive/iterative), search, delete, traverse (inorder/preorder/postorder). Maintain BST property: left < node < right. Use malloc for nodes, free for cleanup.
+
+#@@@@@@@@@@
+
+64. Which of the following are C math functions? (Multiple correct)
+A) sqrt()
+B) pow()
+C) sin()
+D) cos()
+E) log()
+F) ceil()
+
+Answer: A, B, C, D, E, F - All are math functions from math.h. sqrt (square root), pow (power), sin/cos (trigonometry), log (logarithm), ceil (ceiling). Link with -lm flag.
+
+#@@@@@@@@@@
+
+65. Complete this C code for mutex usage:
+```c
+#include <pthread.h>
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int shared_data = 0;
+
+void* thread_func(void *arg) {
+    pthread_mutex_lock(&mutex);
+    shared_data++;
+    _______________;
+    return NULL;
+}
+```
+
+Answer: `pthread_mutex_unlock(&mutex)` - Always unlock mutex after critical section. Failure to unlock causes deadlock. Use RAII pattern or cleanup handlers for exception safety.
+
+#@@@@@@@@@@
+
+66. What is the purpose of #pragma once in C?
+
+Answer: #pragma once is include guard alternative, prevents multiple inclusion of header file. Simpler than #ifndef guards, faster compilation. Not standard but widely supported. Example: `#pragma once` at top of header.
+
+#@@@@@@@@@@
+
+67. Find the dangling pointer in this C code:
+```c
+#include <stdlib.h>
+
+int* create_array() {
+    int *arr = malloc(10 * sizeof(int));
+    return arr;
+}
+
+int main() {
+    int *p = create_array();
+    free(p);
+    *p = 5;  // Dangling pointer - accessing freed memory
+    return 0;
+}
+```
+
+Answer: Accessing freed memory through dangling pointer. After free(p), p still holds address but memory is invalid. Fix: set p = NULL after free, or don't access after free.
+
+#@@@@@@@@@@
+
+68. How do you use flexible array members in C99?
+
+Answer: Last member of struct can be incomplete array: `struct Buffer { int len; char data[]; };` Allocate: `malloc(sizeof(struct Buffer) + n)`. Provides variable-length struct. Must be last member, struct must have other members.
+
+#@@@@@@@@@@
+
+69. What is the difference between little-endian and big-endian?
+
+Answer: Little-endian stores least significant byte first (x86). Big-endian stores most significant byte first (network byte order). Affects multi-byte data representation. Use htonl/ntohl for network portability.
+
+#@@@@@@@@@@
+
+70. Which of the following are C11 features? (Multiple correct)
+A) _Generic
+B) _Static_assert
+C) _Atomic types
+D) Thread support
+E) Anonymous structs/unions
+F) Bounds-checking functions
+
+Answer: A, B, C, D, E, F - All are C11 features. _Generic (type-generic macros), _Static_assert (compile-time assert), _Atomic (atomic operations), threads.h, anonymous structs/unions, gets_s/strcpy_s.
+
+#@@@@@@@@@@
+
+71. Complete this C code for quicksort:
+```c
+#include <stdio.h>
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return _______________;
+}
+```
+
+Answer: `i + 1` - Return partition index. Quicksort recursively sorts left and right partitions. Average O(n log n), worst O(n²).
+
+#@@@@@@@@@@
+
+72. What is the purpose of register keyword in C?
+
+Answer: register suggests storing variable in CPU register for faster access. Compiler may ignore. Cannot take address of register variable. Modern compilers optimize automatically, register rarely needed. Mostly obsolete.
+
+#@@@@@@@@@@
+
+73. How do you implement a stack in C?
+
+Answer: Array-based: fixed size, simple, fast. Linked-list-based: dynamic size, flexible. Implement push, pop, peek, isEmpty. Track top index/pointer. Check overflow/underflow. LIFO (Last In First Out) structure.
+
+#@@@@@@@@@@
+
+74. Which of the following are valid C integer literals? (Multiple correct)
+A) 42
+B) 0x2A
+C) 052
+D) 0b101010
+E) 42L
+F) 42U
+
+Answer: A, B, C, E, F - 42 (decimal), 0x2A (hex), 052 (octal), 42L (long), 42U (unsigned) are valid. 0b101010 (binary) is C23/GCC extension, not standard C.
+
+#@@@@@@@@@@
+
+75. Complete this C code for directory traversal:
+```c
+#include <dirent.h>
+#include <stdio.h>
+
+int main() {
+    DIR *dir = opendir(".");
+    struct dirent *entry;
+
+    while ((entry = _______________) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    return 0;
+}
+```
+
+Answer: `readdir(dir)` - readdir() returns next directory entry, NULL at end. Use opendir/readdir/closedir for directory operations. POSIX, not standard C.
+
+#@@@@@@@@@@
+
+76. What is the difference between deep copy and shallow copy in C?
+
+Answer: Shallow copy copies pointer values (both point to same data). Deep copy duplicates pointed-to data (independent copies). For structs with pointers, shallow copy shares data, deep copy allocates new memory and copies content.
+
+#@@@@@@@@@@
+
+77. How do you use bit fields in C?
+
+Answer: Struct members with specified bit width: `struct Flags { unsigned int a:1; unsigned int b:3; };` Saves memory, used for hardware registers, flags. Compiler-dependent layout, not portable. Cannot take address of bit field.
+
+#@@@@@@@@@@
+
+78. Which of the following are C character classification functions? (Multiple correct)
+A) isalpha()
+B) isdigit()
+C) isspace()
+D) isupper()
+E) islower()
+F) isalnum()
+
+Answer: A, B, C, D, E, F - All are from ctype.h. isalpha (letter), isdigit (digit), isspace (whitespace), isupper/islower (case), isalnum (alphanumeric).
+
+#@@@@@@@@@@
+
+79. Complete this C code for pipe communication:
+```c
+#include <unistd.h>
+#include <stdio.h>
+
+int main() {
+    int pipefd[2];
+    pipe(pipefd);
+
+    if (fork() == 0) {
+        // Child writes
+        close(pipefd[0]);
+        write(pipefd[1], "Hello", 5);
+        close(pipefd[1]);
+    } else {
+        // Parent reads
+        close(pipefd[1]);
+        char buf[10];
+        read(_______________, buf, 10);
+        close(pipefd[0]);
+    }
+    return 0;
+}
+```
+
+Answer: `pipefd[0]` - Read from read end of pipe. pipefd[0] is read end, pipefd[1] is write end. Close unused ends. POSIX IPC mechanism.
+
+#@@@@@@@@@@
+
+80. What is the purpose of extern "C" in C headers?
+
+Answer: extern "C" prevents C++ name mangling when C header included in C++ code. Ensures C linkage. Example: `#ifdef __cplusplus extern "C" { #endif ... #ifdef __cplusplus } #endif`. Enables C/C++ interoperability.
+
+#@@@@@@@@@@
+
+81. How do you implement a queue in C?
+
+Answer: Array-based (circular buffer) or linked-list-based. Implement enqueue, dequeue, peek, isEmpty. Track front and rear pointers/indices. FIFO (First In First Out) structure. Handle full/empty conditions.
+
+#@@@@@@@@@@
+
+82. Which of the following are C time functions? (Multiple correct)
+A) time()
+B) clock()
+C) difftime()
+D) strftime()
+E) localtime()
+F) gmtime()
+
+Answer: A, B, C, D, E, F - All are from time.h. time (current time), clock (CPU time), difftime (time difference), strftime (format time), localtime/gmtime (convert time).
+
+#@@@@@@@@@@
+
+83. Complete this C code for semaphore usage:
+```c
+#include <semaphore.h>
+
+sem_t semaphore;
+
+void init() {
+    sem_init(&semaphore, 0, 1);
+}
+
+void critical_section() {
+    _______________;
+    // Critical section
+    sem_post(&semaphore);
+}
+```
+
+Answer: `sem_wait(&semaphore)` - Wait (decrement) semaphore before critical section, post (increment) after. Binary semaphore (value 1) acts as mutex. POSIX synchronization primitive.
+
+#@@@@@@@@@@
+
+84. What is the difference between #include <file.h> and #include "file.h"?
+
+Answer: <file.h> searches system include directories (standard headers). "file.h" searches current directory first, then system directories (user headers). Use <> for standard libraries, "" for project headers.
+
+#@@@@@@@@@@
+
+85. How do you use designated initializers in C99?
+
+Answer: Initialize specific struct/array members: `struct Point p = {.x = 10, .y = 20};` or `int arr[10] = {[0] = 1, [9] = 10};` Can initialize in any order, unspecified members zero-initialized. Improves readability.
+
+#@@@@@@@@@@
+
+86. Which of the following are C conversion specifiers for printf? (Multiple correct)
+A) %d
+B) %f
+C) %s
+D) %c
+E) %p
+F) %x
+
+Answer: A, B, C, D, E, F - All are printf conversion specifiers. %d (int), %f (float), %s (string), %c (char), %p (pointer), %x (hex).
+
+#@@@@@@@@@@
+
+87. Find the format string vulnerability in this C code:
+```c
+#include <stdio.h>
+
+void log_message(char *user_input) {
+    printf(user_input);  // Format string vulnerability
+}
+
+int main() {
+    char input[100];
+    fgets(input, sizeof(input), stdin);
+    log_message(input);
+    return 0;
+}
+```
+
+Answer: Using user input directly as format string. Attacker can use %s, %x, %n to read/write memory. Fix: `printf("%s", user_input);` Always use format string literal.
+
+#@@@@@@@@@@
+
+88. What is the purpose of _Alignas in C11?
+
+Answer: _Alignas specifies alignment requirement for variable/type. Example: `_Alignas(16) int arr[4];` Ensures proper alignment for SIMD, hardware requirements. Use alignof to query alignment. Part of C11 alignment support.
+
+#@@@@@@@@@@
+
+89. How do you use compound literals in C99?
+
+Answer: Create unnamed objects: `(int[]){1, 2, 3}` or `(struct Point){.x=1, .y=2}`. Used in function calls, assignments. Lifetime: automatic in block, static at file scope. Example: `func((int[]){1, 2, 3}, 3);`
+
+#@@@@@@@@@@
+
+90. Which of the following are C atomic operations? (Multiple correct)
+A) atomic_load()
+B) atomic_store()
+C) atomic_fetch_add()
+D) atomic_compare_exchange()
+E) atomic_flag_test_and_set()
+F) atomic_thread_fence()
+
+Answer: A, B, C, D, E, F - All are C11 atomic operations from stdatomic.h. Provide lock-free synchronization. atomic_load/store (access), fetch_add (increment), compare_exchange (CAS), flag operations, fences.
+
+#@@@@@@@@@@
+
+91. Complete this C code for binary search:
+```c
+int binary_search(int arr[], int size, int target) {
+    int left = 0, right = size - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (arr[mid] == target)
+            return mid;
+        else if (arr[mid] < target)
+            left = _______________;
+        else
+            right = mid - 1;
+    }
+
+    return -1;
+}
+```
+
+Answer: `mid + 1` - Move left pointer past mid. Binary search requires sorted array. O(log n) time complexity. Avoid overflow with `left + (right - left) / 2`.
+
+#@@@@@@@@@@
+
+92. What is the difference between call by value and call by reference in C?
+
+Answer: C only has call by value - copies argument values. Simulate call by reference with pointers - pass address, dereference in function. Changes to pointer parameters affect original. Arrays decay to pointers (implicit reference).
+
+#@@@@@@@@@@
+
+93. How do you use _Generic in C11?
+
+Answer: _Generic provides type-generic macros: `#define abs(x) _Generic((x), int: abs, long: labs, float: fabsf)(x)` Selects expression based on type. Compile-time type selection. Enables generic programming in C.
+
+#@@@@@@@@@@
+
+94. Which of the following are C standard library headers? (Multiple correct)
+A) stdio.h
+B) stdlib.h
+C) string.h
+D) math.h
+E) time.h
+F) ctype.h
+
+Answer: A, B, C, D, E, F - All are C standard library headers. stdio (I/O), stdlib (utilities), string (strings), math (math), time (time), ctype (character classification).
+
+#@@@@@@@@@@
+
+95. Complete this C code for merge sort:
+```c
+void merge(int arr[], int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    int L[n1], R[n2];
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = _______________;
+    }
+}
+```
+
+Answer: `R[j++]` - Copy from right array and increment index. Merge sort is stable, O(n log n) time, O(n) space. Divide and conquer algorithm.
+
+#@@@@@@@@@@
+
+96. What is the purpose of __attribute__ in GCC?
+
+Answer: __attribute__ specifies special attributes: `__attribute__((packed))` (no padding), `__attribute__((aligned(16)))` (alignment), `__attribute__((noreturn))` (never returns). GCC extension, not standard C. Used for optimization, hardware interfacing.
+
+#@@@@@@@@@@
+
+97. How do you implement a priority queue in C?
+
+Answer: Use binary heap (array-based). Min-heap or max-heap. Implement insert (heapify up), extract (heapify down), peek. Parent at i/2, children at 2i and 2i+1. O(log n) insert/extract, O(1) peek.
+
+#@@@@@@@@@@
+
+98. Which of the following are C relational operators? (Multiple correct)
+A) ==
+B) !=
+C) <
+D) >
+E) <=
+F) >=
+
+Answer: A, B, C, D, E, F - All are relational operators. == (equal), != (not equal), < (less), > (greater), <= (less or equal), >= (greater or equal). Return 1 (true) or 0 (false).
+
+#@@@@@@@@@@
+
+99. Complete this C code for thread creation:
+```c
+#include <pthread.h>
+#include <stdio.h>
+
+void* thread_function(void *arg) {
+    printf("Thread running\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_function, NULL);
+    _______________;
+    return 0;
+}
+```
+
+Answer: `pthread_join(thread, NULL)` - Wait for thread to complete. Without join, main may exit before thread finishes. Use pthread_detach for independent threads.
+
+#@@@@@@@@@@
+
+100. What is the difference between static and dynamic libraries in C?
+
+Answer: Static libraries (.a) linked at compile time, code included in executable, larger size, no runtime dependencies. Dynamic libraries (.so/.dll) linked at runtime, shared between programs, smaller executables, requires library at runtime. Use static for portability, dynamic for updates.
+
+#@@@@@@@@@@
+
+101. How do you use function-like macros in C?
+
+Answer: Define with parameters: `#define MAX(a,b) ((a) > (b) ? (a) : (b))` Use parentheses to avoid precedence issues. No type checking, inline expansion. Can cause side effects if arguments evaluated multiple times. Use inline functions in C99+ instead.
+
+#@@@@@@@@@@
+
+102. Which of the following are C logical operators? (Multiple correct)
+A) &&
+B) ||
+C) !
+D) &
+E) |
+F) ^
+
+Answer: A, B, C - && (AND), || (OR), ! (NOT) are logical operators. &, |, ^ are bitwise operators (not logical).
+
+#@@@@@@@@@@
+
+103. Complete this C code for bubble sort:
+```c
+void bubble_sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = _______________;
+            }
+        }
+    }
+}
+```
+
+Answer: `temp` - Swap adjacent elements if out of order. Bubble sort is O(n²), stable, simple but inefficient. Optimized version checks if swapped.
+
+#@@@@@@@@@@
+
+104. What is the purpose of atexit() in C?
+
+Answer: atexit() registers function to be called at program termination (normal exit). Example: `atexit(cleanup);` Called in reverse registration order. Maximum 32 functions (implementation-defined). Used for cleanup, logging.
+
+#@@@@@@@@@@
+
+105. How do you use va_copy() in C99?
+
+Answer: va_copy() copies va_list for multiple traversals: `va_list args2; va_copy(args2, args);` Must call va_end() on copy. Allows reusing variadic arguments. Example: count arguments first, then process.
+
+#@@@@@@@@@@
+
+106. Which of the following are C assignment operators? (Multiple correct)
+A) =
+B) +=
+C) -=
+D) *=
+E) /=
+F) %=
+
+Answer: A, B, C, D, E, F - All are assignment operators. = (simple), += (add), -= (subtract), *= (multiply), /= (divide), %= (modulo). Also: &=, |=, ^=, <<=, >>=.
+
+#@@@@@@@@@@
+
+107. Find the use-after-free bug in this C code:
+```c
+#include <stdlib.h>
+#include <string.h>
+
+char* process_string(char *str) {
+    char *result = malloc(strlen(str) + 1);
+    strcpy(result, str);
+    free(result);
+    return result;  // Use-after-free
+}
+
+int main() {
+    char *s = process_string("Hello");
+    printf("%s\n", s);  // Undefined behavior
+    return 0;
+}
+```
+
+Answer: Returning freed pointer. result freed before return, caller accesses invalid memory. Fix: don't free before return, or let caller free. Memory management responsibility must be clear.
+
+#@@@@@@@@@@
+
+108. What is the difference between fread() and fwrite() in C?
+
+Answer: fread() reads binary data from file: `fread(ptr, size, count, file)`. fwrite() writes binary data to file: `fwrite(ptr, size, count, file)`. Both return number of items read/written. Used for binary I/O, structures, arrays.
+
+#@@@@@@@@@@
+
+109. How do you implement a trie in C?
+
+Answer: Tree structure for strings. Node has children array (26 for lowercase), isEndOfWord flag. Implement insert, search, delete. O(m) operations where m is string length. Used for autocomplete, spell checking, IP routing.
+
+#@@@@@@@@@@
+
+110. Which of the following are C increment/decrement operators? (Multiple correct)
+A) ++
+B) --
+C) +=
+D) -=
+E) +1
+F) -1
+
+Answer: A, B - ++ (increment), -- (decrement) are increment/decrement operators. += and -= are compound assignment. +1 and -1 are expressions, not operators.
+
+#@@@@@@@@@@
+
+111. Complete this C code for selection sort:
+```c
+void selection_sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx])
+                min_idx = j;
+        }
+        int temp = arr[min_idx];
+        arr[min_idx] = arr[i];
+        arr[i] = _______________;
+    }
+}
+```
+
+Answer: `temp` - Swap minimum element with current position. Selection sort is O(n²), not stable, simple. Makes minimum number of swaps.
+
+#@@@@@@@@@@
+
+112. What is the purpose of _Noreturn in C11?
+
+Answer: _Noreturn indicates function never returns (exits, infinite loop, longjmp). Example: `_Noreturn void fatal_error(const char *msg);` Enables compiler optimizations, warnings. Similar to __attribute__((noreturn)) in GCC.
+
+#@@@@@@@@@@
+
+113. How do you use snprintf() safely in C?
+
+Answer: snprintf() writes formatted string with size limit: `snprintf(buf, sizeof(buf), "Value: %d", x);` Returns would-be length (may exceed buffer). Always check return value. Prevents buffer overflow. Null-terminates if space available.
+
+#@@@@@@@@@@
+
+114. Which of the following are C ternary operators? (Multiple correct)
+A) ? :
+B) &&
+C) ||
+D) ,
+E) sizeof
+F) &
+
+Answer: A - Only ?: is ternary operator (conditional). Others are binary or unary. Syntax: `condition ? true_expr : false_expr`. Only ternary operator in C.
+
+#@@@@@@@@@@
+
+115. Complete this C code for insertion sort:
+```c
+void insertion_sort(int arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = _______________;
+    }
+}
+```
+
+Answer: `key` - Insert key at correct position. Insertion sort is O(n²), stable, efficient for small/nearly sorted arrays. Online algorithm.
+
+#@@@@@@@@@@
+
+116. What is the difference between fseek() and ftell() in C?
+
+Answer: fseek() sets file position: `fseek(file, offset, SEEK_SET/SEEK_CUR/SEEK_END)`. ftell() returns current position: `long pos = ftell(file);` Used for random access, file size calculation. Return -1 on error.
+
+#@@@@@@@@@@
+
+117. How do you use _Static_assert in C11?
+
+Answer: _Static_assert() checks condition at compile time: `_Static_assert(sizeof(int) == 4, "int must be 4 bytes");` Fails compilation if false. Used for platform assumptions, struct sizes, alignment. No runtime overhead.
+
+#@@@@@@@@@@
+
+118. Which of the following are C comma operator uses? (Multiple correct)
+A) Multiple expressions in for loop
+B) Function argument separator
+C) Array initializer separator
+D) Sequence point operator
+E) Variable declaration separator
+F) Return multiple values
+
+Answer: A, D - Comma operator evaluates left to right, returns rightmost value. Used in for loops: `for (i=0, j=10; i<j; i++, j--)`. B, C, E use comma as separator (not operator). F not possible in C.
+
+#@@@@@@@@@@
+
+119. Complete this C code for heap allocation:
+```c
+#include <stdlib.h>
+
+int main() {
+    int n = 100;
+    int *arr = malloc(n * sizeof(int));
+
+    if (arr == NULL) {
+        return 1;
+    }
+
+    // Use arr
+
+    _______________;
+    return 0;
+}
+```
+
+Answer: `free(arr)` - Always free allocated memory to prevent leaks. Check malloc return value. Set pointer to NULL after free (optional but good practice).
+
+#@@@@@@@@@@
+
+120. What is the purpose of uintptr_t in C?
+
+Answer: uintptr_t is unsigned integer type that can hold pointer value (from stdint.h). Used for pointer arithmetic, bit manipulation on pointers, serialization. Guaranteed to convert pointer to integer and back without loss.
+
+#@@@@@@@@@@
+
+121. How do you implement a graph in C?
+
+Answer: Adjacency matrix (2D array) or adjacency list (array of linked lists). Matrix: O(V²) space, O(1) edge check. List: O(V+E) space, O(degree) edge check. Implement add_edge, BFS, DFS, shortest path algorithms.
+
+#@@@@@@@@@@
+
+122. Which of the following are C sizeof operator properties? (Multiple correct)
+A) Compile-time evaluation
+B) Returns size_t type
+C) Works on types and variables
+D) Doesn't evaluate expression
+E) Unary operator
+F) Can be used in #if
+
+Answer: A, B, C, D, E - sizeof evaluated at compile time, returns size_t, works on types/variables, doesn't evaluate operand (except VLA), unary operator. Cannot use in #if (preprocessor doesn't know types).
+
+#@@@@@@@@@@
+
+123. Complete this C code for counting sort:
+```c
+void counting_sort(int arr[], int n, int max) {
+    int count[max + 1];
+    int output[n];
+
+    for (int i = 0; i <= max; i++)
+        count[i] = 0;
+
+    for (int i = 0; i < n; i++)
+        count[arr[i]]++;
+
+    for (int i = 1; i <= max; i++)
+        count[i] += _______________;
+
+    for (int i = n - 1; i >= 0; i--) {
+        output[count[arr[i]] - 1] = arr[i];
+        count[arr[i]]--;
+    }
+}
+```
+
+Answer: `count[i - 1]` - Cumulative count for positioning. Counting sort is O(n+k), stable, non-comparison sort. Requires known range.
+
+#@@@@@@@@@@
+
+124. What is the difference between strncpy() and strcpy() in C?
+
+Answer: strcpy() copies until null terminator, no size limit, buffer overflow risk. strncpy() copies up to n characters, may not null-terminate if source >= n. Always use strncpy() with size-1 and manually add null terminator.
+
+#@@@@@@@@@@
+
+125. How do you use dlopen() and dlsym() in C?
+
+Answer: dlopen() loads shared library at runtime: `void *handle = dlopen("lib.so", RTLD_LAZY);` dlsym() gets symbol: `void (*func)() = dlsym(handle, "function");` dlclose() unloads. Used for plugins, dynamic loading. POSIX API.
+
+#@@@@@@@@@@
+
+126. Which of the following are C pointer arithmetic operations? (Multiple correct)
+A) ptr + n
+B) ptr - n
+C) ptr1 - ptr2
+D) ptr++
+E) ptr--
+F) ptr * n
+
+Answer: A, B, C, D, E - ptr+n, ptr-n (move by n elements), ptr1-ptr2 (distance), ptr++, ptr-- (move by 1). ptr*n is invalid (can't multiply pointers).
+
+#@@@@@@@@@@
+
+127. Complete this C code for radix sort:
+```c
+void radix_sort(int arr[], int n) {
+    int max = arr[0];
+    for (int i = 1; i < n; i++)
+        if (arr[i] > max)
+            max = arr[i];
+
+    for (int exp = 1; max / exp > 0; exp *= 10)
+        _______________;
+}
+```
+
+Answer: `counting_sort_by_digit(arr, n, exp)` - Sort by each digit using counting sort. Radix sort is O(d*(n+k)), stable, non-comparison. Processes digits from least to most significant.
+
+#@@@@@@@@@@
+
+128. What is the purpose of intmax_t and uintmax_t in C?
+
+Answer: intmax_t and uintmax_t are largest signed/unsigned integer types (from stdint.h). Guaranteed to hold any integer value. Used for maximum range, generic code. Example: `intmax_t big = INTMAX_MAX;`
+
+#@@@@@@@@@@
+
+129. How do you implement a bloom filter in C?
+
+Answer: Bit array with multiple hash functions. Insert: set bits at hash positions. Query: check all hash positions. False positives possible, no false negatives. Space-efficient probabilistic data structure. Used for membership testing.
+
+#@@@@@@@@@@
+
+130. Which of the following are C standard integer types from stdint.h? (Multiple correct)
+A) int8_t
+B) int16_t
+C) int32_t
+D) int64_t
+E) uint8_t
+F) uint16_t
+
+Answer: A, B, C, D, E, F - All are fixed-width integer types from stdint.h. int8_t, int16_t, int32_t, int64_t (signed), uint8_t, uint16_t, uint32_t, uint64_t (unsigned). Guaranteed sizes.
+
+#@@@@@@@@@@
+
+131. Complete this C code for shell sort:
+```c
+void shell_sort(int arr[], int n) {
+    for (int gap = n / 2; gap > 0; gap /= 2) {
+        for (int i = gap; i < n; i++) {
+            int temp = arr[i];
+            int j;
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
+                arr[j] = _______________;
+            arr[j] = temp;
+        }
+    }
+}
+```
+
+Answer: `arr[j - gap]` - Shift elements by gap. Shell sort is O(n log²n) to O(n²), unstable, improved insertion sort. Gap sequence affects performance.
+
+#@@@@@@@@@@
+
+132. What is the difference between abort() and exit() in C?
+
+Answer: exit() performs normal termination, calls atexit handlers, flushes buffers, closes files. abort() performs abnormal termination, generates SIGABRT, no cleanup. exit(0) success, exit(1) failure. Use abort() for fatal errors.
+
+#@@@@@@@@@@
+
+133. How do you use mmap() in C?
+
+Answer: mmap() maps file/device to memory: `void *addr = mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, offset);` munmap() unmaps. Used for file I/O, shared memory, large allocations. POSIX API.
+
+#@@@@@@@@@@
+
+134. Which of the following are C string comparison functions? (Multiple correct)
+A) strcmp()
+B) strncmp()
+C) strcasecmp()
+D) strncasecmp()
+E) memcmp()
+F) strcoll()
+
+Answer: A, B, E, F - strcmp, strncmp, memcmp, strcoll are standard. strcasecmp, strncasecmp are POSIX (not C standard). strcmp (full), strncmp (n chars), memcmp (binary), strcoll (locale-aware).
+
+#@@@@@@@@@@
+
+135. Complete this C code for heap sort:
+```c
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    if (largest != i) {
+        swap(&arr[i], &arr[largest]);
+        _______________;
+    }
+}
+```
+
+Answer: `heapify(arr, n, largest)` - Recursively heapify subtree. Heap sort is O(n log n), not stable, in-place. Build max-heap, then extract elements.
+
+#@@@@@@@@@@
+
+136. What is the purpose of __func__ in C99?
+
+Answer: __func__ is predefined identifier containing current function name as string. Example: `printf("Error in %s\n", __func__);` Used for debugging, logging, error messages. Similar to __FUNCTION__ in GCC.
+
+#@@@@@@@@@@
+
+137. How do you implement a red-black tree in C?
+
+Answer: Self-balancing BST with color property (red/black). Maintain: root black, red nodes have black children, all paths have same black count. Implement insert with recoloring/rotation, delete. O(log n) operations. Complex but efficient.
+
+#@@@@@@@@@@
+
+138. Which of the following are C memory allocation functions? (Multiple correct)
+A) malloc()
+B) calloc()
+C) realloc()
+D) free()
+E) alloca()
+F) aligned_alloc()
+
+Answer: A, B, C, D, F - malloc, calloc, realloc, free, aligned_alloc (C11) are standard. alloca is non-standard (stack allocation). aligned_alloc for aligned memory.
+
+#@@@@@@@@@@
+
+139. Complete this C code for bucket sort:
+```c
+void bucket_sort(float arr[], int n) {
+    struct Bucket {
+        int count;
+        float *values;
+    } buckets[n];
+
+    for (int i = 0; i < n; i++) {
+        buckets[i].count = 0;
+        buckets[i].values = malloc(n * sizeof(float));
+    }
+
+    for (int i = 0; i < n; i++) {
+        int idx = n * arr[i];
+        buckets[idx].values[buckets[idx].count++] = arr[i];
+    }
+
+    for (int i = 0; i < n; i++)
+        _______________;
+}
+```
+
+Answer: `insertion_sort(buckets[i].values, buckets[i].count)` - Sort each bucket individually. Bucket sort is O(n+k) average, O(n²) worst. Good for uniformly distributed data.
+
+#@@@@@@@@@@
+
+140. What is the difference between fflush() and fsync() in C?
+
+Answer: fflush() flushes C library buffer to OS (stdio.h). fsync() flushes OS buffer to disk (POSIX). fflush(stdout) ensures output visible. fsync(fd) ensures data on disk. Use both for durability.
+
+#@@@@@@@@@@
+
+141. How do you use strtol() and strtod() in C?
+
+Answer: strtol() converts string to long: `long val = strtol(str, &endptr, base);` strtod() converts to double: `double d = strtod(str, &endptr);` Check endptr for errors. Base 0 auto-detects (0x hex, 0 octal, else decimal).
+
+#@@@@@@@@@@
+
+142. Which of the following are C file positioning functions? (Multiple correct)
+A) fseek()
+B) ftell()
+C) rewind()
+D) fgetpos()
+E) fsetpos()
+F) feof()
+
+Answer: A, B, C, D, E - fseek, ftell, rewind, fgetpos, fsetpos are positioning functions. feof() checks end-of-file (not positioning). rewind() is fseek(file, 0, SEEK_SET).
+
+#@@@@@@@@@@
+
+143. Complete this C code for LRU cache:
+```c
+struct LRUNode {
+    int key, value;
+    struct LRUNode *prev, *next;
+};
+
+struct LRUCache {
+    int capacity, size;
+    struct LRUNode *head, *tail;
+    // Hash map for O(1) lookup
+};
+
+void move_to_front(struct LRUCache *cache, struct LRUNode *node) {
+    // Remove from current position
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+
+    // Insert at front
+    node->next = cache->head->next;
+    node->prev = cache->head;
+    cache->head->next->prev = node;
+    cache->head->next = _______________;
+}
+```
+
+Answer: `node` - Move accessed node to front (most recently used). LRU cache uses doubly linked list + hash map. O(1) get/put operations.
+
+#@@@@@@@@@@
+
+144. What is the purpose of __LINE__ and __FILE__ in C?
+
+Answer: __LINE__ is current line number (integer). __FILE__ is current file name (string). Predefined macros for debugging, logging, assertions. Example: `printf("Error at %s:%d\n", __FILE__, __LINE__);`
+
+#@@@@@@@@@@
+
+145. How do you implement a skip list in C?
+
+Answer: Probabilistic data structure with multiple levels. Each node has forward pointers array. Insert/search/delete in O(log n) average. Simpler than balanced trees. Random level assignment. Used as alternative to balanced BST.
+
+#@@@@@@@@@@
+
+146. Which of the following are C wide character functions? (Multiple correct)
+A) wprintf()
+B) wscanf()
+C) wcslen()
+D) wcscpy()
+E) wcscat()
+F) wcscmp()
+
+Answer: A, B, C, D, E, F - All are wide character functions from wchar.h. wprintf/wscanf (I/O), wcslen (length), wcscpy (copy), wcscat (concatenate), wcscmp (compare). For Unicode/internationalization.
+
+#@@@@@@@@@@
+
+147. Complete this C code for Dijkstra's algorithm:
+```c
+void dijkstra(int graph[V][V], int src) {
+    int dist[V];
+    bool visited[V];
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INT_MAX;
+        visited[i] = false;
+    }
+    dist[src] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = min_distance(dist, visited);
+        visited[u] = true;
+
+        for (int v = 0; v < V; v++) {
+            if (!visited[v] && graph[u][v] &&
+                dist[u] != INT_MAX &&
+                dist[u] + graph[u][v] < dist[v])
+                dist[v] = _______________;
+        }
+    }
+}
+```
+
+Answer: `dist[u] + graph[u][v]` - Update distance if shorter path found. Dijkstra's algorithm finds shortest paths from source. O(V²) or O(E log V) with priority queue.
+
+#@@@@@@@@@@
+
+148. What is the difference between setvbuf() and setbuf() in C?
+
+Answer: setvbuf() sets buffer mode and size: `setvbuf(file, buffer, _IOFBF/_IOLBF/_IONBF, size)`. setbuf() is simpler: `setbuf(file, buffer)` (fully buffered or unbuffered). setvbuf() more flexible. Used for performance tuning.
+
+#@@@@@@@@@@
+
+149. How do you use getopt() for command line parsing in C?
+
+Answer: getopt() parses options: `while ((opt = getopt(argc, argv, "ab:c::")) != -1)` a (no arg), b: (required arg), c:: (optional arg). optarg holds argument, optind is next index. POSIX function for CLI parsing.
+
+#@@@@@@@@@@
+
+150. Which of the following are C error handling mechanisms? (Multiple correct)
+A) errno
+B) perror()
+C) strerror()
+D) Return codes
+E) setjmp/longjmp
+F) Assertions
+
+Answer: A, B, C, D, E, F - All are error handling mechanisms. errno (error number), perror (print error), strerror (error string), return codes (function returns), setjmp/longjmp (non-local jumps), assertions (debug checks).
+
+#@@@@@@@@@@
+
+151. Complete this C code for Floyd-Warshall algorithm:
+```c
+void floyd_warshall(int graph[V][V]) {
+    int dist[V][V];
+
+    for (int i = 0; i < V; i++)
+        for (int j = 0; j < V; j++)
+            dist[i][j] = graph[i][j];
+
+    for (int k = 0; k < V; k++) {
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (dist[i][k] != INT_MAX &&
+                    dist[k][j] != INT_MAX &&
+                    dist[i][k] + dist[k][j] < dist[i][j])
+                    dist[i][j] = _______________;
+            }
+        }
+    }
+}
+```
+
+Answer: `dist[i][k] + dist[k][j]` - Update distance through intermediate vertex k. Floyd-Warshall finds all-pairs shortest paths. O(V³) time complexity.
+
+#@@@@@@@@@@
+
+152. What is the purpose of tmpfile() and tmpnam() in C?
+
+Answer: tmpfile() creates temporary file, returns FILE*, auto-deleted on close. tmpnam() generates unique filename. tmpfile() safer (no race conditions). Use mkstemp() (POSIX) for secure temp files. Avoid tmpnam() (security issues).
+
+#@@@@@@@@@@
+
+153. How do you implement a B-tree in C?
+
+Answer: Self-balancing tree with multiple keys per node. Nodes have minimum degree t. Internal nodes have t-1 to 2t-1 keys. Implement search, insert (split), delete (merge/redistribute). O(log n) operations. Used in databases, filesystems.
+
+#@@@@@@@@@@
+
+154. Which of the following are C locale functions? (Multiple correct)
+A) setlocale()
+B) localeconv()
+C) strcoll()
+D) strxfrm()
+E) strftime()
+F) isalpha()
+
+Answer: A, B, C, D - setlocale (set locale), localeconv (locale info), strcoll (locale compare), strxfrm (locale transform) are locale functions. strftime uses locale but is time function. isalpha is character function.
+
+#@@@@@@@@@@
+
+155. Complete this C code for Bellman-Ford algorithm:
+```c
+void bellman_ford(int graph[V][V], int src) {
+    int dist[V];
+
+    for (int i = 0; i < V; i++)
+        dist[i] = INT_MAX;
+    dist[src] = 0;
+
+    for (int i = 0; i < V - 1; i++) {
+        for (int u = 0; u < V; u++) {
+            for (int v = 0; v < V; v++) {
+                if (graph[u][v] && dist[u] != INT_MAX &&
+                    dist[u] + graph[u][v] < dist[v])
+                    dist[v] = _______________;
+            }
+        }
+    }
+}
+```
+
+Answer: `dist[u] + graph[u][v]` - Relax edges V-1 times. Bellman-Ford handles negative weights, detects negative cycles. O(VE) time complexity.
+
+#@@@@@@@@@@
+
+156. What is the difference between asctime() and ctime() in C?
+
+Answer: asctime() converts struct tm to string: `char *s = asctime(&tm);` ctime() converts time_t to string: `char *s = ctime(&t);` Both return static buffer (not thread-safe). Use asctime_r/ctime_r for thread safety.
+
+#@@@@@@@@@@
+
+157. How do you use iconv() for character encoding conversion in C?
+
+Answer: iconv() converts between encodings: `iconv_t cd = iconv_open("UTF-8", "ISO-8859-1"); iconv(cd, &inbuf, &inleft, &outbuf, &outleft); iconv_close(cd);` Used for internationalization. POSIX function.
+
+#@@@@@@@@@@
+
+158. Which of the following are C signal handling functions? (Multiple correct)
+A) signal()
+B) raise()
+C) kill()
+D) sigaction()
+E) alarm()
+F) pause()
+
+Answer: A, B, D, E, F - signal, raise, sigaction, alarm, pause are signal functions. kill() is POSIX (not C standard). signal (register handler), raise (send to self), sigaction (advanced), alarm (timer), pause (wait).
+
+#@@@@@@@@@@
+
+159. Complete this C code for Kruskal's algorithm:
+```c
+struct Edge {
+    int src, dest, weight;
+};
+
+int find(int parent[], int i) {
+    if (parent[i] != i)
+        parent[i] = find(parent, parent[i]);
+    return parent[i];
+}
+
+void kruskal(struct Edge edges[], int E, int V) {
+    qsort(edges, E, sizeof(struct Edge), compare);
+    int parent[V];
+    for (int i = 0; i < V; i++)
+        parent[i] = i;
+
+    for (int i = 0; i < E; i++) {
+        int x = find(parent, edges[i].src);
+        int y = find(parent, edges[i].dest);
+        if (x != y)
+            parent[x] = _______________;
+    }
+}
+```
+
+Answer: `y` - Union operation in union-find. Kruskal's algorithm finds minimum spanning tree. Sort edges, use union-find to detect cycles. O(E log E) time.
+
+#@@@@@@@@@@
+
+160. What is the purpose of clearerr() and ferror() in C?
+
+Answer: ferror() checks if error occurred on stream: `if (ferror(file))`. clearerr() clears error and EOF indicators: `clearerr(file)`. Used after I/O errors to reset state and continue operations.
+
+#@@@@@@@@@@
+
+161. How do you implement a suffix tree in C?
+
+Answer: Compressed trie of all suffixes. Ukkonen's algorithm for O(n) construction. Each edge labeled with substring. Used for pattern matching, longest common substring, longest repeated substring. Complex but powerful for string algorithms.
+
+#@@@@@@@@@@
+
+162. Which of the following are C multibyte character functions? (Multiple correct)
+A) mblen()
+B) mbtowc()
+C) wctomb()
+D) mbstowcs()
+E) wcstombs()
+F) mbrtowc()
+
+Answer: A, B, C, D, E - mblen, mbtowc, wctomb, mbstowcs, wcstombs are standard. mbrtowc is C95/POSIX (restartable version). Used for multibyte/wide character conversion.
+
+#@@@@@@@@@@
+
+163. Complete this C code for Prim's algorithm:
+```c
+void prim(int graph[V][V]) {
+    int parent[V], key[V];
+    bool inMST[V];
+
+    for (int i = 0; i < V; i++) {
+        key[i] = INT_MAX;
+        inMST[i] = false;
+    }
+    key[0] = 0;
+    parent[0] = -1;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = min_key(key, inMST);
+        inMST[u] = true;
+
+        for (int v = 0; v < V; v++) {
+            if (graph[u][v] && !inMST[v] && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = _______________;
+            }
+        }
+    }
+}
+```
+
+Answer: `graph[u][v]` - Update key with edge weight. Prim's algorithm finds minimum spanning tree. Greedy approach, O(V²) or O(E log V) with heap.
+
+#@@@@@@@@@@
+
+164. What is the difference between rand() and random() in C?
+
+Answer: rand() is C standard, returns 0 to RAND_MAX, simple LCG. random() is POSIX, better quality, larger period. Both not cryptographically secure. Use arc4random() or /dev/urandom for security. Seed with srand()/srandom().
+
+#@@@@@@@@@@
+
+165. How do you use qsort() in C?
+
+Answer: qsort() sorts array: `qsort(arr, count, size, compare_func)`. Compare function: `int cmp(const void *a, const void *b)` returns <0, 0, >0. Example: `qsort(arr, n, sizeof(int), compare_int);` Generic sorting function.
+
+#@@@@@@@@@@
+
+166. Which of the following are C environment functions? (Multiple correct)
+A) getenv()
+B) setenv()
+C) putenv()
+D) system()
+E) exit()
+F) atexit()
+
+Answer: A, D, E, F - getenv, system, exit, atexit are standard. setenv, putenv are POSIX. getenv (get variable), system (execute command), exit (terminate), atexit (register cleanup).
+
+#@@@@@@@@@@
+
+167. Complete this C code for topological sort:
+```c
+void topological_sort_util(int v, bool visited[], int stack[], int *top, int graph[V][V]) {
+    visited[v] = true;
+
+    for (int i = 0; i < V; i++) {
+        if (graph[v][i] && !visited[i])
+            topological_sort_util(i, visited, stack, top, graph);
+    }
+
+    stack[++(*top)] = _______________;
+}
+```
+
+Answer: `v` - Push vertex to stack after visiting all descendants. Topological sort orders DAG vertices. DFS-based, O(V+E). Used for task scheduling, dependency resolution.
+
+#@@@@@@@@@@
+
+168. What is the purpose of ungetc() in C?
+
+Answer: ungetc() pushes character back to input stream: `ungetc(c, file);` Only one character guaranteed. Used for lookahead in parsers. Next read returns pushed character. Cannot push EOF.
+
+#@@@@@@@@@@
+
+169. How do you implement a segment tree in C?
+
+Answer: Binary tree for range queries. Each node stores aggregate (sum, min, max) of range. Build O(n), query O(log n), update O(log n). Array representation: left child 2i, right child 2i+1. Used for range sum/min/max queries.
+
+#@@@@@@@@@@
+
+170. Which of the following are C assertion macros? (Multiple correct)
+A) assert()
+B) static_assert()
+C) _Static_assert()
+D) NDEBUG
+E) __assert_fail()
+F) assert_perror()
+
+Answer: A, C - assert() (runtime), _Static_assert() (compile-time C11) are standard. static_assert is C23/C++ alias. NDEBUG disables assert. __assert_fail, assert_perror are implementation/POSIX.
+
+#@@@@@@@@@@
+
+171. Complete this C code for binary indexed tree (Fenwick tree):
+```c
+void update(int BIT[], int n, int index, int val) {
+    index++;
+    while (index <= n) {
+        BIT[index] += val;
+        index += _______________;
+    }
+}
+
+int query(int BIT[], int index) {
+    int sum = 0;
+    index++;
+    while (index > 0) {
+        sum += BIT[index];
+        index -= index & (-index);
+    }
+    return sum;
+}
+```
+
+Answer: `index & (-index)` - Add least significant bit. Fenwick tree supports range sum queries and updates in O(log n). Compact and efficient.
+
+#@@@@@@@@@@
+
+172. What is the purpose of offsetof() macro in C?
+
+Answer: offsetof() returns byte offset of struct member: `size_t off = offsetof(struct S, member);` From stddef.h. Used for serialization, memory layout, introspection. Compile-time constant.
+
+#@@@@@@@@@@
+
+173. How do you implement a disjoint set (union-find) in C?
+
+Answer: Array-based with path compression and union by rank. find() with path compression, union() with rank. O(α(n)) amortized time (nearly constant). Used in Kruskal's algorithm, network connectivity, image processing.
+
+#@@@@@@@@@@
+
+174. Which of the following are C preprocessor operators? (Multiple correct)
+A) #
+B) ##
+C) defined
+D) _Pragma
+E) #@
+F) %:
+
+Answer: A, B, C, D - # (stringification), ## (token pasting), defined (check macro), _Pragma (pragma operator) are standard. #@ is Microsoft extension. %: is digraph (not operator).
+
+#@@@@@@@@@@
+
+175. Complete this C code for KMP pattern matching:
+```c
+void compute_lps(char *pattern, int M, int lps[]) {
+    int len = 0;
+    lps[0] = 0;
+    int i = 1;
+
+    while (i < M) {
+        if (pattern[i] == pattern[len]) {
+            len++;
+            lps[i] = len;
+            i++;
+        } else {
+            if (len != 0)
+                len = _______________;
+            else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+}
+```
+
+Answer: `lps[len - 1]` - Fallback to previous LPS value. KMP algorithm finds pattern in O(n+m) time. Longest Proper Prefix which is also Suffix array.
+
+#@@@@@@@@@@
+
+176. What is the difference between vprintf() and vsprintf() in C?
+
+Answer: vprintf() prints to stdout with va_list: `vprintf(format, args);` vsprintf() writes to string: `vsprintf(buf, format, args);` Both take va_list instead of variable arguments. Used in wrapper functions. Use vsnprintf() for safety.
+
+#@@@@@@@@@@
+
+177. How do you use bsearch() in C?
+
+Answer: bsearch() performs binary search: `void *result = bsearch(&key, arr, count, size, compare);` Array must be sorted. Returns pointer to found element or NULL. O(log n) time. Example: `bsearch(&target, arr, n, sizeof(int), cmp);`
+
+#@@@@@@@@@@
+
+178. Which of the following are C trigonometric functions? (Multiple correct)
+A) sin()
+B) cos()
+C) tan()
+D) asin()
+E) acos()
+F) atan()
+
+Answer: A, B, C, D, E, F - All are trigonometric functions from math.h. sin, cos, tan (basic), asin, acos, atan (inverse). Also: sinh, cosh, tanh (hyperbolic), atan2 (two-argument).
+
+#@@@@@@@@@@
+
+179. Complete this C code for Rabin-Karp algorithm:
+```c
+#define d 256
+#define q 101
+
+void rabin_karp(char *text, char *pattern) {
+    int M = strlen(pattern);
+    int N = strlen(text);
+    int p = 0, t = 0, h = 1;
+
+    for (int i = 0; i < M - 1; i++)
+        h = (h * d) % q;
+
+    for (int i = 0; i < M; i++) {
+        p = (d * p + pattern[i]) % q;
+        t = (d * t + text[i]) % q;
+    }
+
+    for (int i = 0; i <= N - M; i++) {
+        if (p == t) {
+            // Check characters
+        }
+        if (i < N - M) {
+            t = (d * (t - text[i] * h) + text[i + M]) % q;
+            if (t < 0)
+                t = _______________;
+        }
+    }
+}
+```
+
+Answer: `t + q` - Handle negative modulo. Rabin-Karp uses rolling hash for pattern matching. O(n+m) average, O(nm) worst case.
+
+#@@@@@@@@@@
+
+180. What is the purpose of freopen() in C?
+
+Answer: freopen() reassigns stream to new file: `freopen("output.txt", "w", stdout);` Redirects stdin/stdout/stderr. Returns stream pointer or NULL. Used for file redirection without changing code.
+
+#@@@@@@@@@@
+
+181. How do you implement an AVL tree in C?
+
+Answer: Self-balancing BST with height property. Balance factor = height(left) - height(right) ∈ {-1, 0, 1}. Rotations: LL, RR, LR, RL. O(log n) operations. More strictly balanced than red-black tree.
+
+#@@@@@@@@@@
+
+182. Which of the following are C complex number functions? (Multiple correct)
+A) cabs()
+B) carg()
+C) creal()
+D) cimag()
+E) conj()
+F) cexp()
+
+Answer: A, B, C, D, E, F - All are complex functions from complex.h (C99). cabs (magnitude), carg (argument), creal/cimag (components), conj (conjugate), cexp (exponential).
+
+#@@@@@@@@@@
+
+183. Complete this C code for Z algorithm:
+```c
+void calculate_z(char *str, int Z[]) {
+    int n = strlen(str);
+    int L = 0, R = 0;
+
+    for (int i = 1; i < n; i++) {
+        if (i > R) {
+            L = R = i;
+            while (R < n && str[R - L] == str[R])
+                R++;
+            Z[i] = R - L;
+            R--;
+        } else {
+            int k = i - L;
+            if (Z[k] < R - i + 1)
+                Z[i] = Z[k];
+            else {
+                L = i;
+                while (R < n && str[R - L] == str[R])
+                    R++;
+                Z[i] = _______________;
+                R--;
+            }
+        }
+    }
+}
+```
+
+Answer: `R - L` - Z array stores length of longest substring starting at i matching prefix. Z algorithm for pattern matching in O(n+m) time.
+
+#@@@@@@@@@@
+
+184. What is the difference between longjmp() and siglongjmp() in C?
+
+Answer: longjmp() restores context from setjmp(), may not restore signal mask. siglongjmp() restores context from sigsetjmp(), can restore signal mask if specified. Use siglongjmp() in signal handlers for safety.
+
+#@@@@@@@@@@
+
+185. How do you use strptime() and strftime() in C?
+
+Answer: strptime() parses time string: `strptime(str, "%Y-%m-%d", &tm);` strftime() formats time: `strftime(buf, size, "%Y-%m-%d", &tm);` POSIX functions for time conversion. Locale-aware formatting.
+
+#@@@@@@@@@@
+
+186. Which of the following are C floating-point classification functions? (Multiple correct)
+A) isfinite()
+B) isinf()
+C) isnan()
+D) isnormal()
+E) signbit()
+F) fpclassify()
+
+Answer: A, B, C, D, E, F - All are from math.h (C99). isfinite (finite), isinf (infinite), isnan (NaN), isnormal (normal), signbit (sign), fpclassify (category).
+
+#@@@@@@@@@@
+
+187. Complete this C code for Manacher's algorithm:
+```c
+void manacher(char *s) {
+    int n = strlen(s);
+    char T[2 * n + 3];
+    T[0] = '^';
+    for (int i = 0; i < n; i++) {
+        T[2 * i + 1] = '#';
+        T[2 * i + 2] = s[i];
+    }
+    T[2 * n + 1] = '#';
+    T[2 * n + 2] = '$';
+
+    int P[2 * n + 3];
+    int C = 0, R = 0;
+
+    for (int i = 1; i < 2 * n + 2; i++) {
+        int mirror = 2 * C - i;
+        if (i < R)
+            P[i] = min(R - i, P[mirror]);
+
+        while (T[i + P[i] + 1] == T[i - P[i] - 1])
+            P[i]++;
+
+        if (i + P[i] > R) {
+            C = i;
+            R = _______________;
+        }
+    }
+}
+```
+
+Answer: `i + P[i]` - Update rightmost boundary. Manacher's algorithm finds longest palindromic substring in O(n) time.
+
+#@@@@@@@@@@
+
+188. What is the purpose of __builtin functions in GCC?
+
+Answer: __builtin functions are GCC built-ins for optimization. Examples: __builtin_popcount (count bits), __builtin_clz (leading zeros), __builtin_expect (branch prediction), __builtin_memcpy (optimized copy). Compiler-specific, not portable.
+
+#@@@@@@@@@@
+
+189. How do you implement a suffix array in C?
+
+Answer: Array of indices sorted by suffixes. Build with O(n log²n) or O(n log n) algorithms. Used with LCP array for string algorithms. Space-efficient alternative to suffix tree. Pattern matching, longest common substring.
+
+#@@@@@@@@@@
+
+190. Which of the following are C rounding functions? (Multiple correct)
+A) ceil()
+B) floor()
+C) round()
+D) trunc()
+E) rint()
+F) nearbyint()
+
+Answer: A, B, C, D, E, F - All are rounding functions from math.h. ceil (up), floor (down), round (nearest), trunc (toward zero), rint/nearbyint (nearest, different exception handling).
+
+#@@@@@@@@@@
+
+191. Complete this C code for Aho-Corasick algorithm:
+```c
+struct ACNode {
+    struct ACNode *children[ALPHABET_SIZE];
+    struct ACNode *fail;
+    int output;
+};
+
+void build_failure_links(struct ACNode *root) {
+    struct ACNode *queue[MAX_NODES];
+    int front = 0, rear = 0;
+
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (root->children[i]) {
+            root->children[i]->fail = root;
+            queue[rear++] = root->children[i];
+        }
+    }
+
+    while (front < rear) {
+        struct ACNode *current = queue[front++];
+        for (int i = 0; i < ALPHABET_SIZE; i++) {
+            if (current->children[i]) {
+                struct ACNode *fail = current->fail;
+                while (fail != root && !fail->children[i])
+                    fail = fail->fail;
+                current->children[i]->fail = fail->children[i] ? fail->children[i] : _______________;
+                queue[rear++] = current->children[i];
+            }
+        }
+    }
+}
+```
+
+Answer: `root` - Set failure link to root if no match. Aho-Corasick for multiple pattern matching in O(n+m+z) time.
+
+#@@@@@@@@@@
+
+192. What is the difference between modf() and frexp() in C?
+
+Answer: modf() splits into integer and fractional parts: `double frac = modf(x, &intpart);` frexp() splits into mantissa and exponent: `double m = frexp(x, &exp);` where x = m * 2^exp. Both from math.h.
+
+#@@@@@@@@@@
+
+193. How do you use mprotect() in C?
+
+Answer: mprotect() changes memory protection: `mprotect(addr, len, PROT_READ|PROT_WRITE|PROT_EXEC);` POSIX function. Used for security, JIT compilation, debugging. Must be page-aligned. Can cause SIGSEGV if violated.
+
+#@@@@@@@@@@
+
+194. Which of the following are C power and exponential functions? (Multiple correct)
+A) pow()
+B) sqrt()
+C) cbrt()
+D) exp()
+E) log()
+F) log10()
+
+Answer: A, B, C, D, E, F - All are from math.h. pow (power), sqrt (square root), cbrt (cube root), exp (e^x), log (natural log), log10 (base-10 log).
+
+#@@@@@@@@@@
+
+195. Complete this C code for Boyer-Moore algorithm:
+```c
+void bad_character_heuristic(char *pattern, int size, int badchar[]) {
+    for (int i = 0; i < NO_OF_CHARS; i++)
+        badchar[i] = -1;
+
+    for (int i = 0; i < size; i++)
+        badchar[(int)pattern[i]] = _______________;
+}
+
+void boyer_moore(char *text, char *pattern) {
+    int m = strlen(pattern);
+    int n = strlen(text);
+    int badchar[NO_OF_CHARS];
+
+    bad_character_heuristic(pattern, m, badchar);
+
+    int s = 0;
+    while (s <= n - m) {
+        int j = m - 1;
+        while (j >= 0 && pattern[j] == text[s + j])
+            j--;
+
+        if (j < 0) {
+            // Pattern found
+            s += (s + m < n) ? m - badchar[text[s + m]] : 1;
+        } else {
+            s += max(1, j - badchar[text[s + j]]);
+        }
+    }
+}
+```
+
+Answer: `i` - Store last occurrence index. Boyer-Moore algorithm for efficient pattern matching. O(n/m) best case, O(nm) worst case.
+
+#@@@@@@@@@@
+
+196. What is the purpose of posix_memalign() in C?
+
+Answer: posix_memalign() allocates aligned memory: `posix_memalign(&ptr, alignment, size);` Alignment must be power of 2 and multiple of sizeof(void*). POSIX function. Used for SIMD, DMA, cache optimization.
+
+#@@@@@@@@@@
+
+197. How do you implement a Trie with compressed paths (Radix tree) in C?
+
+Answer: Radix tree stores edge labels (strings) instead of single characters. Nodes have variable children. Space-efficient for sparse tries. Used in routing tables, IP lookup, string dictionaries. More complex than standard trie.
+
+#@@@@@@@@@@
+
+198. Which of the following are C hyperbolic functions? (Multiple correct)
+A) sinh()
+B) cosh()
+C) tanh()
+D) asinh()
+E) acosh()
+F) atanh()
+
+Answer: A, B, C, D, E, F - All are hyperbolic functions from math.h. sinh, cosh, tanh (basic hyperbolic), asinh, acosh, atanh (inverse hyperbolic).
+
+#@@@@@@@@@@
+
+199. Complete this C code for Tarjan's strongly connected components:
+```c
+void tarjan_scc_util(int u, int disc[], int low[], bool stackMember[],
+                     int stack[], int *stackTop, int *time, int graph[V][V]) {
+    disc[u] = low[u] = ++(*time);
+    stack[++(*stackTop)] = u;
+    stackMember[u] = true;
+
+    for (int v = 0; v < V; v++) {
+        if (graph[u][v]) {
+            if (disc[v] == -1) {
+                tarjan_scc_util(v, disc, low, stackMember, stack, stackTop, time, graph);
+                low[u] = min(low[u], low[v]);
+            } else if (stackMember[v]) {
+                low[u] = min(low[u], ______________);
+            }
+        }
+    }
+
+    if (low[u] == disc[u]) {
+        while (stack[*stackTop] != u) {
+            stackMember[stack[(*stackTop)--]] = false;
+        }
+        stackMember[stack[(*stackTop)--]] = false;
+    }
+}
+```
+
+Answer: `disc[v]` - Update low-link value with discovery time. Tarjan's algorithm finds strongly connected components in O(V+E) time using DFS.
+
+#@@@@@@@@@@
+
+200. What are the key differences between C89, C99, C11, C17, and C23 standards?
+
+Answer: C89/C90 (original ANSI/ISO). C99 added: inline, restrict, VLA, // comments, designated initializers, compound literals, flexible array members, long long, _Bool, complex. C11 added: _Generic, _Static_assert, _Atomic, threads, anonymous structs/unions, bounds-checking. C17 (bug fixes). C23 adds: typeof, constexpr, binary literals, digit separators, nullptr, improved attributes, #embed, auto type inference.
+
+#@@@@@@@@@@

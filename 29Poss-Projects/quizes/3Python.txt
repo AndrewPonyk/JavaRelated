@@ -1,0 +1,2845 @@
+PYTHON COMPREHENSIVE QUIZ - 200 QUESTIONS
+Tech Stack: Django, pytest, Flask, FastAPI, NumPy, Pandas, PyTorch, TensorFlow, Jupyter, Asyncio, Celery, SQLAlchemy, requests
+
+#@@@@@@@@@@
+
+1. What is the difference between Django's `select_related()` and `prefetch_related()`?
+
+Answer: select_related() uses SQL JOIN for foreign key relationships, loads related objects in single query. prefetch_related() uses separate queries for many-to-many and reverse foreign key relationships, then joins in Python. Use select_related for ForeignKey/OneToOne, prefetch_related for ManyToMany/reverse FK.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid Django model field types? (Multiple correct answers)
+A) CharField
+B) IntegerField
+C) DateTimeField
+D) JSONField
+E) ArrayField
+F) StringField
+
+Answer: A, B, C, D, E - StringField is not a Django field type. ArrayField is PostgreSQL-specific. Others are standard Django field types.
+
+#@@@@@@@@@@
+
+3. Find the bug in this Flask route:
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    data = request.json
+    user = User(
+        name=data['name'],
+        email=data['email']
+    )
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'id': user.id})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+Answer: No error handling for missing keys in request.json, no validation of input data, no handling of database errors. Should use data.get() with defaults, validate input, and wrap in try-catch for proper error handling.
+
+#@@@@@@@@@@
+
+4. Explain the difference between `async def` and `def` functions in Python.
+
+Answer: async def creates coroutine function that must be awaited, runs in event loop, can use await keyword. def creates regular function that executes synchronously. Use async def for I/O-bound operations, def for CPU-bound or simple operations.
+
+#@@@@@@@@@@
+
+5. What will this NumPy code output?
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+result = arr.reshape(-1)
+print(result.shape)
+print(result)
+```
+
+Answer: (6,) and [1 2 3 4 5 6]. reshape(-1) flattens array to 1D, -1 means "infer dimension". Original 2x3 array becomes 6-element 1D array.
+
+#@@@@@@@@@@
+
+6. How do you implement custom Django middleware?
+
+Answer: Create class with __init__(get_response), __call__(request) methods. Process request before view, process response after view. Register in MIDDLEWARE setting. Example: authentication, logging, CORS handling.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid pytest fixtures scopes? (Multiple correct)
+A) function
+B) class
+C) module
+D) package
+E) session
+F) global
+
+Answer: A, B, C, D, E - global is not a valid pytest scope. function (default), class, module, package, session control fixture lifecycle and sharing.
+
+#@@@@@@@@@@
+
+8. Complete this FastAPI dependency injection:
+```python
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+app = FastAPI()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int, db: Session = _______________):
+    return db.query(User).filter(User.id == user_id).first()
+```
+
+Answer: `Depends(get_db)` - FastAPI dependency injection system. Depends() creates dependency that will be resolved and injected into function parameter.
+
+#@@@@@@@@@@
+
+9. What is the purpose of `pandas.DataFrame.groupby()`?
+
+Answer: Groups DataFrame rows by specified columns/criteria, enables split-apply-combine operations. Returns GroupBy object for aggregation functions like sum(), mean(), count(). Useful for data analysis and summarization.
+
+#@@@@@@@@@@
+
+10. Find the issue in this SQLAlchemy model:
+```python
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    email = Column(String(100))
+    created_at = Column(DateTime)
+```
+
+Answer: Missing default value for created_at field. Should use default=datetime.utcnow or server_default for automatic timestamp. Also consider adding nullable=False constraints and unique=True for email.
+
+#@@@@@@@@@@
+
+11. Which async/await patterns are valid in Python? (Multiple correct)
+A) await asyncio.sleep(1)
+B) await some_coroutine()
+C) async for item in async_iterator
+D) async with async_context_manager
+E) await regular_function()
+
+Answer: A, B, C, D - Cannot await regular functions, only coroutines, futures, or awaitable objects. async for/with are valid async context patterns.
+
+#@@@@@@@@@@
+
+12. Predict the output of this Pandas code:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4],
+    'B': [5, 6, 7, 8]
+})
+
+result = df.loc[df['A'] > 2, 'B'].sum()
+print(result)
+```
+
+Answer: 15 - Filters rows where A > 2 (rows with A=3,4), selects column B (values 7,8), sums them: 7+8=15.
+
+#@@@@@@@@@@
+
+13. How do you implement custom Django template tags?
+
+Answer: Create templatetags package in app, create .py file with register = template.Library(), use @register.simple_tag or @register.inclusion_tag decorators. Load in template with {% load tag_name %}.
+
+#@@@@@@@@@@
+
+14. Complete this Celery task definition:
+```python
+from celery import Celery
+
+app = Celery('myapp', broker='redis://localhost:6379')
+
+@app.task
+def process_data(data):
+    # Long running task
+    result = expensive_computation(data)
+    return result
+
+# Usage
+result = process_data._______________('input_data')
+print(result.get())
+```
+
+Answer: `delay` - Executes task asynchronously. delay() is shortcut for apply_async(). Returns AsyncResult object to get result with get() method.
+
+#@@@@@@@@@@
+
+15. What is the difference between Django's `Model.save()` and `Model.objects.bulk_create()`?
+
+Answer: save() saves single instance, triggers signals, validates data, handles relationships. bulk_create() inserts multiple objects in single query, no signals, no validation, better performance for bulk operations. Use save() for single objects, bulk_create() for performance.
+
+#@@@@@@@@@@
+
+16. Which of the following are valid Flask extensions? (Multiple correct)
+A) Flask-SQLAlchemy
+B) Flask-Login
+C) Flask-WTF
+D) Flask-Mail
+E) Flask-Admin
+F) Flask-Database
+
+Answer: A, B, C, D, E - Flask-Database is not a standard Flask extension. Others are popular Flask extensions for database, authentication, forms, email, and admin interface.
+
+#@@@@@@@@@@
+
+17. Find the bug in this asyncio code:
+```python
+import asyncio
+
+async def fetch_data(url):
+    # Simulate API call
+    await asyncio.sleep(1)
+    return f"Data from {url}"
+
+async def main():
+    urls = ['url1', 'url2', 'url3']
+    results = []
+
+    for url in urls:
+        result = await fetch_data(url)
+        results.append(result)
+
+    return results
+
+asyncio.run(main())
+```
+
+Answer: Sequential execution instead of concurrent. Each await waits for completion before next iteration. Use asyncio.gather() or asyncio.create_task() for concurrent execution: `results = await asyncio.gather(*[fetch_data(url) for url in urls])`.
+
+#@@@@@@@@@@
+
+18. What is the purpose of `numpy.broadcasting`?
+
+Answer: Allows operations between arrays of different shapes by automatically expanding smaller arrays. Rules: start from trailing dimensions, dimensions must be equal or one must be 1. Enables efficient vectorized operations without explicit reshaping.
+
+#@@@@@@@@@@
+
+19. Predict the output:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Alice', 'Charlie'],
+    'score': [85, 90, 88, 92]
+})
+
+result = df.groupby('name')['score'].mean()
+print(result['Alice'])
+```
+
+Answer: 86.5 - Groups by name, calculates mean score for each group. Alice has scores [85, 88], mean is (85+88)/2 = 86.5.
+
+#@@@@@@@@@@
+
+20. How do you implement Django model inheritance?
+
+Answer: Three types: Abstract base classes (Meta: abstract=True), Multi-table inheritance (inherit from concrete model), Proxy models (Meta: proxy=True). Abstract for shared fields, multi-table for related models, proxy for different behavior same data.
+
+#@@@@@@@@@@
+
+21. Which pytest features help with test organization? (Multiple correct)
+A) Test classes
+B) Parametrized tests
+C) Fixtures
+D) Markers
+E) Conftest.py
+F) Test modules
+
+Answer: A, B, C, D, E, F - All are pytest features for organizing tests. Classes group related tests, parametrize runs same test with different inputs, fixtures provide setup/teardown, markers tag tests, conftest.py shares fixtures.
+
+#@@@@@@@@@@
+
+22. Complete this FastAPI request validation:
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel, validator
+
+app = FastAPI()
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    age: int
+
+    @validator('email')
+    def validate_email(cls, v):
+        if '@' not in v:
+            raise ValueError('Invalid email format')
+        return v
+
+    @validator('age')
+    def validate_age(cls, v):
+        if v < 0 or v > 150:
+            raise ValueError('Age must be between 0 and 150')
+        return v
+
+@app.post("/users/")
+def create_user(user: _______________):
+    return {"message": f"User {user.name} created"}
+```
+
+Answer: `UserCreate` - Pydantic model for request validation. FastAPI automatically validates request body against model schema and runs custom validators.
+
+#@@@@@@@@@@
+
+23. What is the difference between `pandas.merge()` and `pandas.concat()`?
+
+Answer: merge() joins DataFrames based on common columns/indices (like SQL JOIN), supports inner/outer/left/right joins. concat() concatenates DataFrames along axis (rows or columns), stacks data. Use merge() for relational joins, concat() for combining datasets.
+
+#@@@@@@@@@@
+
+24. Find the issue in this Django view:
+```python
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import User
+
+def get_users(request):
+    users = User.objects.all()
+    user_list = []
+    for user in users:
+        user_list.append({
+            'id': user.id,
+            'name': user.name,
+            'email': user.email
+        })
+    return JsonResponse(user_list, safe=False)
+```
+
+Answer: N+1 query problem if User model has foreign key relationships that are accessed. No pagination for large datasets. Consider using select_related()/prefetch_related() for optimization and pagination for performance.
+
+#@@@@@@@@@@
+
+25. What will this TensorFlow code output?
+```python
+import tensorflow as tf
+
+x = tf.constant([[1, 2], [3, 4]])
+y = tf.constant([[5, 6], [7, 8]])
+result = tf.matmul(x, y)
+print(result.numpy())
+```
+
+Answer: [[19 22] [43 50]] - Matrix multiplication of 2x2 matrices. (1*5+2*7, 1*6+2*8), (3*5+4*7, 3*6+4*8) = (19,22), (43,50).
+
+#@@@@@@@@@@
+
+26. How do you implement custom Django form validation?
+
+Answer: Override clean_<fieldname>() for field validation, clean() for cross-field validation. Raise ValidationError with error message. Example: clean_email() to check uniqueness, clean() to validate password confirmation.
+
+#@@@@@@@@@@
+
+27. Which of the following are valid SQLAlchemy relationship types? (Multiple correct)
+A) one-to-one
+B) one-to-many
+C) many-to-many
+D) many-to-one
+E) self-referential
+
+Answer: A, B, C, D, E - All are valid SQLAlchemy relationships. Use relationship() with appropriate foreign keys and back_populates/backref for bidirectional relationships.
+
+#@@@@@@@@@@
+
+28. Complete this Flask application factory:
+```python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+
+    db._______________()
+
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
+    return app
+```
+
+Answer: `init_app(app)` - Initializes SQLAlchemy extension with Flask app. Application factory pattern allows creating multiple app instances with different configurations.
+
+#@@@@@@@@@@
+
+29. What is the purpose of `asyncio.gather()` vs `asyncio.wait()`?
+
+Answer: gather() waits for all coroutines to complete, returns results in order, raises exception if any fails. wait() provides more control with return_when parameter, returns (done, pending) sets. Use gather() for simple parallel execution, wait() for complex coordination.
+
+#@@@@@@@@@@
+
+30. Predict the output:
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+mask = arr > 3
+result = arr[mask]
+print(result)
+```
+
+Answer: [4 5] - Boolean indexing with mask. arr > 3 creates boolean array [False False False True True], used to select elements where condition is True.
+
+#@@@@@@@@@@
+
+31. How do you implement Django custom user model?
+
+Answer: Inherit from AbstractUser or AbstractBaseUser, set AUTH_USER_MODEL in settings, create custom UserManager if needed. AbstractUser extends default user, AbstractBaseUser for complete customization. Migrate database after changes.
+
+#@@@@@@@@@@
+
+32. Which pytest plugins are commonly used? (Multiple correct)
+A) pytest-django
+B) pytest-cov
+C) pytest-mock
+D) pytest-xdist
+E) pytest-html
+F) pytest-database
+
+Answer: A, B, C, D, E - pytest-database is not a standard plugin. Others provide Django integration, coverage reporting, mocking, parallel execution, and HTML reports.
+
+#@@@@@@@@@@
+
+33. Find the bug in this Pandas operation:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6]
+})
+
+df['C'] = df['A'] + df['B']
+df.loc[0, 'A'] = 10
+
+print(df['C'])
+```
+
+Answer: No bug - this code works correctly. Column C is calculated once when created, changing A later doesn't update C automatically. If dynamic calculation is needed, use computed properties or recalculate C after changes.
+
+#@@@@@@@@@@
+
+34. What is the difference between Django's `Q` objects and `F` expressions?
+
+Answer: Q objects create complex queries with AND/OR/NOT logic for filtering. F expressions reference model fields in queries, enable field comparisons and updates. Use Q for complex WHERE clauses, F for field-to-field operations.
+
+#@@@@@@@@@@
+
+35. Complete this Celery configuration:
+```python
+from celery import Celery
+
+app = Celery('myapp')
+
+app.config_from_object({
+    'broker_url': 'redis://localhost:6379',
+    'result_backend': 'redis://localhost:6379',
+    'task_serializer': 'json',
+    'accept_content': ['json'],
+    'result_serializer': 'json',
+    'timezone': 'UTC',
+    'enable_utc': True,
+    'task_routes': {
+        'myapp.tasks.send_email': {'queue': '_______________'},
+        'myapp.tasks.process_data': {'queue': 'data_processing'}
+    }
+})
+```
+
+Answer: `email` or `notifications` - Queue name for email tasks. Task routing directs different tasks to specific queues for better resource management and scaling.
+
+#@@@@@@@@@@
+
+36. How do you handle database transactions in Django?
+
+Answer: Use @transaction.atomic decorator or with transaction.atomic() context manager. Creates database transaction, rolls back on exceptions. Use savepoints for nested transactions. Example: @transaction.atomic on view functions.
+
+#@@@@@@@@@@
+
+37. Which of the following are valid FastAPI response types? (Multiple correct)
+A) JSONResponse
+B) HTMLResponse
+C) PlainTextResponse
+D) RedirectResponse
+E) FileResponse
+F) XMLResponse
+
+Answer: A, B, C, D, E - XMLResponse is not built-in but can be custom implemented. Others are standard FastAPI response types for different content types and use cases.
+
+#@@@@@@@@@@
+
+38. Predict the output:
+```python
+import asyncio
+
+async def task(name, delay):
+    print(f"Task {name} starting")
+    await asyncio.sleep(delay)
+    print(f"Task {name} completed")
+    return f"Result from {name}"
+
+async def main():
+    tasks = [
+        asyncio.create_task(task("A", 2)),
+        asyncio.create_task(task("B", 1)),
+        asyncio.create_task(task("C", 3))
+    ]
+
+    results = await asyncio.gather(*tasks)
+    print(results)
+
+asyncio.run(main())
+```
+
+Answer: "Task A starting", "Task B starting", "Task C starting", "Task B completed", "Task A completed", "Task C completed", ['Result from A', 'Result from B', 'Result from C']. Tasks run concurrently, complete in order of delay, results returned in original order.
+
+#@@@@@@@@@@
+
+39. What is the purpose of `numpy.einsum()`?
+
+Answer: Einstein summation notation for efficient array operations. Provides concise way to express complex tensor operations like matrix multiplication, transpose, trace. More flexible than standard operations, can be optimized by NumPy.
+
+#@@@@@@@@@@
+
+40. Find the issue in this Flask-SQLAlchemy model:
+```python
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    posts = db.relationship('Post', backref='author')
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+```
+
+Answer: No apparent issue - this is correct Flask-SQLAlchemy model definition with proper relationship setup. User has many Posts, Post belongs to User, backref creates reverse relationship.
+
+#@@@@@@@@@@
+
+41. How do you implement custom Django management commands?
+
+Answer: Create management/commands directory in app, create .py file with Command class inheriting from BaseCommand. Implement handle() method. Run with python manage.py command_name. Useful for data migration, cleanup tasks.
+
+#@@@@@@@@@@
+
+42. Which pandas operations are memory efficient for large datasets? (Multiple correct)
+A) Using chunksize in read_csv()
+B) Using categorical data types
+C) Using query() instead of boolean indexing
+D) Using eval() for complex expressions
+E) Loading entire dataset into memory
+
+Answer: A, B, C, D - Loading entire dataset is memory inefficient. Chunking processes data in batches, categorical reduces memory for repeated strings, query() and eval() optimize operations.
+
+#@@@@@@@@@@
+
+43. Complete this PyTorch neural network:
+```python
+import torch
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(SimpleNet, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+# Usage
+model = SimpleNet(784, 128, 10)
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim._______________()
+```
+
+Answer: `Adam(model.parameters())` or `SGD(model.parameters(), lr=0.01)` - PyTorch optimizers. Adam is popular adaptive optimizer, SGD is classic stochastic gradient descent. Both need model parameters.
+
+#@@@@@@@@@@
+
+44. What is the difference between Django's `get()` and `filter()`?
+
+Answer: get() returns single object, raises DoesNotExist if not found or MultipleObjectsReturned if multiple. filter() returns QuerySet (can be empty), supports chaining. Use get() for unique lookups, filter() for multiple results or chaining.
+
+#@@@@@@@@@@
+
+45. Predict the output:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, None, 4],
+    'B': [5, None, 7, 8]
+})
+
+result = df.dropna().shape
+print(result)
+```
+
+Answer: (2, 2) - dropna() removes rows with any NaN values. Original has 4 rows, rows 1 and 2 have NaN values, so 2 rows remain with 2 columns.
+
+#@@@@@@@@@@
+
+46. How do you implement Django REST framework serializers?
+
+Answer: Inherit from serializers.ModelSerializer or serializers.Serializer. ModelSerializer auto-generates fields from model, Serializer for custom logic. Override create()/update() methods, add validation with validate_<field>() methods.
+
+#@@@@@@@@@@
+
+47. Which of the following are valid Flask request object attributes? (Multiple correct)
+A) request.json
+B) request.form
+C) request.args
+D) request.files
+E) request.headers
+F) request.cookies
+
+Answer: A, B, C, D, E, F - All are valid Flask request attributes for accessing different types of request data: JSON, form data, query parameters, uploaded files, headers, and cookies.
+
+#@@@@@@@@@@
+
+48. Find the bug in this asyncio code:
+```python
+import asyncio
+import aiohttp
+
+async def fetch_url(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def main():
+    urls = ['http://example.com', 'http://google.com']
+
+    session = aiohttp.ClientSession()
+    tasks = [fetch_url(session, url) for url in urls]
+    results = await asyncio.gather(*tasks)
+
+    return results
+
+asyncio.run(main())
+```
+
+Answer: ClientSession is not properly closed. Should use `async with aiohttp.ClientSession() as session:` or call `await session.close()` in finally block to prevent resource leaks.
+
+#@@@@@@@@@@
+
+49. What is the purpose of `numpy.vectorize()`?
+
+Answer: Converts scalar function to work element-wise on arrays. Creates universal function (ufunc) from Python function. Useful for applying custom functions to arrays, but not necessarily faster than loops - mainly for convenience.
+
+#@@@@@@@@@@
+
+50. Complete this Django model with custom manager:
+```python
+from django.db import models
+
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status='published')
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    status = models.CharField(max_length=20, default='draft')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()  # Default manager
+    published = _______________()  # Custom manager
+```
+
+Answer: `PublishedManager` - Custom manager instance. Provides Post.published.all() to get only published posts, while Post.objects.all() returns all posts.
+
+#@@@@@@@@@@
+
+51. What will this requests code output?
+```python
+import requests
+
+response = requests.get('https://httpbin.org/json')
+data = response.json()
+print(type(data))
+print(data.get('slideshow', {}).get('title', 'Not found'))
+```
+
+Answer: <class 'dict'> and the title from the JSON response or 'Not found' if the structure doesn't match. requests.json() parses JSON response into Python dictionary.
+
+#@@@@@@@@@@
+
+52. Which of the following are valid Django URL patterns? (Multiple correct)
+A) path('users/', views.user_list)
+B) path('users/<int:id>/', views.user_detail)
+C) re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive)
+D) path('api/v1/', include('api.urls'))
+E) url(r'^legacy/', views.legacy_view)
+
+Answer: A, B, C, D, E - All are valid Django URL patterns. path() for simple patterns, re_path() for regex, include() for URL namespacing, url() is legacy but still works.
+
+#@@@@@@@@@@
+
+53. Find the bug in this FastAPI middleware:
+```python
+from fastapi import FastAPI, Request
+from fastapi.middleware.base import BaseHTTPMiddleware
+
+app = FastAPI()
+
+class TimingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        response.headers["X-Process-Time"] = str(process_time)
+        return response
+
+app.add_middleware(TimingMiddleware)
+```
+
+Answer: Missing `import time` statement. The time module is used but not imported. Should add `import time` at the top of the file.
+
+#@@@@@@@@@@
+
+54. What is the difference between `pandas.apply()` and `pandas.map()`?
+
+Answer: apply() works on Series/DataFrame, can apply functions along axis, more flexible. map() only works on Series, maps values using dictionary/function/Series, faster for simple transformations. Use map() for value mapping, apply() for complex operations.
+
+#@@@@@@@@@@
+
+55. Predict the output:
+```python
+import numpy as np
+
+a = np.array([1, 2, 3])
+b = np.array([[4], [5], [6]])
+result = a + b
+print(result.shape)
+print(result)
+```
+
+Answer: (3, 3) and [[5 6 7] [6 7 8] [7 8 9]]. Broadcasting: 1D array (3,) + 2D array (3,1) results in (3,3) array. Each row of b is added to entire array a.
+
+#@@@@@@@@@@
+
+56. How do you implement Django signals?
+
+Answer: Use django.dispatch.Signal or built-in signals like post_save, pre_delete. Connect with @receiver decorator or signal.connect(). Signals allow decoupled applications to get notified when actions occur. Example: send email after user registration.
+
+#@@@@@@@@@@
+
+57. Which of the following are valid pytest markers? (Multiple correct)
+A) @pytest.mark.slow
+B) @pytest.mark.parametrize
+C) @pytest.mark.skip
+D) @pytest.mark.xfail
+E) @pytest.mark.custom_marker
+
+Answer: A, B, C, D, E - All are valid. slow/custom_marker are custom markers, parametrize runs test with different parameters, skip skips test, xfail expects test to fail.
+
+#@@@@@@@@@@
+
+58. Complete this SQLAlchemy query:
+```python
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import and_, or_
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Find users with age > 25 AND (name starts with 'A' OR email contains 'gmail')
+users = session.query(User).filter(
+    and_(
+        User.age > 25,
+        or_(
+            User.name._______________('A%'),
+            User.email._______________('%gmail%')
+        )
+    )
+).all()
+```
+
+Answer: First blank: `like`, Second blank: `like`. SQLAlchemy uses like() method for SQL LIKE operations with wildcards.
+
+#@@@@@@@@@@
+
+59. What is the purpose of `asyncio.create_task()` vs direct `await`?
+
+Answer: create_task() schedules coroutine for concurrent execution, returns Task object immediately. Direct await waits for completion before proceeding. Use create_task() for concurrency, direct await for sequential execution.
+
+#@@@@@@@@@@
+
+60. Find the issue in this Django model:
+```python
+from django.db import models
+
+class Order(models.Model):
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.CharField(max_length=100)
+    quantity = models.IntegerField()
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+```
+
+Answer: No apparent issue - this is correct Django model definition. Order has foreign key to Customer, OrderItem has foreign key to Order. Proper cascade deletion and decimal fields for money.
+
+#@@@@@@@@@@
+
+61. Which TensorFlow operations are commonly used? (Multiple correct)
+A) tf.matmul()
+B) tf.reduce_sum()
+C) tf.nn.relu()
+D) tf.keras.layers.Dense()
+E) tf.gradient_tape()
+
+Answer: A, B, C, D, E - All are common TensorFlow operations. matmul for matrix multiplication, reduce_sum for aggregation, relu for activation, Dense for layers, gradient_tape for automatic differentiation.
+
+#@@@@@@@@@@
+
+62. Predict the output:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4],
+    'B': [10, 20, 30, 40]
+})
+
+result = df.apply(lambda x: x.max() - x.min(), axis=0)
+print(result)
+```
+
+Answer: A    3, B    30, dtype: int64. apply() with axis=0 applies function to each column. For column A: max(4) - min(1) = 3, for column B: max(40) - min(10) = 30.
+
+#@@@@@@@@@@
+
+63. How do you implement Django custom authentication backend?
+
+Answer: Create class inheriting from BaseBackend, implement authenticate() and get_user() methods. Add to AUTHENTICATION_BACKENDS setting. Example: LDAP authentication, social auth, custom token authentication.
+
+#@@@@@@@@@@
+
+64. Complete this Flask error handling:
+```python
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Not found'}), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
+
+@app.errorhandler(_______________)
+def validation_error(error):
+    return jsonify({'error': str(error)}), 400
+```
+
+Answer: `ValueError` or custom exception class. Flask errorhandler can handle specific exception types, not just HTTP status codes.
+
+#@@@@@@@@@@
+
+65. What is the difference between `numpy.array()` and `numpy.asarray()`?
+
+Answer: array() always creates new array, copies data by default. asarray() returns input if already array, otherwise creates new array. Use asarray() to avoid unnecessary copying, array() when you need guaranteed copy.
+
+#@@@@@@@@@@
+
+66. Find the bug in this Celery task:
+```python
+from celery import Celery
+import requests
+
+app = Celery('myapp', broker='redis://localhost:6379')
+
+@app.task
+def fetch_data(url):
+    response = requests.get(url)
+    return response.json()
+
+# Usage
+result = fetch_data.delay('http://api.example.com/data')
+data = result.get(timeout=5)
+```
+
+Answer: No error handling for HTTP requests or JSON parsing. Should handle requests.RequestException, check response.status_code, and handle JSON decode errors. Also consider adding retry logic for failed requests.
+
+#@@@@@@@@@@
+
+67. Which of the following are valid Django template filters? (Multiple correct)
+A) {{ value|length }}
+B) {{ text|truncatewords:30 }}
+C) {{ date|date:"Y-m-d" }}
+D) {{ number|floatformat:2 }}
+E) {{ string|custom_filter }}
+
+Answer: A, B, C, D, E - All are valid Django template filters. length gets length, truncatewords limits words, date formats dates, floatformat formats numbers, custom_filter is user-defined.
+
+#@@@@@@@@@@
+
+68. Predict the output:
+```python
+import asyncio
+
+async def producer(queue):
+    for i in range(3):
+        await queue.put(f"item-{i}")
+        print(f"Produced item-{i}")
+    await queue.put(None)  # Sentinel
+
+async def consumer(queue):
+    while True:
+        item = await queue.get()
+        if item is None:
+            break
+        print(f"Consumed {item}")
+
+async def main():
+    queue = asyncio.Queue(maxsize=1)
+    await asyncio.gather(
+        producer(queue),
+        consumer(queue)
+    )
+
+asyncio.run(main())
+```
+
+Answer: "Produced item-0", "Consumed item-0", "Produced item-1", "Consumed item-1", "Produced item-2", "Consumed item-2". Queue with maxsize=1 forces producer to wait for consumer, creating alternating output.
+
+#@@@@@@@@@@
+
+69. What is the purpose of `pandas.pivot_table()`?
+
+Answer: Creates spreadsheet-style pivot table from DataFrame. Groups data by index/columns, applies aggregation functions. Useful for data summarization and cross-tabulation. Similar to Excel pivot tables.
+
+#@@@@@@@@@@
+
+70. Complete this FastAPI dependency with caching:
+```python
+from fastapi import FastAPI, Depends
+from functools import lru_cache
+
+app = FastAPI()
+
+@lru_cache()
+def get_settings():
+    return Settings()
+
+@app.get("/info")
+def get_info(settings: Settings = _______________):
+    return {"app_name": settings.app_name}
+```
+
+Answer: `Depends(get_settings)` - FastAPI dependency injection with caching. @lru_cache() ensures Settings is created only once and reused.
+
+#@@@@@@@@@@
+
+71. How do you implement Django custom template context processors?
+
+Answer: Create function that takes request parameter and returns dictionary. Add to TEMPLATES['OPTIONS']['context_processors'] setting. Context processors add variables to all template contexts automatically.
+
+#@@@@@@@@@@
+
+72. Which of the following are valid NumPy array creation functions? (Multiple correct)
+A) np.zeros()
+B) np.ones()
+C) np.arange()
+D) np.linspace()
+E) np.random.rand()
+F) np.empty()
+
+Answer: A, B, C, D, E, F - All are valid NumPy array creation functions. zeros/ones create arrays filled with 0/1, arange creates sequences, linspace creates evenly spaced values, random.rand creates random arrays, empty creates uninitialized arrays.
+
+#@@@@@@@@@@
+
+73. Find the issue in this SQLAlchemy session usage:
+```python
+from sqlalchemy.orm import sessionmaker
+
+Session = sessionmaker(bind=engine)
+
+def create_user(name, email):
+    session = Session()
+    user = User(name=name, email=email)
+    session.add(user)
+    session.commit()
+    return user.id
+
+def get_user(user_id):
+    session = Session()
+    return session.query(User).get(user_id)
+```
+
+Answer: Sessions are not closed, causing resource leaks. Should use try/finally with session.close() or context manager. Also, get_user() returns detached object after session closes.
+
+#@@@@@@@@@@
+
+74. What will this PyTorch code output?
+```python
+import torch
+
+x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+y = x ** 2
+z = y.sum()
+z.backward()
+print(x.grad)
+```
+
+Answer: tensor([2., 4., 6.]) - Gradients of z with respect to x. Since z = sum(x²), dz/dx = 2x, so gradients are [2*1, 2*2, 2*3] = [2, 4, 6].
+
+#@@@@@@@@@@
+
+75. How do you implement Django model validation?
+
+Answer: Override clean() method in model, raise ValidationError for invalid data. Call full_clean() to trigger validation. Use validators parameter in field definitions. Example: validate email format, check business rules.
+
+#@@@@@@@@@@
+
+76. Which pytest fixtures are built-in? (Multiple correct)
+A) tmpdir
+B) capsys
+C) monkeypatch
+D) request
+E) cache
+F) database
+
+Answer: A, B, C, D, E - database is not built-in. tmpdir provides temporary directory, capsys captures stdout/stderr, monkeypatch for mocking, request provides test request info, cache for test caching.
+
+#@@@@@@@@@@
+
+77. Complete this Flask-WTF form:
+```python
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), _______________])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    submit = SubmitField('Sign In')
+```
+
+Answer: `Email()` - WTForms validator for email format validation. Ensures the input is a valid email address format.
+
+#@@@@@@@@@@
+
+78. What is the difference between `pandas.loc` and `pandas.iloc`?
+
+Answer: loc uses label-based indexing (row/column names), iloc uses integer position-based indexing. loc includes both endpoints in slices, iloc excludes end. Use loc for named access, iloc for positional access.
+
+#@@@@@@@@@@
+
+79. Predict the output:
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+result = np.sum(arr, axis=1, keepdims=True)
+print(result.shape)
+print(result)
+```
+
+Answer: (2, 1) and [[6] [15]]. sum() with axis=1 sums along columns (row-wise), keepdims=True preserves original dimensions. Results: [1+2+3=6], [4+5+6=15].
+
+#@@@@@@@@@@
+
+80. How do you implement Django custom field types?
+
+Answer: Inherit from existing field class, override to_python(), from_db_value(), get_prep_value() methods. Register with database backend if needed. Example: JSON field, encrypted field, custom data types.
+
+#@@@@@@@@@@
+
+81. Which of the following are valid Celery task options? (Multiple correct)
+A) bind=True
+B) retry_policy
+C) rate_limit
+D) time_limit
+E) queue
+F) priority
+
+Answer: A, B, C, D, E, F - All are valid Celery task options. bind gives access to task instance, retry_policy controls retries, rate_limit throttles execution, time_limit sets timeout, queue routes tasks, priority sets execution priority.
+
+#@@@@@@@@@@
+
+82. Find the bug in this asyncio code:
+```python
+import asyncio
+
+class AsyncResource:
+    def __init__(self):
+        self.connection = None
+
+    async def connect(self):
+        self.connection = await create_connection()
+
+    async def close(self):
+        if self.connection:
+            await self.connection.close()
+
+async def main():
+    resource = AsyncResource()
+    await resource.connect()
+    # Do work with resource
+    # Missing: await resource.close()
+
+asyncio.run(main())
+```
+
+Answer: Resource is not properly closed, causing resource leak. Should call await resource.close() or use async context manager (__aenter__/__aexit__) for automatic cleanup.
+
+#@@@@@@@@@@
+
+83. What is the purpose of `numpy.newaxis`?
+
+Answer: Alias for None, used to add new axes to arrays. Equivalent to np.expand_dims(). Useful for broadcasting and reshaping operations. Example: arr[:, np.newaxis] converts 1D to column vector.
+
+#@@@@@@@@@@
+
+84. Complete this Django REST framework viewset:
+```python
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    @action(detail=True, methods=['post'])
+    def set_password(self, request, pk=None):
+        user = self.get_object()
+        password = request.data.get('password')
+        user.set_password(password)
+        user.save()
+        return Response({'status': 'password set'})
+
+    @action(detail=_______________, methods=['get'])
+    def active_users(self, request):
+        active = User.objects.filter(is_active=True)
+        serializer = self.get_serializer(active, many=True)
+        return Response(serializer.data)
+```
+
+Answer: `False` - detail=False creates collection-level action (applies to all users), not instance-level (specific user). URL will be /users/active_users/ instead of /users/{id}/active_users/.
+
+#@@@@@@@@@@
+
+85. What will this Pandas code output?
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 2, 3],
+    'B': [4, 5, 5, 6]
+})
+
+result = df.drop_duplicates(subset=['A'])
+print(len(result))
+```
+
+Answer: 3 - drop_duplicates() removes rows with duplicate values in column A. Original has A values [1, 2, 2, 3], after removing duplicates: [1, 2, 3], so 3 rows remain.
+
+#@@@@@@@@@@
+
+86. How do you implement Django custom permissions?
+
+Answer: Create class inheriting from BasePermission, implement has_permission() and/or has_object_permission() methods. Use in views with permission_classes. Example: owner-only access, time-based permissions.
+
+#@@@@@@@@@@
+
+87. Which of the following are valid Flask configuration methods? (Multiple correct)
+A) app.config.from_object()
+B) app.config.from_pyfile()
+C) app.config.from_envvar()
+D) app.config.from_json()
+E) app.config.from_mapping()
+
+Answer: A, B, C, D, E - All are valid Flask configuration methods. from_object loads from class/module, from_pyfile from Python file, from_envvar from environment variable file, from_json from JSON file, from_mapping from dictionary.
+
+#@@@@@@@@@@
+
+88. Predict the output:
+```python
+import asyncio
+
+async def slow_operation():
+    await asyncio.sleep(2)
+    return "Done"
+
+async def main():
+    try:
+        result = await asyncio.wait_for(slow_operation(), timeout=1)
+        print(result)
+    except asyncio.TimeoutError:
+        print("Operation timed out")
+
+asyncio.run(main())
+```
+
+Answer: "Operation timed out" - wait_for() with timeout=1 cancels slow_operation() after 1 second, but the operation takes 2 seconds, so TimeoutError is raised and caught.
+
+#@@@@@@@@@@
+
+89. What is the purpose of `pandas.melt()`?
+
+Answer: Transforms DataFrame from wide to long format. Unpivots columns into rows, useful for data normalization and analysis. Opposite of pivot(). Example: convert multiple measurement columns into single value column with identifier.
+
+#@@@@@@@@@@
+
+90. Complete this TensorFlow model training:
+```python
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(
+    optimizer='adam',
+    loss='_______________',
+    metrics=['accuracy']
+)
+
+model.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
+```
+
+Answer: `sparse_categorical_crossentropy` or `categorical_crossentropy` - Loss function for multi-class classification. Use sparse_categorical_crossentropy for integer labels, categorical_crossentropy for one-hot encoded labels.
+
+#@@@@@@@@@@
+
+91. How do you implement Django database routing?
+
+Answer: Create database router class with db_for_read(), db_for_write(), allow_relation(), allow_migrate() methods. Add to DATABASE_ROUTERS setting. Routes queries to specific databases based on model/operation.
+
+#@@@@@@@@@@
+
+92. Which of the following are valid pytest command-line options? (Multiple correct)
+A) -v (verbose)
+B) -s (no capture)
+C) -k (keyword filter)
+D) -m (marker filter)
+E) --cov (coverage)
+F) --pdb (debugger)
+
+Answer: A, B, C, D, E, F - All are valid pytest options. -v for verbose output, -s to see print statements, -k to filter by test names, -m to filter by markers, --cov for coverage (with plugin), --pdb to drop into debugger on failures.
+
+#@@@@@@@@@@
+
+93. Find the issue in this NumPy operation:
+```python
+import numpy as np
+
+arr1 = np.array([1, 2, 3])
+arr2 = np.array([4, 5])
+
+try:
+    result = arr1 + arr2
+    print(result)
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+Answer: No issue with the code structure - it properly handles the ValueError that occurs when trying to add arrays with incompatible shapes (3,) and (2,). Broadcasting rules don't allow this operation, so ValueError is raised and caught.
+
+#@@@@@@@@@@
+
+94. What is the difference between Django's `select_for_update()` and regular queries?
+
+Answer: select_for_update() adds database row locking (SELECT ... FOR UPDATE), prevents concurrent modifications. Regular queries don't lock rows. Use for preventing race conditions in critical sections, like updating account balances.
+
+#@@@@@@@@@@
+
+95. Complete this FastAPI background task:
+```python
+from fastapi import FastAPI, BackgroundTasks
+
+app = FastAPI()
+
+def send_notification(email: str, message: str):
+    # Send email notification
+    print(f"Sending {message} to {email}")
+
+@app.post("/send-email/")
+def send_email(email: str, background_tasks: _______________):
+    background_tasks.add_task(send_notification, email, "Welcome!")
+    return {"message": "Email will be sent in background"}
+```
+
+Answer: `BackgroundTasks` - FastAPI BackgroundTasks parameter type. Allows adding tasks to run after response is sent to client.
+
+#@@@@@@@@@@
+
+96. What will this SQLAlchemy code output?
+```python
+from sqlalchemy import create_engine, text
+
+engine = create_engine('sqlite:///:memory:')
+
+with engine.connect() as conn:
+    result = conn.execute(text("SELECT 1 + 1 as result"))
+    row = result.fetchone()
+    print(row.result)
+```
+
+Answer: 2 - Executes SQL query "SELECT 1 + 1 as result" which returns 2. fetchone() gets first row, row.result accesses the 'result' column.
+
+#@@@@@@@@@@
+
+97. How do you implement Django custom model fields?
+
+Answer: Inherit from existing field class (CharField, IntegerField, etc.), override formfield(), to_python(), from_db_value(), get_prep_value() methods. Handle serialization/deserialization between Python and database. Example: JSON field, encrypted field.
+
+#@@@@@@@@@@
+
+98. Which of the following are valid Pandas aggregation functions? (Multiple correct)
+A) sum()
+B) mean()
+C) std()
+D) agg()
+E) apply()
+F) transform()
+
+Answer: A, B, C, D, E, F - All are valid aggregation functions. sum/mean/std are basic aggregations, agg() allows multiple functions, apply() for custom functions, transform() returns same-sized result.
+
+#@@@@@@@@@@
+
+99. Predict the output:
+```python
+import asyncio
+
+async def countdown(name, n):
+    while n > 0:
+        print(f"{name}: {n}")
+        await asyncio.sleep(1)
+        n -= 1
+    print(f"{name}: Done!")
+
+async def main():
+    await asyncio.gather(
+        countdown("A", 2),
+        countdown("B", 3)
+    )
+
+asyncio.run(main())
+```
+
+Answer: "A: 2", "B: 3", "A: 1", "B: 2", "A: Done!", "B: 1", "B: Done!" - Both countdowns run concurrently, interleaving output based on timing. A finishes first (2 iterations), then B finishes (3 iterations).
+
+#@@@@@@@@@@
+
+100. Complete this Django cache configuration:
+```python
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'myapp',
+        'TIMEOUT': _______________,
+    }
+}
+```
+
+Answer: `300` or any number in seconds - Cache timeout in seconds. 300 = 5 minutes is common default. None means no timeout (cache forever), 0 means don't cache.
+
+#@@@@@@@@@@
+
+101. What is the purpose of `numpy.where()`?
+
+Answer: Conditional element selection from arrays. Returns elements from x or y depending on condition. Syntax: np.where(condition, x, y). Also used to find indices where condition is True. Vectorized if-else operation.
+
+#@@@@@@@@@@
+
+102. Which of the following are valid Django model Meta options? (Multiple correct)
+A) ordering
+B) verbose_name
+C) db_table
+D) unique_together
+E) indexes
+F) permissions
+
+Answer: A, B, C, D, E, F - All are valid Meta options. ordering sets default sort, verbose_name for admin display, db_table for custom table name, unique_together for composite uniqueness, indexes for database indexes, permissions for custom permissions.
+
+#@@@@@@@@@@
+
+103. Find the bug in this Flask-SQLAlchemy query:
+```python
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+db = SQLAlchemy(app)
+
+@app.route('/users')
+def get_users():
+    users = User.query.filter(User.age > 18).all()
+    return {'users': [user.to_dict() for user in users]}
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    age = db.Column(db.Integer)
+```
+
+Answer: User class is defined after it's used in the route. Python needs class definition before usage. Move User class definition before the route, or use application factory pattern with blueprints.
+
+#@@@@@@@@@@
+
+104. What will this PyTorch code output?
+```python
+import torch
+
+x = torch.tensor([[1, 2], [3, 4]], dtype=torch.float32)
+y = torch.tensor([[2, 0], [1, 2]], dtype=torch.float32)
+result = torch.mm(x, y)
+print(result)
+```
+
+Answer: tensor([[4., 4.], [10., 8.]]) - Matrix multiplication. (1*2+2*1, 1*0+2*2), (3*2+4*1, 3*0+4*2) = (4,4), (10,8).
+
+#@@@@@@@@@@
+
+105. How do you implement Django custom admin actions?
+
+Answer: Create function taking modeladmin, request, queryset parameters. Add to admin class actions list. Use @admin.action decorator for metadata. Example: bulk email, export data, status updates.
+
+#@@@@@@@@@@
+
+106. Which pytest features help with test isolation? (Multiple correct)
+A) Fixtures with function scope
+B) setUp/tearDown methods
+C) Database transactions
+D) Temporary directories
+E) Mocking
+F) Test classes
+
+Answer: A, B, C, D, E, F - All help with isolation. Function-scoped fixtures reset per test, setUp/tearDown clean state, database transactions rollback changes, temp directories provide clean filesystem, mocking isolates external dependencies, classes group related tests.
+
+#@@@@@@@@@@
+
+107. Complete this FastAPI WebSocket endpoint:
+```python
+from fastapi import FastAPI, WebSocket
+
+app = FastAPI()
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket._______________()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Echo: {data}")
+    except Exception:
+        pass
+```
+
+Answer: `accept()` - Accepts WebSocket connection. Must be called before sending/receiving messages. Establishes WebSocket handshake.
+
+#@@@@@@@@@@
+
+108. What is the difference between `pandas.join()` and `pandas.merge()`?
+
+Answer: join() joins on index by default, simpler syntax for index-based joins. merge() more flexible, joins on columns or index, supports different join types. join() is convenience method, merge() is more powerful and explicit.
+
+#@@@@@@@@@@
+
+109. Predict the output:
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+indices = np.array([0, 2, 4])
+result = arr[indices]
+print(result)
+```
+
+Answer: [1 3 5] - Fancy indexing with array of indices. Selects elements at positions 0, 2, 4 from original array, which are values 1, 3, 5.
+
+#@@@@@@@@@@
+
+110. How do you implement Django custom form widgets?
+
+Answer: Inherit from existing widget class, override render() method to generate HTML. Set widget in form field definition. Example: custom date picker, rich text editor, file upload with preview.
+
+#@@@@@@@@@@
+
+111. Which of the following are valid Celery result backends? (Multiple correct)
+A) Redis
+B) RabbitMQ
+C) Database
+D) Memcached
+E) File system
+F) MongoDB
+
+Answer: A, B, C, D, E, F - All are valid Celery result backends. Redis/RabbitMQ for message brokers, database for persistence, memcached for caching, filesystem for simple storage, MongoDB for document storage.
+
+#@@@@@@@@@@
+
+112. Find the issue in this asyncio code:
+```python
+import asyncio
+
+async def worker(queue):
+    while True:
+        item = await queue.get()
+        if item is None:
+            break
+        print(f"Processing {item}")
+        # Simulate work
+        await asyncio.sleep(1)
+
+async def main():
+    queue = asyncio.Queue()
+
+    # Start worker
+    worker_task = asyncio.create_task(worker(queue))
+
+    # Add items
+    for i in range(3):
+        await queue.put(f"item-{i}")
+
+    # Signal completion
+    await queue.put(None)
+
+    # Wait for worker to finish
+    await worker_task
+
+asyncio.run(main())
+```
+
+Answer: No apparent issue - this code correctly implements producer-consumer pattern with asyncio.Queue. Worker processes items until None sentinel is received, then exits gracefully.
+
+#@@@@@@@@@@
+
+113. What is the purpose of `numpy.concatenate()` vs `numpy.stack()`?
+
+Answer: concatenate() joins arrays along existing axis, arrays must have same shape except in concatenation axis. stack() creates new axis and stacks arrays along it, arrays must have same shape. Use concatenate() to extend, stack() to add dimension.
+
+#@@@@@@@@@@
+
+114. Complete this Django REST framework pagination:
+```python
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
+class CustomPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': self.page.paginator.count,
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'results': data,
+            'page_size': self.page_size,
+            'total_pages': self.page.paginator._______________
+        })
+```
+
+Answer: `num_pages` - Property of Django Paginator that returns total number of pages. Provides complete pagination metadata in API response.
+
+#@@@@@@@@@@
+
+115. What will this Pandas code output?
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+})
+
+result = df.iloc[1:, 1:]
+print(result.shape)
+```
+
+Answer: (2, 2) - iloc[1:, 1:] selects rows from index 1 onwards and columns from index 1 onwards. Original is 3x3, result is 2x2 (rows 1-2, columns B-C).
+
+#@@@@@@@@@@
+
+116. How do you implement Django custom middleware for request processing?
+
+Answer: Create class with __init__(get_response) and __call__(request) methods. Process request before view, modify response after view. Add to MIDDLEWARE setting. Example: authentication, logging, CORS, rate limiting.
+
+#@@@@@@@@@@
+
+117. Which of the following are valid Flask-WTF CSRF protection features? (Multiple correct)
+A) CSRFProtect extension
+B) csrf.exempt decorator
+C) csrf_token() function
+D) Hidden CSRF field in forms
+E) CSRF validation in AJAX
+
+Answer: A, B, C, D, E - All are Flask-WTF CSRF features. CSRFProtect enables protection, exempt skips validation, csrf_token generates tokens, hidden fields in forms, AJAX support with tokens.
+
+#@@@@@@@@@@
+
+118. Predict the output:
+```python
+import asyncio
+
+async def fetch_data(delay):
+    await asyncio.sleep(delay)
+    return f"Data after {delay}s"
+
+async def main():
+    tasks = [fetch_data(1), fetch_data(2), fetch_data(0.5)]
+
+    for coro in asyncio.as_completed(tasks):
+        result = await coro
+        print(result)
+
+asyncio.run(main())
+```
+
+Answer: "Data after 0.5s", "Data after 1s", "Data after 2s" - as_completed() yields coroutines as they complete, so results appear in completion order (shortest delay first).
+
+#@@@@@@@@@@
+
+119. What is the purpose of `pandas.cut()` vs `pandas.qcut()`?
+
+Answer: cut() bins data into equal-width intervals based on values. qcut() bins data into equal-frequency intervals (quantiles). Use cut() for value-based binning, qcut() for distribution-based binning.
+
+#@@@@@@@@@@
+
+120. Complete this TensorFlow custom layer:
+```python
+import tensorflow as tf
+
+class CustomDense(tf.keras.layers.Layer):
+    def __init__(self, units):
+        super(CustomDense, self).__init__()
+        self.units = units
+
+    def build(self, input_shape):
+        self.w = self.add_weight(
+            shape=(input_shape[-1], self.units),
+            initializer='random_normal',
+            trainable=True
+        )
+        self.b = self.add_weight(
+            shape=(self.units,),
+            initializer='zeros',
+            trainable=True
+        )
+
+    def call(self, inputs):
+        return tf.matmul(inputs, self.w) + self.b
+```
+
+Answer: This is a complete custom dense layer implementation. No completion needed - it properly implements build() for weight creation and call() for forward pass computation.
+
+#@@@@@@@@@@
+
+121. How do you implement Django model managers with custom QuerySets?
+
+Answer: Create custom QuerySet class with methods, create Manager class using from_queryset() or get_queryset(). Attach manager to model. Enables chaining custom methods with standard QuerySet operations.
+
+#@@@@@@@@@@
+
+122. Which of the following are valid pytest parametrize decorators? (Multiple correct)
+A) @pytest.mark.parametrize("x", [1, 2, 3])
+B) @pytest.mark.parametrize("x,y", [(1,2), (3,4)])
+C) @pytest.mark.parametrize("x", [1, 2], ids=["first", "second"])
+D) @pytest.mark.parametrize("x", [pytest.param(1, marks=pytest.mark.slow)])
+E) @pytest.mark.parametrize("x,y,expected", [(1,2,3), (2,3,5)])
+
+Answer: A, B, C, D, E - All are valid parametrize syntax. Single parameter, multiple parameters, custom IDs, marked parameters, and multiple parameters with expected results.
+
+#@@@@@@@@@@
+
+123. Find the bug in this SQLAlchemy relationship:
+```python
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    posts = relationship("Post", back_populates="author")
+
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True)
+    title = Column(String(100))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    author = relationship("User", back_populates="posts")
+```
+
+Answer: No bug - this is correct SQLAlchemy relationship definition with proper bidirectional relationship using back_populates. User has many Posts, Post belongs to User.
+
+#@@@@@@@@@@
+
+124. What will this NumPy code output?
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+result = np.transpose(arr)
+print(result.shape)
+print(result)
+```
+
+Answer: (3, 2) and [[1 4] [2 5] [3 6]] - transpose() swaps axes, converting 2x3 array to 3x2. Rows become columns and vice versa.
+
+#@@@@@@@@@@
+
+125. How do you implement Django custom template tags with arguments?
+
+Answer: Use @register.simple_tag for functions, @register.inclusion_tag for templates. Accept arguments in function parameters. Example: @register.simple_tag def format_date(date, format_string). Use in template: {% format_date post.date "%Y-%m-%d" %}.
+
+#@@@@@@@@@@
+
+126. Which of the following are valid FastAPI dependency scopes? (Multiple correct)
+A) Request scope (default)
+B) Application scope with Depends
+C) Singleton with @lru_cache
+D) Session scope
+E) Custom scope with dependency providers
+
+Answer: A, B, C, E - Session scope is not built-in FastAPI concept. Request scope is default, application scope via Depends, singleton via @lru_cache, custom scopes via dependency providers.
+
+#@@@@@@@@@@
+
+127. Predict the output:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'group': ['A', 'A', 'B', 'B'],
+    'value': [1, 2, 3, 4]
+})
+
+result = df.groupby('group')['value'].transform('sum')
+print(result.tolist())
+```
+
+Answer: [3, 3, 7, 7] - transform() applies function to each group and returns same-sized result. Group A sum is 1+2=3, Group B sum is 3+4=7. Each row gets its group's sum.
+
+#@@@@@@@@@@
+
+128. Complete this Celery periodic task:
+```python
+from celery import Celery
+from celery.schedules import crontab
+
+app = Celery('myapp')
+
+app.conf.beat_schedule = {
+    'send-daily-report': {
+        'task': 'myapp.tasks.send_daily_report',
+        'schedule': _______________,
+    },
+    'cleanup-temp-files': {
+        'task': 'myapp.tasks.cleanup_temp_files',
+        'schedule': 30.0,  # Every 30 seconds
+    },
+}
+```
+
+Answer: `crontab(hour=9, minute=0)` or similar crontab expression - Schedules task to run daily at 9:00 AM. Can also use crontab(minute=0, hour=9) or other time specifications.
+
+#@@@@@@@@@@
+
+129. What is the difference between Django's `get_object_or_404()` and `get()`?
+
+Answer: get_object_or_404() raises Http404 if object not found, suitable for views. get() raises DoesNotExist exception. Use get_object_or_404() in views for automatic 404 responses, get() for programmatic handling.
+
+#@@@@@@@@@@
+
+130. Which of the following are valid NumPy random functions? (Multiple correct)
+A) np.random.rand()
+B) np.random.randn()
+C) np.random.randint()
+D) np.random.choice()
+E) np.random.shuffle()
+F) np.random.seed()
+
+Answer: A, B, C, D, E, F - All are valid NumPy random functions. rand() for uniform [0,1), randn() for standard normal, randint() for integers, choice() for sampling, shuffle() for in-place shuffling, seed() for reproducibility.
+
+#@@@@@@@@@@
+
+131. Find the issue in this Flask application:
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+users = []  # Global list
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    user_id = len(users) + 1
+    user = {'id': user_id, 'name': data['name']}
+    users.append(user)
+    return jsonify(user), 201
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    return jsonify(users)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+Answer: Using global list for data storage is not thread-safe and doesn't persist data. In production with multiple workers, data will be inconsistent. Should use proper database or thread-safe storage mechanism.
+
+#@@@@@@@@@@
+
+132. What will this PyTorch code output?
+```python
+import torch
+
+x = torch.tensor([1, 2, 3], dtype=torch.float32)
+y = x.view(3, 1)
+z = x.view(1, 3)
+result = torch.matmul(y, z)
+print(result.shape)
+```
+
+Answer: torch.Size([3, 3]) - Matrix multiplication of (3,1) and (1,3) tensors results in (3,3) tensor. Outer product operation.
+
+#@@@@@@@@@@
+
+133. How do you implement Django custom model save methods?
+
+Answer: Override save() method in model class, call super().save() to perform actual save. Add custom logic before/after save. Use *args, **kwargs for flexibility. Example: auto-generate slug, update timestamps, send notifications.
+
+#@@@@@@@@@@
+
+134. Which pytest plugins are commonly used for Django? (Multiple correct)
+A) pytest-django
+B) pytest-factoryboy
+C) pytest-mock
+D) pytest-cov
+E) pytest-xdist
+F) pytest-html
+
+Answer: A, B, C, D, E, F - All are commonly used with Django. pytest-django for Django integration, factoryboy for test data, mock for mocking, cov for coverage, xdist for parallel execution, html for reports.
+
+#@@@@@@@@@@
+
+135. Complete this FastAPI exception handler:
+```python
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+@app.exception_handler(_______________)
+async def validation_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Validation error", "errors": exc.errors()}
+    )
+
+@app.get("/test")
+def test_endpoint():
+    raise HTTPException(status_code=400, detail="Test error")
+```
+
+Answer: `RequestValidationError` - FastAPI exception type for request validation errors. Import from fastapi.exceptions. Handles Pydantic validation errors automatically.
+
+#@@@@@@@@@@
+
+136. What is the purpose of `pandas.stack()` vs `pandas.unstack()`?
+
+Answer: stack() pivots columns to rows (wide to long), creates MultiIndex. unstack() pivots rows to columns (long to wide), flattens MultiIndex. Inverse operations for reshaping hierarchical data.
+
+#@@@@@@@@@@
+
+137. Predict the output:
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+condition = arr > 3
+result = np.where(condition, arr * 2, arr)
+print(result)
+```
+
+Answer: [1 2 3 8 10] - where() applies condition element-wise. For arr > 3 (elements 4,5), multiply by 2. For others, keep original. Result: [1, 2, 3, 4*2, 5*2].
+
+#@@@@@@@@@@
+
+138. How do you implement Django custom form field validation?
+
+Answer: Override clean_<fieldname>() method in form class, raise ValidationError for invalid data. Return cleaned value. Example: clean_email() to check uniqueness, clean_password() to validate strength.
+
+#@@@@@@@@@@
+
+139. Which of the following are valid SQLAlchemy query methods? (Multiple correct)
+A) filter()
+B) filter_by()
+C) order_by()
+D) group_by()
+E) having()
+F) limit()
+
+Answer: A, B, C, D, E, F - All are valid SQLAlchemy query methods. filter() for complex conditions, filter_by() for simple equality, order_by() for sorting, group_by() for grouping, having() for group conditions, limit() for result count.
+
+#@@@@@@@@@@
+
+140. Find the bug in this asyncio code:
+```python
+import asyncio
+
+async def process_item(item):
+    print(f"Processing {item}")
+    await asyncio.sleep(1)
+    return f"Processed {item}"
+
+async def main():
+    items = ['A', 'B', 'C']
+    results = []
+
+    for item in items:
+        task = asyncio.create_task(process_item(item))
+        results.append(task)
+
+    # Wait for all tasks
+    completed = await asyncio.gather(*results)
+    print(completed)
+
+asyncio.run(main())
+```
+
+Answer: No bug - this code correctly creates tasks for concurrent execution and waits for all to complete with gather(). Tasks run concurrently, not sequentially.
+
+#@@@@@@@@@@
+
+141. What will this TensorFlow code output?
+```python
+import tensorflow as tf
+
+x = tf.constant([1, 2, 3, 4])
+y = tf.reshape(x, (2, 2))
+z = tf.reduce_sum(y, axis=1)
+print(z.numpy())
+```
+
+Answer: [3 7] - reshape() creates [[1,2], [3,4]], reduce_sum() with axis=1 sums along columns: [1+2, 3+4] = [3, 7].
+
+#@@@@@@@@@@
+
+142. How do you implement Django custom user authentication?
+
+Answer: Create custom authentication backend inheriting from BaseBackend, implement authenticate() and get_user() methods. Add to AUTHENTICATION_BACKENDS setting. Example: email authentication, LDAP, social auth.
+
+#@@@@@@@@@@
+
+143. Which of the following are valid Flask-SQLAlchemy relationship options? (Multiple correct)
+A) backref
+B) back_populates
+C) lazy
+D) cascade
+E) foreign_keys
+F) secondary
+
+Answer: A, B, C, D, E, F - All are valid relationship options. backref creates reverse relationship, back_populates for explicit bidirectional, lazy controls loading, cascade for deletion behavior, foreign_keys for complex relationships, secondary for many-to-many.
+
+#@@@@@@@@@@
+
+144. Complete this Pandas data cleaning:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, None, 4],
+    'B': ['x', 'y', 'z', None],
+    'C': [1.1, 2.2, 3.3, 4.4]
+})
+
+# Fill missing values: A with mean, B with 'unknown'
+df_cleaned = df.fillna({
+    'A': df['A']._______________,
+    'B': 'unknown'
+})
+```
+
+Answer: `mean()` - Fills missing values in column A with the mean of non-null values. fillna() with dictionary allows different fill values per column.
+
+#@@@@@@@@@@
+
+145. What is the purpose of `numpy.meshgrid()`?
+
+Answer: Creates coordinate matrices from coordinate vectors. Useful for evaluating functions on grids, plotting, and vectorized operations over 2D/3D spaces. Returns arrays for each dimension with broadcasted coordinates.
+
+#@@@@@@@@@@
+
+146. Predict the output:
+```python
+import asyncio
+
+async def producer(queue):
+    for i in range(3):
+        await queue.put(i)
+        print(f"Produced {i}")
+    await queue.put(None)
+
+async def consumer(queue):
+    while True:
+        item = await queue.get()
+        if item is None:
+            queue.task_done()
+            break
+        print(f"Consumed {item}")
+        queue.task_done()
+
+async def main():
+    queue = asyncio.Queue()
+
+    producer_task = asyncio.create_task(producer(queue))
+    consumer_task = asyncio.create_task(consumer(queue))
+
+    await asyncio.gather(producer_task, consumer_task)
+
+asyncio.run(main())
+```
+
+Answer: "Produced 0", "Consumed 0", "Produced 1", "Consumed 1", "Produced 2", "Consumed 2" - Producer and consumer run concurrently, processing items as they're produced. Output may vary slightly due to timing.
+
+#@@@@@@@@@@
+
+147. How do you implement Django model property methods?
+
+Answer: Use @property decorator for read-only computed fields, define getter/setter methods for read-write properties. Properties appear as model attributes but execute code. Example: full_name property combining first/last names.
+
+#@@@@@@@@@@
+
+148. Which of the following are valid pytest assertion methods? (Multiple correct)
+A) assert x == y
+B) pytest.approx() for floats
+C) assert x in collection
+D) assert callable(x)
+E) pytest.raises() for exceptions
+F) assert x is None
+
+Answer: A, B, C, D, E, F - All are valid pytest assertions. Basic assert statements, approx() for floating point comparison, membership testing, callable checking, exception testing, identity checking.
+
+#@@@@@@@@@@
+
+149. Complete this FastAPI OAuth2 authentication:
+```python
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+
+app = FastAPI()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    # Validate token and return user
+    user = validate_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return user
+
+@app.get("/protected")
+def protected_route(current_user = _______________):
+    return {"message": f"Hello {current_user.username}"}
+```
+
+Answer: `Depends(get_current_user)` - FastAPI dependency injection for authentication. Automatically validates token and injects current user into route handler.
+
+#@@@@@@@@@@
+
+150. What will this final Pandas code output?
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie'],
+    'age': [25, 30, 35],
+    'city': ['NY', 'LA', 'Chicago']
+})
+
+result = df.query("age > 25 and city != 'LA'")
+print(len(result))
+```
+
+Answer: 1 - query() filters rows where age > 25 AND city != 'LA'. Only Charlie (age=35, city='Chicago') meets both conditions. Bob has age > 25 but city='LA', Alice has age=25 (not > 25).
+
+#@@@@@@@@@@
+
+151. How do you implement Django custom context processors?
+
+Answer: Create function accepting request parameter, returning dictionary of context variables. Add to TEMPLATES['OPTIONS']['context_processors']. Variables become available in all templates automatically.
+
+#@@@@@@@@@@
+
+152. Which of the following are valid NumPy array methods? (Multiple correct)
+A) reshape()
+B) flatten()
+C) transpose()
+D) sort()
+E) argmax()
+F) clip()
+
+Answer: A, B, C, D, E, F - All are valid NumPy array methods. reshape() changes shape, flatten() creates 1D copy, transpose() swaps axes, sort() sorts in-place, argmax() finds max index, clip() limits values to range.
+
+#@@@@@@@@@@
+
+153. Find the final bug in this SQLAlchemy session management:
+```python
+from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
+
+Session = sessionmaker(bind=engine)
+
+@contextmanager
+def get_session():
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+# Usage
+with get_session() as session:
+    user = User(name="John")
+    session.add(user)
+    # Commit happens automatically
+```
+
+Answer: No bug - this is correct SQLAlchemy session management using context manager. Automatically commits on success, rolls back on exception, and always closes session. Good pattern for transaction management.
+
+#@@@@@@@@@@
+
+154. What is the purpose of `pandas.crosstab()`?
+
+Answer: Creates cross-tabulation table showing frequency of combinations between two or more variables. Similar to pivot_table but specifically for counting occurrences. Useful for categorical data analysis and contingency tables.
+
+#@@@@@@@@@@
+
+155. Complete this Django REST framework throttling:
+```python
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
+
+class CustomThrottle(UserRateThrottle):
+    scope = 'custom'
+
+class MyAPIView(APIView):
+    throttle_classes = [_______________]
+    throttle_scope = 'custom'
+
+    def get(self, request):
+        return Response({'message': 'Hello'})
+
+# In settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_RATES': {
+        'custom': '100/hour'
+    }
+}
+```
+
+Answer: `CustomThrottle` - Custom throttle class for rate limiting. Limits requests to 100 per hour per user for this specific API view.
+
+#@@@@@@@@@@
+
+156. What will this PyTorch autograd code output?
+```python
+import torch
+
+x = torch.tensor([2.0], requires_grad=True)
+y = x ** 3
+y.backward()
+print(x.grad.item())
+```
+
+Answer: 12.0 - Gradient of y = x³ with respect to x is dy/dx = 3x². At x=2, gradient is 3*2² = 12.
+
+#@@@@@@@@@@
+
+157. How do you implement Django custom model validators?
+
+Answer: Create validator function that raises ValidationError for invalid data. Use in model field validators parameter or override model's clean() method. Example: validate file size, check business rules, format validation.
+
+#@@@@@@@@@@
+
+158. Which of the following are valid Flask application configuration patterns? (Multiple correct)
+A) Environment variables
+B) Configuration classes
+C) Instance folders
+D) JSON configuration files
+E) Python configuration files
+F) Command line arguments
+
+Answer: A, B, C, D, E, F - All are valid Flask configuration patterns. Environment variables for deployment, classes for organization, instance folders for sensitive data, JSON/Python files for structured config, command line for overrides.
+
+#@@@@@@@@@@
+
+159. Predict the final output:
+```python
+import numpy as np
+
+arr1 = np.array([[1, 2], [3, 4]])
+arr2 = np.array([[5, 6], [7, 8]])
+result = np.concatenate([arr1, arr2], axis=0)
+print(result.shape)
+print(result)
+```
+
+Answer: (4, 2) and [[1 2] [3 4] [5 6] [7 8]] - concatenate() with axis=0 stacks arrays vertically. Two 2x2 arrays become one 4x2 array.
+
+#@@@@@@@@@@
+
+160. Complete this Celery error handling:
+```python
+from celery import Celery
+from celery.exceptions import Retry
+
+app = Celery('myapp')
+
+@app.task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+def unreliable_task(self, data):
+    try:
+        # Potentially failing operation
+        result = process_data(data)
+        return result
+    except SpecificException as exc:
+        # Custom retry logic
+        raise self.retry(countdown=60, exc=exc)
+    except Exception as exc:
+        # Log error and don't retry
+        logger.error(f"Task failed: {exc}")
+        raise
+```
+
+Answer: This is complete Celery error handling with automatic retries for general exceptions and custom retry logic for specific exceptions. No completion needed.
+
+#@@@@@@@@@@
+
+161. What is the difference between Django's `select_related()` and `only()`?
+
+Answer: select_related() follows foreign key relationships and loads related objects in single query. only() limits fields loaded from database, creates deferred model instances. Use select_related() for relationships, only() for field optimization.
+
+#@@@@@@@@@@
+
+162. Which pytest features help with test data management? (Multiple correct)
+A) Fixtures
+B) Factory Boy
+C) Parametrize
+D) Database fixtures
+E) Temporary files
+F) Mock data
+
+Answer: A, B, C, D, E, F - All help with test data. Fixtures provide setup/teardown, Factory Boy creates test objects, parametrize provides test data variations, database fixtures for data setup, temporary files for file testing, mock data for isolation.
+
+#@@@@@@@@@@
+
+163. Find the issue in this FastAPI dependency:
+```python
+from fastapi import FastAPI, Depends
+
+app = FastAPI()
+
+def get_database():
+    db = Database()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def get_user_service(db = Depends(get_database)):
+    return UserService(db)
+
+@app.get("/users")
+def get_users(user_service = Depends(get_user_service)):
+    return user_service.get_all_users()
+```
+
+Answer: No apparent issue - this is correct FastAPI dependency injection with proper resource management. Database connection is properly closed, dependencies are correctly chained.
+
+#@@@@@@@@@@
+
+164. What will this NumPy broadcasting code output?
+```python
+import numpy as np
+
+a = np.array([[1], [2], [3]])  # Shape (3, 1)
+b = np.array([10, 20, 30])     # Shape (3,)
+result = a + b
+print(result.shape)
+print(result)
+```
+
+Answer: (3, 3) and [[11 21 31] [12 22 32] [13 23 33]] - Broadcasting: (3,1) + (3,) becomes (3,3). Each row of a is added to entire array b.
+
+#@@@@@@@@@@
+
+165. How do you implement Django custom model field lookups?
+
+Answer: Create lookup class inheriting from Lookup, implement as_sql() method. Register with field using register_lookup(). Example: case-insensitive contains, date range lookups, custom operators.
+
+#@@@@@@@@@@
+
+166. Which of the following are valid Pandas string methods? (Multiple correct)
+A) str.contains()
+B) str.replace()
+C) str.split()
+D) str.upper()
+E) str.extract()
+F) str.len()
+
+Answer: A, B, C, D, E, F - All are valid Pandas string accessor methods. Available on Series with string data using .str accessor. Provide vectorized string operations.
+
+#@@@@@@@@@@
+
+167. Complete this SQLAlchemy event listener:
+```python
+from sqlalchemy import event
+from sqlalchemy.orm import Session
+
+@event.listens_for(User, '_______________')
+def user_before_insert(mapper, connection, target):
+    # Auto-generate username from email
+    if not target.username and target.email:
+        target.username = target.email.split('@')[0]
+
+@event.listens_for(Session, 'before_commit')
+def before_commit(session):
+    # Log all changes before commit
+    for obj in session.new:
+        print(f"Creating: {obj}")
+```
+
+Answer: `before_insert` - SQLAlchemy event that fires before inserting new records. Allows modification of object before database insertion.
+
+#@@@@@@@@@@
+
+168. What is the purpose of `asyncio.Semaphore()`?
+
+Answer: Limits number of concurrent operations. Acts as counter that can be acquired/released. Useful for rate limiting, resource pooling, controlling concurrency level. Example: limit concurrent HTTP requests.
+
+#@@@@@@@@@@
+
+169. Predict the output:
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4, 5],
+    'B': [2, 4, 6, 8, 10]
+})
+
+result = df.corr()
+print(result.loc['A', 'B'])
+```
+
+Answer: 1.0 - Perfect positive correlation between A and B. B = 2*A, so correlation coefficient is 1.0 (perfect linear relationship).
+
+#@@@@@@@@@@
+
+170. How do you implement Django custom admin filters?
+
+Answer: Create class inheriting from SimpleListFilter, implement lookups() and queryset() methods. Add to list_filter in admin class. Example: date range filters, custom status filters, related object filters.
+
+#@@@@@@@@@@
+
+171. Which of the following are valid TensorFlow optimizers? (Multiple correct)
+A) Adam
+B) SGD
+C) RMSprop
+D) Adagrad
+E) AdamW
+F) LBFGS
+
+Answer: A, B, C, D, E - LBFGS is not standard TensorFlow optimizer (available in scipy). Others are common TensorFlow optimizers for neural network training with different characteristics.
+
+#@@@@@@@@@@
+
+172. Find the issue in this Flask session management:
+```python
+from flask import Flask, session, request
+
+app = Flask(__name__)
+# Missing: app.secret_key = 'your-secret-key'
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    # Validate user credentials
+    if validate_user(username):
+        session['user_id'] = username
+        return 'Logged in'
+    return 'Invalid credentials'
+
+@app.route('/profile')
+def profile():
+    if 'user_id' in session:
+        return f"Welcome {session['user_id']}"
+    return 'Not logged in'
+```
+
+Answer: Missing secret_key configuration. Flask sessions require secret key for signing cookies. Without it, sessions won't work and will raise RuntimeError.
+
+#@@@@@@@@@@
+
+173. What will this PyTorch tensor operation output?
+```python
+import torch
+
+x = torch.tensor([[1, 2, 3], [4, 5, 6]])
+y = torch.sum(x, dim=0, keepdim=True)
+print(y.shape)
+print(y)
+```
+
+Answer: torch.Size([1, 3]) and tensor([[5, 7, 9]]) - sum() with dim=0 sums along rows, keepdim=True preserves dimension. Result: [1+4, 2+5, 3+6] = [5, 7, 9] with shape (1,3).
+
+#@@@@@@@@@@
+
+174. How do you implement Django custom model metaclasses?
+
+Answer: Create metaclass inheriting from ModelBase, override __new__ method to modify class creation. Set metaclass in model Meta class. Example: auto-generate fields, add validation, modify model behavior.
+
+#@@@@@@@@@@
+
+175. Which of the following are valid pytest configuration options? (Multiple correct)
+A) pytest.ini file
+B) pyproject.toml [tool.pytest.ini_options]
+C) setup.cfg [tool:pytest]
+D) Command line options
+E) Environment variables
+F) conftest.py configuration
+
+Answer: A, B, C, D, E, F - All are valid pytest configuration methods. Different files and methods for configuring pytest behavior, test discovery, and execution options.
+
+#@@@@@@@@@@
+
+176. Complete this FastAPI file upload:
+```python
+from fastapi import FastAPI, File, UploadFile
+
+app = FastAPI()
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = _______________):
+    contents = await file.read()
+    # Process file contents
+    return {
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "size": len(contents)
+    }
+```
+
+Answer: `File(...)` - FastAPI file upload parameter. File() creates file upload dependency, UploadFile provides async file interface with metadata.
+
+#@@@@@@@@@@
+
+177. What is the purpose of `numpy.linalg` module?
+
+Answer: Provides linear algebra functions: matrix operations, decompositions, eigenvalues, solving linear systems. Includes functions like dot(), inv(), det(), eig(), svd(). Essential for scientific computing and machine learning.
+
+#@@@@@@@@@@
+
+178. Predict the output:
+```python
+import asyncio
+
+async def delayed_print(message, delay):
+    await asyncio.sleep(delay)
+    print(message)
+
+async def main():
+    await asyncio.wait([
+        delayed_print("First", 2),
+        delayed_print("Second", 1),
+        delayed_print("Third", 3)
+    ])
+
+asyncio.run(main())
+```
+
+Answer: "Second", "First", "Third" - Tasks complete in order of their delays (1s, 2s, 3s). asyncio.wait() runs all coroutines concurrently.
+
+#@@@@@@@@@@
+
+179. How do you implement Django custom model save signals?
+
+Answer: Use post_save or pre_save signals with @receiver decorator or signal.connect(). Signals fire automatically on model save operations. Example: send notifications, update related objects, logging.
+
+#@@@@@@@@@@
+
+180. Which of the following are valid Pandas index operations? (Multiple correct)
+A) set_index()
+B) reset_index()
+C) reindex()
+D) sort_index()
+E) drop_index()
+F) rename_axis()
+
+Answer: A, B, C, D, F - drop_index() is not a Pandas method (use drop() instead). Others are valid index operations for setting, resetting, reordering, sorting, and renaming DataFrame indices.
+
+#@@@@@@@@@@
+
+181. Find the final issue in this Celery configuration:
+```python
+from celery import Celery
+
+app = Celery('myapp')
+
+app.conf.update(
+    broker_url='redis://localhost:6379/0',
+    result_backend='redis://localhost:6379/0',
+    task_serializer='json',
+    accept_content=['json'],
+    result_serializer='json',
+    timezone='UTC',
+    enable_utc=True,
+    worker_prefetch_multiplier=1,
+    task_acks_late=True,
+)
+
+@app.task
+def my_task(data):
+    return process_data(data)
+```
+
+Answer: No apparent issue - this is a well-configured Celery setup with proper serialization, timezone handling, and worker configuration for reliable task processing.
+
+#@@@@@@@@@@
+
+182. What will this NumPy advanced indexing output?
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+rows = np.array([0, 2])
+cols = np.array([1, 2])
+result = arr[rows[:, np.newaxis], cols]
+print(result)
+```
+
+Answer: [[2 3] [8 9]] - Advanced indexing with broadcasting. rows[:, np.newaxis] creates (2,1) shape, cols is (2,). Results in selecting elements at (0,1), (0,2), (2,1), (2,2).
+
+#@@@@@@@@@@
+
+183. How do you implement Django custom model ordering?
+
+Answer: Set ordering in model Meta class or override get_queryset() in manager/view. Use field names with optional '-' prefix for descending. Example: ordering = ['-created_at', 'name'] for newest first, then by name.
+
+#@@@@@@@@@@
+
+184. Which of the following are valid SQLAlchemy column constraints? (Multiple correct)
+A) nullable=False
+B) unique=True
+C) primary_key=True
+D) default=value
+E) index=True
+F) foreign_key=True
+
+Answer: A, B, C, D, E - foreign_key=True is not valid syntax (use ForeignKey() instead). Others are valid column constraints for nullability, uniqueness, primary keys, defaults, and indexing.
+
+#@@@@@@@@@@
+
+185. Complete this Django REST framework serializer validation:
+```python
+from rest_framework import serializers
+
+class UserSerializer(serializers.ModelSerializer):
+    password_confirm = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'password_confirm']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        if data['password'] != data['password_confirm']:
+            raise serializers.ValidationError("Passwords don't match")
+        data.pop('password_confirm')
+        return data
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+```
+
+Answer: This is complete DRF serializer with cross-field validation. No completion needed - properly validates password confirmation and creates user with hashed password.
+
+#@@@@@@@@@@
+
+186. What is the purpose of `pandas.MultiIndex`?
+
+Answer: Hierarchical indexing for DataFrames and Series. Enables multiple levels of row/column labels. Useful for complex data structures, time series with multiple dimensions, pivot tables. Supports advanced slicing and grouping operations.
+
+#@@@@@@@@@@
+
+187. Predict the output:
+```python
+import torch
+
+x = torch.tensor([[1, 2], [3, 4]], dtype=torch.float32)
+y = torch.tensor([[1, 0], [0, 1]], dtype=torch.float32)
+result = torch.mul(x, y)  # Element-wise multiplication
+print(result)
+```
+
+Answer: tensor([[1., 0.], [0., 4.]]) - Element-wise multiplication. (1*1, 2*0), (3*0, 4*1) = (1,0), (0,4). Different from matrix multiplication (torch.mm).
+
+#@@@@@@@@@@
+
+188. How do you implement Django custom template context variables?
+
+Answer: Use context processors to add variables to all templates, or pass context in view render() calls. Context processors are functions returning dictionaries added to template context automatically.
+
+#@@@@@@@@@@
+
+189. Which of the following are valid Flask-WTF form field types? (Multiple correct)
+A) StringField
+B) IntegerField
+C) BooleanField
+D) SelectField
+E) FileField
+F) DateTimeField
+
+Answer: A, B, C, D, E, F - All are valid WTForms field types available in Flask-WTF. Provide different input types with built-in validation and rendering capabilities.
+
+#@@@@@@@@@@
+
+190. Find the issue in this asyncio exception handling:
+```python
+import asyncio
+
+async def risky_operation():
+    await asyncio.sleep(1)
+    raise ValueError("Something went wrong")
+
+async def main():
+    try:
+        tasks = [
+            asyncio.create_task(risky_operation()),
+            asyncio.create_task(risky_operation()),
+            asyncio.create_task(risky_operation())
+        ]
+
+        results = await asyncio.gather(*tasks)
+        print(results)
+    except ValueError as e:
+        print(f"Caught error: {e}")
+        # Issue: Other tasks may still be running
+
+asyncio.run(main())
+```
+
+Answer: When gather() raises exception, other tasks continue running in background. Should cancel remaining tasks in exception handler or use return_exceptions=True in gather() to collect all results/exceptions.
+
+#@@@@@@@@@@
+
+191. What will this NumPy random code output?
+```python
+import numpy as np
+
+np.random.seed(42)
+arr1 = np.random.rand(3)
+np.random.seed(42)
+arr2 = np.random.rand(3)
+print(np.array_equal(arr1, arr2))
+```
+
+Answer: True - Setting same seed (42) produces identical random sequences. Both arrays will have same random values, so array_equal() returns True.
+
+#@@@@@@@@@@
+
+192. How do you implement Django custom model field choices?
+
+Answer: Define choices as tuple of tuples in model field. Use TextChoices or IntegerChoices for better organization. Example: status = models.CharField(choices=STATUS_CHOICES). Provides validation and display names.
+
+#@@@@@@@@@@
+
+193. Which of the following are valid pytest test discovery patterns? (Multiple correct)
+A) test_*.py files
+B) *_test.py files
+C) Test* classes
+D) test_* functions
+E) *_test functions
+F) Test* methods in Test* classes
+
+Answer: A, B, C, D - *_test functions and Test* methods are not standard discovery patterns. Pytest discovers test_*.py and *_test.py files, Test* classes, and test_* functions/methods.
+
+#@@@@@@@@@@
+
+194. Complete this FastAPI middleware:
+```python
+from fastapi import FastAPI, Request
+from fastapi.middleware.base import BaseHTTPMiddleware
+import time
+
+app = FastAPI()
+
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+
+        # Log request
+        print(f"Request: {request.method} {request.url}")
+
+        response = await call_next(request)
+
+        # Log response
+        process_time = time.time() - start_time
+        print(f"Response: {response.status_code} in {process_time:.4f}s")
+
+        return response
+
+app.add_middleware(_______________)
+```
+
+Answer: `LoggingMiddleware` - Adds the custom middleware class to FastAPI application. Middleware processes all requests and responses.
+
+#@@@@@@@@@@
+
+195. What is the purpose of `pandas.get_dummies()`?
+
+Answer: Creates dummy/indicator variables from categorical data. Converts categorical columns to binary columns (one-hot encoding). Useful for machine learning preprocessing where algorithms require numeric input.
+
+#@@@@@@@@@@
+
+196. Predict the final output:
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+mask = arr % 2 == 0
+result = np.extract(mask, arr)
+print(result)
+```
+
+Answer: [2 4] - extract() returns elements where mask is True. arr % 2 == 0 creates mask [False, True, False, True, False], extracting even numbers 2 and 4.
+
+#@@@@@@@@@@
+
+197. How do you implement Django custom model managers with inheritance?
+
+Answer: Create base manager class with common methods, inherit in specific managers. Use Manager.from_queryset() to combine manager and queryset methods. Attach to models with objects attribute.
+
+#@@@@@@@@@@
+
+198. Which of the following are valid Celery task routing options? (Multiple correct)
+A) Queue routing
+B) Exchange routing
+C) Routing key patterns
+D) Task name patterns
+E) Priority routing
+F) Geographic routing
+
+Answer: A, B, C, D, E - Geographic routing is not built-in Celery feature. Others are valid routing options for directing tasks to specific queues, exchanges, or workers based on patterns and priorities.
+
+#@@@@@@@@@@
+
+199. Find the final bug in this SQLAlchemy relationship:
+```python
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy.orm import relationship
+
+# Association table for many-to-many
+user_role_table = Table('user_roles', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('role_id', Integer, ForeignKey('roles.id'))
+)
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    roles = relationship("Role", secondary=user_role_table, back_populates="users")
+
+class Role(Base):
+    __tablename__ = 'roles'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    users = relationship("User", secondary=user_role_table, back_populates="roles")
+```
+
+Answer: No bug - this is correct SQLAlchemy many-to-many relationship implementation with association table and proper bidirectional relationships using back_populates.
+
+#@@@@@@@@@@
+
+200. What will this final comprehensive code output?
+```python
+import pandas as pd
+import numpy as np
+
+# Create sample data
+df = pd.DataFrame({
+    'category': ['A', 'B', 'A', 'B', 'A'],
+    'value': [10, 20, 15, 25, 12]
+})
+
+# Group by category and calculate statistics
+result = df.groupby('category')['value'].agg(['mean', 'sum', 'count'])
+print(result)
+print(f"Total records: {len(df)}")
+print(f"Categories: {df['category'].nunique()}")
+```
+
+Answer:
+```
+         mean  sum  count
+category
+A        12.333333   37      3
+B        22.5   45      2
+```
+Total records: 5
+Categories: 2
+
+Groups data by category, calculates mean/sum/count for each group. Category A has 3 records (10,15,12) with mean≈12.33, sum=37. Category B has 2 records (20,25) with mean=22.5, sum=45.
+
+#@@@@@@@@@@

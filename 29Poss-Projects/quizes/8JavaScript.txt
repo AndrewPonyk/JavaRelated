@@ -1,0 +1,2858 @@
+JavaScript Quiz - 200 Questions
+Tech Stack: ES6+, Next.js, TypeScript, Node.js, React, GraphQL, Vue.js, Angular, Express, Jest, Prisma/TypeORM, Playwright/Cypress, Webpack, Babel, Vite, Svelte
+
+1. What is the difference between `let`, `const`, and `var` in ES6+?
+
+Answer: `var` is function-scoped, hoisted, and can be redeclared. `let` is block-scoped, hoisted but not initialized (temporal dead zone), cannot be redeclared. `const` is block-scoped, must be initialized at declaration, cannot be reassigned (but objects/arrays can be mutated).
+
+#@@@@@@@@@@
+
+2. Which of the following are new features in ES6+? (Multiple correct)
+A) Arrow functions
+B) Template literals
+C) Destructuring assignment
+D) Classes
+E) Modules (import/export)
+F) Async/await
+
+Answer: A, B, C, D, E, F - All are ES6+ features. Arrow functions, template literals, destructuring, classes, and modules were introduced in ES6. Async/await was added in ES2017 (ES8).
+
+#@@@@@@@@@@
+
+3. Complete this React functional component with hooks:
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/users/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user');
+        }
+        const userData = await response.json();
+        setUser(userData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        _______________
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!user) return <div>User not found</div>;
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+Answer: `setLoading(false)` - Set loading to false in the finally block to ensure loading state is updated regardless of success or failure.
+
+#@@@@@@@@@@
+
+4. How do you implement server-side rendering (SSR) in Next.js?
+
+Answer: Next.js provides SSR through `getServerSideProps` function that runs on each request. Export this function from page components to fetch data server-side. Use `getStaticProps` for static generation at build time, and `getStaticPaths` for dynamic routes with static generation.
+
+#@@@@@@@@@@
+
+5. Find the bug in this TypeScript interface definition:
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+  preferences: {
+    theme: 'light' | 'dark';
+    notifications: boolean;
+  };
+}
+
+interface AdminUser extends User {
+  permissions: string[];
+  lastLogin: Date;
+}
+
+// Usage
+const admin: AdminUser = {
+  id: 1,
+  name: "John Doe",
+  email: "john@example.com",
+  permissions: ["read", "write", "delete"],
+  lastLogin: new Date(),
+  preferences: {
+    theme: "blue",  // Bug: invalid theme value
+    notifications: true
+  }
+};
+```
+
+Answer: The theme value "blue" is invalid. The theme property is defined as a union type 'light' | 'dark', so it can only be "light" or "dark". Should be `theme: "light"` or `theme: "dark"`.
+
+#@@@@@@@@@@
+
+6. What is the difference between Node.js and browser JavaScript environments?
+
+Answer: Node.js has access to file system, process, OS modules, and uses CommonJS modules by default. Browser has DOM, BOM, Web APIs (fetch, localStorage), and uses ES modules. Node.js is server-side with different global objects (global vs window), different module systems, and different APIs.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid React hooks? (Multiple correct)
+A) useState
+B) useEffect
+C) useContext
+D) useReducer
+E) useMemo
+F) useCallback
+
+Answer: A, B, C, D, E, F - All are valid React hooks. useState for state management, useEffect for side effects, useContext for context consumption, useReducer for complex state logic, useMemo for memoizing values, useCallback for memoizing functions.
+
+#@@@@@@@@@@
+
+8. Complete this GraphQL query with variables:
+```graphql
+query GetUserPosts($userId: ID!, $limit: Int = 10) {
+  user(id: $userId) {
+    id
+    name
+    email
+    posts(limit: $limit) {
+      id
+      title
+      content
+      createdAt
+      comments {
+        id
+        text
+        author {
+          _______________
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: `name` or `id` - Complete the author field with properties like name or id. GraphQL requires you to specify which fields you want to retrieve from nested objects.
+
+#@@@@@@@@@@
+
+9. How do you implement lazy loading in Vue.js?
+
+Answer: Use dynamic imports with `() => import('./Component.vue')` for route-level code splitting, or `defineAsyncComponent` for component-level lazy loading. Vue Router supports lazy loading with dynamic imports in route definitions for better performance.
+
+#@@@@@@@@@@
+
+10. Which of the following are Angular lifecycle hooks? (Multiple correct)
+A) ngOnInit
+B) ngOnDestroy
+C) ngOnChanges
+D) ngAfterViewInit
+E) ngDoCheck
+F) ngAfterContentInit
+
+Answer: A, B, C, D, E, F - All are Angular lifecycle hooks. ngOnInit (component initialization), ngOnDestroy (cleanup), ngOnChanges (input changes), ngAfterViewInit (view initialization), ngDoCheck (change detection), ngAfterContentInit (content projection).
+
+#@@@@@@@@@@
+
+11. Predict the output of this JavaScript code:
+```javascript
+console.log('1');
+
+setTimeout(() => console.log('2'), 0);
+
+Promise.resolve().then(() => console.log('3'));
+
+console.log('4');
+
+setTimeout(() => console.log('5'), 0);
+
+Promise.resolve().then(() => console.log('6'));
+```
+
+Answer: 1, 4, 3, 6, 2, 5 - Synchronous code executes first (1, 4), then microtasks/Promise callbacks (3, 6), then macrotasks/setTimeout callbacks (2, 5). Event loop prioritizes microtasks over macrotasks.
+
+#@@@@@@@@@@
+
+12. How do you set up middleware in Express.js?
+
+Answer: Use `app.use()` for application-level middleware, `router.use()` for router-level middleware. Middleware functions have access to req, res, and next. Call `next()` to pass control to next middleware. Order matters - middleware executes in the order it's defined.
+
+#@@@@@@@@@@
+
+13. Which of the following are Jest testing utilities? (Multiple correct)
+A) describe
+B) it/test
+C) expect
+D) beforeEach
+E) afterAll
+F) jest.mock
+
+Answer: A, B, C, D, E, F - All are Jest utilities. describe (test suites), it/test (test cases), expect (assertions), beforeEach/afterAll (setup/teardown), jest.mock (mocking functions/modules).
+
+#@@@@@@@@@@
+
+14. Complete this Prisma schema definition:
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  posts     Post[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [_______________])
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+Answer: `id` - The relation references the `id` field of the User model. This creates a foreign key relationship between Post.authorId and User.id.
+
+#@@@@@@@@@@
+
+15. What is the difference between unit tests and integration tests in Playwright?
+
+Answer: Unit tests test individual components/functions in isolation using mocking. Integration tests test multiple components working together. Playwright is primarily for end-to-end testing, testing complete user workflows across real browsers, but can also be used for integration testing of web components.
+
+#@@@@@@@@@@
+
+16. Which of the following are Webpack concepts? (Multiple correct)
+A) Entry points
+B) Loaders
+C) Plugins
+D) Output
+E) Mode
+F) Chunks
+
+Answer: A, B, C, D, E, F - All are Webpack concepts. Entry points define where to start bundling, loaders transform files, plugins extend functionality, output specifies where to emit bundles, mode sets optimization level, chunks are code splitting units.
+
+#@@@@@@@@@@
+
+17. Complete this Babel configuration:
+```json
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "browsers": ["> 1%", "last 2 versions"]
+      },
+      "useBuiltIns": "_______________"
+    }],
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-transform-runtime"
+  ]
+}
+```
+
+Answer: `"usage"` or `"entry"` - useBuiltIns can be "usage" (adds polyfills based on code usage), "entry" (adds polyfills based on target environments), or false (no automatic polyfill addition).
+
+#@@@@@@@@@@
+
+18. How do you implement code splitting in Vite?
+
+Answer: Vite supports automatic code splitting for dynamic imports using `import()`. Use `defineAsyncComponent` in Vue or `React.lazy()` in React. Vite also supports manual chunk splitting via `build.rollupOptions.output.manualChunks` configuration.
+
+#@@@@@@@@@@
+
+19. Find the bug in this Svelte component:
+```svelte
+<script>
+  let count = 0;
+  let doubled;
+
+  // Bug: reactive statement should use $:
+  doubled = count * 2;
+
+  function increment() {
+    count += 1;
+  }
+</script>
+
+<h1>Count: {count}</h1>
+<p>Doubled: {doubled}</p>
+<button on:click={increment}>+</button>
+```
+
+Answer: The reactive statement should use `$:` prefix. Change `doubled = count * 2;` to `$: doubled = count * 2;` to make it reactive to changes in count.
+
+#@@@@@@@@@@
+
+20. What is the difference between TypeScript interfaces and types?
+
+Answer: Interfaces can be extended and merged, support declaration merging, and are primarily for object shapes. Types are more flexible, support unions, intersections, primitives, and computed types. Interfaces are open (can be augmented), types are closed. Use interfaces for object contracts, types for complex type operations.
+
+#@@@@@@@@@@
+
+21. Which of the following are Node.js built-in modules? (Multiple correct)
+A) fs
+B) http
+C) path
+D) crypto
+E) os
+F) express
+
+Answer: A, B, C, D, E - All except express are built-in Node.js modules. fs (file system), http (HTTP server/client), path (file path utilities), crypto (cryptographic functionality), os (operating system utilities). Express is a third-party framework.
+
+#@@@@@@@@@@
+
+22. Complete this React Context implementation:
+```jsx
+import React, { createContext, useContext, useReducer } from 'react';
+
+const AuthContext = createContext();
+
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case 'LOGIN':
+      return { ...state, user: action.payload, isAuthenticated: true };
+    case 'LOGOUT':
+      return { ...state, user: null, isAuthenticated: false };
+    default:
+      return state;
+  }
+};
+
+export const AuthProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(authReducer, {
+    user: null,
+    isAuthenticated: false
+  });
+
+  return (
+    <AuthContext.Provider value={{ ...state, dispatch }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within _______________');
+  }
+  return context;
+};
+```
+
+Answer: `AuthProvider` - The hook must be used within the AuthProvider component to access the context value.
+
+#@@@@@@@@@@
+
+23. How do you implement GraphQL subscriptions?
+
+Answer: GraphQL subscriptions enable real-time updates. Use WebSocket or Server-Sent Events for transport. Define subscription types in schema, implement resolvers that return AsyncIterator or Observable. Clients subscribe using subscription operation and receive real-time updates when data changes.
+
+#@@@@@@@@@@
+
+24. Which of the following are Vue.js composition API functions? (Multiple correct)
+A) ref
+B) reactive
+C) computed
+D) watch
+E) onMounted
+F) provide/inject
+
+Answer: A, B, C, D, E, F - All are Composition API functions. ref (reactive references), reactive (reactive objects), computed (computed properties), watch (watchers), onMounted (lifecycle hooks), provide/inject (dependency injection).
+
+#@@@@@@@@@@
+
+25. Find the issue in this Angular service:
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private apiUrl = 'https://api.example.com/users';
+
+  constructor(private http: HttpClient) {}
+
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl);
+  }
+
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  createUser(user: User): Observable<User> {
+    return this.http.post<User>(this.apiUrl, user);
+  }
+}
+
+// Missing User interface definition
+```
+
+Answer: Missing User interface definition. TypeScript needs the User interface to be defined or imported. Add `interface User { id: number; name: string; email: string; }` or import it from another file.
+
+#@@@@@@@@@@
+
+26. What is the difference between Express.js and Fastify?
+
+Answer: Express.js is mature, has large ecosystem, middleware-based architecture. Fastify is faster (2x performance), has built-in JSON schema validation, TypeScript support, async/await by default, plugin architecture, and automatic serialization. Fastify is more opinionated but offers better performance and developer experience.
+
+#@@@@@@@@@@
+
+27. Which of the following are Jest matchers? (Multiple correct)
+A) toBe
+B) toEqual
+C) toHaveBeenCalled
+D) toMatchSnapshot
+E) toThrow
+F) toBeInTheDocument
+
+Answer: A, B, C, D, E, F - All are Jest matchers. toBe (strict equality), toEqual (deep equality), toHaveBeenCalled (spy functions), toMatchSnapshot (snapshot testing), toThrow (error testing), toBeInTheDocument (DOM testing with testing-library).
+
+#@@@@@@@@@@
+
+28. Complete this TypeORM entity definition:
+```typescript
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  name: string;
+
+  @OneToMany(() => Post, post => post.author)
+  posts: Post[];
+}
+
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  title: string;
+
+  @Column('text')
+  content: string;
+
+  @ManyToOne(() => User, user => user.posts)
+  author: User;
+
+  @Column()
+  _______________: number;
+}
+```
+
+Answer: `authorId` - Add the foreign key column for the ManyToOne relationship. TypeORM automatically creates this column but it's good practice to explicitly define it.
+
+#@@@@@@@@@@
+
+29. How do you implement page transitions in Playwright?
+
+Answer: Use `page.waitForNavigation()` or `page.waitForURL()` to wait for page transitions. Use `page.goto()` for navigation, `page.goBack()/goForward()` for history navigation. Handle SPAs with `page.waitForSelector()` or `page.waitForFunction()` for dynamic content changes.
+
+#@@@@@@@@@@
+
+30. Which of the following are Cypress commands? (Multiple correct)
+A) cy.visit()
+B) cy.get()
+C) cy.click()
+D) cy.type()
+E) cy.should()
+F) cy.intercept()
+
+Answer: A, B, C, D, E, F - All are Cypress commands. visit (navigate to URL), get (select elements), click (click elements), type (type text), should (assertions), intercept (mock network requests).
+
+#@@@@@@@@@@
+
+31. Predict the output of this async/await code:
+```javascript
+async function fetchData() {
+  console.log('1');
+
+  const promise1 = new Promise(resolve => {
+    console.log('2');
+    setTimeout(() => {
+      console.log('3');
+      resolve('A');
+    }, 100);
+  });
+
+  const promise2 = new Promise(resolve => {
+    console.log('4');
+    setTimeout(() => {
+      console.log('5');
+      resolve('B');
+    }, 50);
+  });
+
+  console.log('6');
+
+  const result1 = await promise1;
+  console.log('7', result1);
+
+  const result2 = await promise2;
+  console.log('8', result2);
+}
+
+fetchData();
+console.log('9');
+```
+
+Answer: 1, 2, 4, 6, 9, 5, 3, 7 A, 8 B - Synchronous code executes first (1, 2, 4, 6, 9), then promise2 resolves first (5), then promise1 (3), then await results (7 A, 8 B).
+
+#@@@@@@@@@@
+
+32. How do you implement server-side caching in Next.js?
+
+Answer: Use `revalidate` property in `getStaticProps` for ISR (Incremental Static Regeneration), `getServerSideProps` with cache headers, or implement custom caching with Redis/memory cache. Next.js also provides automatic static optimization and CDN caching support.
+
+#@@@@@@@@@@
+
+33. Which of the following are TypeScript utility types? (Multiple correct)
+A) Partial<T>
+B) Required<T>
+C) Pick<T, K>
+D) Omit<T, K>
+E) Record<K, T>
+F) Exclude<T, U>
+
+Answer: A, B, C, D, E, F - All are TypeScript utility types. Partial (makes all properties optional), Required (makes all properties required), Pick (selects subset of properties), Omit (excludes properties), Record (creates object type), Exclude (excludes types from union).
+
+#@@@@@@@@@@
+
+34. Find the bug in this Node.js stream implementation:
+```javascript
+const fs = require('fs');
+const { Transform } = require('stream');
+
+class UpperCaseTransform extends Transform {
+  _transform(chunk, encoding, callback) {
+    // Bug: not handling encoding properly
+    const upperChunk = chunk.toString().toUpperCase();
+    this.push(upperChunk);
+    callback();
+  }
+}
+
+const readStream = fs.createReadStream('input.txt');
+const writeStream = fs.createWriteStream('output.txt');
+const upperCaseTransform = new UpperCaseTransform();
+
+readStream
+  .pipe(upperCaseTransform)
+  .pipe(writeStream);
+```
+
+Answer: The code doesn't handle encoding properly. Should use `chunk.toString(encoding)` or handle Buffer encoding correctly. Also missing error handling and the encoding parameter should be used when converting the chunk to string.
+
+#@@@@@@@@@@
+
+35. What is the difference between React class components and functional components?
+
+Answer: Class components use ES6 classes, have lifecycle methods, this.state for state management. Functional components use functions, hooks for state and lifecycle, simpler syntax, better performance, easier testing. Hooks enable functional components to have all class component capabilities with cleaner code.
+
+#@@@@@@@@@@
+
+36. Which of the following are Express.js middleware types? (Multiple correct)
+A) Application-level middleware
+B) Router-level middleware
+C) Error-handling middleware
+D) Built-in middleware
+E) Third-party middleware
+F) Custom middleware
+
+Answer: A, B, C, D, E, F - All are Express.js middleware types. Application-level (app.use), Router-level (router.use), Error-handling (4 parameters), Built-in (express.static), Third-party (body-parser), Custom (user-defined functions).
+
+#@@@@@@@@@@
+
+37. Complete this Vue.js component with Composition API:
+```vue
+<template>
+  <div>
+    <h1>{{ title }}</h1>
+    <p>Count: {{ count }}</p>
+    <button @click="increment">Increment</button>
+    <ul>
+      <li v-for="item in filteredItems" :key="item.id">
+        {{ item.name }}
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import { ref, computed, onMounted } from 'vue'
+
+export default {
+  setup() {
+    const title = ref('My App')
+    const count = ref(0)
+    const items = ref([])
+
+    const increment = () => {
+      count.value++
+    }
+
+    const filteredItems = computed(() => {
+      return items.value.filter(item => item.active)
+    })
+
+    onMounted(() => {
+      // Fetch data
+      items.value = [
+        { id: 1, name: 'Item 1', active: true },
+        { id: 2, name: 'Item 2', active: false },
+        { id: 3, name: 'Item 3', active: true }
+      ]
+    })
+
+    return {
+      title,
+      count,
+      increment,
+      _______________
+    }
+  }
+}
+</script>
+```
+
+Answer: `filteredItems` - Return the computed property so it can be used in the template. All reactive references and computed properties used in the template must be returned from the setup function.
+
+#@@@@@@@@@@
+
+38. How do you implement authentication in Angular?
+
+Answer: Use Angular guards (CanActivate, CanLoad), JWT tokens, HTTP interceptors for token attachment, route protection, and services for auth state management. Implement login/logout functionality, token refresh, and role-based access control. Use Angular's built-in security features and HTTPS.
+
+#@@@@@@@@@@
+
+39. Which of the following are Svelte features? (Multiple correct)
+A) Reactive statements
+B) Stores
+C) Transitions
+D) Actions
+E) Slots
+F) Context API
+
+Answer: A, B, C, D, E, F - All are Svelte features. Reactive statements ($:), Stores (global state), Transitions (animations), Actions (element directives), Slots (content projection), Context API (component communication).
+
+#@@@@@@@@@@
+
+40. Find the memory leak in this React component:
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+
+    // Missing cleanup
+  }, []);
+
+  return <div>Seconds: {seconds}</div>;
+}
+```
+
+Answer: Missing cleanup function in useEffect. Add `return () => clearInterval(interval);` to prevent memory leak when component unmounts. Without cleanup, the interval continues running even after component is destroyed.
+
+#@@@@@@@@@@
+
+41. What is the output of this code?
+```javascript
+console.log(typeof null);
+console.log(typeof undefined);
+console.log(typeof NaN);
+console.log(null === undefined);
+console.log(null == undefined);
+```
+
+Answer:
+```
+object
+undefined
+number
+false
+true
+```
+typeof null returns "object" (historical bug), typeof undefined returns "undefined", typeof NaN returns "number". null === undefined is false (strict equality), null == undefined is true (loose equality).
+
+#@@@@@@@@@@
+
+42. Which of the following are TypeScript utility types? (Multiple correct)
+A) Partial<T>
+B) Required<T>
+C) Readonly<T>
+D) Pick<T, K>
+E) Omit<T, K>
+F) Record<K, T>
+
+Answer: A, B, C, D, E, F - All are TypeScript utility types. Partial (all properties optional), Required (all properties required), Readonly (all properties readonly), Pick (select properties), Omit (exclude properties), Record (key-value type).
+
+#@@@@@@@@@@
+
+43. Complete this Next.js API route:
+```javascript
+// pages/api/users/[id].js
+export default async function handler(req, res) {
+  const { id } = req.query;
+  const { method } = req;
+
+  switch (method) {
+    case 'GET':
+      const user = await db.user.findUnique({ where: { id } });
+      return res.status(200).json(user);
+
+    case 'PUT':
+      const updated = await db.user.update({
+        where: { id },
+        data: req.body
+      });
+      return res.status(200).json(updated);
+
+    case 'DELETE':
+      await db.user.delete({ where: { id } });
+      return res.status(_______________).json({ message: 'Deleted' });
+
+    default:
+      res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+      return res.status(405).end(`Method ${method} Not Allowed`);
+  }
+}
+```
+
+Answer: `204` or `200` - Use 204 No Content for successful deletion with no response body, or 200 OK with confirmation message. Next.js API routes handle serverless functions.
+
+#@@@@@@@@@@
+
+44. How do you implement server-side rendering (SSR) in Next.js?
+
+Answer: Use getServerSideProps for SSR: `export async function getServerSideProps(context) { return { props: {} } }`. Runs on every request, provides fresh data. For static generation, use getStaticProps. For incremental static regeneration, add revalidate. Choose based on data freshness needs.
+
+#@@@@@@@@@@
+
+45. Which of the following are Node.js built-in modules? (Multiple correct)
+A) fs (file system)
+B) http
+C) path
+D) crypto
+E) stream
+F) events
+
+Answer: A, B, C, D, E, F - All are Node.js built-in modules. fs (file operations), http (HTTP server), path (path utilities), crypto (cryptography), stream (streaming data), events (event emitter). No installation required.
+
+#@@@@@@@@@@
+
+46. Find the bug in this async/await code:
+```javascript
+async function fetchUsers() {
+  const users = [];
+  const userIds = [1, 2, 3, 4, 5];
+
+  userIds.forEach(async (id) => {
+    const user = await fetch(`/api/users/${id}`);
+    users.push(user);
+  });
+
+  return users; // Bug: returns empty array
+}
+```
+
+Answer: forEach doesn't wait for async callbacks. Use for...of loop or Promise.all: `await Promise.all(userIds.map(id => fetch(...)))`. forEach executes callbacks but doesn't await them, so function returns before fetches complete.
+
+#@@@@@@@@@@
+
+47. What is the difference between React useCallback and useMemo?
+
+Answer: useCallback memoizes functions, returns same function reference unless dependencies change. useMemo memoizes values, returns computed result. useCallback for preventing child re-renders when passing callbacks, useMemo for expensive computations. useCallback(fn, deps) is equivalent to useMemo(() => fn, deps).
+
+#@@@@@@@@@@
+
+48. Which of the following are GraphQL operation types? (Multiple correct)
+A) Query
+B) Mutation
+C) Subscription
+D) Fragment
+E) Directive
+F) Schema
+
+Answer: A, B, C - Query, Mutation, and Subscription are operation types. Fragment is reusable selection set, Directive modifies execution, Schema defines types. Operations: Query (read), Mutation (write), Subscription (real-time updates).
+
+#@@@@@@@@@@
+
+49. Complete this Express middleware:
+```javascript
+const express = require('express');
+const app = express();
+
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log('Time:', Date.now());
+  _______________
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: err.message });
+});
+
+app.listen(3000);
+```
+
+Answer: `next()` - Call next() to pass control to next middleware. Without next(), request hangs. Middleware chain requires next() calls. Error middleware has 4 parameters (err, req, res, next).
+
+#@@@@@@@@@@
+
+50. How do you implement code splitting in React?
+
+Answer: Use React.lazy() and Suspense: `const Component = React.lazy(() => import('./Component'))`. Wrap with Suspense: `<Suspense fallback={<Loading />}><Component /></Suspense>`. For route-based splitting, use with React Router. Reduces initial bundle size, improves performance.
+
+#@@@@@@@@@@
+
+51. Which of the following are Jest testing functions? (Multiple correct)
+A) describe()
+B) test() / it()
+C) expect()
+D) beforeEach()
+E) afterAll()
+F) jest.fn()
+
+Answer: A, B, C, D, E, F - All are Jest functions. describe (test suite), test/it (test case), expect (assertions), beforeEach (setup), afterAll (teardown), jest.fn() (mock functions). Comprehensive testing framework.
+
+#@@@@@@@@@@
+
+52. Find the bug in this TypeScript code:
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+}
+
+function updateUser(user: User, updates: Partial<User>) {
+  return { ...user, ...updates };
+}
+
+const user: User = { id: 1, name: 'John', email: 'john@example.com' };
+const updated = updateUser(user, { age: 30 });
+updated.id = 'abc'; // Bug: type error
+```
+
+Answer: Cannot assign string to number type. TypeScript enforces type safety. updated.id is number type from User interface. TypeScript prevents runtime type errors at compile time.
+
+#@@@@@@@@@@
+
+53. What is the difference between Prisma and TypeORM?
+
+Answer: Prisma uses schema-first approach with Prisma Schema Language, type-safe client, migrations. TypeORM uses decorators, Active Record/Data Mapper patterns, supports multiple databases. Prisma has better TypeScript integration and developer experience. TypeORM more flexible, supports legacy databases. Choose based on project needs.
+
+#@@@@@@@@@@
+
+54. Which of the following are Webpack concepts? (Multiple correct)
+A) Entry
+B) Output
+C) Loaders
+D) Plugins
+E) Mode
+F) DevServer
+
+Answer: A, B, C, D, E, F - All are Webpack concepts. Entry (entry point), Output (bundle output), Loaders (file transformers), Plugins (build process), Mode (development/production), DevServer (dev server). Webpack bundles JavaScript applications.
+
+#@@@@@@@@@@
+
+55. Complete this Vue 3 Composition API:
+```javascript
+import { ref, computed, watch } from 'vue';
+
+export default {
+  setup() {
+    const count = ref(0);
+    const doubled = computed(() => count.value * 2);
+
+    watch(count, (newValue, oldValue) => {
+      console.log(`Count changed from ${oldValue} to ${newValue}`);
+    });
+
+    function increment() {
+      count.value++;
+    }
+
+    return {
+      count,
+      doubled,
+      _______________
+    };
+  }
+};
+```
+
+Answer: `increment` - Return the increment function to make it available in template. All reactive state, computed properties, and methods used in template must be returned from setup().
+
+#@@@@@@@@@@
+
+56. How do you implement authentication with JWT in Node.js?
+
+Answer: Use jsonwebtoken library. Sign token: `jwt.sign(payload, secret, { expiresIn: '1h' })`. Verify token: `jwt.verify(token, secret)`. Store in httpOnly cookie or Authorization header. Implement middleware to verify tokens on protected routes. Use refresh tokens for security.
+
+#@@@@@@@@@@
+
+57. Which of the following are Angular decorators? (Multiple correct)
+A) @Component
+B) @Injectable
+C) @Input
+D) @Output
+E) @ViewChild
+F) @HostListener
+
+Answer: A, B, C, D, E, F - All are Angular decorators. @Component (component metadata), @Injectable (service), @Input (property binding), @Output (event emitter), @ViewChild (DOM query), @HostListener (event listener). Decorators add metadata.
+
+#@@@@@@@@@@
+
+58. Find the bug in this React useEffect:
+```jsx
+function SearchComponent() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    if (query) {
+      fetch(`/api/search?q=${query}`)
+        .then(res => res.json())
+        .then(data => setResults(data));
+    }
+  }); // Bug: missing dependency array
+
+  return (
+    <input value={query} onChange={e => setQuery(e.target.value)} />
+  );
+}
+```
+
+Answer: Missing dependency array causes infinite loop. Effect runs after every render, setResults triggers re-render. Add [query] dependency: `useEffect(() => {...}, [query])`. Effect runs only when query changes.
+
+#@@@@@@@@@@
+
+59. What is the difference between Vite and Webpack?
+
+Answer: Vite uses native ES modules in dev, esbuild for pre-bundling, faster cold start and HMR. Webpack bundles everything, slower but more mature ecosystem. Vite optimized for modern browsers, Webpack supports older browsers. Vite simpler config, Webpack more flexible. Choose Vite for speed, Webpack for compatibility.
+
+#@@@@@@@@@@
+
+60. Which of the following are Playwright features? (Multiple correct)
+A) Cross-browser testing
+B) Auto-wait
+C) Network interception
+D) Screenshots/videos
+E) Parallel execution
+F) Mobile emulation
+
+Answer: A, B, C, D, E, F - All are Playwright features. Cross-browser (Chromium, Firefox, WebKit), Auto-wait (automatic waiting), Network interception (mock APIs), Screenshots/videos (debugging), Parallel execution (speed), Mobile emulation (responsive testing). Modern E2E testing.
+
+#@@@@@@@@@@
+
+61. Complete this Cypress test:
+```javascript
+describe('Login Flow', () => {
+  beforeEach(() => {
+    cy.visit('/login');
+  });
+
+  it('should login successfully', () => {
+    cy.get('[data-testid="email"]').type('user@example.com');
+    cy.get('[data-testid="password"]').type('password123');
+    cy.get('[data-testid="submit"]').click();
+
+    cy.url().should('include', '/dashboard');
+    cy.get('[data-testid="welcome"]').should('contain', _______________);
+  });
+});
+```
+
+Answer: `'user@example.com'` or `'Welcome'` - Assert expected text in welcome message. Cypress provides intuitive API for E2E testing with automatic waiting and retries.
+
+#@@@@@@@@@@
+
+62. What is the output of this code?
+```javascript
+const arr = [1, 2, 3];
+const [a, , b] = arr;
+console.log(a, b);
+
+const obj = { x: 1, y: 2, z: 3 };
+const { x, ...rest } = obj;
+console.log(x, rest);
+```
+
+Answer:
+```
+1 3
+1 { y: 2, z: 3 }
+```
+Array destructuring with skipping: [a, , b] skips second element. Object destructuring with rest operator: ...rest collects remaining properties.
+
+#@@@@@@@@@@
+
+63. Which of the following are Babel plugins/presets? (Multiple correct)
+A) @babel/preset-env
+B) @babel/preset-react
+C) @babel/preset-typescript
+D) @babel/plugin-transform-runtime
+E) @babel/plugin-proposal-decorators
+F) @babel/polyfill
+
+Answer: A, B, C, D, E, F - All are Babel packages. preset-env (ES6+ to ES5), preset-react (JSX), preset-typescript (TypeScript), plugin-transform-runtime (helpers), plugin-proposal-decorators (decorators), polyfill (deprecated, use core-js). Babel transpiles modern JavaScript.
+
+#@@@@@@@@@@
+
+64. How do you implement optimistic updates in GraphQL?
+
+Answer: Use Apollo Client's optimisticResponse option in mutations. Immediately update cache with expected result, then replace with server response. If mutation fails, revert changes. Improves perceived performance. Example: `useMutation(UPDATE_TODO, { optimisticResponse: { updateTodo: { id, text, __typename: 'Todo' } } })`.
+
+#@@@@@@@@@@
+
+65. Which of the following are React hooks? (Multiple correct)
+A) useState
+B) useEffect
+C) useContext
+D) useReducer
+E) useCallback
+F) useMemo
+
+Answer: A, B, C, D, E, F - All are React hooks. useState (state), useEffect (side effects), useContext (context), useReducer (complex state), useCallback (memoized functions), useMemo (memoized values). Hooks enable functional components with state and lifecycle.
+
+#@@@@@@@@@@
+
+66. Find the bug in this Next.js dynamic route:
+```javascript
+// pages/posts/[slug].js
+export async function getStaticPaths() {
+  const posts = await fetchAllPosts();
+  const paths = posts.map(post => ({
+    params: { slug: post.slug }
+  }));
+
+  return { paths, fallback: false };
+}
+
+export async function getStaticProps({ params }) {
+  const post = await fetchPost(params.slug);
+  return { props: { post } };
+}
+
+// Bug: What happens when accessing non-existent slug?
+```
+
+Answer: With fallback: false, non-existent slugs return 404. For dynamic content, use fallback: 'blocking' (SSR on-demand) or fallback: true (show loading, then ISR). Choose based on content strategy.
+
+#@@@@@@@@@@
+
+67. What is the difference between Express and Fastify?
+
+Answer: Fastify is faster, schema-based validation, better TypeScript support, plugin architecture. Express is more mature, larger ecosystem, simpler API. Fastify optimized for performance with JSON schema validation. Express more flexible, easier learning curve. Choose Fastify for performance, Express for ecosystem.
+
+#@@@@@@@@@@
+
+68. Which of the following are TypeScript advanced types? (Multiple correct)
+A) Union types (A | B)
+B) Intersection types (A & B)
+C) Conditional types (T extends U ? X : Y)
+D) Mapped types ({ [K in keyof T]: ... })
+E) Template literal types
+F) Discriminated unions
+
+Answer: A, B, C, D, E, F - All are TypeScript advanced types. Union (either type), Intersection (both types), Conditional (type logic), Mapped (transform types), Template literal (string types), Discriminated unions (tagged unions). Powerful type system.
+
+#@@@@@@@@@@
+
+69. Complete this React Context API:
+```jsx
+import React, { createContext, useContext, useState } from 'react';
+
+const ThemeContext = createContext();
+
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within _______________');
+  }
+  return context;
+}
+```
+
+Answer: `ThemeProvider` - Ensure hook is used within provider. Context API provides global state without prop drilling. Custom hooks encapsulate context logic.
+
+#@@@@@@@@@@
+
+70. How do you implement server-side caching in Node.js?
+
+Answer: Use Redis for distributed caching, node-cache for in-memory caching. Implement cache-aside pattern: check cache, if miss fetch from DB and cache. Set TTL for expiration. Use cache invalidation strategies. For HTTP caching, use Cache-Control headers. Consider CDN for static assets.
+
+#@@@@@@@@@@
+
+71. Which of the following are Vue 3 features? (Multiple correct)
+A) Composition API
+B) Teleport
+C) Fragments
+D) Suspense
+E) Multiple v-models
+F) Script setup
+
+Answer: A, B, C, D, E, F - All are Vue 3 features. Composition API (logic composition), Teleport (render elsewhere), Fragments (multiple root nodes), Suspense (async components), Multiple v-models (multiple bindings), Script setup (syntactic sugar).
+
+#@@@@@@@@@@
+
+72. What is the output of this code?
+```javascript
+const promise = new Promise((resolve, reject) => {
+  console.log('1');
+  resolve('2');
+  console.log('3');
+});
+
+promise.then(value => console.log(value));
+console.log('4');
+```
+
+Answer: 1, 3, 4, 2 - Promise executor runs synchronously (1, 3), then synchronous code (4), then promise resolution as microtask (2).
+
+#@@@@@@@@@@
+
+73. Which of the following are Next.js rendering methods? (Multiple correct)
+A) Static Site Generation (SSG)
+B) Server-Side Rendering (SSR)
+C) Incremental Static Regeneration (ISR)
+D) Client-Side Rendering (CSR)
+E) Edge Rendering
+F) All of the above
+
+Answer: F - All are Next.js rendering methods. SSG (getStaticProps), SSR (getServerSideProps), ISR (revalidate), CSR (useEffect), Edge (middleware). Choose based on data freshness needs.
+
+#@@@@@@@@@@
+
+74. Complete this Express error handling:
+```javascript
+app.get('/users/:id', async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      const error = new Error('User not found');
+      error.status = 404;
+      throw error;
+    }
+    res.json(user);
+  } catch (error) {
+    _______________
+  }
+});
+```
+
+Answer: `next(error)` - Pass error to next() to trigger error-handling middleware. Express error handlers have 4 parameters: (err, req, res, next).
+
+#@@@@@@@@@@
+
+75. How do you implement memoization in React?
+
+Answer: Use useMemo for values: `const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b])`. Use useCallback for functions: `const memoizedCallback = useCallback(() => { doSomething(a, b) }, [a, b])`. Use React.memo for components.
+
+#@@@@@@@@@@
+
+76. Which of the following are TypeScript mapped types? (Multiple correct)
+A) Partial<T>
+B) Required<T>
+C) Readonly<T>
+D) Pick<T, K>
+E) Record<K, T>
+F) All of the above
+
+Answer: F - All are mapped types. They transform properties of existing types. Partial makes all optional, Required makes all required, Readonly makes all readonly, Pick selects properties, Record creates new type.
+
+#@@@@@@@@@@
+
+77. Find the bug in this GraphQL resolver:
+```javascript
+const resolvers = {
+  Query: {
+    user: async (parent, { id }, context) => {
+      return await context.db.user.findUnique({ where: { id } });
+    }
+  },
+  User: {
+    posts: async (parent, args, context) => {
+      // Bug: N+1 query problem
+      return await context.db.post.findMany({ where: { authorId: parent.id } });
+    }
+  }
+};
+```
+
+Answer: N+1 query problem. Each user triggers separate posts query. Use DataLoader to batch and cache requests: `context.postLoader.load(parent.id)`. DataLoader batches multiple requests into single query.
+
+#@@@@@@@@@@
+
+78. What is the difference between shallow and deep comparison in React?
+
+Answer: Shallow comparison checks if references are equal (===), not content. Deep comparison checks all nested properties. React.memo uses shallow comparison by default. For deep comparison, provide custom comparison function. Shallow is faster, deep is more accurate.
+
+#@@@@@@@@@@
+
+79. Which of the following are Vite features? (Multiple correct)
+A) Native ES modules
+B) Hot Module Replacement (HMR)
+C) Pre-bundling with esbuild
+D) Build optimization with Rollup
+E) Plugin system
+F) All of the above
+
+Answer: F - All are Vite features. Native ESM in dev, instant HMR, esbuild for dependencies, Rollup for production, extensive plugin ecosystem. Significantly faster than traditional bundlers.
+
+#@@@@@@@@@@
+
+80. Complete this Prisma query:
+```typescript
+const users = await prisma.user.findMany({
+  where: {
+    email: {
+      contains: '@example.com'
+    }
+  },
+  include: {
+    posts: {
+      where: {
+        published: true
+      },
+      orderBy: {
+        createdAt: _______________
+      }
+    }
+  }
+});
+```
+
+Answer: `'desc'` or `'asc'` - Sort posts by createdAt descending (newest first) or ascending (oldest first). Prisma provides type-safe query API with nested filtering and sorting.
+
+#@@@@@@@@@@
+
+81. How do you implement custom hooks in React?
+
+Answer: Create function starting with "use", call other hooks inside: `function useCustomHook() { const [state, setState] = useState(); useEffect(() => {}); return [state, setState]; }`. Custom hooks enable reusable stateful logic across components.
+
+#@@@@@@@@@@
+
+82. Which of the following are Node.js event emitter methods? (Multiple correct)
+A) on()
+B) emit()
+C) once()
+D) removeListener()
+E) listenerCount()
+F) All of the above
+
+Answer: F - All are EventEmitter methods. on (add listener), emit (trigger event), once (one-time listener), removeListener (remove listener), listenerCount (count listeners). Core pattern in Node.js.
+
+#@@@@@@@@@@
+
+83. Find the bug in this Angular component:
+```typescript
+@Component({
+  selector: 'app-user',
+  template: `<div>{{ user.name }}</div>`
+})
+export class UserComponent implements OnInit {
+  user: User;
+
+  ngOnInit() {
+    this.userService.getUser(1).subscribe(user => {
+      this.user = user;
+    });
+    // Bug: no unsubscribe
+  }
+}
+```
+
+Answer: Missing unsubscribe causes memory leak. Use takeUntil with Subject, async pipe, or store subscription and unsubscribe in ngOnDestroy. Async pipe auto-unsubscribes.
+
+#@@@@@@@@@@
+
+84. What is the difference between controlled and uncontrolled components in React?
+
+Answer: Controlled components have form data controlled by React state, value prop and onChange handler. Uncontrolled components store data in DOM, accessed via refs. Controlled provides validation and dynamic behavior, uncontrolled simpler for basic forms.
+
+#@@@@@@@@@@
+
+85. Which of the following are Express.js built-in middleware? (Multiple correct)
+A) express.json()
+B) express.urlencoded()
+C) express.static()
+D) express.Router()
+E) express.raw()
+F) express.text()
+
+Answer: A, B, C, E, F - All except Router are middleware. json (parse JSON), urlencoded (parse URL-encoded), static (serve static files), raw (parse raw), text (parse text). Router is routing utility.
+
+#@@@@@@@@@@
+
+86. Complete this TypeScript conditional type:
+```typescript
+type IsString<T> = T extends string ? _______________ : false;
+
+type Test1 = IsString<string>; // true
+type Test2 = IsString<number>; // false
+```
+
+Answer: `true` - Conditional types use ternary syntax. If T extends string, return true, else false. Powerful for type-level programming.
+
+#@@@@@@@@@@
+
+87. How do you implement server-sent events (SSE) in Node.js?
+
+Answer: Set headers: `res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' })`. Send data: `res.write(`data: ${JSON.stringify(data)}\n\n`)`. Client uses EventSource API. One-way real-time updates.
+
+#@@@@@@@@@@
+
+88. Which of the following are Vue directives? (Multiple correct)
+A) v-if
+B) v-for
+C) v-model
+D) v-bind
+E) v-on
+F) All of the above
+
+Answer: F - All are Vue directives. v-if (conditional), v-for (loops), v-model (two-way binding), v-bind (attribute binding), v-on (event handling). Core Vue template syntax.
+
+#@@@@@@@@@@
+
+89. Find the bug in this Webpack configuration:
+```javascript
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: './dist' // Bug: not absolute path
+  },
+  module: {
+    rules: [
+      { test: /\.js$/, use: 'babel-loader' }
+    ]
+  }
+};
+```
+
+Answer: Output path must be absolute. Use `path: path.resolve(__dirname, 'dist')`. Webpack requires absolute paths for output directory.
+
+#@@@@@@@@@@
+
+90. What is the difference between Promise.all() and Promise.race()?
+
+Answer: Promise.all() waits for all promises to resolve, returns array of results, rejects if any fails. Promise.race() returns first settled promise (resolved or rejected). Use all for parallel operations, race for timeout patterns.
+
+#@@@@@@@@@@
+
+91. Which of the following are Cypress assertions? (Multiple correct)
+A) should('exist')
+B) should('be.visible')
+C) should('have.text')
+D) should('have.class')
+E) should('be.disabled')
+F) All of the above
+
+Answer: F - All are Cypress assertions. Cypress uses Chai assertions with jQuery-like syntax. Assertions automatically retry until timeout.
+
+#@@@@@@@@@@
+
+92. Complete this Next.js Image component:
+```jsx
+import Image from 'next/image';
+
+function Profile() {
+  return (
+    <Image
+      src="/profile.jpg"
+      alt="Profile"
+      width={500}
+      height={500}
+      _______________="lazy"
+    />
+  );
+}
+```
+
+Answer: `loading` - Set loading strategy. Options: lazy (default, load when visible), eager (load immediately). Next.js Image provides automatic optimization, lazy loading, responsive images.
+
+#@@@@@@@@@@
+
+93. How do you implement debouncing in JavaScript?
+
+Answer: Use setTimeout to delay function execution: `function debounce(func, delay) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), delay); }; }`. Useful for search inputs, resize handlers.
+
+#@@@@@@@@@@
+
+94. Which of the following are GraphQL scalar types? (Multiple correct)
+A) Int
+B) Float
+C) String
+D) Boolean
+E) ID
+F) All of the above
+
+Answer: F - All are GraphQL built-in scalar types. Int (signed 32-bit integer), Float (signed double-precision), String (UTF-8), Boolean (true/false), ID (unique identifier). Can define custom scalars.
+
+#@@@@@@@@@@
+
+95. Find the bug in this React component:
+```jsx
+function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers().then(data => setUsers(data));
+  }, []); // Bug: missing error handling
+
+  return (
+    <ul>
+      {users.map(user => <li key={user.id}>{user.name}</li>)}
+    </ul>
+  );
+}
+```
+
+Answer: Missing error handling and loading state. Add try-catch or .catch(), loading state, error state. Handle network failures gracefully. Also consider cleanup for unmounted component.
+
+#@@@@@@@@@@
+
+96. What is the difference between TypeScript any and unknown?
+
+Answer: any disables type checking, allows any operation. unknown is type-safe, requires type checking before use. unknown forces type guards or assertions. Use unknown instead of any for better type safety.
+
+#@@@@@@@@@@
+
+97. Which of the following are Angular lifecycle hooks? (Multiple correct)
+A) ngOnInit
+B) ngOnDestroy
+C) ngOnChanges
+D) ngAfterViewInit
+E) ngDoCheck
+F) All of the above
+
+Answer: F - All are Angular lifecycle hooks. ngOnInit (initialization), ngOnDestroy (cleanup), ngOnChanges (input changes), ngAfterViewInit (view ready), ngDoCheck (change detection). Execute in specific order.
+
+#@@@@@@@@@@
+
+98. Complete this Svelte component:
+```svelte
+<script>
+  import { onMount, onDestroy } from 'svelte';
+
+  let interval;
+
+  onMount(() => {
+    interval = setInterval(() => {
+      console.log('tick');
+    }, 1000);
+  });
+
+  onDestroy(() => {
+    _______________
+  });
+</script>
+```
+
+Answer: `clearInterval(interval)` - Clean up interval on component destroy. Svelte lifecycle functions similar to React hooks but simpler syntax.
+
+#@@@@@@@@@@
+
+99. How do you implement file upload in Express?
+
+Answer: Use multer middleware: `const upload = multer({ dest: 'uploads/' })`. Apply to route: `app.post('/upload', upload.single('file'), (req, res) => { req.file })`. Multer handles multipart/form-data, provides file info.
+
+#@@@@@@@@@@
+
+100. Which of the following are Jest mock functions? (Multiple correct)
+A) jest.fn()
+B) jest.mock()
+C) jest.spyOn()
+D) jest.clearAllMocks()
+E) jest.resetAllMocks()
+F) All of the above
+
+Answer: F - All are Jest mocking functions. fn (create mock), mock (mock module), spyOn (spy on method), clearAllMocks (clear call history), resetAllMocks (reset implementation). Essential for testing.
+
+#@@@@@@@@@@
+
+101. Find the bug in this async function:
+```javascript
+async function processItems(items) {
+  const results = [];
+
+  items.forEach(async (item) => {
+    const result = await processItem(item);
+    results.push(result);
+  });
+
+  return results; // Bug: returns empty array
+}
+```
+
+Answer: forEach doesn't wait for async callbacks. Use for...of loop or Promise.all: `const results = await Promise.all(items.map(item => processItem(item)))`. forEach is synchronous.
+
+#@@@@@@@@@@
+
+102. What is the output of this code?
+```javascript
+console.log([] + []);
+console.log([] + {});
+console.log({} + []);
+console.log({} + {});
+```
+
+Answer: "", "[object Object]", "[object Object]", "[object Object][object Object]" - Type coercion converts to strings. Empty array becomes empty string, object becomes "[object Object]".
+
+#@@@@@@@@@@
+
+103. Which of the following are Playwright locator strategies? (Multiple correct)
+A) page.locator()
+B) page.getByRole()
+C) page.getByText()
+D) page.getByLabel()
+E) page.getByTestId()
+F) All of the above
+
+Answer: F - All are Playwright locator strategies. locator (CSS/XPath), getByRole (accessibility), getByText (text content), getByLabel (form labels), getByTestId (test IDs). Prefer accessibility locators.
+
+#@@@@@@@@@@
+
+104. Complete this TypeORM repository:
+```typescript
+@EntityRepository(User)
+export class UserRepository extends Repository<User> {
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.findOne({ where: { _______________ } });
+  }
+}
+```
+
+Answer: `email` - Specify email field in where clause. TypeORM repositories provide type-safe database operations with query builder and entity manager.
+
+#@@@@@@@@@@
+
+105. How do you implement throttling in JavaScript?
+
+Answer: Limit function execution frequency: `function throttle(func, limit) { let inThrottle; return (...args) => { if (!inThrottle) { func(...args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } }; }`. Useful for scroll, resize events.
+
+#@@@@@@@@@@
+
+106. Which of the following are React performance optimization techniques? (Multiple correct)
+A) React.memo
+B) useMemo
+C) useCallback
+D) Code splitting
+E) Lazy loading
+F) All of the above
+
+Answer: F - All are React optimization techniques. memo (component memoization), useMemo (value memoization), useCallback (function memoization), code splitting (dynamic imports), lazy loading (React.lazy).
+
+#@@@@@@@@@@
+
+107. Find the bug in this Vue component:
+```vue
+<template>
+  <div>
+    <button @click="count++">{{ count }}</button>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      count: 0
+    }
+  }
+}
+</script>
+```
+
+Answer: No bug, but could use method for complex logic. Template uses inline increment which is fine for simple operations. For complex logic, use methods: `@click="increment"`.
+
+#@@@@@@@@@@
+
+108. What is the difference between CommonJS and ES modules?
+
+Answer: CommonJS uses require/module.exports, synchronous, Node.js default. ES modules use import/export, asynchronous, browser and modern Node.js. ESM has static analysis, tree shaking. Use ESM for new projects.
+
+#@@@@@@@@@@
+
+109. Which of the following are Babel presets? (Multiple correct)
+A) @babel/preset-env
+B) @babel/preset-react
+C) @babel/preset-typescript
+D) @babel/preset-flow
+E) @babel/preset-minify
+F) All of the above
+
+Answer: F - All are Babel presets. preset-env (ES6+), preset-react (JSX), preset-typescript (TypeScript), preset-flow (Flow), preset-minify (minification). Presets are collections of plugins.
+
+#@@@@@@@@@@
+
+110. Complete this GraphQL mutation:
+```graphql
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+    email
+    _______________
+  }
+}
+```
+
+Answer: `createdAt` or any other User field - Specify fields to return from mutation. GraphQL mutations return data, allowing immediate UI updates without refetch.
+
+#@@@@@@@@@@
+
+111. How do you implement CORS in Express?
+
+Answer: Use cors middleware: `const cors = require('cors'); app.use(cors())`. Configure: `app.use(cors({ origin: 'https://example.com', credentials: true }))`. CORS enables cross-origin requests from browsers.
+
+#@@@@@@@@@@
+
+112. Which of the following are TypeScript decorators? (Multiple correct)
+A) Class decorators
+B) Method decorators
+C) Property decorators
+D) Parameter decorators
+E) Accessor decorators
+F) All of the above
+
+Answer: F - All are TypeScript decorator types. Class, method, property, parameter, and accessor decorators. Experimental feature requiring compiler flag. Used extensively in Angular and NestJS.
+
+#@@@@@@@@@@
+
+113. Find the bug in this Next.js middleware:
+```javascript
+import { NextResponse } from 'next/server';
+
+export function middleware(request) {
+  const token = request.cookies.get('token');
+
+  if (!token) {
+    return NextResponse.redirect('/login'); // Bug: invalid URL
+  }
+
+  return NextResponse.next();
+}
+```
+
+Answer: NextResponse.redirect() requires full URL, not path. Use: `return NextResponse.redirect(new URL('/login', request.url))`. Must provide absolute URL.
+
+#@@@@@@@@@@
+
+114. What is the difference between npm, yarn, and pnpm?
+
+Answer: npm is default Node package manager. Yarn is faster, has workspaces, better caching. pnpm is fastest, uses hard links, saves disk space, strict node_modules structure. pnpm most efficient for monorepos.
+
+#@@@@@@@@@@
+
+115. Which of the following are Angular RxJS operators? (Multiple correct)
+A) map
+B) filter
+C) switchMap
+D) mergeMap
+E) catchError
+F) tap
+
+Answer: A, B, C, D, E, F - All are RxJS operators used in Angular. map (transform), filter (filter values), switchMap (switch to new observable), mergeMap (merge observables), catchError (error handling), tap (side effects).
+
+#@@@@@@@@@@
+
+116. Complete this Svelte store:
+```javascript
+import { writable } from 'svelte/store';
+
+export const count = writable(0);
+
+export function increment() {
+  count.update(n => _______________);
+}
+```
+
+Answer: `n + 1` - Update function receives current value and returns new value. Svelte stores provide reactive state management across components.
+
+#@@@@@@@@@@
+
+117. How do you implement WebSocket in Node.js?
+
+Answer: Use ws library or Socket.io. Create WebSocket server: `const wss = new WebSocket.Server({ port: 8080 })`. Handle connections: `wss.on('connection', ws => { ws.on('message', data => {}) })`. Socket.io provides rooms, namespaces, automatic reconnection.
+
+#@@@@@@@@@@
+
+118. Which of the following are React Router v6 features? (Multiple correct)
+A) Routes component
+B) useNavigate hook
+C) useParams hook
+D) Outlet component
+E) Navigate component
+F) useSearchParams hook
+
+Answer: A, B, C, D, E, F - All are React Router v6 features. Routes (route container), useNavigate (programmatic navigation), useParams (route params), Outlet (nested routes), Navigate (declarative redirect), useSearchParams (query params).
+
+#@@@@@@@@@@
+
+119. Find the bug in this Promise chain:
+```javascript
+function fetchUserData(userId) {
+  return fetch(`/api/users/${userId}`)
+    .then(response => response.json())
+    .then(user => {
+      console.log('User:', user);
+      return fetch(`/api/posts?userId=${user.id}`);
+    })
+    .then(response => response.json())
+    .then(posts => {
+      console.log('Posts:', posts);
+      // Bug: not returning posts
+    });
+}
+```
+
+Answer: Missing return statement in last .then(). Should return posts to make them available to caller. Promise chains require explicit returns to pass values forward.
+
+#@@@@@@@@@@
+
+120. What is the difference between Angular services and providers?
+
+Answer: Services are classes with @Injectable decorator, contain business logic. Providers configure how services are created and injected. Provider types: useClass, useValue, useFactory, useExisting. Services are what you inject, providers define how to inject.
+
+#@@@@@@@@@@
+
+121. Which of the following are Svelte reactive features? (Multiple correct)
+A) $: reactive statements
+B) $ store subscriptions
+C) bind: directives
+D) on: event handlers
+E) {#if} blocks
+F) {#each} blocks
+
+Answer: A, B, C, D, E, F - All are Svelte reactive features. $: (reactive declarations), $ (store auto-subscription), bind: (two-way binding), on: (events), {#if} (conditionals), {#each} (loops).
+
+#@@@@@@@@@@
+
+122. Complete this GraphQL schema:
+```graphql
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  posts: [Post!]!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: _______________
+  createdAt: DateTime!
+}
+```
+
+Answer: `User!` - Define non-nullable User type for author field. GraphQL schema defines types, queries, and mutations. ! indicates non-nullable fields.
+
+#@@@@@@@@@@
+
+123. How do you implement rate limiting in Express?
+
+Answer: Use express-rate-limit middleware: `const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 })`. Apply globally or per-route. For distributed systems, use Redis store. Return 429 Too Many Requests when exceeded.
+
+#@@@@@@@@@@
+
+124. Which of the following are Jest matchers? (Multiple correct)
+A) toBe()
+B) toEqual()
+C) toHaveBeenCalled()
+D) toMatchSnapshot()
+E) toThrow()
+F) resolves / rejects
+
+Answer: A, B, C, D, E, F - All are Jest matchers. toBe (strict equality), toEqual (deep equality), toHaveBeenCalled (mock calls), toMatchSnapshot (snapshot testing), toThrow (exceptions), resolves/rejects (async).
+
+#@@@@@@@@@@
+
+125. Find the bug in this TypeScript generic:
+```typescript
+function getProperty<T, K extends keyof T>(obj: T, key: K) {
+  return obj[key];
+}
+
+const user = { id: 1, name: 'John', age: 30 };
+const name = getProperty(user, 'name'); // OK
+const invalid = getProperty(user, 'email'); // Type error
+```
+
+Answer: 'email' is not a key of user object. K extends keyof T ensures key exists in object. TypeScript prevents accessing non-existent properties. This is type safety working correctly.
+
+#@@@@@@@@@@
+
+126. What is the difference between Prisma Client and Prisma Studio?
+
+Answer: Prisma Client is auto-generated type-safe database client for queries. Prisma Studio is GUI for viewing and editing database data. Client for application code, Studio for development/debugging. Both part of Prisma ecosystem.
+
+#@@@@@@@@@@
+
+127. Which of the following are Webpack loaders? (Multiple correct)
+A) babel-loader
+B) css-loader
+C) style-loader
+D) file-loader
+E) ts-loader
+F) sass-loader
+
+Answer: A, B, C, D, E, F - All are Webpack loaders. babel-loader (JavaScript transpilation), css-loader (CSS imports), style-loader (inject CSS), file-loader (file assets), ts-loader (TypeScript), sass-loader (Sass compilation).
+
+#@@@@@@@@@@
+
+128. Complete this Vue Router navigation guard:
+```javascript
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = checkAuth();
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login');
+  } else {
+    _______________
+  }
+});
+```
+
+Answer: `next()` - Call next() without arguments to proceed with navigation. Navigation guards must call next() to resolve the navigation.
+
+#@@@@@@@@@@
+
+129. How do you implement pagination in GraphQL?
+
+Answer: Use cursor-based pagination with Connection pattern: edges (array of nodes with cursors), pageInfo (hasNextPage, hasPreviousPage, startCursor, endCursor). Arguments: first/after for forward, last/before for backward. Better than offset pagination for real-time data.
+
+#@@@@@@@@@@
+
+130. Which of the following are Express.js middleware types? (Multiple correct)
+A) Application-level
+B) Router-level
+C) Error-handling
+D) Built-in
+E) Third-party
+F) All of the above
+
+Answer: F - All are Express.js middleware types. Application-level (app.use), Router-level (router.use), Error-handling (4 parameters), Built-in (express.static), Third-party (body-parser).
+
+#@@@@@@@@@@
+
+131. Find the bug in this React Context:
+```jsx
+const ThemeContext = createContext();
+
+function App() {
+  const [theme, setTheme] = useState('light');
+
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Child />
+    </ThemeContext.Provider>
+  );
+}
+
+function Child() {
+  const theme = useContext(ThemeContext);
+  // Bug: can't update theme
+  return <div>{theme}</div>;
+}
+```
+
+Answer: Provider only passes theme value, not setter. Should pass object: `value={{ theme, setTheme }}`. Context consumers need both state and updater function.
+
+#@@@@@@@@@@
+
+132. What is the output of this code?
+```javascript
+const obj = { a: 1, b: 2, c: 3 };
+const { a, ...rest } = obj;
+console.log(a);
+console.log(rest);
+delete obj.b;
+console.log(rest);
+```
+
+Answer: 1, { b: 2, c: 3 }, { b: 2, c: 3 } - Rest operator creates shallow copy. Deleting from original doesn't affect copy.
+
+#@@@@@@@@@@
+
+133. Which of the following are Next.js data fetching methods? (Multiple correct)
+A) getStaticProps
+B) getStaticPaths
+C) getServerSideProps
+D) getInitialProps
+E) SWR
+F) All of the above
+
+Answer: F - All are Next.js data fetching methods. getStaticProps (SSG), getStaticPaths (dynamic SSG), getServerSideProps (SSR), getInitialProps (legacy), SWR (client-side). Choose based on use case.
+
+#@@@@@@@@@@
+
+134. Complete this TypeScript interface:
+```typescript
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+  error?: _______________
+}
+
+type UserResponse = ApiResponse<User>;
+```
+
+Answer: `string` or `Error` - Define optional error property type. Generic interfaces enable type-safe API responses for different data types.
+
+#@@@@@@@@@@
+
+135. How do you implement authentication in Next.js?
+
+Answer: Use NextAuth.js for OAuth/JWT, implement API routes for login/logout, use middleware for route protection, store tokens in httpOnly cookies. Use getServerSideProps to check auth server-side. Implement session management and CSRF protection.
+
+#@@@@@@@@@@
+
+136. Which of the following are Vite plugins? (Multiple correct)
+A) @vitejs/plugin-react
+B) @vitejs/plugin-vue
+C) vite-plugin-pwa
+D) vite-plugin-compression
+E) vite-plugin-html
+F) All of the above
+
+Answer: F - All are Vite plugins. plugin-react (React support), plugin-vue (Vue support), plugin-pwa (PWA), plugin-compression (gzip/brotli), plugin-html (HTML transformation). Extensive plugin ecosystem.
+
+#@@@@@@@@@@
+
+137. Find the bug in this Prisma schema:
+```prisma
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  posts Post[]
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  authorId Int
+  // Bug: missing relation
+}
+```
+
+Answer: Missing @relation attribute on Post. Add: `author User @relation(fields: [authorId], references: [id])`. Prisma requires explicit relation definition.
+
+#@@@@@@@@@@
+
+138. What is the difference between useEffect and useLayoutEffect?
+
+Answer: useEffect runs after paint, asynchronous, doesn't block rendering. useLayoutEffect runs before paint, synchronous, blocks rendering. Use useLayoutEffect for DOM measurements, useEffect for most side effects. useLayoutEffect can cause performance issues.
+
+#@@@@@@@@@@
+
+139. Which of the following are Angular modules? (Multiple correct)
+A) BrowserModule
+B) HttpClientModule
+C) FormsModule
+D) ReactiveFormsModule
+E) RouterModule
+F) All of the above
+
+Answer: F - All are Angular modules. BrowserModule (browser platform), HttpClientModule (HTTP), FormsModule (template-driven forms), ReactiveFormsModule (reactive forms), RouterModule (routing). Import in @NgModule.
+
+#@@@@@@@@@@
+
+140. Complete this Express route with validation:
+```javascript
+const { body, validationResult } = require('express-validator');
+
+app.post('/users',
+  body('email').isEmail(),
+  body('password').isLength({ min: 6 }),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(_______________).json({ errors: errors.array() });
+    }
+    // Create user
+  }
+);
+```
+
+Answer: `400` - Return 400 Bad Request for validation errors. Express-validator provides middleware for input validation.
+
+#@@@@@@@@@@
+
+141. How do you implement error boundaries in React?
+
+Answer: Create class component with componentDidCatch and getDerivedStateFromError: `class ErrorBoundary extends React.Component { componentDidCatch(error, info) {} getDerivedStateFromError(error) { return { hasError: true }; } }`. Wrap components to catch errors. No hooks equivalent yet.
+
+#@@@@@@@@@@
+
+142. Which of the following are Cypress commands for waiting? (Multiple correct)
+A) cy.wait()
+B) cy.intercept().as()
+C) cy.get().should()
+D) cy.contains()
+E) All of the above
+F) A, B, C only
+
+Answer: F - wait (explicit wait), intercept with alias (wait for network), should (implicit wait/retry). contains also has implicit waiting. Cypress auto-waits for most commands.
+
+#@@@@@@@@@@
+
+143. Find the bug in this GraphQL query:
+```graphql
+query GetUser {
+  user(id: "123") {
+    id
+    name
+    posts {
+      title
+      comments {
+        text
+        author {
+          name
+          posts {
+            # Bug: circular query, potential infinite loop
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: Circular query can cause performance issues or infinite loops. GraphQL servers should implement query depth limiting, complexity analysis, or timeout. Avoid deeply nested circular queries.
+
+#@@@@@@@@@@
+
+144. What is the difference between Server Components and Client Components in Next.js 13+?
+
+Answer: Server Components render on server, no JavaScript sent to client, can access backend directly, default in app directory. Client Components render on client, interactive, use hooks, marked with 'use client'. Server Components improve performance, Client Components for interactivity.
+
+#@@@@@@@@@@
+
+145. Which of the following are TypeScript type guards? (Multiple correct)
+A) typeof
+B) instanceof
+C) in operator
+D) Custom type predicates
+E) Discriminated unions
+F) All of the above
+
+Answer: F - All are TypeScript type guards. typeof (primitive types), instanceof (class instances), in (property existence), custom predicates (is keyword), discriminated unions (literal types). Narrow types safely.
+
+#@@@@@@@@@@
+
+146. Complete this Svelte transition:
+```svelte
+<script>
+  import { fade, fly } from 'svelte/transition';
+  let visible = true;
+</script>
+
+{#if visible}
+  <div transition:_______________={{ duration: 300 }}>
+    Hello!
+  </div>
+{/if}
+```
+
+Answer: `fade` or `fly` - Apply transition directive. Svelte provides built-in transitions: fade, fly, slide, scale, draw. Can create custom transitions.
+
+#@@@@@@@@@@
+
+147. How do you implement real-time updates with GraphQL subscriptions?
+
+Answer: Use WebSocket transport with graphql-ws or subscriptions-transport-ws. Define subscription type in schema, implement resolver returning AsyncIterator. Client subscribes: `subscription { messageAdded { id text } }`. Use PubSub for event publishing.
+
+#@@@@@@@@@@
+
+148. Which of the following are Node.js streams? (Multiple correct)
+A) Readable
+B) Writable
+C) Duplex
+D) Transform
+E) PassThrough
+F) All of the above
+
+Answer: F - All are Node.js stream types. Readable (read data), Writable (write data), Duplex (read and write), Transform (modify data), PassThrough (pipe through). Streams handle large data efficiently.
+
+#@@@@@@@@@@
+
+149. Find the bug in this Vue Composition API:
+```vue
+<script setup>
+import { ref, computed } from 'vue';
+
+const count = ref(0);
+const doubled = computed(() => count * 2); // Bug: missing .value
+
+function increment() {
+  count.value++;
+}
+</script>
+```
+
+Answer: Missing .value in computed. Should be `count.value * 2`. Refs require .value to access/modify value in script, but not in template.
+
+#@@@@@@@@@@
+
+150. What is the difference between shallow rendering and full rendering in testing?
+
+Answer: Shallow rendering renders component without children, faster, isolates component. Full rendering (mount) renders component with children, tests integration, slower. Shallow for unit tests, full for integration tests. React Testing Library encourages full rendering.
+
+#@@@@@@@@@@
+
+151. Which of the following are Angular HTTP interceptor use cases? (Multiple correct)
+A) Adding authentication tokens
+B) Logging requests/responses
+C) Error handling
+D) Caching
+E) Request transformation
+F) All of the above
+
+Answer: F - All are HTTP interceptor use cases. Interceptors modify requests/responses globally. Add headers, handle errors, cache responses, log traffic, transform data. Implement HttpInterceptor interface.
+
+#@@@@@@@@@@
+
+152. Complete this Express.js route parameter validation:
+```javascript
+app.get('/users/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id) || id < 1) {
+    return res.status(400).json({ error: 'Invalid ID' });
+  }
+
+  User.findById(id)
+    .then(user => {
+      if (!user) {
+        return res.status(_______________).json({ error: 'User not found' });
+      }
+      res.json(user);
+    });
+});
+```
+
+Answer: `404` - Return 404 Not Found when resource doesn't exist. 400 for invalid input, 404 for missing resource.
+
+#@@@@@@@@@@
+
+153. How do you implement optimistic UI updates in React?
+
+Answer: Update UI immediately before API call, revert on error: `setData(newData); api.update(newData).catch(() => setData(oldData))`. Use React Query or SWR for automatic optimistic updates. Improves perceived performance.
+
+#@@@@@@@@@@
+
+154. Which of the following are Webpack plugins? (Multiple correct)
+A) HtmlWebpackPlugin
+B) MiniCssExtractPlugin
+C) CleanWebpackPlugin
+D) DefinePlugin
+E) HotModuleReplacementPlugin
+F) All of the above
+
+Answer: F - All are Webpack plugins. HtmlWebpackPlugin (generate HTML), MiniCssExtractPlugin (extract CSS), CleanWebpackPlugin (clean output), DefinePlugin (define constants), HotModuleReplacementPlugin (HMR).
+
+#@@@@@@@@@@
+
+155. Find the bug in this TypeScript enum:
+```typescript
+enum Status {
+  Pending,
+  Approved,
+  Rejected
+}
+
+function updateStatus(status: Status) {
+  console.log(status);
+}
+
+updateStatus(0); // Works but not type-safe
+updateStatus(Status.Pending); // Correct
+updateStatus('Pending'); // Type error
+```
+
+Answer: Numeric enums accept numbers directly, reducing type safety. Use string enums for better type safety: `enum Status { Pending = 'PENDING', Approved = 'APPROVED' }`. String enums prevent numeric assignment.
+
+#@@@@@@@@@@
+
+156. What is the difference between SWR and React Query?
+
+Answer: Both are data fetching libraries. SWR (stale-while-revalidate) is simpler, smaller bundle. React Query has more features: mutations, pagination, infinite queries, devtools. SWR for simple cases, React Query for complex data management.
+
+#@@@@@@@@@@
+
+157. Which of the following are Next.js Image optimization features? (Multiple correct)
+A) Automatic lazy loading
+B) Responsive images
+C) WebP conversion
+D) Blur placeholder
+E) Priority loading
+F) All of the above
+
+Answer: F - All are Next.js Image features. Automatic lazy loading, responsive srcset, modern formats (WebP/AVIF), blur-up placeholder, priority for above-fold images. Significant performance improvement.
+
+#@@@@@@@@@@
+
+158. Complete this Prisma transaction:
+```typescript
+const result = await prisma.$transaction(async (tx) => {
+  const user = await tx.user.create({
+    data: { email: 'user@example.com', name: 'John' }
+  });
+
+  const post = await tx.post.create({
+    data: {
+      title: 'First Post',
+      authorId: _______________
+    }
+  });
+
+  return { user, post };
+});
+```
+
+Answer: `user.id` - Use created user's ID for foreign key. Prisma transactions ensure atomicity - all operations succeed or all fail.
+
+#@@@@@@@@@@
+
+159. How do you implement infinite scroll in React?
+
+Answer: Use Intersection Observer API: `const observer = new IntersectionObserver(entries => { if (entries[0].isIntersecting) loadMore() })`. Observe sentinel element at list end. Libraries: react-infinite-scroll-component, React Query's useInfiniteQuery.
+
+#@@@@@@@@@@
+
+160. Which of the following are Vue 3 Composition API lifecycle hooks? (Multiple correct)
+A) onMounted
+B) onUpdated
+C) onUnmounted
+D) onBeforeMount
+E) onBeforeUpdate
+F) All of the above
+
+Answer: F - All are Composition API lifecycle hooks. Equivalent to Options API lifecycle methods. Use in setup() function. onMounted (mounted), onUpdated (updated), onUnmounted (unmounted), etc.
+
+#@@@@@@@@@@
+
+161. Find the bug in this GraphQL resolver:
+```javascript
+const resolvers = {
+  Query: {
+    users: async () => {
+      const users = await db.user.findMany();
+      return users;
+    }
+  },
+  User: {
+    posts: async (parent) => {
+      // Bug: N+1 problem
+      return await db.post.findMany({
+        where: { authorId: parent.id }
+      });
+    }
+  }
+};
+```
+
+Answer: N+1 query problem. Each user triggers separate posts query. Use DataLoader: `context.postLoader.load(parent.id)`. DataLoader batches and caches requests, solving N+1 problem.
+
+#@@@@@@@@@@
+
+162. What is the output of this code?
+```javascript
+async function test() {
+  console.log('1');
+  await Promise.resolve();
+  console.log('2');
+}
+
+console.log('3');
+test();
+console.log('4');
+```
+
+Answer: 3, 1, 4, 2 - Synchronous code first (3), async function starts (1), await yields (4), then microtask (2).
+
+#@@@@@@@@@@
+
+163. Which of the following are Express.js response methods? (Multiple correct)
+A) res.send()
+B) res.json()
+C) res.status()
+D) res.redirect()
+E) res.render()
+F) All of the above
+
+Answer: F - All are Express response methods. send (send response), json (send JSON), status (set status code), redirect (redirect), render (render template). Chain methods: res.status(200).json({}).
+
+#@@@@@@@@@@
+
+164. Complete this React custom hook:
+```typescript
+function useLocalStorage<T>(key: string, initialValue: T) {
+  const [value, setValue] = useState<T>(() => {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : initialValue;
+  });
+
+  const setStoredValue = (newValue: T) => {
+    setValue(newValue);
+    window.localStorage.setItem(key, _______________);
+  };
+
+  return [value, setStoredValue] as const;
+}
+```
+
+Answer: `JSON.stringify(newValue)` - Serialize value before storing in localStorage. Custom hooks encapsulate reusable logic.
+
+#@@@@@@@@@@
+
+165. How do you implement code splitting by route in React Router?
+
+Answer: Use React.lazy with dynamic imports: `const Home = React.lazy(() => import('./Home'))`. Wrap with Suspense: `<Suspense fallback={<Loading />}><Routes>...</Routes></Suspense>`. Each route loads separately, reducing initial bundle.
+
+#@@@@@@@@@@
+
+166. Which of the following are TypeScript conditional types? (Multiple correct)
+A) T extends U ? X : Y
+B) infer keyword
+C) Exclude<T, U>
+D) Extract<T, U>
+E) NonNullable<T>
+F) All of the above
+
+Answer: F - All involve conditional types. Conditional type syntax (T extends U ? X : Y), infer (extract types), Exclude/Extract/NonNullable (utility types using conditionals). Advanced type manipulation.
+
+#@@@@@@@@@@
+
+167. Find the bug in this Svelte component:
+```svelte
+<script>
+  let items = [1, 2, 3];
+
+  function addItem() {
+    items.push(4); // Bug: doesn't trigger reactivity
+  }
+</script>
+
+<button on:click={addItem}>Add</button>
+{#each items as item}
+  <p>{item}</p>
+{/each}
+```
+
+Answer: Array mutation doesn't trigger reactivity. Use assignment: `items = [...items, 4]` or `items = items`. Svelte reactivity requires assignment.
+
+#@@@@@@@@@@
+
+168. What is the difference between getStaticProps and getServerSideProps in Next.js?
+
+Answer: getStaticProps runs at build time, generates static HTML, fast, use for static content. getServerSideProps runs on each request, fresh data, slower, use for dynamic content. Add revalidate to getStaticProps for ISR.
+
+#@@@@@@@@@@
+
+169. Which of the following are Playwright assertions? (Multiple correct)
+A) expect(locator).toBeVisible()
+B) expect(locator).toHaveText()
+C) expect(locator).toBeEnabled()
+D) expect(locator).toHaveCount()
+E) expect(page).toHaveURL()
+F) All of the above
+
+Answer: F - All are Playwright assertions. Auto-waiting assertions retry until timeout. toBeVisible, toHaveText, toBeEnabled, toHaveCount, toHaveURL. Web-first assertions.
+
+#@@@@@@@@@@
+
+170. Complete this Angular service with dependency injection:
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: _______________
+})
+export class UserService {
+  constructor(private http: HttpClient) {}
+
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>('/api/users');
+  }
+}
+```
+
+Answer: `'root'` - Provide service at root level, creating singleton. Alternative: provide in specific module. Root-level services available app-wide.
+
+#@@@@@@@@@@
+
+171. How do you implement request cancellation in React?
+
+Answer: Use AbortController: `const controller = new AbortController(); fetch(url, { signal: controller.signal }); return () => controller.abort()`. In useEffect cleanup. React Query and Axios support cancellation. Prevents memory leaks.
+
+#@@@@@@@@@@
+
+172. Which of the following are Cypress best practices? (Multiple correct)
+A) Use data-testid attributes
+B) Avoid using cy.wait() with time
+C) Use cy.intercept() for API mocking
+D) Keep tests independent
+E) Use beforeEach for setup
+F) All of the above
+
+Answer: F - All are Cypress best practices. data-testid (stable selectors), avoid arbitrary waits (use intercept), mock APIs (faster, reliable), independent tests (no shared state), beforeEach (clean setup).
+
+#@@@@@@@@@@
+
+173. Find the bug in this Next.js API route:
+```javascript
+// pages/api/users.js
+export default function handler(req, res) {
+  if (req.method === 'GET') {
+    const users = getUsers();
+    res.status(200).json(users);
+  } else if (req.method === 'POST') {
+    const user = createUser(req.body);
+    res.status(201).json(user);
+  }
+  // Bug: no else clause for unsupported methods
+}
+```
+
+Answer: Missing handling for unsupported methods. Add else: `res.setHeader('Allow', ['GET', 'POST']); res.status(405).end('Method Not Allowed')`. Return 405 for unsupported methods.
+
+#@@@@@@@@@@
+
+174. What is the difference between useMemo and useCallback?
+
+Answer: useMemo memoizes computed values: `useMemo(() => expensiveCalc(), [deps])`. useCallback memoizes functions: `useCallback(() => {}, [deps])`. useMemo for expensive calculations, useCallback for stable function references. useCallback(fn, deps) === useMemo(() => fn, deps).
+
+#@@@@@@@@@@
+
+175. Which of the following are GraphQL directives? (Multiple correct)
+A) @include
+B) @skip
+C) @deprecated
+D) @defer
+E) @stream
+F) All of the above
+
+Answer: F - All are GraphQL directives. @include (conditional inclusion), @skip (conditional exclusion), @deprecated (mark deprecated), @defer (defer fragment), @stream (stream list). Modify query execution.
+
+#@@@@@@@@@@
+
+176. Complete this TypeORM query builder:
+```typescript
+const users = await userRepository
+  .createQueryBuilder('user')
+  .leftJoinAndSelect('user.posts', 'post')
+  .where('user.age > :age', { age: 18 })
+  .andWhere('post.published = :published', { published: true })
+  .orderBy('user.createdAt', _______________)
+  .getMany();
+```
+
+Answer: `'DESC'` or `'ASC'` - Sort order descending (newest first) or ascending (oldest first). Query builder provides fluent API for complex queries.
+
+#@@@@@@@@@@
+
+177. How do you implement form validation in React Hook Form?
+
+Answer: Use register with validation rules: `<input {...register('email', { required: true, pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i })} />`. Access errors: `errors.email`. Use yup or zod for schema validation. Minimal re-renders.
+
+#@@@@@@@@@@
+
+178. Which of the following are Vite configuration options? (Multiple correct)
+A) server
+B) build
+C) plugins
+D) resolve
+E) optimizeDeps
+F) All of the above
+
+Answer: F - All are Vite config options. server (dev server), build (build options), plugins (plugins array), resolve (module resolution), optimizeDeps (dependency optimization). Configure in vite.config.js.
+
+#@@@@@@@@@@
+
+179. Find the bug in this Vue component:
+```vue
+<template>
+  <div>
+    <input v-model="searchQuery" @input="search" />
+    <div v-for="result in results" :key="result.id">
+      {{ result.name }}
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      searchQuery: '',
+      results: []
+    }
+  },
+  methods: {
+    search() {
+      // Bug: no debouncing, fires on every keystroke
+      this.results = this.performSearch(this.searchQuery);
+    }
+  }
+}
+</script>
+```
+
+Answer: Missing debouncing causes excessive searches. Use lodash debounce or implement custom debounce. Better: use watch with debounce or vue-debounce library.
+
+#@@@@@@@@@@
+
+180. What is the output of this code?
+```javascript
+const arr = [1, 2, 3, 4, 5];
+const result = arr.reduce((acc, curr) => {
+  if (curr % 2 === 0) {
+    acc.push(curr * 2);
+  }
+  return acc;
+}, []);
+console.log(result);
+```
+
+Answer: [4, 8] - Reduce filters even numbers and doubles them. curr % 2 === 0 selects 2 and 4, multiplies by 2, resulting in [4, 8].
+
+#@@@@@@@@@@
+
+181. Which of the following are Angular forms features? (Multiple correct)
+A) FormControl
+B) FormGroup
+C) FormArray
+D) Validators
+E) FormBuilder
+F) All of the above
+
+Answer: F - All are Angular reactive forms features. FormControl (single field), FormGroup (group of controls), FormArray (dynamic array), Validators (validation), FormBuilder (helper service). Type-safe forms.
+
+#@@@@@@@@@@
+
+182. Complete this Express.js authentication middleware:
+```javascript
+const jwt = require('jsonwebtoken');
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(_______________).json({ error: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+}
+```
+
+Answer: `403` - Return 403 Forbidden for invalid/expired token. 401 for missing token, 403 for invalid token.
+
+#@@@@@@@@@@
+
+183. How do you implement drag and drop in React?
+
+Answer: Use HTML5 Drag and Drop API: onDragStart, onDragOver, onDrop events. Set draggable attribute. Use dataTransfer for data. Libraries: react-dnd, react-beautiful-dnd. Handle touch events for mobile.
+
+#@@@@@@@@@@
+
+184. Which of the following are Babel configuration files? (Multiple correct)
+A) babel.config.js
+B) .babelrc
+C) .babelrc.json
+D) package.json (babel key)
+E) babel.config.json
+F) All of the above
+
+Answer: F - All are valid Babel config files. babel.config.js (project-wide), .babelrc (file-relative), .babelrc.json (JSON format), package.json babel key, babel.config.json. Choose based on project structure.
+
+#@@@@@@@@@@
+
+185. Find the bug in this React component:
+```jsx
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState('all');
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'completed') return todo.completed;
+    if (filter === 'active') return !todo.completed;
+    return true;
+  });
+  // Bug: filter runs on every render
+
+  return (
+    <div>
+      {filteredTodos.map(todo => <div key={todo.id}>{todo.text}</div>)}
+    </div>
+  );
+}
+```
+
+Answer: Filter runs on every render. Use useMemo: `const filteredTodos = useMemo(() => todos.filter(...), [todos, filter])`. Memoization prevents unnecessary recalculations.
+
+#@@@@@@@@@@
+
+186. What is the difference between Prisma and raw SQL?
+
+Answer: Prisma provides type-safe queries, auto-completion, migrations, schema management. Raw SQL offers full control, complex queries, performance optimization. Prisma prevents SQL injection, easier maintenance. Use Prisma for most cases, raw SQL for complex queries.
+
+#@@@@@@@@@@
+
+187. Which of the following are Next.js 13+ app directory features? (Multiple correct)
+A) Server Components
+B) Streaming
+C) Layouts
+D) Loading UI
+E) Error handling
+F) All of the above
+
+Answer: F - All are app directory features. Server Components (default), Streaming (progressive rendering), Layouts (shared UI), Loading UI (loading.js), Error handling (error.js). New paradigm for Next.js.
+
+#@@@@@@@@@@
+
+188. Complete this GraphQL subscription:
+```javascript
+const { PubSub } = require('graphql-subscriptions');
+const pubsub = new PubSub();
+
+const resolvers = {
+  Mutation: {
+    addMessage: (parent, { text }) => {
+      const message = { id: Date.now(), text };
+      pubsub.publish('MESSAGE_ADDED', { messageAdded: message });
+      return message;
+    }
+  },
+  Subscription: {
+    messageAdded: {
+      subscribe: () => pubsub._______________('MESSAGE_ADDED')
+    }
+  }
+};
+```
+
+Answer: `asyncIterator` - Return async iterator for subscription. PubSub publishes events, asyncIterator subscribes to them. Real-time GraphQL updates.
+
+#@@@@@@@@@@
+
+189. How do you implement virtual scrolling in React?
+
+Answer: Use react-window or react-virtualized libraries. Render only visible items: `<FixedSizeList height={600} itemCount={1000} itemSize={35}>{Row}</FixedSizeList>`. Improves performance for large lists by rendering only viewport items.
+
+#@@@@@@@@@@
+
+190. Which of the following are TypeScript module resolution strategies? (Multiple correct)
+A) Classic
+B) Node
+C) Node16
+D) NodeNext
+E) Bundler
+F) All of the above
+
+Answer: F - All are TypeScript module resolution strategies. Classic (legacy), Node (Node.js), Node16/NodeNext (ESM support), Bundler (for bundlers). Configure in tsconfig.json moduleResolution.
+
+#@@@@@@@@@@
+
+191. Find the bug in this Webpack config:
+```javascript
+module.exports = {
+  mode: 'production',
+  entry: './src/index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist')
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'] // Bug: wrong order for production
+      }
+    ]
+  }
+};
+```
+
+Answer: In production, use MiniCssExtractPlugin.loader instead of style-loader to extract CSS to separate files. style-loader injects CSS into JS, not optimal for production.
+
+#@@@@@@@@@@
+
+192. What is the difference between shallow and deep merging in JavaScript?
+
+Answer: Shallow merge copies top-level properties: `{...obj1, ...obj2}` or `Object.assign()`. Deep merge recursively copies nested objects. Shallow merge overwrites nested objects, deep merge merges them. Use lodash.merge for deep merge.
+
+#@@@@@@@@@@
+
+193. Which of the following are Express.js security best practices? (Multiple correct)
+A) Use helmet middleware
+B) Implement rate limiting
+C) Validate input
+D) Use HTTPS
+E) Set secure cookies
+F) All of the above
+
+Answer: F - All are security best practices. helmet (security headers), rate limiting (prevent abuse), input validation (prevent injection), HTTPS (encryption), secure cookies (httpOnly, secure flags).
+
+#@@@@@@@@@@
+
+194. Complete this React Error Boundary:
+```jsx
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>_______________</h1>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+Answer: `Something went wrong` or any error message - Display fallback UI when error occurs. Error boundaries catch errors in child components.
+
+#@@@@@@@@@@
+
+195. How do you implement SSR with data fetching in Next.js?
+
+Answer: Use getServerSideProps: `export async function getServerSideProps(context) { const data = await fetchData(); return { props: { data } }; }`. Runs on every request, provides fresh data. Access request context for cookies, headers, query params.
+
+#@@@@@@@@@@
+
+196. Which of the following are Svelte stores? (Multiple correct)
+A) writable
+B) readable
+C) derived
+D) custom stores
+E) All of the above
+F) A, B, C only
+
+Answer: E - All are Svelte store types. writable (read/write), readable (read-only), derived (computed from other stores), custom stores (implement subscribe). Reactive state management.
+
+#@@@@@@@@@@
+
+197. Find the bug in this TypeScript code:
+```typescript
+interface Config {
+  apiUrl: string;
+  timeout: number;
+}
+
+const config: Config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000
+};
+
+config.apiUrl = 'https://new-api.example.com'; // Works but shouldn't
+```
+
+Answer: No bug, but config is mutable. Use `const config: Readonly<Config>` or `as const` for immutability. TypeScript interfaces don't enforce immutability at runtime.
+
+#@@@@@@@@@@
+
+198. What is the difference between client-side and server-side rendering?
+
+Answer: CSR renders in browser, JavaScript required, slower initial load, better interactivity. SSR renders on server, faster initial load, better SEO, higher server load. Hybrid approaches (Next.js) combine benefits. Choose based on use case.
+
+#@@@@@@@@@@
+
+199. Which of the following are Node.js performance optimization techniques? (Multiple correct)
+A) Clustering
+B) Caching
+C) Connection pooling
+D) Compression
+E) Load balancing
+F) All of the above
+
+Answer: F - All are Node.js performance optimizations. Clustering (multi-core), Caching (Redis), Connection pooling (database), Compression (gzip), Load balancing (distribute traffic). Improve scalability and performance.
+
+#@@@@@@@@@@
+
+200. Complete this final JavaScript quiz question - What are the key principles of modern JavaScript development?
+
+Answer: Use ES6+ features, modular code, type safety (TypeScript), testing (Jest/Cypress), bundling (Webpack/Vite), linting (ESLint), formatting (Prettier), version control (Git), CI/CD, performance optimization, security best practices, accessibility, responsive design, and continuous learning. Modern JavaScript emphasizes developer experience, code quality, and user experience.
+
+#@@@@@@@@@@

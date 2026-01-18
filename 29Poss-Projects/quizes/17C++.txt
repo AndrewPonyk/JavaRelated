@@ -1,0 +1,2089 @@
+C++ Quiz - 200 Questions
+Tech Stack: STL, Boost Libraries, RAII, Qt Framework, CUDA, Concurrency, Clang/GCC, CMake
+
+1. Which of the following are STL containers? (Multiple correct)
+A) vector
+B) list
+C) map
+D) set
+E) unordered_map
+F) deque
+
+Answer: A, B, C, D, E, F - All are STL containers. vector (dynamic array), list (doubly linked list), map (ordered key-value), set (ordered unique elements), unordered_map (hash table), deque (double-ended queue).
+
+#@@@@@@@@@@
+
+2. Complete this RAII implementation:
+```cpp
+class FileHandler {
+private:
+    FILE* file;
+
+public:
+    FileHandler(const char* filename, const char* mode)
+        : file(fopen(filename, mode)) {
+        if (!file) {
+            throw std::runtime_error("Failed to open file");
+        }
+    }
+
+    ~FileHandler() {
+        if (file) {
+            _______________
+        }
+    }
+
+    // Delete copy constructor and assignment
+    FileHandler(const FileHandler&) = delete;
+    FileHandler& operator=(const FileHandler&) = delete;
+
+    FILE* get() const { return file; }
+};
+```
+
+Answer: `fclose(file);` - Close the file in the destructor to ensure resource cleanup. RAII (Resource Acquisition Is Initialization) ensures automatic resource management through constructor/destructor pairs.
+
+#@@@@@@@@@@
+
+3. What is the difference between stack and heap allocation in C++?
+
+Answer: Stack allocation is automatic, fast, limited size, automatic cleanup when scope ends. Heap allocation is manual (new/delete), slower, larger size, manual cleanup required. Stack for local variables, heap for dynamic allocation. Use smart pointers for automatic heap management.
+
+#@@@@@@@@@@
+
+4. Which of the following are C++11/14/17 features? (Multiple correct)
+A) auto keyword
+B) lambda expressions
+C) smart pointers
+D) range-based for loops
+E) constexpr
+F) structured bindings
+
+Answer: A, B, C, D, E, F - All are modern C++ features. auto (C++11), lambda expressions (C++11), smart pointers (C++11), range-based for (C++11), constexpr (C++11), structured bindings (C++17).
+
+#@@@@@@@@@@
+
+5. Find the memory leak in this C++ code:
+```cpp
+class MyClass {
+private:
+    int* data;
+    size_t size;
+
+public:
+    MyClass(size_t s) : size(s) {
+        data = new int[size];
+    }
+
+    // Missing destructor, copy constructor, and assignment operator
+
+    void setValue(size_t index, int value) {
+        if (index < size) {
+            data[index] = value;
+        }
+    }
+};
+
+int main() {
+    MyClass obj(100);
+    return 0;
+}
+```
+
+Answer: Missing destructor causes memory leak. Need `~MyClass() { delete[] data; }`. Also missing copy constructor and assignment operator (Rule of Three/Five). Use smart pointers or implement proper copy semantics.
+
+#@@@@@@@@@@
+
+6. How do you implement thread-safe singleton in C++11?
+
+Answer: Use static local variable with thread-safe initialization: `static Singleton& getInstance() { static Singleton instance; return instance; }`. C++11 guarantees thread-safe static local initialization. Alternative: use std::once_flag with std::call_once.
+
+#@@@@@@@@@@
+
+7. Which of the following are Boost libraries? (Multiple correct)
+A) Boost.Asio
+B) Boost.Thread
+C) Boost.Filesystem
+D) Boost.Regex
+E) Boost.Smart_ptr
+F) Boost.Algorithm
+
+Answer: A, B, C, D, E, F - All are Boost libraries. Asio (networking), Thread (threading), Filesystem (file operations), Regex (regular expressions), Smart_ptr (smart pointers), Algorithm (algorithms). Many became part of standard library.
+
+#@@@@@@@@@@
+
+8. Complete this Qt application:
+```cpp
+#include <QApplication>
+#include <QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    QWidget window;
+    QVBoxLayout *layout = new QVBoxLayout(&window);
+
+    QPushButton *button = new QPushButton("Click me!");
+    layout->addWidget(button);
+
+    QObject::connect(button, &QPushButton::clicked, []() {
+        qDebug() << "Button clicked!";
+    });
+
+    window._______________();
+
+    return app.exec();
+}
+```
+
+Answer: `show` - Display the window. Qt applications need to call show() on widgets to make them visible. The exec() method starts the event loop.
+
+#@@@@@@@@@@
+
+9. What is the difference between virtual and pure virtual functions?
+
+Answer: Virtual functions have default implementation, can be overridden in derived classes. Pure virtual functions have no implementation (= 0), must be overridden, make class abstract. Virtual enables polymorphism, pure virtual enforces interface contracts.
+
+#@@@@@@@@@@
+
+10. Which of the following are C++ concurrency features? (Multiple correct)
+A) std::thread
+B) std::mutex
+C) std::atomic
+D) std::future
+E) std::condition_variable
+F) std::async
+
+Answer: A, B, C, D, E, F - All are C++ concurrency features. thread (threading), mutex (synchronization), atomic (lock-free operations), future (async results), condition_variable (thread coordination), async (asynchronous execution).
+
+#@@@@@@@@@@
+
+11. Predict the output of this C++ code:
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    std::vector<int> vec = {5, 2, 8, 1, 9, 3};
+
+    std::sort(vec.begin(), vec.end());
+
+    auto it = std::lower_bound(vec.begin(), vec.end(), 5);
+
+    std::cout << "Position: " << (it - vec.begin()) << std::endl;
+    std::cout << "Value: " << *it << std::endl;
+
+    return 0;
+}
+```
+
+Answer: Position: 3, Value: 5 - After sorting: [1,2,3,5,8,9]. lower_bound finds first position where 5 could be inserted (index 3). The value at that position is 5.
+
+#@@@@@@@@@@
+
+12. How do you implement CUDA kernel in C++?
+
+Answer: Use `__global__` keyword for kernel function, launch with `<<<blocks, threads>>>` syntax, use `__device__` for device functions, `__host__` for host functions. Manage memory with cudaMalloc/cudaFree, transfer data with cudaMemcpy. Synchronize with cudaDeviceSynchronize().
+
+#@@@@@@@@@@
+
+13. Which of the following are CMake commands? (Multiple correct)
+A) add_executable
+B) target_link_libraries
+C) find_package
+D) set
+E) include_directories
+F) add_library
+
+Answer: A, B, C, D, E, F - All are CMake commands. add_executable (create executable), target_link_libraries (link libraries), find_package (find dependencies), set (set variables), include_directories (add include paths), add_library (create library).
+
+#@@@@@@@@@@
+
+14. Complete this template specialization:
+```cpp
+template<typename T>
+class Vector {
+private:
+    T* data;
+    size_t size;
+
+public:
+    Vector(size_t s) : size(s), data(new T[s]) {}
+    ~Vector() { delete[] data; }
+
+    T& operator[](size_t index) { return data[index]; }
+};
+
+// Template specialization for bool
+template<>
+class Vector<_______________> {
+private:
+    std::vector<bool> data;
+
+public:
+    Vector(size_t s) : data(s) {}
+
+    // Special implementation for bool
+};
+```
+
+Answer: `bool` - Template specialization for bool type. std::vector<bool> is specialized to use bit packing for space efficiency, so custom Vector<bool> might need different implementation.
+
+#@@@@@@@@@@
+
+15. What is the difference between Clang and GCC compilers?
+
+Answer: GCC is GNU compiler, mature, excellent optimization, strong C++ standards support. Clang is LLVM-based, faster compilation, better error messages, modular architecture, better static analysis. Both support modern C++ standards. Choose based on specific needs and platform requirements.
+
+#@@@@@@@@@@
+
+16. Which of the following are C++11 features? (Multiple correct)
+A) auto keyword
+B) lambda expressions
+C) nullptr
+D) range-based for loops
+E) move semantics
+F) All of the above
+
+Answer: F - All are C++11 features. auto (type inference), lambdas (anonymous functions), nullptr (null pointer literal), range-for (foreach), move semantics (rvalue references). Modern C++ revolution.
+
+#@@@@@@@@@@
+
+17. Find the bug in this code:
+```cpp
+void processData(std::vector<int>& data) {
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        if (*it < 0) {
+            data.erase(it); // Bug: iterator invalidation
+        }
+    }
+}
+```
+
+Answer: Erasing invalidates iterator. Fix: `it = data.erase(it); --it;` or use erase-remove idiom: `data.erase(std::remove_if(data.begin(), data.end(), [](int x) { return x < 0; }), data.end());`. Iterator invalidation is common bug.
+
+#@@@@@@@@@@
+
+18. What is the output of this code?
+```cpp
+#include <iostream>
+int main() {
+    int x = 5;
+    int& ref = x;
+    ref = 10;
+    std::cout << x << std::endl;
+}
+```
+
+Answer: 10 - References are aliases. Modifying ref modifies x. References must be initialized and cannot be reseated.
+
+#@@@@@@@@@@
+
+19. Which of the following are smart pointer types? (Multiple correct)
+A) unique_ptr
+B) shared_ptr
+C) weak_ptr
+D) auto_ptr (deprecated)
+E) All of the above
+
+Answer: E - All are smart pointers. unique_ptr (exclusive ownership), shared_ptr (reference counting), weak_ptr (non-owning), auto_ptr (deprecated, use unique_ptr). RAII for heap memory.
+
+#@@@@@@@@@@
+
+20. Complete this move constructor:
+```cpp
+class String {
+private:
+    char* data;
+    size_t length;
+
+public:
+    String(String&& other) noexcept
+        : data(other.data), length(other.length) {
+        other.data = _______________;
+        other.length = 0;
+    }
+};
+```
+
+Answer: `nullptr` - Set source pointer to null after move. Move semantics transfer ownership. noexcept important for performance.
+
+#@@@@@@@@@@
+
+21. How do you implement virtual functions in C++?
+
+Answer: Use virtual keyword in base class. Example: `virtual void draw() = 0;` for pure virtual. Override in derived classes. Virtual enables runtime polymorphism through vtable. Use override keyword in C++11+.
+
+#@@@@@@@@@@
+
+22. Which of the following are STL algorithms? (Multiple correct)
+A) std::sort
+B) std::find
+C) std::transform
+D) std::accumulate
+E) std::for_each
+F) All of the above
+
+Answer: F - All are STL algorithms. sort (sorting), find (search), transform (map), accumulate (reduce), for_each (iterate). Generic algorithms work with iterators.
+
+#@@@@@@@@@@
+
+23. Find the bug:
+```cpp
+int* createArray() {
+    int arr[10] = {0};
+    return arr; // Bug: returning pointer to local array
+}
+```
+
+Answer: Returning pointer to local variable. Array destroyed when function returns. Fix: use dynamic allocation `new int[10]` or return std::vector. Dangling pointer bug.
+
+#@@@@@@@@@@
+
+24. What is the difference between struct and class in C++?
+
+Answer: struct has public default access, class has private default. Otherwise identical. Use struct for POD (Plain Old Data), class for objects with behavior. Convention, not technical difference.
+
+#@@@@@@@@@@
+
+25. Which of the following are C++14 features? (Multiple correct)
+A) Generic lambdas
+B) Return type deduction
+C) Binary literals
+D) std::make_unique
+E) All of the above
+
+Answer: E - All are C++14 features. Generic lambdas (auto parameters), Return deduction (auto return), Binary literals (0b prefix), make_unique (smart pointer factory). Incremental improvements.
+
+#@@@@@@@@@@
+
+26. Complete this template function:
+```cpp
+template<typename T>
+T max(T a, T b) {
+    return (a > b) ? _______________ : b;
+}
+```
+
+Answer: `a` - Return larger value. Template functions work with any type supporting >. Type deduction from arguments.
+
+#@@@@@@@@@@
+
+27. How do you implement operator overloading in C++?
+
+Answer: Define operator as member or friend function. Example: `Vector operator+(const Vector& other) const { }`. Overload +, -, *, [], (), etc. Use for natural syntax with custom types.
+
+#@@@@@@@@@@
+
+28. Which of the following are Boost libraries? (Multiple correct)
+A) Boost.Asio (networking)
+B) Boost.Filesystem
+C) Boost.Thread
+D) Boost.Regex
+E) All of the above
+
+Answer: E - All are Boost libraries. Asio (async I/O), Filesystem (file operations), Thread (threading), Regex (regular expressions). Many Boost features became C++ standard.
+
+#@@@@@@@@@@
+
+29. Find the bug:
+```cpp
+class Base {
+public:
+    ~Base() { } // Bug: non-virtual destructor
+};
+
+class Derived : public Base {
+private:
+    int* data;
+public:
+    Derived() : data(new int[100]) {}
+    ~Derived() { delete[] data; }
+};
+
+Base* ptr = new Derived();
+delete ptr; // Memory leak
+```
+
+Answer: Non-virtual destructor causes memory leak. Only Base destructor called. Fix: `virtual ~Base() { }`. Always make base class destructors virtual.
+
+#@@@@@@@@@@
+
+30. What is the difference between const and constexpr?
+
+Answer: const means value cannot be modified. constexpr means value computed at compile time. constexpr implies const. Use constexpr for compile-time constants, const for runtime constants.
+
+#@@@@@@@@@@
+
+31. Which of the following are C++17 features? (Multiple correct)
+A) std::optional
+B) std::variant
+C) std::any
+D) Structured bindings
+E) if constexpr
+F) All of the above
+
+Answer: F - All are C++17 features. optional (nullable), variant (type-safe union), any (type-erased), Structured bindings (auto [a, b] = pair), if constexpr (compile-time if). Major improvements.
+
+#@@@@@@@@@@
+
+32. Complete this lambda expression:
+```cpp
+std::vector<int> numbers = {1, 2, 3, 4, 5};
+auto sum = std::accumulate(numbers.begin(), numbers.end(), 0,
+    [](int acc, int val) { return acc + _______________; });
+```
+
+Answer: `val` - Add current value to accumulator. Lambdas are anonymous functions. Capture clause [], parameters, body.
+
+#@@@@@@@@@@
+
+33. How do you implement multiple inheritance in C++?
+
+Answer: Inherit from multiple base classes. Example: `class Derived : public Base1, public Base2 { }`. Watch for diamond problem, use virtual inheritance. Multiple inheritance powerful but complex.
+
+#@@@@@@@@@@
+
+34. Which of the following are Qt framework components? (Multiple correct)
+A) Qt Widgets
+B) Qt Quick/QML
+C) Qt Network
+D) Qt SQL
+E) All of the above
+
+Answer: E - All are Qt components. Widgets (traditional GUI), Quick/QML (declarative UI), Network (networking), SQL (database). Cross-platform application framework.
+
+#@@@@@@@@@@
+
+35. Find the bug:
+```cpp
+std::vector<int> vec = {1, 2, 3};
+for (int i = 0; i <= vec.size(); ++i) { // Bug: off-by-one
+    std::cout << vec[i] << std::endl;
+}
+```
+
+Answer: Loop condition should be `i < vec.size()` not `<=`. Accessing vec[3] out of bounds. Use range-based for or correct condition.
+
+#@@@@@@@@@@
+
+36. What is the difference between new/delete and malloc/free?
+
+Answer: new/delete are operators, call constructors/destructors, type-safe. malloc/free are functions, no constructors/destructors, return void*. Use new/delete in C++, malloc/free is C legacy.
+
+#@@@@@@@@@@
+
+37. Which of the following are C++20 features? (Multiple correct)
+A) Concepts
+B) Ranges
+C) Coroutines
+D) Modules
+E) Three-way comparison (<=>)
+F) All of the above
+
+Answer: F - All are C++20 features. Concepts (template constraints), Ranges (composable algorithms), Coroutines (async), Modules (better than headers), Spaceship operator (auto comparison). Massive update.
+
+#@@@@@@@@@@
+
+38. Complete this variadic template:
+```cpp
+template<typename... Args>
+void print(Args... args) {
+    (std::cout << ... << _______________) << std::endl;
+}
+```
+
+Answer: `args` - Fold expression for parameter pack. Variadic templates accept variable arguments. C++17 fold expressions simplify parameter pack expansion.
+
+#@@@@@@@@@@
+
+39. How do you implement exception handling in C++?
+
+Answer: Use try/catch blocks. Example: `try { risky(); } catch (const std::exception& e) { handle(); }`. Throw with `throw std::runtime_error("msg")`. Use RAII for exception safety.
+
+#@@@@@@@@@@
+
+40. Which of the following are concurrency primitives? (Multiple correct)
+A) std::thread
+B) std::mutex
+C) std::condition_variable
+D) std::atomic
+E) std::future
+F) All of the above
+
+Answer: F - All are concurrency primitives. thread (threads), mutex (mutual exclusion), condition_variable (signaling), atomic (lock-free), future (async results). C++11 threading support.
+
+#@@@@@@@@@@
+
+41. Find the bug:
+```cpp
+std::string getString() {
+    std::string str = "Hello";
+    return str; // No bug - RVO applies
+}
+```
+
+Answer: No bug - Return Value Optimization (RVO) eliminates copy. Modern compilers optimize return by value. Move semantics also help.
+
+#@@@@@@@@@@
+
+42. What is the difference between pass-by-value and pass-by-reference?
+
+Answer: Pass-by-value copies argument. Pass-by-reference uses reference, no copy. Use const reference for large objects to avoid copy. Example: `void func(const std::vector<int>& vec)`.
+
+#@@@@@@@@@@
+
+43. Which of the following are CUDA programming concepts? (Multiple correct)
+A) Kernels
+B) Threads/Blocks/Grids
+C) Device memory
+D) __global__ functions
+E) All of the above
+
+Answer: E - All are CUDA concepts. Kernels (GPU functions), Threads/Blocks/Grids (execution model), Device memory (GPU RAM), __global__ (kernel qualifier). GPU parallel programming.
+
+#@@@@@@@@@@
+
+44. Complete this perfect forwarding:
+```cpp
+template<typename T>
+void wrapper(T&& arg) {
+    function(std::_______________(arg));
+}
+```
+
+Answer: `forward<T>` - Perfect forwarding preserves value category. Universal references (T&&) with std::forward. Enables generic wrapper functions.
+
+#@@@@@@@@@@
+
+45. How do you implement namespaces in C++?
+
+Answer: Use namespace keyword. Example: `namespace MyLib { class MyClass { }; }`. Access with `MyLib::MyClass` or `using namespace MyLib`. Organize code, prevent naming conflicts.
+
+#@@@@@@@@@@
+
+46. Which of the following are STL iterators? (Multiple correct)
+A) Input iterator
+B) Output iterator
+C) Forward iterator
+D) Bidirectional iterator
+E) Random access iterator
+F) All of the above
+
+Answer: F - All are iterator categories. Input (read once), Output (write once), Forward (multi-pass read), Bidirectional (++/--), Random access (arithmetic). Iterator hierarchy.
+
+#@@@@@@@@@@
+
+47. Find the bug:
+```cpp
+class Singleton {
+private:
+    static Singleton* instance;
+    Singleton() {}
+
+public:
+    static Singleton* getInstance() {
+        if (!instance) {
+            instance = new Singleton(); // Bug: not thread-safe
+        }
+        return instance;
+    }
+};
+```
+
+Answer: Not thread-safe. Multiple threads can create multiple instances. Fix: use std::call_once or Meyer's singleton. Thread safety critical.
+
+#@@@@@@@@@@
+
+48. What is the difference between inline and constexpr functions?
+
+Answer: inline suggests compiler to inline function (optimization hint). constexpr can be evaluated at compile time. constexpr functions are implicitly inline. Use constexpr for compile-time computation.
+
+#@@@@@@@@@@
+
+49. Which of the following are memory management techniques? (Multiple correct)
+A) RAII
+B) Smart pointers
+C) Custom allocators
+D) Memory pools
+E) All of the above
+
+Answer: E - All are memory techniques. RAII (automatic cleanup), Smart pointers (automatic deletion), Custom allocators (control allocation), Memory pools (pre-allocated). Efficient memory management.
+
+#@@@@@@@@@@
+
+50. Complete this std::bind usage:
+```cpp
+void print(int a, int b, int c) {
+    std::cout << a << " " << b << " " << c << std::endl;
+}
+
+auto bound = std::bind(print, _______________, 2, std::placeholders::_1);
+bound(3); // Prints: ? 2 3
+```
+
+Answer: `1` or `std::placeholders::_2` - First argument is 1, second is 2, third is placeholder. std::bind creates function objects. Prefer lambdas in modern C++.
+
+#@@@@@@@@@@
+
+51. How do you implement template metaprogramming in C++?
+
+Answer: Use templates for compile-time computation. Example: `template<int N> struct Factorial { static const int value = N * Factorial<N-1>::value; };`. Recursive templates, type traits. Turing-complete at compile time.
+
+#@@@@@@@@@@
+
+52. Which of the following are C++ casting operators? (Multiple correct)
+A) static_cast
+B) dynamic_cast
+C) const_cast
+D) reinterpret_cast
+E) All of the above
+
+Answer: E - All are C++ casts. static_cast (compile-time), dynamic_cast (runtime polymorphic), const_cast (remove const), reinterpret_cast (low-level). Prefer C++ casts over C-style.
+
+#@@@@@@@@@@
+
+53. Find the bug:
+```cpp
+std::shared_ptr<int> ptr1 = std::make_shared<int>(42);
+std::shared_ptr<int> ptr2 = ptr1;
+ptr1.reset();
+std::cout << *ptr2 << std::endl; // No bug
+```
+
+Answer: No bug - shared_ptr uses reference counting. ptr2 still valid after ptr1 reset. Output: 42. Shared ownership model.
+
+#@@@@@@@@@@
+
+54. What is the output of this code?
+```cpp
+#include <iostream>
+class Base {
+public:
+    virtual void show() { std::cout << "Base" << std::endl; }
+};
+class Derived : public Base {
+public:
+    void show() override { std::cout << "Derived" << std::endl; }
+};
+int main() {
+    Base* ptr = new Derived();
+    ptr->show();
+    delete ptr;
+}
+```
+
+Answer: Derived - Virtual function enables runtime polymorphism. Derived::show() called through base pointer. Dynamic dispatch via vtable.
+
+#@@@@@@@@@@
+
+55. Which of the following are initialization methods in C++11+? (Multiple correct)
+A) Direct initialization
+B) Copy initialization
+C) List initialization (uniform)
+D) Value initialization
+E) All of the above
+
+Answer: E - All are initialization methods. Direct `T obj(args)`, Copy `T obj = value`, List `T obj{args}` (prevents narrowing), Value `T obj{}`. Prefer list initialization.
+
+#@@@@@@@@@@
+
+56. Complete this std::async usage:
+```cpp
+#include <future>
+int compute() { return 42; }
+
+auto future = std::async(std::launch::_______________, compute);
+int result = future.get();
+```
+
+Answer: `async` or `deferred` - Launch policy. async (new thread), deferred (lazy evaluation). std::async for simple async tasks.
+
+#@@@@@@@@@@
+
+57. How do you implement copy-and-swap idiom in C++?
+
+Answer: Implement copy constructor, swap function, assignment using swap. Example: `T& operator=(T other) { swap(*this, other); return *this; }`. Exception-safe assignment. Strong exception guarantee.
+
+#@@@@@@@@@@
+
+58. Which of the following are function object types? (Multiple correct)
+A) Function pointers
+B) Functors (classes with operator())
+C) Lambda expressions
+D) std::function
+E) All of the above
+
+Answer: E - All are callable objects. Function pointers (C-style), Functors (stateful), Lambdas (convenient), std::function (type-erased). Different trade-offs.
+
+#@@@@@@@@@@
+
+59. Find the bug:
+```cpp
+std::vector<bool> flags(10, false);
+bool& ref = flags[0]; // Bug: vector<bool> doesn't return bool&
+```
+
+Answer: std::vector<bool> is specialized, returns proxy object not bool&. Can't take reference. Fix: use std::vector<char> or std::deque<bool>. Special case in STL.
+
+#@@@@@@@@@@
+
+60. What is the difference between emplace_back and push_back?
+
+Answer: emplace_back constructs in-place with arguments. push_back takes object, may copy/move. emplace_back more efficient, avoids temporary. Example: `vec.emplace_back(args)` vs `vec.push_back(T(args))`.
+
+#@@@@@@@@@@
+
+61. Which of the following are design patterns commonly used in C++? (Multiple correct)
+A) Singleton
+B) Factory
+C) Observer
+D) RAII
+E) CRTP (Curiously Recurring Template Pattern)
+F) All of the above
+
+Answer: F - All are C++ patterns. Singleton (single instance), Factory (object creation), Observer (event handling), RAII (resource management), CRTP (static polymorphism). Essential patterns.
+
+#@@@@@@@@@@
+
+62. Complete this range-based for loop:
+```cpp
+std::map<std::string, int> scores = {{"Alice", 90}, {"Bob", 85}};
+for (const auto& [name, score] : _______________) {
+    std::cout << name << ": " << score << std::endl;
+}
+```
+
+Answer: `scores` - Structured bindings with range-for. C++17 feature. Iterate over map with decomposition.
+
+#@@@@@@@@@@
+
+63. How do you implement SFINAE (Substitution Failure Is Not An Error)?
+
+Answer: Use template substitution failures for overload resolution. Example: `template<typename T> typename std::enable_if<std::is_integral<T>::value, T>::type func(T t)`. Type traits for compile-time selection.
+
+#@@@@@@@@@@
+
+64. Which of the following are std::chrono components? (Multiple correct)
+A) duration
+B) time_point
+C) clocks (system_clock, steady_clock)
+D) All of the above
+
+Answer: D - All are chrono components. duration (time span), time_point (point in time), clocks (time sources). Type-safe time library.
+
+#@@@@@@@@@@
+
+65. Find the bug:
+```cpp
+class MyClass {
+    int* data;
+public:
+    MyClass(int size) : data(new int[size]) {}
+    ~MyClass() { delete data; } // Bug: should be delete[]
+};
+```
+
+Answer: Using delete instead of delete[] for array. Undefined behavior. Fix: `delete[] data`. Match new[] with delete[], new with delete.
+
+#@@@@@@@@@@
+
+66. What is the difference between std::move and std::forward?
+
+Answer: std::move unconditionally casts to rvalue. std::forward conditionally forwards based on value category. move for moving, forward for perfect forwarding in templates.
+
+#@@@@@@@@@@
+
+67. Which of the following are CMake target properties? (Multiple correct)
+A) INCLUDE_DIRECTORIES
+B) LINK_LIBRARIES
+C) COMPILE_OPTIONS
+D) CXX_STANDARD
+E) All of the above
+
+Answer: E - All are target properties. Include dirs (headers), Link libs (dependencies), Compile options (flags), CXX standard (C++ version). Modern CMake uses target properties.
+
+#@@@@@@@@@@
+
+68. Complete this std::variant usage:
+```cpp
+std::variant<int, std::string> var = "hello";
+if (std::holds_alternative<_______________>(var)) {
+    std::cout << std::get<std::string>(var) << std::endl;
+}
+```
+
+Answer: `std::string` - Check variant type. std::variant is type-safe union. C++17 feature for sum types.
+
+#@@@@@@@@@@
+
+69. How do you implement expression templates in C++?
+
+Answer: Use templates to build expression trees at compile time. Delay evaluation, optimize operations. Example: `Vector a, b, c; a = b + c * 2;` builds expression tree. Advanced template technique.
+
+#@@@@@@@@@@
+
+70. Which of the following are undefined behaviors in C++? (Multiple correct)
+A) Dereferencing null pointer
+B) Array out of bounds
+C) Use after free
+D) Signed integer overflow
+E) All of the above
+
+Answer: E - All are undefined behavior. Null deref, out of bounds, use after free, signed overflow. Undefined behavior can cause anything. Use sanitizers to detect.
+
+#@@@@@@@@@@
+
+71. Find the bug:
+```cpp
+std::unique_ptr<int> ptr1 = std::make_unique<int>(42);
+std::unique_ptr<int> ptr2 = ptr1; // Bug: can't copy unique_ptr
+```
+
+Answer: unique_ptr is move-only, can't copy. Fix: `std::unique_ptr<int> ptr2 = std::move(ptr1);`. Exclusive ownership model.
+
+#@@@@@@@@@@
+
+72. What is the difference between std::array and C array?
+
+Answer: std::array is STL container, knows size, no decay to pointer, can be copied. C array decays to pointer, no size info, can't copy. Use std::array for safety.
+
+#@@@@@@@@@@
+
+73. Which of the following are Qt signals and slots features? (Multiple correct)
+A) Type-safe callbacks
+B) Thread-safe
+C) Automatic connection management
+D) Meta-object system
+E) All of the above
+
+Answer: E - All are signals/slots features. Type-safe (compile-time), Thread-safe (queued connections), Automatic (disconnect on delete), Meta-object (moc). Qt's event system.
+
+#@@@@@@@@@@
+
+74. Complete this concept definition (C++20):
+```cpp
+template<typename T>
+concept Addable = requires(T a, T b) {
+    { a + b } -> std::_______________<T>;
+};
+```
+
+Answer: `convertible_to` or `same_as` - Concept constraint. Concepts replace SFINAE. Clearer template constraints.
+
+#@@@@@@@@@@
+
+75. How do you implement tag dispatching in C++?
+
+Answer: Use empty tag types for overload resolution. Example: `struct input_iterator_tag {};` then `void func(T, input_iterator_tag)`. Compile-time dispatch based on type traits.
+
+#@@@@@@@@@@
+
+76. Which of the following are memory ordering options for atomics? (Multiple correct)
+A) memory_order_relaxed
+B) memory_order_acquire
+C) memory_order_release
+D) memory_order_seq_cst
+E) All of the above
+
+Answer: E - All are memory orders. relaxed (no ordering), acquire (load barrier), release (store barrier), seq_cst (sequential consistency). Lock-free programming.
+
+#@@@@@@@@@@
+
+77. Find the bug:
+```cpp
+std::string str = "Hello";
+const char* cstr = str.c_str();
+str += " World";
+std::cout << cstr << std::endl; // Bug: dangling pointer
+```
+
+Answer: c_str() pointer invalidated when string modified. Undefined behavior. Fix: call c_str() after modification. String reallocation invalidates pointers.
+
+#@@@@@@@@@@
+
+78. What is the difference between std::map and std::unordered_map?
+
+Answer: std::map is ordered (red-black tree), O(log n) operations. std::unordered_map is hash table, O(1) average. map for ordered iteration, unordered_map for performance.
+
+#@@@@@@@@@@
+
+79. Which of the following are Boost.Asio features? (Multiple correct)
+A) Async I/O
+B) Networking (TCP/UDP)
+C) Timers
+D) Coroutines
+E) All of the above
+
+Answer: E - All are Asio features. Async I/O (non-blocking), Networking (sockets), Timers (async timers), Coroutines (stackless). Foundation for networking.
+
+#@@@@@@@@@@
+
+80. Complete this std::optional usage:
+```cpp
+std::optional<int> findValue(const std::vector<int>& vec, int target) {
+    auto it = std::find(vec.begin(), vec.end(), target);
+    if (it != vec.end()) {
+        return *it;
+    }
+    return _______________; // Not found
+}
+```
+
+Answer: `std::nullopt` or `{}` - Return empty optional. std::optional for nullable values. C++17 feature replaces pointers for optionality.
+
+#@@@@@@@@@@
+
+81. How do you implement type traits in C++?
+
+Answer: Use template specialization and SFINAE. Example: `template<typename T> struct is_pointer : std::false_type {}; template<typename T> struct is_pointer<T*> : std::true_type {};`. Compile-time type information.
+
+#@@@@@@@@@@
+
+82. Which of the following are exception safety guarantees? (Multiple correct)
+A) No-throw guarantee
+B) Strong guarantee
+C) Basic guarantee
+D) No guarantee
+E) All of the above
+
+Answer: E - All are exception guarantees. No-throw (never throws), Strong (commit or rollback), Basic (no leaks, valid state), No guarantee (undefined). Design for exception safety.
+
+#@@@@@@@@@@
+
+83. Find the bug:
+```cpp
+class Resource {
+public:
+    Resource() { std::cout << "Acquired" << std::endl; }
+    ~Resource() { std::cout << "Released" << std::endl; }
+};
+
+void func() {
+    Resource(); // Bug: temporary immediately destroyed
+    // Use resource
+}
+```
+
+Answer: Temporary object immediately destroyed. Fix: `Resource res;` to create named object. Unnamed temporaries have statement lifetime.
+
+#@@@@@@@@@@
+
+84. What is the difference between std::lock_guard and std::unique_lock?
+
+Answer: lock_guard is simple RAII lock, can't unlock early. unique_lock is flexible, can unlock/relock, movable, works with condition variables. Use lock_guard for simple cases.
+
+#@@@@@@@@@@
+
+85. Which of the following are parameter passing guidelines? (Multiple correct)
+A) Pass small types by value
+B) Pass large types by const reference
+C) Pass output parameters by reference
+D) Pass move-only types by value
+E) All of the above
+
+Answer: E - All are guidelines. Small by value (int, pointers), Large by const ref (avoid copy), Output by ref (modify), Move-only by value (unique_ptr). Efficient parameter passing.
+
+#@@@@@@@@@@
+
+86. Complete this std::tuple usage:
+```cpp
+std::tuple<int, std::string, double> data = {42, "hello", 3.14};
+auto [num, str, val] = _______________; // C++17 structured bindings
+```
+
+Answer: `data` - Decompose tuple with structured bindings. std::tuple for heterogeneous collections. C++17 makes tuples more usable.
+
+#@@@@@@@@@@
+
+87. How do you implement policy-based design in C++?
+
+Answer: Use template parameters for policies. Example: `template<typename AllocationPolicy, typename ThreadingPolicy> class Container`. Compile-time composition. Flexible design.
+
+#@@@@@@@@@@
+
+88. Which of the following are std::string_view benefits? (Multiple correct)
+A) No allocation
+B) Lightweight
+C) Non-owning
+D) Efficient substring
+E) All of the above
+
+Answer: E - All are string_view benefits. No allocation (view only), Lightweight (pointer + size), Non-owning (doesn't manage memory), Efficient (no copy). C++17 for string parameters.
+
+#@@@@@@@@@@
+
+89. Find the bug:
+```cpp
+std::vector<int> vec = {1, 2, 3};
+for (auto& elem : vec) {
+    vec.push_back(elem * 2); // Bug: modifying container during iteration
+}
+```
+
+Answer: Modifying container during range-for invalidates iterators. Undefined behavior. Fix: iterate over copy or use index-based loop. Container modification rules.
+
+#@@@@@@@@@@
+
+90. What is the difference between std::ref and std::cref?
+
+Answer: std::ref creates reference_wrapper for mutable reference. std::cref for const reference. Use with std::bind, std::thread to pass by reference. Example: `std::thread(func, std::ref(var))`.
+
+#@@@@@@@@@@
+
+91. Which of the following are coroutine keywords (C++20)? (Multiple correct)
+A) co_await
+B) co_yield
+C) co_return
+D) All of the above
+
+Answer: D - All are coroutine keywords. co_await (suspend and wait), co_yield (generator), co_return (return from coroutine). Async programming model.
+
+#@@@@@@@@@@
+
+92. Complete this std::invoke usage:
+```cpp
+auto result = std::invoke(&MyClass::method, obj, _______________);
+// Call member function with arguments
+```
+
+Answer: `args...` or specific arguments - Invoke member function. std::invoke unifies callable invocation. Works with functions, member functions, functors.
+
+#@@@@@@@@@@
+
+93. How do you implement the rule of five in C++?
+
+Answer: Define destructor, copy constructor, copy assignment, move constructor, move assignment. Or use =default/=delete. Example: `MyClass(MyClass&&) = default;`. Manage resources correctly.
+
+#@@@@@@@@@@
+
+94. Which of the following are std::filesystem operations? (Multiple correct)
+A) path manipulation
+B) file/directory queries
+C) copy/move/remove
+D) directory iteration
+E) All of the above
+
+Answer: E - All are filesystem operations. path (portable paths), queries (exists, is_directory), operations (copy, remove), iteration (directory_iterator). C++17 filesystem library.
+
+#@@@@@@@@@@
+
+95. Find the bug:
+```cpp
+int main() {
+    int* ptr = new int(42);
+    // ... code ...
+    return 0; // Bug: memory leak
+}
+```
+
+Answer: Memory not freed. Fix: `delete ptr;` before return or use smart pointer. Always match new with delete. RAII prevents leaks.
+
+#@@@@@@@@@@
+
+96. What is the difference between std::span and std::string_view?
+
+Answer: std::span is for contiguous sequences (arrays, vectors), mutable or const. std::string_view specifically for strings, always const. span more general. C++20 span, C++17 string_view.
+
+#@@@@@@@@@@
+
+97. Which of the following are compile-time programming techniques? (Multiple correct)
+A) constexpr functions
+B) Template metaprogramming
+C) if constexpr
+D) Concepts
+E) All of the above
+
+Answer: E - All are compile-time techniques. constexpr (compile-time evaluation), Templates (code generation), if constexpr (compile-time branching), Concepts (constraints). Powerful compile-time programming.
+
+#@@@@@@@@@@
+
+98. Complete this std::accumulate with custom operation:
+```cpp
+std::vector<int> vec = {1, 2, 3, 4, 5};
+int product = std::accumulate(vec.begin(), vec.end(), 1,
+    [](int a, int b) { return a * _______________; });
+```
+
+Answer: `b` - Multiply accumulator by current element. std::accumulate is fold/reduce. Custom binary operation.
+
+#@@@@@@@@@@
+
+99. How do you implement zero-overhead abstractions in C++?
+
+Answer: Use templates, inline functions, constexpr, RAII. Compiler optimizes away abstractions. Example: iterators compile to same code as raw pointers. "You don't pay for what you don't use."
+
+#@@@@@@@@@@
+
+100. Which of the following represent C++ core guidelines principles? (Multiple correct)
+A) Type safety
+B) Resource safety
+C) Performance
+D) Simplicity
+E) All of the above
+
+Answer: E - All are core guidelines principles. Type safety (strong types), Resource safety (RAII), Performance (zero overhead), Simplicity (clear code). Modern C++ best practices for safe, efficient code.
+
+#@@@@@@@@@@
+
+101. How do you implement std::enable_if for function overloading?
+
+Answer: Use std::enable_if in return type or template parameter. Example: `template<typename T> typename std::enable_if<std::is_integral<T>::value, T>::type func(T t)`. SFINAE for conditional compilation. C++20 concepts are cleaner alternative.
+
+#@@@@@@@@@@
+
+102. Which of the following are alignment specifiers? (Multiple correct)
+A) alignas
+B) alignof
+C) std::aligned_storage
+D) All of the above
+
+Answer: D - All relate to alignment. alignas (specify alignment), alignof (query alignment), aligned_storage (aligned buffer). Control memory layout for performance.
+
+#@@@@@@@@@@
+
+103. Find the bug:
+```cpp
+std::thread t([]{ std::cout << "Thread" << std::endl; });
+// Bug: thread not joined or detached
+```
+
+Answer: Thread must be joined or detached before destruction. Fix: `t.join();` or `t.detach();`. Termination if thread destroyed while joinable.
+
+#@@@@@@@@@@
+
+104. What is the output of this code?
+```cpp
+int x = 5;
+auto lambda = [x]() mutable { return ++x; };
+std::cout << lambda() << " " << x << std::endl;
+```
+
+Answer: 6 5 - Lambda captures by value. mutable allows modifying copy. Original x unchanged. Capture semantics important.
+
+#@@@@@@@@@@
+
+105. Which of the following are std::regex features? (Multiple correct)
+A) Pattern matching
+B) Search and replace
+C) Capture groups
+D) Multiple grammars (ECMAScript, POSIX)
+E) All of the above
+
+Answer: E - All are regex features. Matching (regex_match), Search/replace (regex_replace), Capture groups (sub_match), Grammars (syntax options). Regular expression library.
+
+#@@@@@@@@@@
+
+106. Complete this placement new:
+```cpp
+alignas(MyClass) char buffer[sizeof(MyClass)];
+MyClass* obj = new (_______________) MyClass(args);
+// Later: obj->~MyClass();
+```
+
+Answer: `buffer` - Placement new constructs object at specific location. Manual memory management. Must call destructor explicitly.
+
+#@@@@@@@@@@
+
+107. How do you implement custom deleters for smart pointers?
+
+Answer: Pass deleter to smart pointer. Example: `std::unique_ptr<FILE, decltype(&fclose)> file(fopen("file.txt", "r"), &fclose);`. Custom cleanup logic. Works with unique_ptr and shared_ptr.
+
+#@@@@@@@@@@
+
+108. Which of the following are std::algorithm categories? (Multiple correct)
+A) Non-modifying (find, count)
+B) Modifying (copy, transform)
+C) Sorting (sort, partial_sort)
+D) Numeric (accumulate, inner_product)
+E) All of the above
+
+Answer: E - All are algorithm categories. Non-modifying (queries), Modifying (mutations), Sorting (ordering), Numeric (calculations). Comprehensive algorithm library.
+
+#@@@@@@@@@@
+
+109. Find the bug:
+```cpp
+class Widget {
+    std::string name;
+public:
+    Widget(std::string n) : name(n) {} // Bug: pass by value inefficient
+};
+```
+
+Answer: Passing string by value causes copy. Fix: `Widget(const std::string& n)` or `Widget(std::string n)` with move. Efficient parameter passing.
+
+#@@@@@@@@@@
+
+110. What is the difference between std::remove and erase?
+
+Answer: std::remove moves elements, doesn't change size, returns new end. erase actually removes elements. Use erase-remove idiom: `vec.erase(std::remove(vec.begin(), vec.end(), value), vec.end());`. Two-step removal.
+
+#@@@@@@@@@@
+
+111. Which of the following are module features (C++20)? (Multiple correct)
+A) Faster compilation
+B) Better encapsulation
+C) No header files
+D) Import instead of include
+E) All of the above
+
+Answer: E - All are module benefits. Faster (no reprocessing), Encapsulation (explicit exports), No headers (module files), Import (module keyword). Major improvement over headers.
+
+#@@@@@@@@@@
+
+112. Complete this std::visit for variant:
+```cpp
+std::variant<int, std::string> var = 42;
+std::visit([](auto&& arg) {
+    using T = std::decay_t<decltype(_______________)>;
+    if constexpr (std::is_same_v<T, int>) {
+        std::cout << "int: " << arg << std::endl;
+    }
+}, var);
+```
+
+Answer: `arg` - Deduce type from argument. std::visit applies visitor to variant. Type-safe variant access.
+
+#@@@@@@@@@@
+
+113. How do you implement the Pimpl idiom?
+
+Answer: Pointer to implementation in header, implementation in source. Example: `class Widget { struct Impl; std::unique_ptr<Impl> pImpl; };`. Reduce compilation dependencies, hide implementation.
+
+#@@@@@@@@@@
+
+114. Which of the following are initialization list benefits? (Multiple correct)
+A) Initialize const members
+B) Initialize references
+C) Initialize base classes
+D) More efficient than assignment
+E) All of the above
+
+Answer: E - All are benefits. Const members (must initialize), References (must initialize), Base classes (constructor chaining), Efficiency (direct initialization). Always prefer initialization lists.
+
+#@@@@@@@@@@
+
+115. Find the bug:
+```cpp
+std::vector<std::thread> threads;
+for (int i = 0; i < 10; ++i) {
+    threads.push_back(std::thread([i]{ std::cout << i; }));
+}
+// Bug: threads not joined
+for (auto& t : threads) t.join();
+```
+
+Answer: Actually no bug in this version - threads are joined. Common mistake is forgetting to join. Always join or detach threads.
+
+#@@@@@@@@@@
+
+116. What is the difference between std::make_shared and new?
+
+Answer: make_shared allocates object and control block together, more efficient, exception-safe. new separate allocations. make_shared preferred. Example: `auto ptr = std::make_shared<T>(args);`.
+
+#@@@@@@@@@@
+
+117. Which of the following are constexpr limitations (pre-C++20)? (Multiple correct)
+A) No virtual functions
+B) No try-catch
+C) Limited loops
+D) All of the above
+
+Answer: D - All were limitations. C++20 relaxed many restrictions. constexpr now supports virtual, try-catch, dynamic allocation. Increasingly powerful.
+
+#@@@@@@@@@@
+
+118. Complete this std::exchange usage:
+```cpp
+int a = 5;
+int b = std::exchange(a, _______________);
+// a is now 10, b is 5
+```
+
+Answer: `10` - Replace a with new value, return old value. std::exchange atomically swaps and returns. Useful in move operations.
+
+#@@@@@@@@@@
+
+119. How do you implement ADL (Argument-Dependent Lookup)?
+
+Answer: ADL finds functions in namespace of arguments. Example: `namespace N { struct S {}; void func(S); }` then `N::S s; func(s);` finds N::func. Enable operator overloading, swap idiom.
+
+#@@@@@@@@@@
+
+120. Which of the following are std::atomic operations? (Multiple correct)
+A) load
+B) store
+C) exchange
+D) compare_exchange_weak/strong
+E) fetch_add
+F) All of the above
+
+Answer: F - All are atomic operations. load (read), store (write), exchange (swap), compare_exchange (CAS), fetch_add (atomic increment). Lock-free programming primitives.
+
+#@@@@@@@@@@
+
+121. Find the bug:
+```cpp
+std::string getString() {
+    return std::string("Hello");
+}
+const std::string& ref = getString(); // Bug: dangling reference
+```
+
+Answer: Binding reference to temporary. Temporary destroyed, reference dangles. Fix: `std::string str = getString();`. Don't bind references to temporaries.
+
+#@@@@@@@@@@
+
+122. What is the difference between std::list and std::forward_list?
+
+Answer: std::list is doubly-linked, bidirectional iterators. std::forward_list is singly-linked, forward iterators only, more memory efficient. Use forward_list when only forward iteration needed.
+
+#@@@@@@@@@@
+
+123. Which of the following are ranges library features (C++20)? (Multiple correct)
+A) Views (lazy evaluation)
+B) Pipeable algorithms
+C) Projections
+D) Sentinels
+E) All of the above
+
+Answer: E - All are ranges features. Views (composable, lazy), Pipeable (operator|), Projections (transform before operation), Sentinels (end conditions). Modern iteration.
+
+#@@@@@@@@@@
+
+124. Complete this std::apply usage:
+```cpp
+auto add = [](int a, int b, int c) { return a + b + c; };
+std::tuple<int, int, int> args = {1, 2, 3};
+int result = std::apply(_______________, args);
+```
+
+Answer: `add` - Apply function to tuple elements. std::apply unpacks tuple as arguments. Functional programming utility.
+
+#@@@@@@@@@@
+
+125. How do you implement the NVI (Non-Virtual Interface) idiom?
+
+Answer: Public non-virtual interface calls private virtual implementation. Example: `public: void func() { doFunc(); } private: virtual void doFunc() = 0;`. Template method pattern. Separate interface from customization.
+
+#@@@@@@@@@@
+
+126. Which of the following are std::condition_variable methods? (Multiple correct)
+A) wait
+B) notify_one
+C) notify_all
+D) wait_for
+E) All of the above
+
+Answer: E - All are condition_variable methods. wait (block until notified), notify_one (wake one), notify_all (wake all), wait_for (timed wait). Thread synchronization.
+
+#@@@@@@@@@@
+
+127. Find the bug:
+```cpp
+std::mutex mtx;
+void func() {
+    mtx.lock();
+    if (error) return; // Bug: mutex not unlocked
+    mtx.unlock();
+}
+```
+
+Answer: Early return without unlock causes deadlock. Fix: use std::lock_guard or std::unique_lock. RAII for exception safety.
+
+#@@@@@@@@@@
+
+128. What is the difference between std::set and std::multiset?
+
+Answer: std::set stores unique elements. std::multiset allows duplicates. Both ordered. Use set for uniqueness, multiset for sorted collection with duplicates.
+
+#@@@@@@@@@@
+
+129. Which of the following are three-way comparison (<=>) results? (Multiple correct)
+A) std::strong_ordering
+B) std::weak_ordering
+C) std::partial_ordering
+D) All of the above
+
+Answer: D - All are comparison categories. strong (total order), weak (equivalent but not equal), partial (incomparable values like NaN). C++20 spaceship operator.
+
+#@@@@@@@@@@
+
+130. Complete this std::jthread usage (C++20):
+```cpp
+std::jthread t([](std::stop_token st) {
+    while (!st._______________()) {
+        // Work
+    }
+});
+// Automatically joins and requests stop
+```
+
+Answer: `stop_requested` - Check if stop requested. std::jthread auto-joins and supports cooperative cancellation. Improvement over std::thread.
+
+#@@@@@@@@@@
+
+131. How do you implement the CRTP (Curiously Recurring Template Pattern)?
+
+Answer: Derive from template base with derived type. Example: `template<typename Derived> class Base {}; class Derived : public Base<Derived> {};`. Static polymorphism. Compile-time interface.
+
+#@@@@@@@@@@
+
+132. Which of the following are std::priority_queue operations? (Multiple correct)
+A) push
+B) pop
+C) top
+D) empty
+E) All of the above
+
+Answer: E - All are priority_queue operations. push (insert), pop (remove top), top (access top), empty (check empty). Heap-based container adapter.
+
+#@@@@@@@@@@
+
+133. Find the bug:
+```cpp
+class Base {
+public:
+    void func() { std::cout << "Base" << std::endl; }
+};
+class Derived : public Base {
+public:
+    void func() { std::cout << "Derived" << std::endl; }
+};
+Base* ptr = new Derived();
+ptr->func(); // Prints "Base" - not a bug, but might be unexpected
+```
+
+Answer: Not a bug but func() is not virtual. Static binding calls Base::func(). Make virtual for polymorphism. Understand virtual vs non-virtual.
+
+#@@@@@@@@@@
+
+134. What is the difference between std::stack and std::queue?
+
+Answer: std::stack is LIFO (Last In First Out), operations: push, pop, top. std::queue is FIFO (First In First Out), operations: push, pop, front, back. Different access patterns.
+
+#@@@@@@@@@@
+
+135. Which of the following are designated initializers (C++20)? (Multiple correct)
+A) Struct member initialization by name
+B) Order must match declaration
+C) Clearer initialization
+D) All of the above
+
+Answer: D - All describe designated initializers. Example: `Point p{.x = 1, .y = 2};`. Named initialization. Borrowed from C99.
+
+#@@@@@@@@@@
+
+136. Complete this std::barrier usage (C++20):
+```cpp
+std::barrier sync_point(num_threads, []{
+    std::cout << "All threads reached barrier" << std::endl;
+});
+// In each thread:
+sync_point._______________();
+```
+
+Answer: `arrive_and_wait` - Wait for all threads. std::barrier for thread synchronization. Reusable synchronization point.
+
+#@@@@@@@@@@
+
+137. How do you implement the observer pattern in C++?
+
+Answer: Subject maintains list of observers, notifies on change. Example: `class Subject { std::vector<Observer*> observers; void notify() { for(auto o : observers) o->update(); } };`. Event-driven design.
+
+#@@@@@@@@@@
+
+138. Which of the following are std::bitset operations? (Multiple correct)
+A) set/reset
+B) flip
+C) test
+D) count
+E) All of the above
+
+Answer: E - All are bitset operations. set/reset (modify bits), flip (toggle), test (check bit), count (count set bits). Fixed-size bit array.
+
+#@@@@@@@@@@
+
+139. Find the bug:
+```cpp
+std::vector<int> vec = {1, 2, 3};
+int* ptr = &vec[0];
+vec.reserve(100);
+std::cout << *ptr << std::endl; // Bug: potential dangling pointer
+```
+
+Answer: reserve() may reallocate, invalidating pointers. Fix: get pointer after reserve or use indices. Vector reallocation invalidates iterators/pointers.
+
+#@@@@@@@@@@
+
+140. What is the difference between std::distance and pointer arithmetic?
+
+Answer: std::distance works with any iterator type, returns difference. Pointer arithmetic only for random access. std::distance is generic. Example: `std::distance(begin, end)`.
+
+#@@@@@@@@@@
+
+141. Which of the following are std::expected features (C++23)? (Multiple correct)
+A) Error handling without exceptions
+B) Contains value or error
+C) Monadic operations
+D) All of the above
+
+Answer: D - All are expected features. Value or error (like Result in Rust), Monadic (and_then, or_else), No exceptions. Modern error handling.
+
+#@@@@@@@@@@
+
+142. Complete this std::source_location usage (C++20):
+```cpp
+void log(std::string_view msg,
+         std::source_location loc = std::source_location::_______________()) {
+    std::cout << loc.file_name() << ":" << loc.line() << " " << msg;
+}
+```
+
+Answer: `current` - Capture call site location. std::source_location for debugging. Replaces __FILE__ and __LINE__ macros.
+
+#@@@@@@@@@@
+
+143. How do you implement the factory pattern in C++?
+
+Answer: Static method creates objects. Example: `class Factory { public: static std::unique_ptr<Base> create(Type t); };`. Encapsulate object creation. Return smart pointers.
+
+#@@@@@@@@@@
+
+144. Which of the following are std::valarray features? (Multiple correct)
+A) Numeric array
+B) Element-wise operations
+C) Slicing
+D) Mathematical operations
+E) All of the above
+
+Answer: E - All are valarray features. Numeric (numbers), Element-wise (vectorized), Slicing (subsets), Math (sin, cos, etc.). Specialized for numerical computing.
+
+#@@@@@@@@@@
+
+145. Find the bug:
+```cpp
+class Widget {
+    int* data;
+public:
+    Widget() : data(new int[10]) {}
+    Widget(const Widget& other) : data(other.data) {} // Bug: shallow copy
+    ~Widget() { delete[] data; }
+};
+```
+
+Answer: Shallow copy causes double delete. Fix: deep copy `data(new int[10])` and copy elements. Rule of three/five.
+
+#@@@@@@@@@@
+
+146. What is the difference between std::advance and std::next?
+
+Answer: std::advance modifies iterator in-place, returns void. std::next returns new iterator, doesn't modify original. advance for mutation, next for new iterator.
+
+#@@@@@@@@@@
+
+147. Which of the following are std::format features (C++20)? (Multiple correct)
+A) Type-safe formatting
+B) Python-like syntax
+C) Compile-time checking
+D) Extensible
+E) All of the above
+
+Answer: E - All are format features. Type-safe (no printf issues), Syntax ({} placeholders), Compile-time (errors caught early), Extensible (custom types). Modern formatting.
+
+#@@@@@@@@@@
+
+148. Complete this std::latch usage (C++20):
+```cpp
+std::latch done(num_tasks);
+// In each task:
+// ... do work ...
+done._______________();
+// Main thread:
+done.wait();
+```
+
+Answer: `count_down` - Decrement counter. std::latch for one-time synchronization. Single-use countdown.
+
+#@@@@@@@@@@
+
+149. How do you implement the strategy pattern in C++?
+
+Answer: Interface for algorithms, concrete implementations. Example: `class Strategy { virtual void execute() = 0; };`. Inject strategy into context. Runtime algorithm selection.
+
+#@@@@@@@@@@
+
+150. Which of the following represent modern C++ principles? (Multiple correct)
+A) RAII everywhere
+B) Prefer stack to heap
+C) Use smart pointers
+D) Const correctness
+E) Zero-cost abstractions
+F) All of the above
+
+Answer: F - All are modern C++ principles. RAII (automatic resource management), Stack (automatic lifetime), Smart pointers (no manual delete), Const (immutability), Zero-cost (performance). C++ combines high-level abstractions with low-level control, enabling safe, efficient systems programming without sacrificing performance.
+
+#@@@@@@@@@@
+
+151. How do you implement std::launder for object lifetime?
+
+Answer: std::launder obtains pointer to object in reused storage. Example: `new (ptr) T; T* p = std::launder(reinterpret_cast<T*>(ptr));`. Handle placement new correctly. Strict aliasing compliance.
+
+#@@@@@@@@@@
+
+152. Which of the following are std::mdspan features (C++23)? (Multiple correct)
+A) Multi-dimensional array view
+B) Non-owning
+C) Flexible layout
+D) All of the above
+
+Answer: D - All are mdspan features. Multi-dimensional (N-D arrays), Non-owning (view), Layout (row/column major). Modern multi-dimensional arrays.
+
+#@@@@@@@@@@
+
+153. Find the bug:
+```cpp
+std::shared_ptr<int> ptr1(new int(42));
+std::shared_ptr<int> ptr2(ptr1.get()); // Bug: double ownership
+```
+
+Answer: Creating two shared_ptrs from raw pointer causes double delete. Fix: `std::shared_ptr<int> ptr2 = ptr1;`. Share ownership correctly.
+
+#@@@@@@@@@@
+
+154. What is the output of this code?
+```cpp
+struct S { int a = 1; int b = 2; };
+auto [x, y] = S{};
+x = 10;
+S s{};
+std::cout << s.a << std::endl;
+```
+
+Answer: 1 - Structured binding creates copies. Modifying x doesn't affect S. Original struct unchanged.
+
+#@@@@@@@@@@
+
+155. Which of the following are std::generator features (C++23)? (Multiple correct)
+A) Coroutine-based
+B) Lazy evaluation
+C) Range interface
+D) All of the above
+
+Answer: D - All are generator features. Coroutine (co_yield), Lazy (on-demand), Range (iterable). Elegant sequence generation.
+
+#@@@@@@@@@@
+
+156. Complete this std::print usage (C++23):
+```cpp
+std::print("Hello, {}!\n", _______________);
+// Prints: Hello, World!
+```
+
+Answer: `"World"` - Format argument. std::print combines format and output. Simpler than format + cout.
+
+#@@@@@@@@@@
+
+157. How do you implement the decorator pattern in C++?
+
+Answer: Wrapper class with same interface. Example: `class Decorator : public Component { Component* wrapped; };`. Add behavior dynamically. Composition over inheritance.
+
+#@@@@@@@@@@
+
+158. Which of the following are std::flat_map features (C++23)? (Multiple correct)
+A) Contiguous storage
+B) Cache-friendly
+C) Sorted
+D) All of the above
+
+Answer: D - All are flat_map features. Contiguous (vector-based), Cache-friendly (better locality), Sorted (ordered). Performance alternative to std::map.
+
+#@@@@@@@@@@
+
+159. Find the bug:
+```cpp
+auto lambda = [](auto x) { return x + x; };
+std::string result = lambda("Hello"); // Bug: pointer arithmetic
+```
+
+Answer: "Hello" is const char*, + does pointer arithmetic not concatenation. Fix: use std::string. Type deduction pitfalls.
+
+#@@@@@@@@@@
+
+160. What is the difference between std::execution::seq and std::execution::par?
+
+Answer: seq is sequential execution. par is parallel execution. Execution policies for parallel algorithms. Example: `std::sort(std::execution::par, begin, end);`. C++17 parallel algorithms.
+
+#@@@@@@@@@@
+
+161. Which of the following are std::stacktrace features (C++23)? (Multiple correct)
+A) Capture call stack
+B) Debugging aid
+C) Exception context
+D) All of the above
+
+Answer: D - All are stacktrace features. Capture (current stack), Debugging (trace errors), Exception (attach to exceptions). Better error diagnostics.
+
+#@@@@@@@@@@
+
+162. Complete this std::to_underlying usage (C++23):
+```cpp
+enum class Color { Red, Green, Blue };
+Color c = Color::Red;
+int value = std::_______________(c);
+```
+
+Answer: `to_underlying` - Convert enum to underlying type. Type-safe enum conversion. Cleaner than static_cast.
+
+#@@@@@@@@@@
+
+163. How do you implement the command pattern in C++?
+
+Answer: Encapsulate request as object. Example: `class Command { virtual void execute() = 0; };`. Queue, log, undo operations. Decouple sender from receiver.
+
+#@@@@@@@@@@
+
+164. Which of the following are std::out_ptr features (C++23)? (Multiple correct)
+A) Interop with C APIs
+B) Smart pointer output parameters
+C) Automatic ownership transfer
+D) All of the above
+
+Answer: D - All are out_ptr features. C APIs (legacy interop), Output parameters (T**), Ownership (automatic). Bridge smart pointers and C.
+
+#@@@@@@@@@@
+
+165. Find the bug:
+```cpp
+std::vector<bool> flags(10);
+auto& ref = flags[0]; // Bug: can't get reference to bool
+```
+
+Answer: std::vector<bool> returns proxy, not bool&. Can't bind reference. Fix: use auto without & or different container. Specialization quirk.
+
+#@@@@@@@@@@
+
+166. What is the difference between std::reduce and std::accumulate?
+
+Answer: std::reduce allows parallel execution, no order guarantee. std::accumulate sequential, left-to-right. reduce for parallelism, accumulate for order-dependent operations.
+
+#@@@@@@@@@@
+
+167. Which of the following are std::unreachable features (C++23)? (Multiple correct)
+A) Optimization hint
+B) Undefined behavior if reached
+C) Better code generation
+D) All of the above
+
+Answer: D - All describe unreachable. Hint (compiler optimization), UB (if reached), Codegen (eliminate dead code). Use carefully.
+
+#@@@@@@@@@@
+
+168. Complete this std::assume_aligned usage:
+```cpp
+void* ptr = aligned_alloc(64, size);
+int* aligned = std::_______________<64, int>(ptr);
+```
+
+Answer: `assume_aligned` - Tell compiler about alignment. Enable optimizations. Vectorization hint.
+
+#@@@@@@@@@@
+
+169. How do you implement the adapter pattern in C++?
+
+Answer: Convert interface to another. Example: `class Adapter : public Target { Adaptee* adaptee; };`. Make incompatible interfaces work together. Wrapper pattern.
+
+#@@@@@@@@@@
+
+170. Which of the following are std::byteswap features (C++23)? (Multiple correct)
+A) Endianness conversion
+B) Constexpr
+C) Type-safe
+D) All of the above
+
+Answer: D - All are byteswap features. Endianness (byte order), Constexpr (compile-time), Type-safe (template). Network byte order conversion.
+
+#@@@@@@@@@@
+
+171. Find the bug:
+```cpp
+std::string_view sv = std::string("temp");
+std::cout << sv << std::endl; // Bug: dangling view
+```
+
+Answer: string_view points to temporary string. Temporary destroyed, view dangles. Fix: store string or ensure lifetime. View lifetime management.
+
+#@@@@@@@@@@
+
+172. What is the difference between std::transform and std::for_each?
+
+Answer: std::transform writes results to output iterator, returns iterator. std::for_each applies function for side effects, returns function. transform for mapping, for_each for iteration.
+
+#@@@@@@@@@@
+
+173. Which of the following are std::expected monadic operations (C++23)? (Multiple correct)
+A) and_then
+B) or_else
+C) transform
+D) All of the above
+
+Answer: D - All are monadic operations. and_then (chain on success), or_else (handle error), transform (map value). Functional error handling.
+
+#@@@@@@@@@@
+
+174. Complete this std::start_lifetime_as usage (C++23):
+```cpp
+alignas(T) std::byte storage[sizeof(T)];
+T* ptr = std::_______________<T>(storage);
+```
+
+Answer: `start_lifetime_as` - Start object lifetime without construction. Low-level memory management. Implicit object creation.
+
+#@@@@@@@@@@
+
+175. How do you implement the composite pattern in C++?
+
+Answer: Tree structure of objects. Example: `class Component { virtual void operation() = 0; }; class Composite : public Component { std::vector<Component*> children; };`. Uniform treatment of individuals and compositions.
+
+#@@@@@@@@@@
+
+176. Which of the following are std::move_only_function features (C++23)? (Multiple correct)
+A) Move-only callable wrapper
+B) No copy overhead
+C) Unique ownership
+D) All of the above
+
+Answer: D - All are move_only_function features. Move-only (can't copy), No overhead (no shared_ptr), Unique (exclusive). Efficient function wrapper.
+
+#@@@@@@@@@@
+
+177. Find the bug:
+```cpp
+std::vector<int> vec = {1, 2, 3};
+auto it = vec.begin();
+vec.clear();
+std::cout << *it << std::endl; // Bug: iterator invalidated
+```
+
+Answer: clear() invalidates all iterators. Dereferencing invalid iterator is undefined behavior. Fix: don't use iterators after modification.
+
+#@@@@@@@@@@
+
+178. What is the difference between std::copy and std::move (algorithm)?
+
+Answer: std::copy copies elements. std::move (algorithm) moves elements using move semantics. copy for preservation, move for transfer. Different from std::move (cast).
+
+#@@@@@@@@@@
+
+179. Which of the following are std::is_scoped_enum features (C++23)? (Multiple correct)
+A) Type trait
+B) Detect enum class
+C) Compile-time check
+D) All of the above
+
+Answer: D - All describe is_scoped_enum. Type trait (metaprogramming), Enum class (scoped), Compile-time (constexpr). Distinguish enum types.
+
+#@@@@@@@@@@
+
+180. Complete this std::reference_wrapper usage:
+```cpp
+int x = 42;
+std::vector<std::_______________<int>> refs;
+refs.push_back(std::ref(x));
+```
+
+Answer: `reference_wrapper` - Store references in containers. Copyable reference wrapper. Enable reference semantics in containers.
+
+#@@@@@@@@@@
+
+181. How do you implement the proxy pattern in C++?
+
+Answer: Surrogate controls access to object. Example: `class Proxy : public Subject { RealSubject* real; };`. Lazy initialization, access control, remote proxy. Indirection layer.
+
+#@@@@@@@@@@
+
+182. Which of the following are std::ranges::to features (C++23)? (Multiple correct)
+A) Convert range to container
+B) Convenient syntax
+C) Type deduction
+D) All of the above
+
+Answer: D - All are ranges::to features. Convert (range to container), Syntax (pipeline), Deduction (automatic type). Example: `vec | filter | to<vector>()`.
+
+#@@@@@@@@@@
+
+183. Find the bug:
+```cpp
+int arr[5] = {1, 2, 3, 4, 5};
+int* ptr = arr;
+delete ptr; // Bug: deleting array allocated on stack
+```
+
+Answer: Can't delete stack-allocated array. Only delete heap-allocated memory. Undefined behavior. Use delete[] for arrays from new[].
+
+#@@@@@@@@@@
+
+184. What is the difference between std::all_of and std::any_of?
+
+Answer: std::all_of checks if predicate true for all elements. std::any_of checks if true for at least one. all_of for universal, any_of for existential quantification.
+
+#@@@@@@@@@@
+
+185. Which of the following are std::views::zip features (C++23)? (Multiple correct)
+A) Combine multiple ranges
+B) Tuple of elements
+C) Lazy evaluation
+D) All of the above
+
+Answer: D - All are zip features. Combine (multiple ranges), Tuple (paired elements), Lazy (view). Iterate multiple ranges together.
+
+#@@@@@@@@@@
+
+186. Complete this std::hardware_destructive_interference_size usage:
+```cpp
+alignas(std::_______________) int counter1;
+alignas(std::hardware_destructive_interference_size) int counter2;
+// Prevent false sharing
+```
+
+Answer: `hardware_destructive_interference_size` - Cache line size for avoiding false sharing. Performance optimization. Concurrent programming.
+
+#@@@@@@@@@@
+
+187. How do you implement the bridge pattern in C++?
+
+Answer: Separate abstraction from implementation. Example: `class Abstraction { Implementation* impl; };`. Decouple interface from implementation. Vary independently.
+
+#@@@@@@@@@@
+
+188. Which of the following are std::views::enumerate features (C++23)? (Multiple correct)
+A) Index-value pairs
+B) Lazy view
+C) Convenient iteration
+D) All of the above
+
+Answer: D - All are enumerate features. Index-value (paired), Lazy (view), Convenient (no manual counter). Python-like enumeration.
+
+#@@@@@@@@@@
+
+189. Find the bug:
+```cpp
+std::unique_ptr<int[]> arr(new int[10]);
+int* ptr = arr.get();
+arr.reset();
+std::cout << ptr[0] << std::endl; // Bug: use after free
+```
+
+Answer: reset() deletes array, ptr becomes dangling. Undefined behavior. Fix: don't use raw pointer after reset. Smart pointer ownership.
+
+#@@@@@@@@@@
+
+190. What is the difference between std::min_element and std::min?
+
+Answer: std::min_element finds minimum in range, returns iterator. std::min compares values, returns minimum value. min_element for ranges, min for values.
+
+#@@@@@@@@@@
+
+191. Which of the following are std::views::chunk features (C++23)? (Multiple correct)
+A) Split range into chunks
+B) Fixed size groups
+C) Lazy view
+D) All of the above
+
+Answer: D - All are chunk features. Split (partition), Fixed size (n elements), Lazy (view). Batch processing.
+
+#@@@@@@@@@@
+
+192. Complete this std::unreachable usage:
+```cpp
+int getValue(Color c) {
+    switch(c) {
+        case Color::Red: return 1;
+        case Color::Blue: return 2;
+    }
+    std::_______________();
+}
+```
+
+Answer: `unreachable` - Indicate unreachable code. Optimization hint. Better than undefined behavior.
+
+#@@@@@@@@@@
+
+193. How do you implement the flyweight pattern in C++?
+
+Answer: Share common state among objects. Example: `class FlyweightFactory { std::map<Key, Flyweight*> pool; };`. Reduce memory usage. Object pooling.
+
+#@@@@@@@@@@
+
+194. Which of the following are std::views::slide features (C++23)? (Multiple correct)
+A) Sliding window
+B) Overlapping chunks
+C) Lazy view
+D) All of the above
+
+Answer: D - All are slide features. Sliding window (moving window), Overlapping (shared elements), Lazy (view). Window-based processing.
+
+#@@@@@@@@@@
+
+195. Find the bug:
+```cpp
+std::map<int, std::string> map;
+map[1] = "one";
+const auto& value = map[2]; // Bug: creates entry
+```
+
+Answer: operator[] creates entry if not exists. For const access use at() or find(). Unexpected modification.
+
+#@@@@@@@@@@
+
+196. What is the difference between std::partial_sort and std::nth_element?
+
+Answer: partial_sort sorts first n elements. nth_element partitions around nth element, no full sort. partial_sort for top-k, nth_element for median/percentile.
+
+#@@@@@@@@@@
+
+197. Which of the following are std::views::join_with features (C++23)? (Multiple correct)
+A) Join ranges with delimiter
+B) Flatten with separator
+C) Lazy view
+D) All of the above
+
+Answer: D - All are join_with features. Join (combine), Delimiter (separator), Lazy (view). String join for ranges.
+
+#@@@@@@@@@@
+
+198. Complete this comprehensive C++ application structure:
+```cpp
+// include/ - Public headers
+// src/ - Implementation files
+// tests/ - Unit tests
+// CMakeLists.txt - Build configuration
+// Modern C++: modules, concepts, ranges
+// Best practices: RAII, smart pointers, const correctness
+```
+
+Answer: Standard C++ project structure. Separation of interface and implementation. Modern C++ features. Build system integration. Professional organization.
+
+#@@@@@@@@@@
+
+199. How do you implement the memento pattern in C++?
+
+Answer: Capture and restore object state. Example: `class Memento { State state; }; class Originator { Memento createMemento(); void restore(Memento); };`. Undo/redo functionality. State preservation.
+
+#@@@@@@@@@@
+
+200. Which of the following represent C++ evolution and future? (Multiple correct)
+A) Continuous modernization
+B) Zero-overhead principle
+C) Backward compatibility
+D) Performance and safety
+E) Rich standard library
+F) All of the above
+
+Answer: F - All represent C++ evolution. Modernization (C++11/14/17/20/23), Zero-overhead (abstraction without cost), Compatibility (legacy code works), Performance and safety (both goals), Standard library (comprehensive). C++ continues to evolve, adding modern features while maintaining its core principles of performance, control, and zero-overhead abstractions. From systems programming to game development, high-frequency trading to embedded systems, C++ remains the language of choice when performance and resource control are critical. The language successfully balances low-level control with high-level abstractions, enabling developers to write efficient, maintainable, and safe code.
+
+#@@@@@@@@@@

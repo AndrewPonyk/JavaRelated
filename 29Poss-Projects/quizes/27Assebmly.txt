@@ -1,0 +1,200 @@
+Assembly Quiz - 200 Questions
+Tech Stack: CPU Architecture (x86, ARM), Registers, Instruction Set (Opcodes), Assembler (NASM, MASM), Machine Code (Binary), Memory Addressing, System Calls (Interrupts), Linker
+
+1. Which of the following are x86-64 general-purpose registers? (Multiple correct)
+A) RAX
+B) RBX
+C) RCX
+D) RDX
+E) RSI
+F) RDI
+
+Answer: A, B, C, D, E, F - All are x86-64 64-bit general-purpose registers. RAX (accumulator), RBX (base), RCX (counter), RDX (data), RSI (source index), RDI (destination index). Also have R8-R15 in 64-bit mode.
+
+#@@@@@@@@@@
+
+2. Complete this x86 NASM assembly code:
+```nasm
+section .data
+    msg db 'Hello, World!', 0xA
+    len equ $ - msg
+
+section .text
+    global _start
+
+_start:
+    ; Write to stdout
+    mov rax, 1          ; sys_write
+    mov rdi, 1          ; stdout
+    mov rsi, msg        ; message address
+    mov rdx, len        ; message length
+    _______________     ; make system call
+
+    ; Exit
+    mov rax, 60         ; sys_exit
+    xor rdi, rdi        ; exit code 0
+    syscall
+```
+
+Answer: `syscall` - Make system call in x86-64. In 32-bit x86, use `int 0x80`. syscall instruction transfers control to kernel for system operations.
+
+#@@@@@@@@@@
+
+3. What is the difference between RISC and CISC architectures?
+
+Answer: RISC (Reduced Instruction Set) has simple instructions, fixed length, load/store architecture, more registers, pipelined execution, examples: ARM, MIPS. CISC (Complex Instruction Set) has complex instructions, variable length, memory operations, fewer registers, examples: x86. RISC is simpler hardware, CISC is denser code.
+
+#@@@@@@@@@@
+
+4. Which of the following are ARM instruction types? (Multiple correct)
+A) Data processing
+B) Load/Store
+C) Branch
+D) Multiply
+E) Status register access
+F) Coprocessor
+
+Answer: A, B, C, D, E, F - All are ARM instruction types. Data processing (arithmetic/logic), Load/Store (memory access), Branch (control flow), Multiply (multiplication), Status register (CPSR/SPSR), Coprocessor (specialized operations). ARM uses load/store architecture.
+
+#@@@@@@@@@@
+
+5. Find the bug in this assembly code:
+```nasm
+section .text
+global factorial
+
+factorial:
+    push rbp
+    mov rbp, rsp
+
+    ; Bug: no base case check
+    mov rax, rdi        ; n
+    dec rdi             ; n-1
+    call factorial      ; recursive call
+    imul rax, rdi       ; n * factorial(n-1)
+
+    pop rbp
+    ret
+```
+
+Answer: Missing base case check - infinite recursion. Should check if rdi <= 1 and return 1. Also, rdi is modified before multiplication, should save it. Correct: check base case, save registers, proper recursion.
+
+#@@@@@@@@@@
+
+6. How do you implement function calling conventions in x86-64?
+
+Answer: System V AMD64 ABI: arguments in RDI, RSI, RDX, RCX, R8, R9, then stack. Return value in RAX. Caller-saved: RAX, RCX, RDX, RSI, RDI, R8-R11. Callee-saved: RBX, RSP, RBP, R12-R15. Stack 16-byte aligned. Windows x64 uses different convention (RCX, RDX, R8, R9).
+
+#@@@@@@@@@@
+
+7. Which of the following are memory addressing modes? (Multiple correct)
+A) Immediate
+B) Register direct
+C) Register indirect
+D) Base + displacement
+E) Indexed
+F) PC-relative
+
+Answer: A, B, C, D, E, F - All are addressing modes. Immediate (constant), Register direct (register value), Register indirect ([reg]), Base + displacement ([reg + offset]), Indexed ([base + index*scale]), PC-relative (relative to program counter). Different modes for different access patterns.
+
+#@@@@@@@@@@
+
+8. Complete this ARM assembly function:
+```arm
+.global add_numbers
+.type add_numbers, %function
+
+add_numbers:
+    ; Function: int add_numbers(int a, int b)
+    ; Arguments: r0 = a, r1 = b
+    ; Return: r0 = a + b
+
+    _______________ r0, r0, r1
+    bx lr           ; return
+```
+
+Answer: `add` - ARM add instruction. Syntax: `add rd, rn, rm` adds rn and rm, stores in rd. `bx lr` returns to caller (branch and exchange to link register).
+
+#@@@@@@@@@@
+
+9. What is the difference between little-endian and big-endian?
+
+Answer: Little-endian stores least significant byte first (x86, ARM default), 0x12345678 stored as 78 56 34 12. Big-endian stores most significant byte first (network byte order, some ARM), stored as 12 34 56 78. Affects multi-byte data interpretation, important for network protocols and file formats.
+
+#@@@@@@@@@@
+
+10. Which of the following are x86 flags in EFLAGS/RFLAGS register? (Multiple correct)
+A) CF (Carry Flag)
+B) ZF (Zero Flag)
+C) SF (Sign Flag)
+D) OF (Overflow Flag)
+E) PF (Parity Flag)
+F) DF (Direction Flag)
+
+Answer: A, B, C, D, E, F - All are x86 flags. CF (carry/borrow), ZF (result zero), SF (result negative), OF (signed overflow), PF (even parity), DF (string direction). Flags set by arithmetic/logic operations, used for conditional branching.
+
+#@@@@@@@@@@
+
+11. Predict the output of this assembly code:
+```nasm
+section .text
+global _start
+
+_start:
+    mov eax, 5
+    mov ebx, 3
+    add eax, ebx    ; eax = 5 + 3 = 8
+    shl eax, 1      ; eax = 8 << 1 = 16
+    sub eax, 4      ; eax = 16 - 4 = 12
+
+    ; Exit with code in eax
+    mov ebx, eax
+    mov eax, 1
+    int 0x80
+```
+
+Answer: Exit code 12. Operations: 5 + 3 = 8, 8 << 1 = 16, 16 - 4 = 12. The program exits with code 12 (stored in ebx for sys_exit).
+
+#@@@@@@@@@@
+
+12. How do you implement inline assembly in C?
+
+Answer: GCC/Clang use `asm` or `__asm__` keyword. Syntax: `asm("assembly code" : outputs : inputs : clobbers)`. Example: `asm("addl %%ebx, %%eax" : "=a"(result) : "a"(x), "b"(y))`. Use `volatile` to prevent optimization. Inline assembly allows mixing C and assembly for performance-critical code.
+
+#@@@@@@@@@@
+
+13. Which of the following are linker responsibilities? (Multiple correct)
+A) Symbol resolution
+B) Relocation
+C) Library linking
+D) Section merging
+E) Address assignment
+F) Dead code elimination
+
+Answer: A, B, C, D, E, F - All are linker tasks. Symbol resolution (match references), Relocation (adjust addresses), Library linking (static/dynamic), Section merging (combine sections), Address assignment (final addresses), Dead code elimination (remove unused). Linker creates executable from object files.
+
+#@@@@@@@@@@
+
+14. Complete this system call wrapper:
+```nasm
+section .text
+global my_write
+
+my_write:
+    ; ssize_t my_write(int fd, const void *buf, size_t count)
+    ; Arguments: rdi = fd, rsi = buf, rdx = count
+
+    mov rax, _______________  ; sys_write syscall number
+    syscall
+    ret
+```
+
+Answer: `1` - sys_write syscall number on Linux x86-64. System call numbers defined in kernel headers. Different syscalls have different numbers (read=0, write=1, open=2, etc.).
+
+#@@@@@@@@@@
+
+15. What is the difference between static and dynamic linking?
+
+Answer: Static linking embeds libraries in executable, larger file, no runtime dependencies, faster startup, version locked. Dynamic linking uses shared libraries (.so/.dll), smaller executable, runtime dependencies, slower startup, version updates, memory sharing. Choose based on deployment requirements.
+
+#@@@@@@@@@@

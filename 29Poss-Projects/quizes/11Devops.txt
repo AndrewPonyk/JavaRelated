@@ -1,0 +1,2660 @@
+DevOps Quiz - 200 Questions
+Tech Stack: Jenkins, Github Actions, Docker, K8s, Ansible, Terraform, Prometheus, Grafana, ELK, GitLab CI/CD, Azure DevOps
+
+1. Which of the following are Docker commands? (Multiple correct)
+A) docker build
+B) docker run
+C) docker push
+D) docker pull
+E) docker exec
+F) docker compose
+
+Answer: A, B, C, D, E, F - All are Docker commands. build (create images), run (start containers), push (upload to registry), pull (download from registry), exec (execute in running container), compose (multi-container applications).
+
+#@@@@@@@@@@
+
+2. Complete this Dockerfile:
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+EXPOSE 3000
+USER _______________
+CMD ["npm", "start"]
+```
+
+Answer: `node` or `1000` - Use non-root user for security. The node image includes a 'node' user, or specify numeric UID like 1000. Running containers as root is a security risk.
+
+#@@@@@@@@@@
+
+3. What is the difference between Kubernetes Deployment and StatefulSet?
+
+Answer: Deployment manages stateless applications, pods are interchangeable, no persistent identity. StatefulSet manages stateful applications, pods have stable network identity, ordered deployment/scaling, persistent storage. Use Deployment for web servers, StatefulSet for databases.
+
+#@@@@@@@@@@
+
+4. Which of the following are Jenkins pipeline types? (Multiple correct)
+A) Declarative Pipeline
+B) Scripted Pipeline
+C) Multibranch Pipeline
+D) Blue Ocean Pipeline
+E) Freestyle Project
+F) Pipeline as Code
+
+Answer: A, B, C, E, F - All except Blue Ocean Pipeline are Jenkins pipeline types. Declarative (structured syntax), Scripted (Groovy script), Multibranch (branch-based), Freestyle (traditional jobs), Pipeline as Code (Jenkinsfile). Blue Ocean is a UI, not a pipeline type.
+
+#@@@@@@@@@@
+
+5. Find the issue in this GitHub Actions workflow:
+```yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm install
+      - run: npm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Deploying to production"
+```
+
+Answer: Missing dependency between jobs. Deploy job should only run after test job succeeds and only on main branch. Add `needs: test` and `if: github.ref == 'refs/heads/main'` to deploy job.
+
+#@@@@@@@@@@
+
+6. How do you manage secrets in Kubernetes?
+
+Answer: Use Kubernetes Secrets to store sensitive data (passwords, tokens, keys). Create with `kubectl create secret`, reference in pods via environment variables or mounted volumes. Use external secret management (Vault, AWS Secrets Manager) for production. Enable encryption at rest.
+
+#@@@@@@@@@@
+
+7. Which of the following are Ansible modules? (Multiple correct)
+A) copy
+B) template
+C) service
+D) yum/apt
+E) user
+F) file
+
+Answer: A, B, C, D, E, F - All are Ansible modules. copy (copy files), template (Jinja2 templates), service (manage services), yum/apt (package management), user (user management), file (file operations). Ansible has hundreds of built-in modules.
+
+#@@@@@@@@@@
+
+8. Complete this Terraform configuration:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1d0"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "WebServer"
+  }
+}
+
+output "instance_ip" {
+  value = aws_instance.web._______________
+}
+```
+
+Answer: `public_ip` or `private_ip` - Reference the instance's IP address attribute. Use public_ip for internet-accessible instances, private_ip for internal communication.
+
+#@@@@@@@@@@
+
+9. What is the difference between Docker and Kubernetes?
+
+Answer: Docker is containerization platform for packaging applications. Kubernetes is container orchestration platform for managing containerized applications at scale. Docker creates containers, Kubernetes manages clusters of containers with scheduling, scaling, networking, and service discovery.
+
+#@@@@@@@@@@
+
+10. Which of the following are Prometheus metric types? (Multiple correct)
+A) Counter
+B) Gauge
+C) Histogram
+D) Summary
+E) Timer
+F) Meter
+
+Answer: A, B, C, D - Prometheus metric types are Counter (monotonic increasing), Gauge (arbitrary values), Histogram (observations in buckets), Summary (quantiles). Timer and Meter are not Prometheus metric types but exist in other monitoring systems.
+
+#@@@@@@@@@@
+
+11. Predict the output of this kubectl command:
+```bash
+kubectl get pods -l app=nginx --field-selector=status.phase=Running
+```
+
+Answer: Lists all running pods with label app=nginx. Shows pod names, ready status, status phase, restarts, and age. Only pods in Running phase with the specified label will be displayed. Empty output if no matching pods exist.
+
+#@@@@@@@@@@
+
+12. How do you implement blue-green deployment?
+
+Answer: Maintain two identical production environments (blue/green). Deploy new version to inactive environment, test thoroughly, switch traffic via load balancer. Provides zero-downtime deployment and instant rollback capability. Can use Kubernetes, AWS ELB, or other traffic routing mechanisms.
+
+#@@@@@@@@@@
+
+13. Which of the following are GitLab CI/CD features? (Multiple correct)
+A) Pipeline stages
+B) Parallel jobs
+C) Artifacts
+D) Environments
+E) Auto DevOps
+F) Container Registry
+
+Answer: A, B, C, D, E, F - All are GitLab CI/CD features. Pipeline stages (sequential execution), parallel jobs (concurrent execution), artifacts (build outputs), environments (deployment targets), Auto DevOps (automated pipelines), Container Registry (image storage).
+
+#@@@@@@@@@@
+
+14. Complete this Ansible playbook:
+```yaml
+---
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Install nginx
+      _______________:
+        name: nginx
+        state: present
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+```
+
+Answer: `package` or `yum`/`apt` - Use the package module for cross-platform package management, or specific modules like yum (RHEL/CentOS) or apt (Debian/Ubuntu) for distribution-specific package management.
+
+#@@@@@@@@@@
+
+15. What is Infrastructure as Code (IaC) and why is it important?
+
+Answer: IaC manages infrastructure through code rather than manual processes. Provides version control, repeatability, consistency, automation. Tools like Terraform, CloudFormation, Ansible enable declarative infrastructure definition. Benefits include reduced errors, faster provisioning, better collaboration, audit trails.
+
+#@@@@@@@@@@
+
+16. Which of the following are Kubernetes service types? (Multiple correct)
+A) ClusterIP
+B) NodePort
+C) LoadBalancer
+D) ExternalName
+E) Headless
+F) All of the above
+
+Answer: F - All are Kubernetes service types. ClusterIP (internal only, default), NodePort (exposes on node port), LoadBalancer (cloud load balancer), ExternalName (DNS CNAME), Headless (no cluster IP, direct pod access). Choose based on access requirements.
+
+#@@@@@@@@@@
+
+17. Complete this Terraform configuration:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "WebServer"
+    Environment = var._______________
+  }
+}
+
+output "instance_ip" {
+  value = aws_instance.web._______________
+}
+```
+
+Answer: First blank: `environment` (variable name), Second blank: `public_ip` or `private_ip` - Use variables for reusability, output important values. Terraform manages infrastructure declaratively.
+
+#@@@@@@@@@@
+
+18. How do you implement blue-green deployment?
+
+Answer: Maintain two identical environments (blue=current, green=new). Deploy to green, test thoroughly. Switch traffic from blue to green (load balancer, DNS). Keep blue for rollback. Benefits: zero downtime, easy rollback. Requires double infrastructure. Kubernetes: use services with label selectors.
+
+#@@@@@@@@@@
+
+19. Which of the following are Prometheus metric types? (Multiple correct)
+A) Counter
+B) Gauge
+C) Histogram
+D) Summary
+E) Timer
+F) A, B, C, D only
+
+Answer: F - Counter (cumulative, increases only), Gauge (can increase/decrease), Histogram (observations in buckets), Summary (quantiles). Timer is not a Prometheus metric type. Choose based on data characteristics.
+
+#@@@@@@@@@@
+
+20. Find the issue in this Kubernetes deployment:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: app
+        image: myapp:latest  # Issue: using 'latest' tag
+        ports:
+        - containerPort: 8080
+```
+
+Answer: Using 'latest' tag is problematic - not reproducible, unclear version, can cause inconsistencies. Use specific version tags: `myapp:1.2.3`. Also missing resource limits, health checks, security context.
+
+#@@@@@@@@@@
+
+21. What is the difference between Docker and containerd?
+
+Answer: Docker is complete container platform (CLI, API, build, runtime). containerd is container runtime (part of Docker), manages container lifecycle. Docker uses containerd internally. Kubernetes can use containerd directly, bypassing Docker. containerd is lighter, focused on runtime.
+
+#@@@@@@@@@@
+
+22. Which of the following are GitLab CI/CD features? (Multiple correct)
+A) Pipelines
+B) Runners
+C) Artifacts
+D) Environments
+E) Auto DevOps
+F) All of the above
+
+Answer: F - All are GitLab CI/CD features. Pipelines (workflow), Runners (execute jobs), Artifacts (build outputs), Environments (deployment targets), Auto DevOps (automatic pipelines). Integrated with GitLab repository.
+
+#@@@@@@@@@@
+
+23. Complete this Ansible playbook:
+```yaml
+---
+- name: Configure web servers
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: _______________
+        enabled: yes
+```
+
+Answer: `started` - Ensure service is running. state options: started, stopped, restarted, reloaded. enabled: yes ensures service starts on boot. Ansible is idempotent.
+
+#@@@@@@@@@@
+
+24. How do you implement canary deployment in Kubernetes?
+
+Answer: Deploy new version alongside old with small percentage of traffic. Use service mesh (Istio) or Ingress controller for traffic splitting. Monitor metrics (errors, latency). Gradually increase traffic to canary. Rollback if issues detected. Example: 90% v1, 10% v2, then 50/50, then 100% v2.
+
+#@@@@@@@@@@
+
+25. Which of the following are Docker Compose features? (Multiple correct)
+A) Multi-container applications
+B) Service dependencies
+C) Volume management
+D) Network configuration
+E) Environment variables
+F) All of the above
+
+Answer: F - All are Docker Compose features. Define multi-container apps in YAML, manage dependencies (depends_on), volumes (persistence), networks (isolation), environment variables (configuration). Simplifies local development.
+
+#@@@@@@@@@@
+
+26. Find the issue in this Jenkins pipeline:
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // Issue: deploying without approval
+                sh 'kubectl apply -f deployment.yaml'
+            }
+        }
+    }
+}
+```
+
+Answer: Missing approval/gate before production deployment. Add input step: `input message: 'Deploy to production?'`. Also missing error handling, credentials management, environment-specific configuration.
+
+#@@@@@@@@@@
+
+27. What is the difference between Ansible and Terraform?
+
+Answer: Ansible is configuration management, procedural, agentless, push-based, good for application deployment and configuration. Terraform is infrastructure provisioning, declarative, manages state, good for cloud resources. Use Terraform for infrastructure, Ansible for configuration. Can be used together.
+
+#@@@@@@@@@@
+
+28. Which of the following are Kubernetes objects? (Multiple correct)
+A) Pod
+B) Service
+C) Deployment
+D) ConfigMap
+E) Secret
+F) All of the above
+
+Answer: F - All are Kubernetes objects. Pod (container group), Service (networking), Deployment (replica management), ConfigMap (configuration), Secret (sensitive data). Defined in YAML/JSON, managed by Kubernetes API.
+
+#@@@@@@@@@@
+
+29. Complete this Prometheus query:
+```promql
+# Calculate request rate over 5 minutes
+rate(http_requests_total[_______________])
+
+# Calculate 95th percentile latency
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+```
+
+Answer: `5m` - Time range for rate calculation. rate() calculates per-second rate over time window. Use for counters. histogram_quantile() calculates percentiles from histogram metrics.
+
+#@@@@@@@@@@
+
+30. How do you implement rolling update in Kubernetes?
+
+Answer: Update Deployment with new image version. Kubernetes gradually replaces pods: `kubectl set image deployment/webapp app=myapp:2.0`. Configure strategy: maxSurge (extra pods), maxUnavailable (unavailable pods). Monitor rollout: `kubectl rollout status`. Rollback if needed: `kubectl rollout undo`.
+
+#@@@@@@@@@@
+
+31. Which of the following are Azure DevOps services? (Multiple correct)
+A) Azure Repos
+B) Azure Pipelines
+C) Azure Boards
+D) Azure Artifacts
+E) Azure Test Plans
+F) All of the above
+
+Answer: F - All are Azure DevOps services. Repos (Git repositories), Pipelines (CI/CD), Boards (work tracking), Artifacts (package management), Test Plans (testing). Integrated DevOps platform.
+
+#@@@@@@@@@@
+
+32. Find the issue in this docker-compose.yml:
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+    # Issue: no resource limits
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password123  # Issue: hardcoded password
+```
+
+Answer: Two issues: 1) No resource limits (memory, CPU) can cause resource exhaustion. Add: `deploy: resources: limits`. 2) Hardcoded password is security risk. Use environment variables or secrets: `${POSTGRES_PASSWORD}`.
+
+#@@@@@@@@@@
+
+33. What is the difference between horizontal and vertical scaling?
+
+Answer: Horizontal scaling adds more instances (scale out), better availability, load distribution, Kubernetes HPA. Vertical scaling increases resources per instance (scale up), simpler, limited by hardware, Kubernetes VPA. Horizontal preferred for cloud-native apps.
+
+#@@@@@@@@@@
+
+34. Which of the following are Grafana features? (Multiple correct)
+A) Dashboards
+B) Alerting
+C) Data sources
+D) Plugins
+E) Annotations
+F) All of the above
+
+Answer: F - All are Grafana features. Dashboards (visualization), Alerting (notifications), Data sources (Prometheus, InfluxDB, etc.), Plugins (extend functionality), Annotations (mark events). Powerful observability platform.
+
+#@@@@@@@@@@
+
+35. Complete this Kubernetes ConfigMap:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  database_url: "postgres://db:5432/mydb"
+  log_level: "info"
+  _______________: "3000"
+```
+
+Answer: `port` or any configuration key - ConfigMaps store non-sensitive configuration. Use in pods via environment variables or volume mounts. For sensitive data, use Secrets.
+
+#@@@@@@@@@@
+
+36. How do you implement GitOps?
+
+Answer: Git as single source of truth for infrastructure and applications. Declarative configuration in Git. Automated sync (ArgoCD, Flux). Pull-based deployment. Benefits: version control, audit trail, easy rollback, collaboration. Changes via pull requests, automated deployment.
+
+#@@@@@@@@@@
+
+37. Which of the following are ELK Stack components? (Multiple correct)
+A) Elasticsearch
+B) Logstash
+C) Kibana
+D) Beats
+E) Filebeat
+F) All of the above
+
+Answer: F - All are ELK/Elastic Stack components. Elasticsearch (search/storage), Logstash (processing), Kibana (visualization), Beats (lightweight shippers), Filebeat (log shipping). Centralized logging and analytics.
+
+#@@@@@@@@@@
+
+38. Find the issue in this Terraform code:
+```hcl
+resource "aws_s3_bucket" "data" {
+  bucket = "my-data-bucket"
+
+  # Issue: no versioning
+  # Issue: no encryption
+
+  tags = {
+    Environment = "production"
+  }
+}
+```
+
+Answer: Missing security features: 1) No versioning (data recovery). Add: `versioning { enabled = true }`. 2) No encryption. Add: `server_side_encryption_configuration`. Also missing access logging, public access block.
+
+#@@@@@@@@@@
+
+39. What is the difference between push and pull-based deployment?
+
+Answer: Push-based: CI/CD pushes changes to environment (Jenkins, GitLab CI), requires credentials in CI, less secure. Pull-based: agent pulls changes from Git (ArgoCD, Flux), GitOps pattern, more secure, better for Kubernetes. Pull-based preferred for cloud-native.
+
+#@@@@@@@@@@
+
+40. Which of the following are Docker networking modes? (Multiple correct)
+A) Bridge
+B) Host
+C) None
+D) Overlay
+E) Macvlan
+F) All of the above
+
+Answer: F - All are Docker network modes. Bridge (default, isolated), Host (use host network), None (no networking), Overlay (multi-host), Macvlan (MAC address). Choose based on requirements.
+
+#@@@@@@@@@@
+
+41. Complete this GitHub Actions workflow:
+```yaml
+name: CI/CD
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: _______________
+```
+
+Answer: `dist/` or `build/` - Path to build output directory. Artifacts persist between jobs, available for download. Use for deployment or sharing between jobs.
+
+#@@@@@@@@@@
+
+42. How do you implement service mesh with Istio?
+
+Answer: Install Istio control plane. Enable sidecar injection: `kubectl label namespace default istio-injection=enabled`. Deploy applications, Istio injects Envoy proxies. Configure traffic management (VirtualService, DestinationRule), security (mTLS), observability (metrics, tracing). Benefits: traffic control, security, observability without code changes.
+
+#@@@@@@@@@@
+
+43. Which of the following are Jenkins plugins? (Multiple correct)
+A) Pipeline
+B) Git
+C) Docker
+D) Kubernetes
+E) Blue Ocean
+F) All of the above
+
+Answer: F - All are popular Jenkins plugins. Pipeline (pipeline support), Git (Git integration), Docker (Docker integration), Kubernetes (K8s deployment), Blue Ocean (modern UI). Jenkins extensible through plugins.
+
+#@@@@@@@@@@
+
+44. Find the issue in this Kubernetes Service:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+spec:
+  type: LoadBalancer
+  # Issue: no selector
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+Answer: Missing selector to match pods. Add: `selector: app: webapp`. Service routes traffic to pods matching selector. Without selector, service has no endpoints.
+
+#@@@@@@@@@@
+
+45. What is the difference between Docker image and Docker container?
+
+Answer: Image is read-only template with application and dependencies, built from Dockerfile, stored in registry. Container is running instance of image, writable layer, isolated process. Image is blueprint, container is running instance. One image can create multiple containers.
+
+#@@@@@@@@@@
+
+46. Which of the following are Terraform commands? (Multiple correct)
+A) terraform init
+B) terraform plan
+C) terraform apply
+D) terraform destroy
+E) terraform validate
+F) All of the above
+
+Answer: F - All are Terraform commands. init (initialize), plan (preview changes), apply (execute changes), destroy (remove resources), validate (check syntax). Workflow: init → plan → apply.
+
+#@@@@@@@@@@
+
+47. Complete this Prometheus alerting rule:
+```yaml
+groups:
+  - name: example
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_errors_total[5m]) > _______________
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+```
+
+Answer: `0.05` or appropriate threshold - Error rate threshold (5% = 0.05). Alert fires if condition true for 5 minutes. Configure Alertmanager for notifications (email, Slack, PagerDuty).
+
+#@@@@@@@@@@
+
+48. How do you implement secrets management in Kubernetes?
+
+Answer: Use Kubernetes Secrets for basic needs. For production: external secrets managers (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault). Use External Secrets Operator or CSI driver. Encrypt secrets at rest (encryption provider). Use RBAC to limit access. Rotate secrets regularly.
+
+#@@@@@@@@@@
+
+49. Which of the following are CI/CD best practices? (Multiple correct)
+A) Automated testing
+B) Fast feedback
+C) Small, frequent commits
+D) Infrastructure as Code
+E) Monitoring and logging
+F) All of the above
+
+Answer: F - All are CI/CD best practices. Automated testing (quality), Fast feedback (quick detection), Small commits (easier debugging), IaC (reproducibility), Monitoring (observability). Also: version control, automated deployment, rollback capability.
+
+#@@@@@@@@@@
+
+50. Find the issue in this Ansible task:
+```yaml
+- name: Copy configuration
+  copy:
+    src: /tmp/config.conf
+    dest: /etc/app/config.conf
+    # Issue: no owner/permissions specified
+    # Issue: no backup
+```
+
+Answer: Missing security and safety: 1) No owner/permissions. Add: `owner: root, group: root, mode: '0644'`. 2) No backup before overwrite. Add: `backup: yes`. Also consider using template instead of copy for dynamic configuration.
+
+#@@@@@@@@@@
+
+51. What is the difference between Kubernetes DaemonSet and Deployment?
+
+Answer: DaemonSet runs one pod per node (logging, monitoring agents), ensures pod on every node, no replica count. Deployment runs specified replicas across cluster, scheduler decides placement. Use DaemonSet for node-level services, Deployment for applications.
+
+#@@@@@@@@@@
+
+52. Which of the following are Docker security best practices? (Multiple correct)
+A) Use official images
+B) Run as non-root user
+C) Scan for vulnerabilities
+D) Minimize image size
+E) Use multi-stage builds
+F) All of the above
+
+Answer: F - All are Docker security practices. Official images (trusted), Non-root (least privilege), Scanning (vulnerability detection), Minimal size (reduced attack surface), Multi-stage (smaller final image). Also: sign images, use secrets management.
+
+#@@@@@@@@@@
+
+53. Complete this Kubernetes Ingress:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        pathType: _______________
+        backend:
+          service:
+            name: webapp
+            port:
+              number: 80
+```
+
+Answer: `Prefix` or `Exact` - pathType options: Prefix (matches prefix), Exact (exact match), ImplementationSpecific. Prefix most common for root path. Ingress routes external traffic to services.
+
+#@@@@@@@@@@
+
+54. How do you implement continuous testing in CI/CD?
+
+Answer: Integrate tests at multiple stages: unit tests (fast, every commit), integration tests (API, database), end-to-end tests (UI, workflows), security tests (SAST, DAST), performance tests. Run in parallel for speed. Fail fast on errors. Generate test reports. Maintain test environments.
+
+#@@@@@@@@@@
+
+55. Which of the following are Kubernetes storage types? (Multiple correct)
+A) EmptyDir
+B) HostPath
+C) PersistentVolume
+D) PersistentVolumeClaim
+E) StorageClass
+F) All of the above
+
+Answer: F - All are Kubernetes storage types. EmptyDir (temporary, pod lifetime), HostPath (node filesystem), PersistentVolume (cluster resource), PersistentVolumeClaim (storage request), StorageClass (dynamic provisioning). Choose based on persistence needs.
+
+#@@@@@@@@@@
+
+56. Find the issue in this GitLab CI configuration:
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  # Issue: no caching
+  # Issue: no artifacts
+
+test:
+  stage: test
+  script:
+    - npm test
+```
+
+Answer: Two issues: 1) No caching of node_modules slows builds. Add: `cache: paths: - node_modules/`. 2) No artifacts from build to test. Add: `artifacts: paths: - dist/`. Improves efficiency and enables artifact sharing.
+
+#@@@@@@@@@@
+
+57. What is the difference between stateful and stateless applications?
+
+Answer: Stateless doesn't store session data, each request independent, easily scalable, Kubernetes Deployment. Stateful stores session/data, requires persistent storage, ordered deployment, Kubernetes StatefulSet. Stateless preferred for cloud-native, easier to scale and manage.
+
+#@@@@@@@@@@
+
+58. Which of the following are monitoring metrics types? (Multiple correct)
+A) Application metrics
+B) Infrastructure metrics
+C) Business metrics
+D) Custom metrics
+E) Log metrics
+F) All of the above
+
+Answer: F - All are monitoring metric types. Application (requests, errors, latency), Infrastructure (CPU, memory, disk), Business (revenue, users), Custom (domain-specific), Log metrics (derived from logs). Comprehensive monitoring requires all types.
+
+#@@@@@@@@@@
+
+59. Complete this Docker multi-stage build:
+```dockerfile
+# Build stage
+FROM node:16 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:16-alpine
+WORKDIR /app
+COPY --from=_______________ /app/dist ./dist
+COPY package*.json ./
+RUN npm ci --only=production
+CMD ["node", "dist/server.js"]
+```
+
+Answer: `builder` - Reference build stage by name. Multi-stage builds reduce final image size by excluding build dependencies. Only production dependencies and artifacts in final image.
+
+#@@@@@@@@@@
+
+60. How do you implement disaster recovery for Kubernetes?
+
+Answer: Backup etcd regularly (cluster state). Backup persistent volumes (Velero). Document cluster configuration. Use Infrastructure as Code (Terraform). Multi-region deployment. Regular restore testing. Automate recovery procedures. Monitor backup success. Maintain runbooks.
+
+#@@@@@@@@@@
+
+61. Which of the following are Ansible modules? (Multiple correct)
+A) apt/yum
+B) copy/template
+C) service/systemd
+D) user/group
+E) file/lineinfile
+F) All of the above
+
+Answer: F - All are Ansible modules. apt/yum (packages), copy/template (files), service/systemd (services), user/group (accounts), file/lineinfile (file operations). Modules are idempotent, declarative.
+
+#@@@@@@@@@@
+
+62. Find the issue in this Prometheus configuration:
+```yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'webapp'
+    static_configs:
+      - targets: ['localhost:8080']
+    # Issue: no relabeling
+    # Issue: hardcoded targets
+```
+
+Answer: Issues: 1) Hardcoded targets not scalable. Use service discovery (Kubernetes, Consul). 2) No relabeling for better organization. Add: `relabel_configs` for dynamic labeling. Also consider scrape_interval per job.
+
+#@@@@@@@@@@
+
+63. What is the difference between Jenkins declarative and scripted pipeline?
+
+Answer: Declarative uses structured syntax (pipeline, stages, steps), easier to read, limited flexibility, recommended. Scripted uses Groovy, more flexible, complex, harder to maintain. Declarative for most cases, scripted for complex logic. Both support pipeline as code.
+
+#@@@@@@@@@@
+
+64. Which of the following are container orchestration platforms? (Multiple correct)
+A) Kubernetes
+B) Docker Swarm
+C) Apache Mesos
+D) Nomad
+E) OpenShift
+F) All of the above
+
+Answer: F - All are container orchestration platforms. Kubernetes (most popular, CNCF), Docker Swarm (simple, Docker native), Mesos (datacenter OS), Nomad (HashiCorp), OpenShift (enterprise Kubernetes). Kubernetes dominates market.
+
+#@@@@@@@@@@
+
+65. Complete this Terraform variable definition:
+```hcl
+variable "environment" {
+  description = "Environment name"
+  type        = _______________
+  default     = "development"
+
+  validation {
+    condition     = contains(["development", "staging", "production"], var.environment)
+    error_message = "Environment must be development, staging, or production."
+  }
+}
+```
+
+Answer: `string` - Variable type. Types: string, number, bool, list, map, object, set, tuple. Use validation for constraints. Variables enable reusability and flexibility.
+
+#@@@@@@@@@@
+
+66. How do you implement health checks in Kubernetes?
+
+Answer: Define liveness probe (restart if fails), readiness probe (remove from service if fails), startup probe (initial startup). Types: HTTP GET, TCP socket, exec command. Example: `livenessProbe: httpGet: path: /health, port: 8080, initialDelaySeconds: 30, periodSeconds: 10`. Essential for reliability.
+
+#@@@@@@@@@@
+
+67. Which of the following are Docker volume types? (Multiple correct)
+A) Named volumes
+B) Bind mounts
+C) tmpfs mounts
+D) Volume plugins
+E) Anonymous volumes
+F) All of the above
+
+Answer: F - All are Docker volume types. Named volumes (managed by Docker), Bind mounts (host filesystem), tmpfs (memory), Volume plugins (third-party), Anonymous volumes (unnamed). Named volumes preferred for persistence.
+
+#@@@@@@@@@@
+
+68. Find the issue in this Kubernetes HorizontalPodAutoscaler:
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: webapp
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Issue: no memory metric
+  # Issue: minReplicas too low for production
+```
+
+Answer: Issues: 1) Only CPU metric, add memory for better scaling. 2) minReplicas: 1 is single point of failure. Use at least 2-3 for production. Also consider custom metrics for application-specific scaling.
+
+#@@@@@@@@@@
+
+69. What is the difference between continuous delivery and continuous deployment?
+
+Answer: Continuous Delivery: code always ready to deploy, manual approval for production, automated to staging. Continuous Deployment: fully automated to production, no manual approval, every change deployed. CD requires high confidence in testing. Choose based on risk tolerance.
+
+#@@@@@@@@@@
+
+70. Which of the following are Grafana data sources? (Multiple correct)
+A) Prometheus
+B) InfluxDB
+C) Elasticsearch
+D) MySQL/PostgreSQL
+E) CloudWatch
+F) All of the above
+
+Answer: F - All are Grafana data sources. Prometheus (metrics), InfluxDB (time series), Elasticsearch (logs), SQL databases (business data), CloudWatch (AWS metrics). Grafana supports 100+ data sources.
+
+#@@@@@@@@@@
+
+71. Complete this Jenkins shared library:
+```groovy
+// vars/buildApp.groovy
+def call(Map config) {
+    pipeline {
+        agent any
+        stages {
+            stage('Build') {
+                steps {
+                    sh "npm install"
+                    sh "npm run build"
+                }
+            }
+            stage('Test') {
+                steps {
+                    sh "npm test"
+                }
+            }
+            stage('Deploy') {
+                when {
+                    branch _______________
+                }
+                steps {
+                    sh "kubectl apply -f k8s/"
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `'main'` or `'master'` - Deploy only from main branch. Shared libraries enable code reuse across pipelines. Define in separate repository, import in Jenkinsfile.
+
+#@@@@@@@@@@
+
+72. How do you implement log aggregation with ELK?
+
+Answer: Install Filebeat on nodes to ship logs. Logstash processes and enriches logs. Elasticsearch stores and indexes logs. Kibana visualizes and searches. Configure log parsing (grok patterns). Create dashboards and alerts. Retention policies for storage management.
+
+#@@@@@@@@@@
+
+73. Which of the following are Kubernetes namespace use cases? (Multiple correct)
+A) Environment separation (dev, staging, prod)
+B) Team isolation
+C) Resource quotas
+D) Access control
+E) Multi-tenancy
+F) All of the above
+
+Answer: F - All are namespace use cases. Environments (logical separation), Teams (isolation), Quotas (resource limits), Access control (RBAC), Multi-tenancy (multiple users). Namespaces provide logical cluster division.
+
+#@@@@@@@@@@
+
+74. Find the issue in this Terraform state configuration:
+```hcl
+terraform {
+  backend "local" {
+    path = "terraform.tfstate"
+  }
+  # Issue: local backend for team
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+```
+
+Answer: Local backend doesn't support team collaboration or locking. Use remote backend (S3 with DynamoDB locking, Terraform Cloud). Example: `backend "s3" { bucket = "tfstate", key = "prod/terraform.tfstate", dynamodb_table = "tfstate-lock" }`.
+
+#@@@@@@@@@@
+
+75. What is the difference between Docker CMD and ENTRYPOINT?
+
+Answer: CMD provides default command/arguments, easily overridden. ENTRYPOINT defines container executable, arguments appended. Use ENTRYPOINT for main command, CMD for default arguments. Example: `ENTRYPOINT ["python"], CMD ["app.py"]`. Can combine both.
+
+#@@@@@@@@@@
+
+76. Which of the following are Azure Pipelines features? (Multiple correct)
+A) YAML pipelines
+B) Classic pipelines
+C) Multi-stage pipelines
+D) Deployment groups
+E) Environments
+F) All of the above
+
+Answer: F - All are Azure Pipelines features. YAML (pipeline as code), Classic (visual designer), Multi-stage (build and deploy), Deployment groups (target servers), Environments (deployment targets with approvals). Flexible CI/CD platform.
+
+#@@@@@@@@@@
+
+77. Complete this Kubernetes NetworkPolicy:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: _______________
+    ports:
+    - protocol: TCP
+      port: 8080
+```
+
+Answer: `frontend` or allowed app label - Restrict ingress to specific pods. NetworkPolicies implement micro-segmentation. Default deny, explicit allow. Requires CNI plugin support (Calico, Cilium).
+
+#@@@@@@@@@@
+
+78. How do you implement feature flags in CI/CD?
+
+Answer: Use feature flag service (LaunchDarkly, Unleash, ConfigCat). Deploy code with flags disabled. Enable for specific users/environments. Gradual rollout, A/B testing. Decouple deployment from release. Quick rollback without redeployment. Clean up old flags.
+
+#@@@@@@@@@@
+
+79. Which of the following are Prometheus exporters? (Multiple correct)
+A) Node Exporter
+B) Blackbox Exporter
+C) MySQL Exporter
+D) Redis Exporter
+E) Custom exporters
+F) All of the above
+
+Answer: F - All are Prometheus exporters. Node Exporter (system metrics), Blackbox (probing), MySQL/Redis (database metrics), Custom (application-specific). Exporters expose metrics in Prometheus format.
+
+#@@@@@@@@@@
+
+80. Find the issue in this Ansible inventory:
+```ini
+[webservers]
+web1.example.com
+web2.example.com
+
+[databases]
+db1.example.com ansible_user=root  # Issue: using root
+db2.example.com ansible_password=secret123  # Issue: plaintext password
+
+[all:vars]
+ansible_connection=ssh
+```
+
+Answer: Security issues: 1) Using root user violates least privilege. Use dedicated user with sudo. 2) Plaintext password in inventory. Use Ansible Vault: `ansible-vault encrypt_string 'secret123'` or SSH keys.
+
+#@@@@@@@@@@
+
+81. What is the difference between Kubernetes ReplicaSet and Deployment?
+
+Answer: ReplicaSet maintains specified number of pod replicas, low-level. Deployment manages ReplicaSets, provides rolling updates, rollback, declarative updates, higher-level. Always use Deployment, not ReplicaSet directly. Deployment creates and manages ReplicaSets.
+
+#@@@@@@@@@@
+
+82. Which of the following are GitOps tools? (Multiple correct)
+A) ArgoCD
+B) Flux
+C) Jenkins X
+D) Tekton
+E) Spinnaker
+F) A, B, C only
+
+Answer: F - ArgoCD, Flux, Jenkins X are GitOps tools. Tekton is CI/CD framework (not specifically GitOps). Spinnaker is continuous delivery (not GitOps-focused). GitOps: Git as source of truth, automated sync, pull-based deployment.
+
+#@@@@@@@@@@
+
+83. Complete this Docker Compose with dependencies:
+```yaml
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  backend:
+    build: ./backend
+    depends_on:
+      - _______________
+    environment:
+      DATABASE_URL: postgres://db:5432/mydb
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+```
+
+Answer: `db` - Backend depends on database. depends_on ensures start order but doesn't wait for readiness. Use health checks or wait-for scripts for true dependency management.
+
+#@@@@@@@@@@
+
+84. How do you implement infrastructure testing?
+
+Answer: Test infrastructure code before deployment. Unit tests (Terraform validate, policy checks). Integration tests (deploy to test environment). Compliance tests (InSpec, Terratest). Security tests (tfsec, Checkov). Automated in CI/CD. Test infrastructure changes like application code.
+
+#@@@@@@@@@@
+
+85. Which of the following are Kubernetes admission controllers? (Multiple correct)
+A) PodSecurityPolicy
+B) ResourceQuota
+C) LimitRanger
+D) NamespaceLifecycle
+E) ValidatingWebhook
+F) All of the above
+
+Answer: F - All are admission controllers. PodSecurityPolicy (security policies), ResourceQuota (resource limits), LimitRanger (default limits), NamespaceLifecycle (namespace operations), ValidatingWebhook (custom validation). Intercept API requests before persistence.
+
+#@@@@@@@@@@
+
+86. Find the issue in this GitHub Actions workflow:
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to production
+        env:
+          AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE  # Issue: hardcoded credentials
+          AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        run: |
+          aws s3 sync ./dist s3://my-bucket
+```
+
+Answer: Hardcoded AWS credentials in workflow file is major security risk. Use GitHub Secrets: `${{ secrets.AWS_ACCESS_KEY_ID }}`. Better: use OIDC for keyless authentication. Never commit credentials.
+
+#@@@@@@@@@@
+
+87. What is the difference between imperative and declarative configuration?
+
+Answer: Imperative specifies how to achieve state (commands, scripts), procedural. Declarative specifies desired state (YAML, HCL), system determines how. Kubernetes, Terraform are declarative. Declarative is idempotent, easier to manage, version control friendly.
+
+#@@@@@@@@@@
+
+88. Which of the following are container security scanning tools? (Multiple correct)
+A) Trivy
+B) Clair
+C) Anchore
+D) Snyk
+E) Aqua
+F) All of the above
+
+Answer: F - All are container security scanners. Trivy (comprehensive, fast), Clair (CoreOS), Anchore (policy-based), Snyk (developer-focused), Aqua (enterprise). Scan for vulnerabilities, secrets, misconfigurations. Integrate into CI/CD.
+
+#@@@@@@@@@@
+
+89. Complete this Prometheus recording rule:
+```yaml
+groups:
+  - name: example
+    interval: 30s
+    rules:
+      - record: job:http_requests:rate5m
+        expr: sum(rate(http_requests_total[_______________])) by (job)
+```
+
+Answer: `5m` - Time range for rate calculation. Recording rules pre-compute expensive queries, improve dashboard performance. Name convention: level:metric:operations. Evaluate at specified interval.
+
+#@@@@@@@@@@
+
+90. How do you implement zero-downtime deployment?
+
+Answer: Strategies: Rolling update (gradual replacement), Blue-green (switch environments), Canary (gradual traffic shift). Use health checks, readiness probes. Maintain backward compatibility. Database migrations before code. Load balancer for traffic management. Rollback plan.
+
+#@@@@@@@@@@
+
+91. Which of the following are Terraform provisioners? (Multiple correct)
+A) local-exec
+B) remote-exec
+C) file
+D) chef
+E) puppet
+F) A, B, C only
+
+Answer: F - local-exec (local commands), remote-exec (remote commands), file (copy files) are Terraform provisioners. chef and puppet are not Terraform provisioners. Provisioners are last resort, prefer cloud-init or configuration management.
+
+#@@@@@@@@@@
+
+92. Find the issue in this Kubernetes Secret:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=  # base64 encoded 'admin'
+  password: cGFzc3dvcmQxMjM=  # base64 encoded 'password123'
+# Issue: base64 is not encryption
+# Issue: weak password
+```
+
+Answer: Issues: 1) Base64 is encoding, not encryption. Enable encryption at rest (EncryptionConfiguration). 2) Weak password. Use strong passwords, consider external secrets manager (Vault, AWS Secrets Manager). 3) Secrets in Git is risky.
+
+#@@@@@@@@@@
+
+93. What is the difference between Docker build cache and layer caching?
+
+Answer: Build cache stores intermediate layers, speeds up rebuilds. Layer caching reuses unchanged layers. Order Dockerfile commands: least to most frequently changing. Copy package files before source code. Use `.dockerignore`. Multi-stage builds optimize caching. `--no-cache` to force rebuild.
+
+#@@@@@@@@@@
+
+94. Which of the following are Jenkins security best practices? (Multiple correct)
+A) Enable authentication
+B) Use RBAC
+C) Secure credentials
+D) Regular updates
+E) Audit logging
+F) All of the above
+
+Answer: F - All are Jenkins security practices. Authentication (LDAP, SAML), RBAC (role-based access), Credentials (encrypted storage), Updates (security patches), Audit logging (compliance). Also: HTTPS, CSP, plugin security.
+
+#@@@@@@@@@@
+
+95. Complete this Kubernetes PersistentVolumeClaim:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-pvc
+spec:
+  accessModes:
+    - _______________
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+```
+
+Answer: `ReadWriteOnce` or `ReadWriteMany` or `ReadOnlyMany` - Access modes: ReadWriteOnce (single node RW), ReadWriteMany (multiple nodes RW), ReadOnlyMany (multiple nodes RO). Choose based on application needs.
+
+#@@@@@@@@@@
+
+96. How do you implement observability in microservices?
+
+Answer: Three pillars: Metrics (Prometheus, Grafana), Logs (ELK, Loki), Traces (Jaeger, Zipkin). Implement distributed tracing, correlation IDs. Service mesh for traffic observability. Dashboards for visualization. Alerting for anomalies. SLIs, SLOs, SLAs for reliability.
+
+#@@@@@@@@@@
+
+97. Which of the following are Ansible best practices? (Multiple correct)
+A) Use roles for organization
+B) Idempotent tasks
+C) Version control playbooks
+D) Use Ansible Vault for secrets
+E) Test in staging first
+F) All of the above
+
+Answer: F - All are Ansible best practices. Roles (reusability), Idempotency (safe re-runs), Version control (Git), Vault (secrets), Testing (validation). Also: use modules over commands, meaningful names, documentation.
+
+#@@@@@@@@@@
+
+98. Find the issue in this Grafana dashboard query:
+```promql
+# Query for request rate
+rate(http_requests_total[1m])
+
+# Issue: too short time window
+# Issue: no aggregation
+```
+
+Answer: Issues: 1) 1m window too short for rate(), use at least 5m for stability. 2) No aggregation, returns many series. Add: `sum(rate(http_requests_total[5m])) by (job, status)`. Aggregate for meaningful metrics.
+
+#@@@@@@@@@@
+
+99. What is the difference between Kubernetes Job and CronJob?
+
+Answer: Job runs pods to completion, one-time task, ensures specified completions. CronJob creates Jobs on schedule (cron syntax), recurring tasks. Use Job for batch processing, CronJob for scheduled tasks (backups, reports). Both ensure completion.
+
+#@@@@@@@@@@
+
+100. Which of the following are Docker Compose commands? (Multiple correct)
+A) docker-compose up
+B) docker-compose down
+C) docker-compose ps
+D) docker-compose logs
+E) docker-compose exec
+F) All of the above
+
+Answer: F - All are docker-compose commands. up (start services), down (stop and remove), ps (list containers), logs (view logs), exec (execute in container). Also: build, pull, restart, scale.
+
+#@@@@@@@@@@
+
+101. Complete this Terraform module:
+```hcl
+# modules/vpc/main.tf
+resource "aws_vpc" "main" {
+  cidr_block = var.cidr_block
+
+  tags = {
+    Name = var.vpc_name
+  }
+}
+
+output "vpc_id" {
+  value = _______________
+}
+
+# Root module
+module "vpc" {
+  source = "./modules/vpc"
+  cidr_block = "10.0.0.0/16"
+  vpc_name = "production"
+}
+```
+
+Answer: `aws_vpc.main.id` - Output VPC ID for use in other resources. Modules enable reusability, encapsulation. Use outputs to expose values. Input variables for configuration.
+
+#@@@@@@@@@@
+
+102. How do you implement progressive delivery?
+
+Answer: Gradual rollout with monitoring and automated rollback. Canary deployment (small percentage), feature flags (targeted users), A/B testing (compare versions). Monitor metrics (errors, latency, business KPIs). Automated rollback on anomalies. Tools: Flagger, Argo Rollouts, Spinnaker.
+
+#@@@@@@@@@@
+
+103. Which of the following are Kubernetes resource types? (Multiple correct)
+A) CPU
+B) Memory
+C) Storage
+D) Ephemeral storage
+E) Custom resources
+F) All of the above
+
+Answer: F - All are Kubernetes resource types. CPU (millicores), Memory (bytes), Storage (persistent volumes), Ephemeral storage (pod storage), Custom resources (extended API). Define requests (guaranteed) and limits (maximum).
+
+#@@@@@@@@@@
+
+104. Find the issue in this Jenkins pipeline:
+```groovy
+pipeline {
+    agent any
+
+    environment {
+        DB_PASSWORD = 'secret123'  // Issue: hardcoded secret
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                sh '''
+                    echo "Deploying..."
+                    echo $DB_PASSWORD  // Issue: logging secret
+                '''
+            }
+        }
+    }
+}
+```
+
+Answer: Security issues: 1) Hardcoded password. Use Jenkins credentials: `credentials('db-password-id')`. 2) Logging secret exposes it. Use `withCredentials` block, mask in logs. Never hardcode or log secrets.
+
+#@@@@@@@@@@
+
+105. What is the difference between Kubernetes StatefulSet and DaemonSet?
+
+Answer: StatefulSet manages stateful apps, stable network identity, ordered deployment, persistent storage, specified replicas. DaemonSet runs one pod per node, no replicas, for node-level services. StatefulSet for databases, DaemonSet for logging/monitoring agents.
+
+#@@@@@@@@@@
+
+106. Which of the following are GitLab CI/CD variables types? (Multiple correct)
+A) Project variables
+B) Group variables
+C) Instance variables
+D) Environment variables
+E) File variables
+F) All of the above
+
+Answer: F - All are GitLab CI/CD variable types. Project (project-specific), Group (shared across projects), Instance (GitLab-wide), Environment (deployment-specific), File (stored as file). Use for configuration, secrets (protected, masked).
+
+#@@@@@@@@@@
+
+107. Complete this Kubernetes ResourceQuota:
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: development
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: _______________
+    limits.cpu: "20"
+    limits.memory: "40Gi"
+    pods: "50"
+```
+
+Answer: `"20Gi"` or appropriate memory limit - ResourceQuota limits namespace resources. Prevents resource exhaustion. Set requests (guaranteed) and limits (maximum). Also limit pods, services, PVCs.
+
+#@@@@@@@@@@
+
+108. How do you implement chaos engineering in Kubernetes?
+
+Answer: Use chaos engineering tools (Chaos Mesh, Litmus, Gremlin). Inject failures: pod deletion, network latency, resource stress. Test resilience, recovery, monitoring. Start with non-production. Gradual complexity increase. Document findings, improve system. Chaos experiments as code.
+
+#@@@@@@@@@@
+
+109. Which of the following are Prometheus alert states? (Multiple correct)
+A) Inactive
+B) Pending
+C) Firing
+D) Resolved
+E) Silenced
+F) A, B, C only
+
+Answer: F - Inactive (condition false), Pending (condition true, waiting for duration), Firing (alert active). Resolved is not a state (alert becomes inactive). Silenced is Alertmanager feature, not Prometheus state.
+
+#@@@@@@@@@@
+
+110. Find the issue in this Terraform resource:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  # Issue: no tags
+  # Issue: no security group
+  # Issue: no key pair for SSH
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt-get update
+              apt-get install -y nginx
+              EOF
+}
+```
+
+Answer: Multiple issues: 1) No tags for identification/cost tracking. 2) No security group, uses default (may be insecure). 3) No key pair, can't SSH. 4) Hardcoded user_data, use template. Add: tags, vpc_security_group_ids, key_name.
+
+#@@@@@@@@@@
+
+111. What is the difference between Docker Swarm and Kubernetes?
+
+Answer: Docker Swarm: simpler, Docker-native, easier setup, limited features, smaller ecosystem. Kubernetes: complex, feature-rich, large ecosystem, industry standard, better for large scale. Swarm for simple use cases, Kubernetes for production at scale.
+
+#@@@@@@@@@@
+
+112. Which of the following are Azure DevOps Boards features? (Multiple correct)
+A) Work items
+B) Backlogs
+C) Sprints
+D) Kanban boards
+E) Queries
+F) All of the above
+
+Answer: F - All are Azure Boards features. Work items (tasks, bugs, features), Backlogs (prioritization), Sprints (iterations), Kanban boards (visualization), Queries (filtering). Agile project management integrated with CI/CD.
+
+#@@@@@@@@@@
+
+113. Complete this Ansible role structure:
+```
+roles/
+  webserver/
+    tasks/
+      main.yml
+    handlers/
+      main.yml
+    templates/
+      nginx.conf.j2
+    files/
+      index.html
+    vars/
+      main.yml
+    defaults/
+      main.yml
+    meta/
+      _______________
+```
+
+Answer: `main.yml` - Role metadata (dependencies, galaxy info). Role structure: tasks (main logic), handlers (triggered tasks), templates (Jinja2), files (static), vars (variables), defaults (default vars), meta (metadata).
+
+#@@@@@@@@@@
+
+114. How do you implement cost optimization in cloud infrastructure?
+
+Answer: Right-sizing (match resources to needs), Reserved instances/Savings plans, Spot instances for non-critical, Auto-scaling (scale down when idle), Resource tagging (cost allocation), Monitoring and alerts, Unused resource cleanup, Storage lifecycle policies. Regular cost reviews.
+
+#@@@@@@@@@@
+
+115. Which of the following are Kubernetes pod scheduling concepts? (Multiple correct)
+A) Node selector
+B) Node affinity
+C) Taints and tolerations
+D) Pod affinity/anti-affinity
+E) Priority classes
+F) All of the above
+
+Answer: F - All are pod scheduling concepts. Node selector (simple node selection), Node affinity (flexible node selection), Taints/tolerations (node restrictions), Pod affinity (co-location), Priority (preemption). Control pod placement for performance, availability, compliance.
+
+#@@@@@@@@@@
+
+116. Find the issue in this Docker Compose production setup:
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .  # Issue: building in production
+    restart: always
+    ports:
+      - "80:8080"  # Issue: exposing on all interfaces
+    environment:
+      NODE_ENV: production
+      DB_PASSWORD: ${DB_PASSWORD}
+```
+
+Answer: Issues: 1) Building in production, use pre-built images: `image: myapp:1.2.3`. 2) Exposing on all interfaces (0.0.0.0), use reverse proxy or specific IP: `127.0.0.1:80:8080`. Also missing: resource limits, health checks, logging configuration.
+
+#@@@@@@@@@@
+
+117. What is the difference between Kubernetes Ingress and Service?
+
+Answer: Service exposes pods within cluster or via NodePort/LoadBalancer, L4 (TCP/UDP). Ingress exposes HTTP/HTTPS routes from outside cluster, L7 (application layer), single entry point, path-based routing, TLS termination. Ingress requires Ingress Controller. Use Ingress for HTTP services.
+
+#@@@@@@@@@@
+
+118. Which of the following are Terraform state management best practices? (Multiple correct)
+A) Remote backend
+B) State locking
+C) Encryption at rest
+D) Separate states per environment
+E) Regular backups
+F) All of the above
+
+Answer: F - All are state management best practices. Remote backend (S3, Terraform Cloud), Locking (prevent concurrent modifications), Encryption (protect sensitive data), Separate states (isolation), Backups (disaster recovery). Never commit state to Git.
+
+#@@@@@@@@@@
+
+119. Complete this Prometheus Alertmanager configuration:
+```yaml
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'cluster']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: _______________
+
+receivers:
+  - name: 'team-slack'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/XXX'
+        channel: '#alerts'
+```
+
+Answer: `'team-slack'` - Default receiver name. Alertmanager routes alerts to receivers (Slack, PagerDuty, email). Configure grouping, throttling, silencing. Route based on labels for different teams/severities.
+
+#@@@@@@@@@@
+
+120. How do you implement database migrations in CI/CD?
+
+Answer: Version migrations (Flyway, Liquibase, Alembic). Run migrations before application deployment. Test migrations in staging. Backward compatible changes. Rollback strategy. Separate migration job in pipeline. Monitor migration success. Never manual database changes.
+
+#@@@@@@@@@@
+
+121. Which of the following are Jenkins agent types? (Multiple correct)
+A) Permanent agents
+B) Cloud agents (Docker, Kubernetes)
+C) SSH agents
+D) JNLP agents
+E) Ephemeral agents
+F) All of the above
+
+Answer: F - All are Jenkins agent types. Permanent (always available), Cloud (dynamic provisioning), SSH (remote via SSH), JNLP (Java Web Start), Ephemeral (created per build). Choose based on workload and infrastructure.
+
+#@@@@@@@@@@
+
+122. Find the issue in this Kubernetes Deployment strategy:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1  # Issue: can reduce capacity significantly
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: app
+        image: myapp:2.0
+```
+
+Answer: With 3 replicas and maxUnavailable: 1, capacity drops to 2 pods (33% reduction). For production, use maxUnavailable: 0 or percentage: `maxUnavailable: 25%`. Ensures availability during updates. Balance speed vs availability.
+
+#@@@@@@@@@@
+
+123. What is the difference between Docker ADD and COPY?
+
+Answer: COPY copies files/directories from build context, simple, preferred. ADD copies files AND can extract tar archives, download URLs, more features but less predictable. Use COPY for clarity, ADD only when needed for extraction/download. COPY is best practice.
+
+#@@@@@@@@@@
+
+124. Which of the following are Grafana visualization types? (Multiple correct)
+A) Graph/Time series
+B) Gauge
+C) Table
+D) Heatmap
+E) Stat
+F) All of the above
+
+Answer: F - All are Grafana visualization types. Graph (time series), Gauge (current value), Table (tabular data), Heatmap (distribution), Stat (single value). Choose based on data type and insight needed. Combine in dashboards.
+
+#@@@@@@@@@@
+
+125. Complete this GitHub Actions matrix strategy:
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix._______________ }}
+      - run: npm test
+```
+
+Answer: `node-version` - Reference matrix variable. Matrix strategy runs job with all combinations (3 Node versions × 2 OSes = 6 jobs). Parallel execution. Test across environments efficiently.
+
+#@@@@@@@@@@
+
+126. How do you implement secret rotation in Kubernetes?
+
+Answer: Use external secrets operator with secrets manager (Vault, AWS Secrets Manager). Automated rotation in secrets manager. Sync to Kubernetes secrets. Application reloads on secret change (sidecar, init container). Regular rotation schedule. Monitor rotation success. Minimize secret lifetime.
+
+#@@@@@@@@@@
+
+127. Which of the following are Ansible inventory formats? (Multiple correct)
+A) INI format
+B) YAML format
+C) JSON format
+D) Dynamic inventory (scripts)
+E) Cloud inventory plugins
+F) All of the above
+
+Answer: F - All are Ansible inventory formats. INI (simple), YAML (structured), JSON (programmatic), Dynamic (scripts for cloud), Plugins (AWS, Azure, GCP). Choose based on complexity and source.
+
+#@@@@@@@@@@
+
+128. Find the issue in this Terraform dependency:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.public.id
+  # Issue: implicit dependency only
+}
+
+resource "aws_security_group" "web" {
+  name = "web-sg"
+  vpc_id = aws_vpc.main.id
+}
+
+# Missing: security group attachment to instance
+```
+
+Answer: Instance missing security group. Add: `vpc_security_group_ids = [aws_security_group.web.id]`. Terraform handles implicit dependencies via references. For explicit dependencies, use `depends_on`. Always define security groups.
+
+#@@@@@@@@@@
+
+129. What is the difference between Kubernetes ConfigMap and Secret?
+
+Answer: ConfigMap stores non-sensitive configuration (environment variables, config files), base64 encoded for binary data. Secret stores sensitive data (passwords, tokens), base64 encoded, encryption at rest optional, access controls. Use ConfigMap for config, Secret for credentials.
+
+#@@@@@@@@@@
+
+130. Which of the following are Docker security best practices? (Multiple correct)
+A) Scan images for vulnerabilities
+B) Use minimal base images
+C) Don't run as root
+D) Use read-only filesystems
+E) Limit capabilities
+F) All of the above
+
+Answer: F - All are Docker security practices. Scan (Trivy, Snyk), Minimal images (alpine, distroless), Non-root user, Read-only filesystem (security.readOnlyRootFilesystem), Drop capabilities (security.capabilities.drop). Defense in depth.
+
+#@@@@@@@@@@
+
+131. Complete this Jenkins declarative pipeline with parallel stages:
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Parallel Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        sh 'npm run test:unit'
+                    }
+                }
+                stage('Integration Tests') {
+                    steps {
+                        sh 'npm run test:integration'
+                    }
+                }
+                stage('_______________') {
+                    steps {
+                        sh 'npm run test:e2e'
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `'E2E Tests'` or `'End-to-End Tests'` - Parallel stages run concurrently, reducing pipeline time. Each stage can have different agent. Use for independent tasks (tests, builds for different platforms).
+
+#@@@@@@@@@@
+
+132. How do you implement multi-tenancy in Kubernetes?
+
+Answer: Namespace per tenant, ResourceQuotas (resource limits), NetworkPolicies (isolation), RBAC (access control), PodSecurityPolicies (security), separate Ingress per tenant. For strong isolation: separate clusters or virtual clusters (vcluster). Monitor resource usage per tenant.
+
+#@@@@@@@@@@
+
+133. Which of the following are Prometheus query functions? (Multiple correct)
+A) rate()
+B) sum()
+C) avg()
+D) histogram_quantile()
+E) increase()
+F) All of the above
+
+Answer: F - All are PromQL functions. rate() (per-second rate), sum() (aggregation), avg() (average), histogram_quantile() (percentiles), increase() (total increase). Combine for complex queries. Essential for metrics analysis.
+
+#@@@@@@@@@@
+
+134. Find the issue in this GitLab CI caching:
+```yaml
+cache:
+  key: ${CI_COMMIT_REF_SLUG}  # Issue: cache per branch
+  paths:
+    - node_modules/
+
+build:
+  script:
+    - npm install
+    - npm run build
+```
+
+Answer: Cache key per branch causes cache miss on new branches. Use: `key: ${CI_COMMIT_REF_SLUG}-${CI_PROJECT_DIR}` or `key: files: - package-lock.json` for content-based caching. Improves cache hit rate, faster builds.
+
+#@@@@@@@@@@
+
+135. What is the difference between Kubernetes Horizontal Pod Autoscaler and Vertical Pod Autoscaler?
+
+Answer: HPA scales number of pods based on metrics (CPU, memory, custom), horizontal scaling. VPA adjusts pod resource requests/limits, vertical scaling, requires pod restart. Use HPA for stateless apps, VPA for right-sizing. Can use both together with caution.
+
+#@@@@@@@@@@
+
+136. Which of the following are Terraform modules sources? (Multiple correct)
+A) Local paths
+B) Git repositories
+C) Terraform Registry
+D) HTTP URLs
+E) S3 buckets
+F) All of the above
+
+Answer: F - All are valid Terraform module sources. Local (`./modules/vpc`), Git (`git::https://...`), Registry (`terraform-aws-modules/vpc/aws`), HTTP, S3. Use Registry for public modules, Git for private, local for development.
+
+#@@@@@@@@@@
+
+137. Complete this Kubernetes CronJob:
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-job
+spec:
+  schedule: "_______________"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: backup:latest
+            command: ["/bin/sh", "-c", "backup.sh"]
+          restartPolicy: OnFailure
+```
+
+Answer: `"0 2 * * *"` or any valid cron expression - Cron syntax: minute hour day month weekday. Example: "0 2 * * *" (2 AM daily), "*/15 * * * *" (every 15 min), "0 0 * * 0" (weekly). Use for scheduled tasks.
+
+#@@@@@@@@@@
+
+138. How do you implement canary analysis in deployment?
+
+Answer: Deploy canary version alongside stable. Define success metrics (error rate, latency, business KPIs). Automated analysis compares canary vs baseline. Progressive traffic increase if metrics good. Automated rollback if metrics degrade. Tools: Flagger, Kayenta, Argo Rollouts. Data-driven deployment decisions.
+
+#@@@@@@@@@@
+
+139. Which of the following are Docker Compose override files? (Multiple correct)
+A) docker-compose.override.yml
+B) docker-compose.prod.yml
+C) docker-compose.dev.yml
+D) docker-compose.test.yml
+E) All of the above
+F) A only
+
+Answer: F - Only docker-compose.override.yml is automatically loaded. Other files require explicit specification: `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`. Use override for local development customization.
+
+#@@@@@@@@@@
+
+140. Find the issue in this Ansible playbook:
+```yaml
+---
+- name: Deploy application
+  hosts: webservers
+  tasks:
+    - name: Copy application
+      copy:
+        src: /tmp/app.jar
+        dest: /opt/app/app.jar
+
+    - name: Restart service
+      service:
+        name: app
+        state: restarted
+      # Issue: always restarts, even if file unchanged
+```
+
+Answer: Service always restarts, even if file unchanged. Use handler: define handler for restart, notify from copy task. Handlers run once at end if notified. Idempotent, only restarts when needed.
+
+#@@@@@@@@@@
+
+141. What is the difference between Docker volumes and bind mounts?
+
+Answer: Volumes managed by Docker, stored in Docker area, portable, better performance, backup/migration tools. Bind mounts use host filesystem path, direct access, development convenience, less portable. Use volumes for production, bind mounts for development.
+
+#@@@@@@@@@@
+
+142. Which of the following are Kubernetes pod lifecycle phases? (Multiple correct)
+A) Pending
+B) Running
+C) Succeeded
+D) Failed
+E) Unknown
+F) All of the above
+
+Answer: F - All are pod phases. Pending (scheduling), Running (at least one container running), Succeeded (all containers terminated successfully), Failed (containers terminated with failure), Unknown (communication error). Monitor pod status for troubleshooting.
+
+#@@@@@@@@@@
+
+143. Complete this Terraform workspace usage:
+```hcl
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "web-${terraform._______________}"
+    Environment = terraform.workspace
+  }
+}
+
+# Commands:
+# terraform workspace new staging
+# terraform workspace select production
+```
+
+Answer: `workspace` - Reference current workspace. Workspaces enable multiple state files (dev, staging, prod) from same configuration. Alternative to separate directories. Use for environment separation.
+
+#@@@@@@@@@@
+
+144. How do you implement blue-green deployment in Kubernetes?
+
+Answer: Two identical deployments (blue=current, green=new). Service points to blue. Deploy green, test thoroughly. Switch service selector to green (zero downtime). Monitor green. Keep blue for quick rollback. Update service: `kubectl patch service webapp -p '{"spec":{"selector":{"version":"green"}}}'`.
+
+#@@@@@@@@@@
+
+145. Which of the following are Jenkins pipeline best practices? (Multiple correct)
+A) Use declarative syntax
+B) Store Jenkinsfile in SCM
+C) Use shared libraries
+D) Implement proper error handling
+E) Use credentials binding
+F) All of the above
+
+Answer: F - All are pipeline best practices. Declarative (structured), SCM (version control), Shared libraries (reusability), Error handling (try-catch, post blocks), Credentials (secure secrets). Also: parallel stages, artifacts, notifications.
+
+#@@@@@@@@@@
+
+146. Find the issue in this Prometheus scrape config:
+```yaml
+scrape_configs:
+  - job_name: 'webapp'
+    scrape_interval: 5s  # Issue: too frequent
+    static_configs:
+      - targets: ['localhost:8080']
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop  # Dropping Go runtime metrics
+```
+
+Answer: Issues: 1) 5s scrape interval too frequent, increases load and storage. Use 15s-60s. 2) Dropping all Go metrics may remove useful data. Be selective: drop specific metrics, not all. Balance granularity vs cost.
+
+#@@@@@@@@@@
+
+147. What is the difference between Kubernetes ReplicationController and ReplicaSet?
+
+Answer: ReplicationController is older, simple equality-based selector. ReplicaSet is newer, set-based selector (in, notin, exists), more flexible. ReplicaSet is used by Deployments. Always use Deployment (which creates ReplicaSet), not ReplicationController or ReplicaSet directly.
+
+#@@@@@@@@@@
+
+148. Which of the following are Grafana alert notification channels? (Multiple correct)
+A) Email
+B) Slack
+C) PagerDuty
+D) Webhook
+E) Microsoft Teams
+F) All of the above
+
+Answer: F - All are Grafana notification channels. Email, Slack, PagerDuty, Webhook, Teams, and many more. Configure multiple channels, route based on severity. Test notifications. Integrate with incident management.
+
+#@@@@@@@@@@
+
+149. Complete this Docker healthcheck:
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY . .
+RUN npm ci --only=production
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node healthcheck.js || exit 1
+
+# Alternative HTTP healthcheck
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/_______________ || exit 1
+
+CMD ["node", "server.js"]
+```
+
+Answer: `health` or `/health` or `/healthz` - Health endpoint path. Healthcheck monitors container health. Docker restarts unhealthy containers. Kubernetes uses liveness/readiness probes instead. Implement health endpoint in application.
+
+#@@@@@@@@@@
+
+150. How do you implement infrastructure drift detection?
+
+Answer: Regularly compare actual infrastructure vs desired state. Terraform: `terraform plan` in CI/CD, detect drift. Cloud-native: AWS Config, Azure Policy. Alert on drift. Automated remediation or manual review. Prevent manual changes, enforce IaC. Regular drift detection schedule.
+
+#@@@@@@@@@@
+
+151. Which of the following are Kubernetes service mesh features? (Multiple correct)
+A) Traffic management
+B) Security (mTLS)
+C) Observability
+D) Resilience (retries, timeouts)
+E) Policy enforcement
+F) All of the above
+
+Answer: F - All are service mesh features. Traffic management (routing, splitting), Security (mTLS, authorization), Observability (metrics, tracing), Resilience (circuit breakers), Policy (rate limiting). Istio, Linkerd provide these without code changes.
+
+#@@@@@@@@@@
+
+152. Find the issue in this Terraform variable validation:
+```hcl
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+
+  validation {
+    condition     = var.instance_type == "t2.micro" || var.instance_type == "t2.small"
+    error_message = "Instance type must be t2.micro or t2.small."
+  }
+  # Issue: validation too restrictive
+}
+```
+
+Answer: Validation hardcodes allowed values, not maintainable. Use: `condition = contains(["t2.micro", "t2.small", "t2.medium"], var.instance_type)` or regex for pattern matching. Better: separate variable for allowed types list.
+
+#@@@@@@@@@@
+
+153. What is the difference between Docker ENTRYPOINT and CMD in exec vs shell form?
+
+Answer: Exec form (JSON array): `["executable", "param"]`, doesn't invoke shell, PID 1, handles signals. Shell form (string): `command param`, invokes /bin/sh, PID 1 is shell, signal handling issues. Use exec form for proper signal handling and process management.
+
+#@@@@@@@@@@
+
+154. Which of the following are Ansible variable precedence levels? (Multiple correct)
+A) Command line (-e)
+B) Role defaults
+C) Inventory variables
+D) Playbook variables
+E) Extra vars
+F) All of the above
+
+Answer: F - All are variable precedence levels. Precedence (low to high): role defaults, inventory, playbook, command line extra vars. Extra vars (-e) highest precedence. Understanding precedence crucial for debugging.
+
+#@@@@@@@@@@
+
+155. Complete this Kubernetes Pod Security Policy:
+```yaml
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: restricted
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  runAsUser:
+    rule: _______________
+  seLinux:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  volumes:
+    - 'configMap'
+    - 'secret'
+    - 'persistentVolumeClaim'
+```
+
+Answer: `MustRunAsNonRoot` - Enforce non-root user. PSP (deprecated, use Pod Security Standards) defines security policies. MustRunAsNonRoot prevents root, RunAsAny allows any user. Implement least privilege.
+
+#@@@@@@@@@@
+
+156. How do you implement automated rollback in CI/CD?
+
+Answer: Monitor deployment metrics (error rate, latency, health checks). Define success criteria and thresholds. Automated analysis compares new vs baseline. Trigger rollback if metrics degrade. Kubernetes: rollout undo. Blue-green: switch back. Canary: stop traffic increase. Alert on rollback.
+
+#@@@@@@@@@@
+
+157. Which of the following are Docker networking drivers? (Multiple correct)
+A) bridge
+B) host
+C) overlay
+D) macvlan
+E) none
+F) All of the above
+
+Answer: F - All are Docker network drivers. bridge (default, single host), host (no isolation), overlay (multi-host swarm), macvlan (MAC addresses), none (no networking). Choose based on requirements and deployment.
+
+#@@@@@@@@@@
+
+158. Find the issue in this GitHub Actions workflow:
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy
+        run: |
+          kubectl apply -f k8s/
+        # Issue: no kubeconfig setup
+        # Issue: no environment specification
+```
+
+Answer: Issues: 1) No kubeconfig/authentication for kubectl. Add: configure kubectl with credentials. 2) No environment specification, might deploy to wrong cluster. Add: environment with protection rules. 3) No deployment verification.
+
+#@@@@@@@@@@
+
+159. What is the difference between Kubernetes Ingress Controller implementations?
+
+Answer: Different implementations: Nginx Ingress (most popular), Traefik (modern, dynamic), HAProxy, AWS ALB, GCE. Features vary: performance, configuration, cloud integration. Nginx: mature, feature-rich. Traefik: automatic service discovery. Choose based on requirements and cloud provider.
+
+#@@@@@@@@@@
+
+160. Which of the following are Terraform provisioner types? (Multiple correct)
+A) local-exec
+B) remote-exec
+C) file
+D) null_resource
+E) A, B, C only
+F) All of the above
+
+Answer: E - local-exec, remote-exec, file are provisioners. null_resource is a resource type (not provisioner) used with provisioners. Provisioners run commands/copy files during resource creation. Last resort, prefer cloud-init or configuration management.
+
+#@@@@@@@@@@
+
+161. Complete this Prometheus federation configuration:
+```yaml
+scrape_configs:
+  - job_name: 'federate'
+    scrape_interval: 15s
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job="_______________"}'
+        - '{__name__=~"job:.*"}'
+    static_configs:
+      - targets:
+        - 'prometheus-1:9090'
+        - 'prometheus-2:9090'
+```
+
+Answer: `prometheus` or any job name - Federation aggregates metrics from multiple Prometheus servers. Match specific jobs or metrics. honor_labels preserves original labels. Use for hierarchical Prometheus setup or cross-cluster monitoring.
+
+#@@@@@@@@@@
+
+162. How do you implement policy as code in infrastructure?
+
+Answer: Define policies in code (OPA, Sentinel, Checkov). Validate infrastructure code against policies. Enforce in CI/CD pipeline. Policies for security, compliance, cost. Example: require encryption, prevent public access, enforce tagging. Fail pipeline on violations. Version control policies.
+
+#@@@@@@@@@@
+
+163. Which of the following are Kubernetes volume types? (Multiple correct)
+A) emptyDir
+B) hostPath
+C) nfs
+D) persistentVolumeClaim
+E) configMap/secret
+F) All of the above
+
+Answer: F - All are Kubernetes volume types. emptyDir (temporary), hostPath (node filesystem), nfs (network storage), persistentVolumeClaim (persistent storage), configMap/secret (configuration). Choose based on persistence and sharing needs.
+
+#@@@@@@@@@@
+
+164. Find the issue in this Jenkins shared library:
+```groovy
+// vars/deployApp.groovy
+def call(String environment) {
+    pipeline {
+        agent any
+        stages {
+            stage('Deploy') {
+                steps {
+                    sh "kubectl apply -f k8s/${environment}/"
+                    // Issue: no deployment verification
+                    // Issue: no rollback on failure
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: Issues: 1) No deployment verification. Add: `kubectl rollout status deployment/app`. 2) No rollback on failure. Add: try-catch with rollback. 3) No approval for production. Add: input step for prod environment.
+
+#@@@@@@@@@@
+
+165. What is the difference between Kubernetes StatefulSet and Deployment for databases?
+
+Answer: StatefulSet provides stable network identity, ordered deployment/scaling, persistent storage per pod, headless service for direct pod access. Deployment treats pods as interchangeable, no stable identity. Use StatefulSet for databases requiring stable identity and storage. Deployment for stateless apps.
+
+#@@@@@@@@@@
+
+166. Which of the following are GitOps principles? (Multiple correct)
+A) Declarative configuration
+B) Git as single source of truth
+C) Automated synchronization
+D) Pull-based deployment
+E) Continuous reconciliation
+F) All of the above
+
+Answer: F - All are GitOps principles. Declarative (desired state in Git), Git (version control, audit trail), Automated sync (ArgoCD, Flux), Pull-based (agents pull from Git), Reconciliation (drift detection). Benefits: reproducibility, auditability, rollback.
+
+#@@@@@@@@@@
+
+167. Complete this Kubernetes Horizontal Pod Autoscaler with custom metrics:
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: webapp
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: _______________
+      target:
+        type: AverageValue
+        averageValue: "1000"
+```
+
+Answer: `http_requests_per_second` or custom metric name - Custom metrics from application. Requires metrics server and custom metrics API. Scale based on application-specific metrics (requests, queue length). More accurate than CPU/memory.
+
+#@@@@@@@@@@
+
+168. How do you implement continuous security in DevOps (DevSecOps)?
+
+Answer: Shift security left: SAST in IDE/commit, dependency scanning, container scanning, DAST in staging, infrastructure scanning (tfsec, Checkov). Security gates in pipeline. Automated vulnerability management. Security testing in CI/CD. Compliance as code. Security monitoring in production.
+
+#@@@@@@@@@@
+
+169. Which of the following are Docker image optimization techniques? (Multiple correct)
+A) Multi-stage builds
+B) Minimal base images
+C) Layer caching
+D) .dockerignore
+E) Combine RUN commands
+F) All of the above
+
+Answer: F - All optimize Docker images. Multi-stage (smaller final image), Minimal base (alpine, distroless), Layer caching (faster builds), .dockerignore (exclude files), Combine RUN (fewer layers). Smaller images: faster pulls, less storage, smaller attack surface.
+
+#@@@@@@@@@@
+
+170. Find the issue in this Terraform module usage:
+```hcl
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  # Issue: no version specified
+
+  name = "my-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["us-east-1a", "us-east-1b"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+}
+```
+
+Answer: No version specified for module. Add: `version = "3.14.0"`. Without version, gets latest which may break compatibility. Pin versions for stability. Use version constraints: `version = "~> 3.14"` for minor updates.
+
+#@@@@@@@@@@
+
+171. What is the difference between Kubernetes DaemonSet update strategies?
+
+Answer: RollingUpdate (default): gradually updates pods, one at a time or by maxUnavailable. OnDelete: manual deletion required, pods updated when deleted. RollingUpdate for automated updates, OnDelete for controlled manual updates. Configure maxUnavailable for update speed vs availability.
+
+#@@@@@@@@@@
+
+172. Which of the following are Prometheus recording rule best practices? (Multiple correct)
+A) Pre-compute expensive queries
+B) Use consistent naming convention
+C) Aggregate high-cardinality metrics
+D) Document rules
+E) Test rules before deployment
+F) All of the above
+
+Answer: F - All are recording rule best practices. Pre-compute (performance), Naming (level:metric:operations), Aggregate (reduce cardinality), Document (maintainability), Test (correctness). Recording rules improve dashboard performance.
+
+#@@@@@@@@@@
+
+173. Complete this Ansible dynamic inventory for AWS:
+```yaml
+# aws_ec2.yml
+plugin: aws_ec2
+regions:
+  - us-east-1
+filters:
+  tag:Environment: _______________
+  instance-state-name: running
+keyed_groups:
+  - key: tags.Role
+    prefix: role
+hostnames:
+  - tag:Name
+```
+
+Answer: `production` or environment name - Filter instances by tag. Dynamic inventory queries cloud provider for current instances. Auto-discovery, no manual inventory maintenance. Use filters to target specific instances.
+
+#@@@@@@@@@@
+
+174. How do you implement cost allocation and chargeback in cloud?
+
+Answer: Tag all resources (team, project, environment). Enable cost allocation tags. Use cloud cost management tools (AWS Cost Explorer, Azure Cost Management). Generate reports by tag. Implement budgets and alerts. Showback (informational) or chargeback (billing). Regular cost reviews with teams.
+
+#@@@@@@@@@@
+
+175. Which of the following are Jenkins pipeline post conditions? (Multiple correct)
+A) always
+B) success
+C) failure
+D) unstable
+E) changed
+F) All of the above
+
+Answer: F - All are post conditions. always (always run), success (build succeeded), failure (build failed), unstable (tests failed), changed (status changed from previous). Use for cleanup, notifications, artifact publishing.
+
+#@@@@@@@@@@
+
+176. Find the issue in this Kubernetes Service:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+spec:
+  type: LoadBalancer
+  selector:
+    app: webapp
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  # Issue: no session affinity for stateful app
+  # Issue: no health check configuration
+```
+
+Answer: Issues: 1) No session affinity for stateful app. Add: `sessionAffinity: ClientIP`. 2) No health check annotations for cloud load balancer. Add cloud-specific annotations. 3) Consider using Ingress instead for HTTP traffic.
+
+#@@@@@@@@@@
+
+177. What is the difference between Terraform plan and apply?
+
+Answer: Plan shows proposed changes without executing, dry-run, safe. Apply executes changes, modifies infrastructure, requires confirmation (unless -auto-approve). Workflow: plan (review), apply (execute). Always review plan before apply. Save plan: `terraform plan -out=tfplan`, apply saved plan.
+
+#@@@@@@@@@@
+
+178. Which of the following are container runtime interfaces? (Multiple correct)
+A) containerd
+B) CRI-O
+C) Docker
+D) rkt
+E) Podman
+F) All of the above
+
+Answer: F - All are container runtimes. containerd (CNCF, used by Docker and Kubernetes), CRI-O (Kubernetes-specific), Docker (complete platform), rkt (deprecated), Podman (daemonless). Kubernetes uses CRI (Container Runtime Interface).
+
+#@@@@@@@@@@
+
+179. Complete this Grafana dashboard variable:
+```json
+{
+  "name": "environment",
+  "type": "query",
+  "datasource": "Prometheus",
+  "query": "label_values(up, _______________)",
+  "refresh": 1,
+  "multi": false,
+  "includeAll": false
+}
+```
+
+Answer: `environment` or label name - Query label values for dashboard variable. Variables enable dynamic dashboards. Use in queries: `{environment="$environment"}`. Refresh options: on dashboard load, on time range change.
+
+#@@@@@@@@@@
+
+180. How do you implement disaster recovery testing?
+
+Answer: Regular DR drills (quarterly, annually). Test backup restoration. Failover to DR site. Verify RTO/RPO metrics. Document procedures (runbooks). Automate recovery where possible. Test different failure scenarios. Review and improve based on findings. Chaos engineering for resilience.
+
+#@@@@@@@@@@
+
+181. Which of the following are Kubernetes pod disruption budget use cases? (Multiple correct)
+A) Prevent all pods from being evicted
+B) Ensure minimum availability during updates
+C) Control voluntary disruptions
+D) Protect critical applications
+E) Coordinate with cluster autoscaler
+F) All of the above
+
+Answer: F - All are PDB use cases. PDB ensures minimum available pods during voluntary disruptions (node drain, updates). Specify minAvailable or maxUnavailable. Protects availability. Doesn't prevent involuntary disruptions (node failure).
+
+#@@@@@@@@@@
+
+182. Find the issue in this Docker Compose healthcheck:
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # Issue: curl not installed in nginx image
+
+  app:
+    image: myapp
+    depends_on:
+      - web
+    # Issue: depends_on doesn't wait for healthy
+```
+
+Answer: Issues: 1) curl not in nginx image. Use: `["CMD", "wget", "--spider", "http://localhost"]` or install curl. 2) depends_on doesn't wait for health. Use: `depends_on: web: condition: service_healthy` (Compose v3.9+).
+
+#@@@@@@@@@@
+
+183. What is the difference between Kubernetes Ingress and Gateway API?
+
+Answer: Ingress is older, simpler, L7 HTTP routing, limited features. Gateway API is newer, more expressive, role-oriented (GatewayClass, Gateway, HTTPRoute), supports more protocols, better for complex routing. Gateway API is future of Kubernetes traffic management.
+
+#@@@@@@@@@@
+
+184. Which of the following are Terraform state locking backends? (Multiple correct)
+A) S3 with DynamoDB
+B) Terraform Cloud
+C) Consul
+D) etcd
+E) Azure Blob Storage
+F) All of the above
+
+Answer: F - All support state locking. S3+DynamoDB (AWS), Terraform Cloud (managed), Consul (HashiCorp), etcd (Kubernetes), Azure Blob (Azure). Locking prevents concurrent modifications. Essential for team collaboration.
+
+#@@@@@@@@@@
+
+185. Complete this Jenkins pipeline with credentials:
+```groovy
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'registry.example.com'
+    }
+
+    stages {
+        stage('Build and Push') {
+            steps {
+                script {
+                    docker.withRegistry("https://${DOCKER_REGISTRY}", _______________) {
+                        def image = docker.build("myapp:${env.BUILD_NUMBER}")
+                        image.push()
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `'docker-registry-credentials'` or credentials ID - Reference Jenkins credentials by ID. withRegistry handles login/logout. Use credentials binding for secure secret access. Never hardcode credentials.
+
+#@@@@@@@@@@
+
+186. How do you implement environment parity in CI/CD?
+
+Answer: Infrastructure as Code (same code for all environments). Containerization (same image across environments). Configuration management (environment-specific config). Automated provisioning. Minimize differences (only config, not code). Test in production-like staging. Parity reduces "works on my machine" issues.
+
+#@@@@@@@@@@
+
+187. Which of the following are Kubernetes cluster autoscaler considerations? (Multiple correct)
+A) Node group configuration
+B) Pod resource requests
+C) Pod disruption budgets
+D) Scaling policies
+E) Cloud provider limits
+F) All of the above
+
+Answer: F - All affect cluster autoscaler. Node groups (scaling targets), Resource requests (scheduling decisions), PDBs (eviction constraints), Policies (scale-up/down thresholds), Cloud limits (quotas). Proper configuration essential for effective autoscaling.
+
+#@@@@@@@@@@
+
+188. Find the issue in this Prometheus alert:
+```yaml
+groups:
+  - name: example
+    rules:
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        # Issue: no 'for' duration
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+```
+
+Answer: Missing 'for' duration causes immediate alerting on transient spikes. Add: `for: 5m`. Alert fires only if condition true for duration. Reduces false positives. Balance responsiveness vs noise.
+
+#@@@@@@@@@@
+
+189. What is the difference between Kubernetes init containers and sidecar containers?
+
+Answer: Init containers run before app containers, sequentially, complete before app starts, used for setup (wait for dependencies, fetch config). Sidecar containers run alongside app container, same lifecycle, used for supporting functions (logging, proxy, monitoring). Different purposes and lifecycles.
+
+#@@@@@@@@@@
+
+190. Which of the following are Ansible roles best practices? (Multiple correct)
+A) Single responsibility
+B) Parameterization with variables
+C) Use defaults for flexibility
+D) Document in README
+E) Test with Molecule
+F) All of the above
+
+Answer: F - All are role best practices. Single responsibility (focused), Variables (reusability), Defaults (sensible defaults, override as needed), Documentation (usage, variables), Testing (Molecule for role testing). Publish to Ansible Galaxy.
+
+#@@@@@@@@@@
+
+191. Complete this Terraform data source:
+```hcl
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]  # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = [_______________]
+  }
+}
+
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+}
+```
+
+Answer: `"hvm"` - Hardware Virtual Machine virtualization type. Data sources query existing resources. Use for AMIs, VPCs, subnets. Reference with `data.<type>.<name>.<attribute>`.
+
+#@@@@@@@@@@
+
+192. How do you implement trunk-based development with CI/CD?
+
+Answer: Single main branch, short-lived feature branches (< 1 day), frequent integration. Feature flags for incomplete features. Automated testing on every commit. Fast feedback. Continuous integration to main. Reduces merge conflicts, enables continuous delivery. Requires discipline and automation.
+
+#@@@@@@@@@@
+
+193. Which of the following are Docker logging drivers? (Multiple correct)
+A) json-file
+B) syslog
+C) journald
+D) fluentd
+E) awslogs
+F) All of the above
+
+Answer: F - All are Docker logging drivers. json-file (default), syslog (syslog daemon), journald (systemd), fluentd (Fluentd), awslogs (CloudWatch). Configure: `--log-driver=fluentd`. Centralized logging for production.
+
+#@@@@@@@@@@
+
+194. Find the issue in this Kubernetes resource limits:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "2000m"  # Issue: limit much higher than request
+```
+
+Answer: CPU limit (2000m = 2 cores) much higher than request (250m). Can cause CPU throttling and noisy neighbor issues. Set limits close to requests for predictable performance. Memory limit OK (2x request). Consider QoS classes: Guaranteed (requests = limits), Burstable, BestEffort.
+
+#@@@@@@@@@@
+
+195. What is the difference between Kubernetes rolling update and recreate strategy?
+
+Answer: RollingUpdate gradually replaces pods, zero downtime, configurable (maxSurge, maxUnavailable), default. Recreate terminates all pods then creates new ones, downtime, simpler, use when incompatible versions can't coexist. RollingUpdate for production, Recreate for development or special cases.
+
+#@@@@@@@@@@
+
+196. Which of the following are GitLab CI/CD pipeline optimization techniques? (Multiple correct)
+A) Caching dependencies
+B) Parallel jobs
+C) Docker layer caching
+D) Artifacts for job dependencies
+E) Conditional jobs
+F) All of the above
+
+Answer: F - All optimize pipelines. Caching (node_modules, dependencies), Parallel (independent jobs), Docker caching (faster builds), Artifacts (share between jobs), Conditional (only: changes, rules). Faster pipelines improve developer productivity.
+
+#@@@@@@@@@@
+
+197. Complete this Kubernetes Network Policy for egress:
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: database
+    ports:
+    - protocol: TCP
+      port: _______________
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 53  # DNS
+```
+
+Answer: `5432` or `3306` or database port - PostgreSQL (5432), MySQL (3306). Egress policy controls outbound traffic. Allow database and DNS. Default deny egress, explicit allow. Micro-segmentation for security.
+
+#@@@@@@@@@@
+
+198. How do you implement compliance as code?
+
+Answer: Define compliance requirements in code (OPA policies, InSpec profiles, Sentinel). Automated compliance scanning in CI/CD. Infrastructure code validation (tfsec, Checkov). Runtime compliance monitoring. Compliance dashboards and reporting. Version control compliance policies. Continuous compliance, not point-in-time audits.
+
+#@@@@@@@@@@
+
+199. Which of the following are Prometheus metric naming best practices? (Multiple correct)
+A) Use base unit (seconds, bytes)
+B) Include unit in name
+C) Use snake_case
+D) Prefix with namespace
+E) Suffix with metric type
+F) All of the above
+
+Answer: F - All are naming best practices. Base units (seconds not milliseconds), Unit in name (http_request_duration_seconds), snake_case (not camelCase), Namespace prefix (myapp_http_requests_total), Suffix (_total for counters, _bucket for histograms). Consistent naming improves usability.
+
+#@@@@@@@@@@
+
+200. Complete this comprehensive DevOps quiz - What are the key principles of DevOps?
+
+Answer: DevOps principles: Culture (collaboration, shared responsibility), Automation (CI/CD, IaC, testing), Measurement (metrics, monitoring, feedback), Sharing (knowledge, tools, practices). CALMS framework. Break down silos between Dev and Ops. Continuous improvement, fail fast, learn from failures. Infrastructure as Code, immutable infrastructure. Shift left (security, testing). Observability (metrics, logs, traces). Everything as code. Automate repetitive tasks. Small, frequent releases. Feedback loops. Blameless postmortems. DevOps is culture and practices, not just tools. Goal: faster, more reliable software delivery.
+
+#@@@@@@@@@@

@@ -1,0 +1,2602 @@
+C# Quiz - 200 Questions
+Tech Stack: .NET 8, ASP.NET Core, Blazor, Entity Framework, LINQ, MAUI, WPF, NUnit, SignalR, gRPC, xUnit, IdentityServer/ASP.NET Identity, Hangfire/Quartz.NET
+
+1. Which of the following are new features in .NET 8? (Multiple correct)
+A) Native AOT improvements
+B) System.Text.Json source generation
+C) Minimal APIs enhancements
+D) Performance improvements
+E) Container optimizations
+F) Blazor Server improvements
+
+Answer: A, B, C, D, E, F - All are .NET 8 features. Native AOT (Ahead-of-Time compilation), System.Text.Json source generation, Minimal APIs enhancements, significant performance improvements, container optimizations, and Blazor Server improvements.
+
+#@@@@@@@@@@
+
+2. Complete this ASP.NET Core minimal API:
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapGet("/users/{id}", async (int id, IUserService userService) =>
+{
+    var user = await userService.GetUserAsync(id);
+    return user is not null ? Results.Ok(user) : _______________();
+});
+
+app.Run();
+```
+
+Answer: `Results.NotFound` - Return a 404 Not Found response when the user is not found. This follows REST conventions for resource not found scenarios.
+
+#@@@@@@@@@@
+
+3. What is the difference between Entity Framework Core and Entity Framework 6?
+
+Answer: EF Core is cross-platform, lightweight, supports .NET Core/.NET 5+, has better performance, supports NoSQL providers. EF6 is Windows-only, .NET Framework, more mature feature set, supports complex types. EF Core is the future direction with active development.
+
+#@@@@@@@@@@
+
+4. Which of the following are LINQ operators? (Multiple correct)
+A) Where
+B) Select
+C) GroupBy
+D) OrderBy
+E) Join
+F) Aggregate
+
+Answer: A, B, C, D, E, F - All are LINQ operators. Where (filtering), Select (projection), GroupBy (grouping), OrderBy (sorting), Join (joining sequences), Aggregate (accumulation). LINQ provides rich querying capabilities for collections.
+
+#@@@@@@@@@@
+
+5. Find the issue in this Blazor component:
+```csharp
+@page "/counter"
+
+<h3>Counter</h3>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+        // Missing StateHasChanged() call
+    }
+}
+```
+
+Answer: Missing `StateHasChanged()` call is not actually an issue in this case. Blazor automatically calls StateHasChanged() after event handlers like @onclick. The code is correct as written. StateHasChanged() is only needed for manual UI updates outside event handlers.
+
+#@@@@@@@@@@
+
+6. How do you implement dependency injection in .NET 8?
+
+Answer: Use built-in DI container with `IServiceCollection`. Register services with `AddScoped`, `AddTransient`, `AddSingleton`. Inject via constructor injection, method injection, or `IServiceProvider`. Configure in `Program.cs` with `builder.Services.Add*()` methods.
+
+#@@@@@@@@@@
+
+7. Which of the following are Entity Framework Core migration commands? (Multiple correct)
+A) Add-Migration
+B) Update-Database
+C) Remove-Migration
+D) Script-Migration
+E) Drop-Database
+F) Get-Migration
+
+Answer: A, B, C, D, E, F - All are EF Core migration commands. Add-Migration (create migration), Update-Database (apply migrations), Remove-Migration (delete last migration), Script-Migration (generate SQL), Drop-Database (delete database), Get-Migration (list migrations).
+
+#@@@@@@@@@@
+
+8. Complete this MAUI application structure:
+```csharp
+public static class MauiProgram
+{
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            });
+
+        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<_______________>();
+
+        return builder.Build();
+    }
+}
+```
+
+Answer: `MainPageViewModel` or any appropriate service/viewmodel - Register ViewModels, services, or other dependencies needed by the application. Common pattern is to register ViewModels for MVVM architecture.
+
+#@@@@@@@@@@
+
+9. What is the difference between WPF and MAUI?
+
+Answer: WPF is Windows-only desktop framework using XAML. MAUI is cross-platform framework for mobile and desktop (Windows, macOS, iOS, Android) using single codebase. MAUI evolved from Xamarin.Forms, supports modern .NET, while WPF remains Windows-specific with rich desktop features.
+
+#@@@@@@@@@@
+
+10. Which of the following are NUnit attributes? (Multiple correct)
+A) [Test]
+B) [TestCase]
+C) [SetUp]
+D) [TearDown]
+E) [TestFixture]
+F) [Category]
+
+Answer: A, B, C, D, E, F - All are NUnit attributes. [Test] (test method), [TestCase] (parameterized test), [SetUp] (before each test), [TearDown] (after each test), [TestFixture] (test class), [Category] (test categorization).
+
+#@@@@@@@@@@
+
+11. Predict the output of this LINQ query:
+```csharp
+var numbers = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+var result = numbers
+    .Where(x => x % 2 == 0)
+    .Select(x => x * x)
+    .OrderByDescending(x => x)
+    .Take(3);
+
+foreach (var item in result)
+{
+    Console.WriteLine(item);
+}
+```
+
+Answer: 100, 64, 36 - Filter even numbers (2,4,6,8,10), square them (4,16,36,64,100), order descending (100,64,36,16,4), take first 3 (100,64,36).
+
+#@@@@@@@@@@
+
+12. How do you implement real-time communication with SignalR?
+
+Answer: Create Hub class inheriting from `Hub`, configure in `Program.cs` with `AddSignalR()` and `MapHub()`, use JavaScript client or .NET client to connect. Implement methods for sending messages, managing connections, and handling groups. Supports WebSockets, Server-Sent Events, Long Polling.
+
+#@@@@@@@@@@
+
+13. Which of the following are ASP.NET Core middleware? (Multiple correct)
+A) Authentication
+B) Authorization
+C) CORS
+D) Static Files
+E) Routing
+F) Exception Handling
+
+Answer: A, B, C, D, E, F - All are ASP.NET Core middleware. Authentication (identity verification), Authorization (permission checking), CORS (cross-origin requests), Static Files (serving static content), Routing (URL routing), Exception Handling (error processing).
+
+#@@@@@@@@@@
+
+14. Complete this Entity Framework Core configuration:
+```csharp
+public class BlogContext : DbContext
+{
+    public DbSet<Blog> Blogs { get; set; }
+    public DbSet<Post> Posts { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Blog>()
+            .HasMany(b => b.Posts)
+            .WithOne(p => p.Blog)
+            .HasForeignKey(p => p.BlogId)
+            .OnDelete(_______________);
+    }
+}
+```
+
+Answer: `DeleteBehavior.Cascade` or `DeleteBehavior.Restrict` - Configure delete behavior. Cascade deletes related posts when blog is deleted, Restrict prevents deletion if related posts exist. Choose based on business requirements.
+
+#@@@@@@@@@@
+
+15. What is the difference between xUnit and NUnit?
+
+Answer: xUnit is more modern, follows .NET conventions, uses constructor/IDisposable for setup/teardown, no [TestFixture] needed, supports parallel execution by default. NUnit is more traditional, uses attributes for setup/teardown, requires [TestFixture], more assertion methods. Both are popular .NET testing frameworks.
+
+#@@@@@@@@@@
+
+16. Which of the following are C# access modifiers? (Multiple correct)
+A) public
+B) private
+C) protected
+D) internal
+E) protected internal
+F) All of the above
+
+Answer: F - All are C# access modifiers. public (accessible everywhere), private (class only), protected (class and derived), internal (same assembly), protected internal (assembly or derived), private protected (assembly and derived). Control encapsulation.
+
+#@@@@@@@@@@
+
+17. Find the bug in this async code:
+```csharp
+public async Task<string> GetDataAsync()
+{
+    var result = await FetchDataAsync();
+    return result;
+}
+
+public void ProcessData()
+{
+    // Bug: blocking async call
+    var data = GetDataAsync().Result;
+    Console.WriteLine(data);
+}
+```
+
+Answer: Using .Result blocks the thread, can cause deadlocks in UI/ASP.NET contexts. Use await: `var data = await GetDataAsync()`. Make ProcessData async. Never block on async code with .Result or .Wait().
+
+#@@@@@@@@@@
+
+18. What is the output of this code?
+```csharp
+int? x = null;
+int y = x ?? 10;
+int z = x?.GetHashCode() ?? -1;
+
+Console.WriteLine($"{y}, {z}");
+```
+
+Answer: 10, -1 - Null-coalescing operator (??) returns right operand if left is null. Null-conditional operator (?.) returns null if operand is null. y = 10 (x is null), z = -1 (x?.GetHashCode() is null).
+
+#@@@@@@@@@@
+
+19. Which of the following are LINQ query operators? (Multiple correct)
+A) Where
+B) Select
+C) GroupBy
+D) Join
+E) OrderBy
+F) All of the above
+
+Answer: F - All are LINQ operators. Where (filter), Select (project), GroupBy (group), Join (combine), OrderBy (sort). LINQ provides declarative query syntax for collections. Method syntax and query syntax available.
+
+#@@@@@@@@@@
+
+20. Complete this dependency injection in ASP.NET Core:
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddSingleton<_______________>();
+        services.AddTransient<IEmailService, EmailService>();
+    }
+}
+```
+
+Answer: `IConfiguration` or any singleton service - Singleton (one instance per application), Scoped (one per request), Transient (new instance each time). Choose based on lifecycle needs.
+
+#@@@@@@@@@@
+
+21. How do you implement custom middleware in ASP.NET Core?
+
+Answer: Create class with Invoke/InvokeAsync method taking HttpContext and RequestDelegate. Register in Configure: `app.UseMiddleware<CustomMiddleware>()` or extension method. Middleware processes request, calls next middleware, processes response. Order matters in pipeline.
+
+#@@@@@@@@@@
+
+22. Which of the following are C# collection types? (Multiple correct)
+A) List<T>
+B) Dictionary<TKey, TValue>
+C) HashSet<T>
+D) Queue<T>
+E) Stack<T>
+F) All of the above
+
+Answer: F - All are C# collections. List (dynamic array), Dictionary (key-value), HashSet (unique items), Queue (FIFO), Stack (LIFO). Choose based on access pattern and requirements.
+
+#@@@@@@@@@@
+
+23. Find the memory leak in this code:
+```csharp
+public class EventPublisher
+{
+    public event EventHandler DataChanged;
+
+    public void RaiseEvent()
+    {
+        DataChanged?.Invoke(this, EventArgs.Empty);
+    }
+}
+
+public class EventSubscriber
+{
+    public EventSubscriber(EventPublisher publisher)
+    {
+        // Bug: not unsubscribing
+        publisher.DataChanged += OnDataChanged;
+    }
+
+    private void OnDataChanged(object sender, EventArgs e) { }
+}
+```
+
+Answer: Event subscription without unsubscription causes memory leak. Publisher holds reference to subscriber. Implement IDisposable, unsubscribe in Dispose: `publisher.DataChanged -= OnDataChanged`. Use weak events or event aggregator pattern.
+
+#@@@@@@@@@@
+
+24. What is the difference between IEnumerable and IQueryable?
+
+Answer: IEnumerable for in-memory collections, LINQ to Objects, executes on client. IQueryable for remote data sources (databases), LINQ to SQL/EF, builds expression tree, executes on server. IQueryable inherits IEnumerable. Use IQueryable for database queries to leverage server-side filtering.
+
+#@@@@@@@@@@
+
+25. Which of the following are Entity Framework Core features? (Multiple correct)
+A) Code First
+B) Database First
+C) Migrations
+D) Change Tracking
+E) Lazy Loading
+F) All of the above
+
+Answer: F - All are EF Core features. Code First (model to database), Database First (database to model), Migrations (version database schema), Change Tracking (detect changes), Lazy Loading (load related data on access). Powerful ORM for .NET.
+
+#@@@@@@@@@@
+
+26. Complete this async/await pattern:
+```csharp
+public async Task<List<User>> GetUsersAsync()
+{
+    using var client = new HttpClient();
+    var response = await client.GetAsync("https://api.example.com/users");
+    response.EnsureSuccessStatusCode();
+
+    var json = await response.Content.ReadAsStringAsync();
+    return JsonSerializer.Deserialize<List<User>>(json);
+}
+
+// Calling code
+public async Task ProcessUsersAsync()
+{
+    var users = await _______________;
+    foreach (var user in users)
+    {
+        Console.WriteLine(user.Name);
+    }
+}
+```
+
+Answer: `GetUsersAsync()` - Await async methods. Async all the way up the call stack. Don't mix sync and async. Use ConfigureAwait(false) in libraries to avoid context capture.
+
+#@@@@@@@@@@
+
+27. How do you implement repository pattern in C#?
+
+Answer: Define interface: `interface IRepository<T> { Task<T> GetByIdAsync(int id); Task<IEnumerable<T>> GetAllAsync(); Task AddAsync(T entity); Task UpdateAsync(T entity); Task DeleteAsync(int id); }`. Implement with EF Core. Register in DI. Abstracts data access, testable, maintainable.
+
+#@@@@@@@@@@
+
+28. Which of the following are C# 10+ features? (Multiple correct)
+A) Record types
+B) Global usings
+C) File-scoped namespaces
+D) Required properties
+E) Raw string literals
+F) All of the above
+
+Answer: F - All are modern C# features. Records (immutable data), Global usings (reduce repetition), File-scoped namespaces (less indentation), Required properties (C# 11), Raw strings (C# 11). Improve code quality and readability.
+
+#@@@@@@@@@@
+
+29. Find the bug in this LINQ query:
+```csharp
+var users = dbContext.Users
+    .Where(u => u.IsActive)
+    .ToList();  // Bug: loading all active users
+
+var admins = users
+    .Where(u => u.Role == "Admin")
+    .ToList();
+```
+
+Answer: ToList() loads all active users into memory before filtering for admins. Inefficient for large datasets. Combine queries: `dbContext.Users.Where(u => u.IsActive && u.Role == "Admin").ToList()`. Let database do the filtering.
+
+#@@@@@@@@@@
+
+30. What is the difference between Task and ValueTask?
+
+Answer: Task is reference type, heap allocated, suitable for most async operations. ValueTask is value type, stack allocated when result available synchronously, reduces allocations for hot paths. Use Task by default, ValueTask for performance-critical code with often-synchronous results.
+
+#@@@@@@@@@@
+
+31. Which of the following are ASP.NET Core authentication schemes? (Multiple correct)
+A) Cookie Authentication
+B) JWT Bearer
+C) OAuth 2.0
+D) OpenID Connect
+E) Windows Authentication
+F) All of the above
+
+Answer: F - All are ASP.NET Core authentication schemes. Cookie (traditional web apps), JWT (APIs), OAuth/OIDC (third-party), Windows (enterprise). Configure in AddAuthentication. Multiple schemes supported.
+
+#@@@@@@@@@@
+
+32. Complete this unit test with Moq:
+```csharp
+[Fact]
+public async Task GetUser_ReturnsUser_WhenUserExists()
+{
+    // Arrange
+    var mockRepo = new Mock<IUserRepository>();
+    mockRepo.Setup(r => r.GetByIdAsync(1))
+        .ReturnsAsync(new User { Id = 1, Name = "John" });
+
+    var service = new UserService(mockRepo._______________);
+
+    // Act
+    var result = await service.GetUserAsync(1);
+
+    // Assert
+    Assert.NotNull(result);
+    Assert.Equal("John", result.Name);
+}
+```
+
+Answer: `Object` - Access mocked object with .Object property. Moq creates mock implementations of interfaces. Setup methods, verify calls. Essential for unit testing with dependencies.
+
+#@@@@@@@@@@
+
+33. How do you implement caching in ASP.NET Core?
+
+Answer: In-memory caching: `services.AddMemoryCache()`, inject `IMemoryCache`. Distributed caching: `services.AddDistributedMemoryCache()` or Redis. Response caching: `services.AddResponseCaching()`, `[ResponseCache]` attribute. Output caching (ASP.NET Core 7+). Choose based on scalability needs.
+
+#@@@@@@@@@@
+
+34. Which of the following are C# exception handling best practices? (Multiple correct)
+A) Catch specific exceptions
+B) Don't catch and ignore
+C) Use finally for cleanup
+D) Throw, not throw ex
+E) Create custom exceptions
+F) All of the above
+
+Answer: F - All are exception handling best practices. Specific exceptions (not catch-all), Don't swallow exceptions, Finally (guaranteed cleanup), throw preserves stack trace (throw ex loses it), Custom exceptions (domain-specific). Proper exception handling improves reliability.
+
+#@@@@@@@@@@
+
+35. Find the bug in this Entity Framework query:
+```csharp
+public async Task<List<Blog>> GetBlogsWithPostsAsync()
+{
+    return await dbContext.Blogs
+        .Include(b => b.Posts)
+        .Where(b => b.IsPublished)
+        .ToListAsync();
+    // Bug: N+1 problem if Posts have Authors
+}
+```
+
+Answer: If accessing Post.Author later, causes N+1 queries. Use ThenInclude: `.Include(b => b.Posts).ThenInclude(p => p.Author)`. Eager load all needed related data. Use AsNoTracking() for read-only queries.
+
+#@@@@@@@@@@
+
+36. What is the difference between ref and out parameters?
+
+Answer: ref requires variable initialization before passing, bidirectional. out doesn't require initialization, must be assigned in method, output only. Both pass by reference. Use out for multiple return values, ref for modifying existing value. C# 7+ supports out variables: `Method(out var result)`.
+
+#@@@@@@@@@@
+
+37. Which of the following are SignalR features? (Multiple correct)
+A) Real-time communication
+B) WebSockets support
+C) Automatic reconnection
+D) Hub-based messaging
+E) Strongly-typed hubs
+F) All of the above
+
+Answer: F - All are SignalR features. Real-time (server push), WebSockets (with fallbacks), Reconnection (automatic), Hubs (RPC-style), Strongly-typed (compile-time safety). Build real-time web applications.
+
+#@@@@@@@@@@
+
+38. Complete this Minimal API in ASP.NET Core:
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/users/{id}", async (int id, IUserRepository repo) =>
+{
+    var user = await repo.GetByIdAsync(id);
+    return user is not null ? Results.Ok(user) : Results._______________();
+});
+
+app.Run();
+```
+
+Answer: `NotFound` - Return 404 for missing resource. Minimal APIs (ASP.NET Core 6+) reduce boilerplate. Results helper for common responses: Ok, NotFound, BadRequest, Created, etc.
+
+#@@@@@@@@@@
+
+39. How do you implement background tasks in ASP.NET Core?
+
+Answer: Implement IHostedService or inherit BackgroundService. Override ExecuteAsync for long-running tasks. Register in DI: `services.AddHostedService<MyBackgroundService>()`. Use for periodic tasks, queue processing. For complex scenarios, use Hangfire or Quartz.NET.
+
+#@@@@@@@@@@
+
+40. Which of the following are C# design patterns? (Multiple correct)
+A) Singleton
+B) Factory
+C) Repository
+D) Unit of Work
+E) Dependency Injection
+F) All of the above
+
+Answer: F - All are common C# design patterns. Singleton (single instance), Factory (object creation), Repository (data access abstraction), Unit of Work (transaction management), DI (inversion of control). Improve code organization and testability.
+
+#@@@@@@@@@@
+
+41. Find the bug in this async code:
+```csharp
+public async Task ProcessDataAsync()
+{
+    var tasks = new List<Task>();
+
+    for (int i = 0; i < 10; i++)
+    {
+        // Bug: closure captures loop variable
+        tasks.Add(Task.Run(() => Console.WriteLine(i)));
+    }
+
+    await Task.WhenAll(tasks);
+}
+```
+
+Answer: Closure captures loop variable i, all tasks may print same value (10). Fix: capture in local variable: `int index = i; tasks.Add(Task.Run(() => Console.WriteLine(index)))`. Or use foreach with collection.
+
+#@@@@@@@@@@
+
+42. What is the difference between String and StringBuilder?
+
+Answer: String is immutable, each modification creates new string, inefficient for many concatenations. StringBuilder is mutable, modifies same instance, efficient for building strings. Use String for few operations, StringBuilder for loops or many concatenations.
+
+#@@@@@@@@@@
+
+43. Which of the following are Blazor hosting models? (Multiple correct)
+A) Blazor Server
+B) Blazor WebAssembly
+C) Blazor Hybrid
+D) All of the above
+E) A and B only
+F) None of the above
+
+Answer: D - All are Blazor hosting models. Server (runs on server, SignalR), WebAssembly (runs in browser), Hybrid (native apps with web UI). Choose based on requirements: Server for low latency, WASM for offline, Hybrid for desktop/mobile.
+
+#@@@@@@@@@@
+
+44. Complete this FluentValidation validator:
+```csharp
+public class UserValidator : AbstractValidator<User>
+{
+    public UserValidator()
+    {
+        RuleFor(u => u.Email)
+            .NotEmpty()
+            .EmailAddress();
+
+        RuleFor(u => u.Age)
+            .GreaterThanOrEqualTo(18)
+            .LessThan(_______________);
+
+        RuleFor(u => u.Password)
+            .MinimumLength(8)
+            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)");
+    }
+}
+```
+
+Answer: `120` or reasonable maximum age - Validate age range. FluentValidation provides fluent API for validation rules. Separate validation from domain models. Integrate with ASP.NET Core model validation.
+
+#@@@@@@@@@@
+
+45. How do you implement API versioning in ASP.NET Core?
+
+Answer: Install Microsoft.AspNetCore.Mvc.Versioning. Configure: `services.AddApiVersioning()`. Version via URL: `[Route("api/v{version:apiVersion}/[controller]")]`, query string, header, or media type. Use `[ApiVersion("1.0")]` on controllers. Support multiple versions during transition.
+
+#@@@@@@@@@@
+
+46. Which of the following are C# nullable reference types features? (Multiple correct)
+A) Nullable warnings
+B) Null-forgiving operator (!)
+C) Null-conditional operator (?.)
+D) Null-coalescing operator (??)
+E) Required properties
+F) All of the above
+
+Answer: F - All relate to nullable reference types (C# 8+). Enable with `<Nullable>enable</Nullable>`. Warnings for potential null references, ! suppresses warnings, ?. safe navigation, ?? default value, required ensures initialization. Reduces null reference exceptions.
+
+#@@@@@@@@@@
+
+47. Find the bug in this code:
+```csharp
+public class UserService : IDisposable
+{
+    private readonly HttpClient _httpClient;
+
+    public UserService()
+    {
+        // Bug: creating HttpClient in constructor
+        _httpClient = new HttpClient();
+    }
+
+    public void Dispose()
+    {
+        _httpClient?.Dispose();
+    }
+}
+```
+
+Answer: Creating HttpClient per instance exhausts sockets. Use IHttpClientFactory: inject `IHttpClientFactory`, create clients with `factory.CreateClient()`. Or use static HttpClient. HttpClient is thread-safe, reuse instances.
+
+#@@@@@@@@@@
+
+48. What is the difference between ICollection, IList, and IEnumerable?
+
+Answer: IEnumerable provides iteration only (foreach), deferred execution. ICollection adds Count, Add, Remove, Clear. IList adds indexing, Insert, RemoveAt. IEnumerable for queries, ICollection for collections, IList for indexed access. Choose least specific interface needed.
+
+#@@@@@@@@@@
+
+49. Which of the following are Dapper features? (Multiple correct)
+A) Micro-ORM
+B) High performance
+C) SQL control
+D) Multi-mapping
+E) Async support
+F) All of the above
+
+Answer: F - All are Dapper features. Micro-ORM (lightweight), Performance (faster than EF), SQL control (write own queries), Multi-mapping (join results to objects), Async (async/await). Alternative to Entity Framework for performance-critical code.
+
+#@@@@@@@@@@
+
+50. Complete this AutoMapper configuration:
+```csharp
+public class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<User, UserDto>()
+            .ForMember(dest => dest.FullName,
+                opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"))
+            .ForMember(dest => dest.Age,
+                opt => opt.MapFrom(src => DateTime.Now.Year - src.BirthYear))
+            .ReverseMap();
+    }
+}
+
+// Usage
+var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+var mapper = config.CreateMapper();
+var dto = mapper._______________<UserDto>(user);
+```
+
+Answer: `Map` - Map source to destination. AutoMapper maps objects, reduces boilerplate. Configure mappings in Profile. Register in DI: `services.AddAutoMapper(typeof(MappingProfile))`.
+
+#@@@@@@@@@@
+
+51. How do you implement health checks in ASP.NET Core?
+
+Answer: Add health checks: `services.AddHealthChecks().AddDbContext<AppDbContext>().AddRedis(redis)`. Map endpoint: `app.MapHealthChecks("/health")`. Custom checks: implement IHealthCheck. Use for monitoring, load balancer health probes, readiness/liveness in Kubernetes.
+
+#@@@@@@@@@@
+
+52. Which of the following are C# 11 features? (Multiple correct)
+A) Raw string literals
+B) Required members
+C) List patterns
+D) File-scoped types
+E) Generic math
+F) All of the above
+
+Answer: F - All are C# 11 features. Raw strings (""" multiline """), Required members (required keyword), List patterns (pattern matching), File-scoped types (file keyword), Generic math (static abstract). Continuous language evolution.
+
+#@@@@@@@@@@
+
+53. Find the race condition:
+```csharp
+public class Counter
+{
+    private int _count = 0;
+
+    public void Increment()
+    {
+        // Bug: not thread-safe
+        _count++;
+    }
+
+    public int GetCount() => _count;
+}
+```
+
+Answer: _count++ is not atomic, race condition in multithreaded scenarios. Use Interlocked: `Interlocked.Increment(ref _count)`. Or lock: `lock(_lock) { _count++; }`. Or concurrent collections. Thread safety crucial for shared state.
+
+#@@@@@@@@@@
+
+54. What is the difference between async void and async Task?
+
+Answer: async Task returns Task, can be awaited, exceptions propagate to caller. async void returns nothing, can't be awaited, exceptions crash app. Use async Task for methods, async void only for event handlers. async void is fire-and-forget, dangerous.
+
+#@@@@@@@@@@
+
+55. Which of the following are MediatR patterns? (Multiple correct)
+A) Request/Response
+B) Notification
+C) Pipeline behaviors
+D) Command Query Separation
+E) All of the above
+F) A, B, C only
+
+Answer: F - Request/Response (IRequest<T>), Notification (INotification), Pipeline behaviors (cross-cutting concerns) are MediatR patterns. CQS is general pattern, not MediatR-specific. MediatR implements mediator pattern, decouples requests from handlers.
+
+#@@@@@@@@@@
+
+56. Complete this gRPC service:
+```csharp
+public class UserService : Users.UsersBase
+{
+    private readonly IUserRepository _repository;
+
+    public UserService(IUserRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public override async Task<UserResponse> GetUser(UserRequest request, ServerCallContext context)
+    {
+        var user = await _repository.GetByIdAsync(request.Id);
+
+        if (user == null)
+        {
+            throw new RpcException(new Status(StatusCode._______________, "User not found"));
+        }
+
+        return new UserResponse { Id = user.Id, Name = user.Name };
+    }
+}
+```
+
+Answer: `NotFound` - gRPC status code for missing resource. gRPC is high-performance RPC framework. Define services in .proto files. Use for microservices communication.
+
+#@@@@@@@@@@
+
+57. How do you implement rate limiting in ASP.NET Core?
+
+Answer: ASP.NET Core 7+: `services.AddRateLimiter()`, configure policies (fixed window, sliding window, token bucket, concurrency). Apply: `app.UseRateLimiter()`, `[EnableRateLimiting("policy")]`. For older versions, use AspNetCoreRateLimit package. Protect APIs from abuse.
+
+#@@@@@@@@@@
+
+58. Which of the following are xUnit attributes? (Multiple correct)
+A) [Fact]
+B) [Theory]
+C) [InlineData]
+D) [ClassData]
+E) [MemberData]
+F) All of the above
+
+Answer: F - All are xUnit attributes. [Fact] (simple test), [Theory] (parameterized test), [InlineData] (inline parameters), [ClassData] (class-based data), [MemberData] (property/method data). Flexible test parameterization.
+
+#@@@@@@@@@@
+
+59. Find the bug in this code:
+```csharp
+public async Task<List<User>> GetUsersAsync()
+{
+    var users = new List<User>();
+
+    foreach (var id in userIds)
+    {
+        // Bug: sequential async calls
+        var user = await _repository.GetByIdAsync(id);
+        users.Add(user);
+    }
+
+    return users;
+}
+```
+
+Answer: Sequential async calls are slow. Parallelize: `var tasks = userIds.Select(id => _repository.GetByIdAsync(id)); var users = await Task.WhenAll(tasks)`. Concurrent execution improves performance.
+
+#@@@@@@@@@@
+
+60. What is the difference between FirstOrDefault and SingleOrDefault?
+
+Answer: FirstOrDefault returns first element or default, doesn't check for multiple. SingleOrDefault returns single element or default, throws if multiple. Use First for "get any", Single for "must be exactly one". Single validates uniqueness.
+
+#@@@@@@@@@@
+
+61. Which of the following are ASP.NET Core filters? (Multiple correct)
+A) Authorization filters
+B) Resource filters
+C) Action filters
+D) Exception filters
+E) Result filters
+F) All of the above
+
+Answer: F - All are ASP.NET Core filters. Authorization (security), Resource (before model binding), Action (before/after action), Exception (handle exceptions), Result (before/after result execution). Implement cross-cutting concerns.
+
+#@@@@@@@@@@
+
+62. Complete this Polly retry policy:
+```csharp
+var retryPolicy = Policy
+    .Handle<HttpRequestException>()
+    .WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        onRetry: (exception, timeSpan, retryCount, context) =>
+        {
+            _logger.LogWarning($"Retry {retryCount} after {timeSpan.TotalSeconds}s");
+        });
+
+await retryPolicy.ExecuteAsync(async () =>
+{
+    return await _httpClient.GetAsync("_______________");
+});
+```
+
+Answer: URL string - Polly provides resilience policies: retry, circuit breaker, timeout, bulkhead. Exponential backoff for retries. Combine policies. Essential for distributed systems.
+
+#@@@@@@@@@@
+
+63. How do you implement CQRS in C#?
+
+Answer: Separate read and write models. Commands (write): `IRequest`, handlers modify state. Queries (read): `IRequest<T>`, handlers return data. Use MediatR for dispatching. Different data stores for read/write if needed. Improves scalability and separation of concerns.
+
+#@@@@@@@@@@
+
+64. Which of the following are C# tuple features? (Multiple correct)
+A) Value tuples
+B) Named elements
+C) Deconstruction
+D) Tuple equality
+E) All of the above
+F) A, B, C only
+
+Answer: E - All are tuple features (C# 7+). Value tuples (struct-based), Named elements (`(int id, string name)`), Deconstruction (`var (id, name) = tuple`), Equality (value-based comparison). Lightweight data structures.
+
+#@@@@@@@@@@
+
+65. Find the bug in this Entity Framework code:
+```csharp
+public async Task UpdateUserAsync(User user)
+{
+    using var context = new AppDbContext();
+
+    // Bug: not attaching entity
+    user.Name = "Updated";
+    await context.SaveChangesAsync();
+}
+```
+
+Answer: Entity not tracked by context, changes not saved. Attach and mark modified: `context.Users.Update(user)` or `context.Entry(user).State = EntityState.Modified`. Or retrieve, modify, save. Change tracking required for updates.
+
+#@@@@@@@@@@
+
+66. What is the difference between IAsyncEnumerable and Task<IEnumerable>?
+
+Answer: IAsyncEnumerable streams results asynchronously (yield return), memory efficient for large datasets. Task<IEnumerable> loads all results before returning, memory intensive. Use IAsyncEnumerable for streaming, pagination, real-time data. C# 8+ feature.
+
+#@@@@@@@@@@
+
+67. Which of the following are Serilog sinks? (Multiple correct)
+A) Console
+B) File
+C) Seq
+D) Application Insights
+E) Elasticsearch
+F) All of the above
+
+Answer: F - All are Serilog sinks. Console (console output), File (file logging), Seq (structured logging server), Application Insights (Azure), Elasticsearch (search/analytics). Serilog is structured logging library. Multiple sinks supported.
+
+#@@@@@@@@@@
+
+68. Complete this custom exception:
+```csharp
+public class UserNotFoundException : Exception
+{
+    public int UserId { get; }
+
+    public UserNotFoundException(int userId)
+        : base($"User with ID {userId} not found")
+    {
+        UserId = userId;
+    }
+
+    public UserNotFoundException(int userId, Exception innerException)
+        : base($"User with ID {userId} not found", _______________)
+    {
+        UserId = userId;
+    }
+}
+```
+
+Answer: `innerException` - Pass inner exception to base constructor. Custom exceptions provide domain-specific error information. Include relevant properties. Inherit from Exception or specific exception type.
+
+#@@@@@@@@@@
+
+69. How do you implement pagination in ASP.NET Core?
+
+Answer: Accept page and pageSize parameters. Use Skip and Take: `query.Skip((page - 1) * pageSize).Take(pageSize)`. Return PagedResult with items, total count, page info. Use PagedList library or custom implementation. Include pagination metadata in response headers or wrapper.
+
+#@@@@@@@@@@
+
+70. Which of the following are C# pattern matching features? (Multiple correct)
+A) Type patterns
+B) Property patterns
+C) Positional patterns
+D) Relational patterns
+E) Logical patterns
+F) All of the above
+
+Answer: F - All are pattern matching features (C# 7-11). Type (`is string s`), Property (`is { Length: > 0 }`), Positional (`is (var x, var y)`), Relational (`is > 0`), Logical (`is > 0 and < 100`). Powerful for conditional logic.
+
+#@@@@@@@@@@
+
+71. Find the bug in this code:
+```csharp
+public class UserService
+{
+    private static List<User> _users = new List<User>();
+
+    public void AddUser(User user)
+    {
+        // Bug: static field shared across instances
+        _users.Add(user);
+    }
+
+    public List<User> GetUsers() => _users;
+}
+```
+
+Answer: Static field shared across all instances, not instance-specific. Remove static or make class static. Static fields are application-wide, use carefully. For instance data, use instance fields.
+
+#@@@@@@@@@@
+
+72. What is the difference between Select and SelectMany?
+
+Answer: Select projects each element to one result (1:1), flattens one level. SelectMany projects each element to sequence and flattens (1:many), flattens all levels. Use Select for transformation, SelectMany for flattening nested collections.
+
+#@@@@@@@@@@
+
+73. Which of the following are IdentityServer4 features? (Multiple correct)
+A) OAuth 2.0
+B) OpenID Connect
+C) Token service
+D) User authentication
+E) API authorization
+F) All of the above
+
+Answer: F - All are IdentityServer4 features. OAuth 2.0 (authorization), OIDC (authentication), Token service (JWT), User authentication (login), API authorization (protect APIs). Comprehensive identity solution for .NET.
+
+#@@@@@@@@@@
+
+74. Complete this middleware pipeline:
+```csharp
+public void Configure(IApplicationBuilder app)
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app._______________();
+}
+```
+
+Answer: `UseEndpoints` or `MapControllers` - Map endpoints/controllers. Middleware order matters: exception handling first, authentication before authorization, routing before endpoints. Proper order ensures correct request processing.
+
+#@@@@@@@@@@
+
+75. How do you implement soft delete in Entity Framework Core?
+
+Answer: Add IsDeleted property to entity. Global query filter: `modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted)`. Override SaveChanges to set IsDeleted instead of deleting. Queries automatically filter deleted entities. Allows data recovery.
+
+#@@@@@@@@@@
+
+76. Which of the following are C# record features? (Multiple correct)
+A) Immutability by default
+B) Value-based equality
+C) With expressions
+D) Positional syntax
+E) Inheritance support
+F) All of the above
+
+Answer: F - All are record features (C# 9+). Immutable (init-only properties), Value equality (compare by value), With expressions (non-destructive mutation), Positional (`record Point(int X, int Y)`), Inheritance (record inheritance). Ideal for DTOs and value objects.
+
+#@@@@@@@@@@
+
+77. Find the bug in this async code:
+```csharp
+public async Task<string> GetDataAsync()
+{
+    try
+    {
+        return await _httpClient.GetStringAsync("https://api.example.com/data");
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error fetching data");
+        // Bug: returning null from async Task<string>
+        return null;
+    }
+}
+```
+
+Answer: Returning null from non-nullable reference type (if nullable reference types enabled). Return empty string, throw, or use Task<string?>. With nullable enabled, compiler warns. Handle nullability explicitly.
+
+#@@@@@@@@@@
+
+78. What is the difference between IOptions, IOptionsSnapshot, and IOptionsMonitor?
+
+Answer: IOptions singleton, reads config once at startup. IOptionsSnapshot scoped, reloads per request. IOptionsMonitor singleton, reloads on config change, supports change notifications. Use IOptions for static config, IOptionsSnapshot for per-request, IOptionsMonitor for dynamic config.
+
+#@@@@@@@@@@
+
+79. Which of the following are MassTransit features? (Multiple correct)
+A) Message bus abstraction
+B) RabbitMQ support
+C) Azure Service Bus support
+D) Saga state machines
+E) Request/Response
+F) All of the above
+
+Answer: F - All are MassTransit features. Message bus (abstraction over transports), RabbitMQ/Azure Service Bus (transports), Sagas (long-running processes), Request/Response (RPC-style). Distributed application framework.
+
+#@@@@@@@@@@
+
+80. Complete this custom model binder:
+```csharp
+public class CustomModelBinder : IModelBinder
+{
+    public Task BindModelAsync(ModelBindingContext bindingContext)
+    {
+        var value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
+
+        if (value == ValueProviderResult.None)
+        {
+            return Task.CompletedTask;
+        }
+
+        bindingContext.ModelState.SetModelValue(bindingContext.ModelName, value);
+
+        var result = /* custom parsing logic */;
+
+        bindingContext.Result = ModelBindingResult.Success(result);
+        return _______________;
+    }
+}
+```
+
+Answer: `Task.CompletedTask` - Return completed task. Custom model binders parse request data to model. Register: `[ModelBinder(typeof(CustomModelBinder))]` or globally. Use for complex binding scenarios.
+
+#@@@@@@@@@@
+
+81. How do you implement distributed caching with Redis in ASP.NET Core?
+
+Answer: Install StackExchange.Redis. Configure: `services.AddStackExchangeRedisCache(options => { options.Configuration = "localhost:6379"; })`. Inject IDistributedCache. Use GetAsync, SetAsync, RemoveAsync. Serialize objects to byte[]. Enables caching across multiple servers.
+
+#@@@@@@@@@@
+
+82. Which of the following are C# expression tree uses? (Multiple correct)
+A) LINQ to SQL
+B) Dynamic query building
+C) Code generation
+D) Serialization
+E) Reflection alternative
+F) All of the above
+
+Answer: F - All use expression trees. LINQ to SQL (translate to SQL), Dynamic queries (build at runtime), Code generation (compile expressions), Serialization (analyze structure), Reflection (type-safe). Represent code as data.
+
+#@@@@@@@@@@
+
+83. Find the bug in this code:
+```csharp
+public class UserController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public UserController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpGet]
+    public IActionResult GetUsers()
+    {
+        // Bug: returning IQueryable, not executed
+        var users = _context.Users.Where(u => u.IsActive);
+        return Ok(users);
+    }
+}
+```
+
+Answer: Returning IQueryable without executing query. DbContext disposed after request, query fails. Execute with ToList(), ToArray(), or FirstOrDefault(). Return materialized results, not queries.
+
+#@@@@@@@@@@
+
+84. What is the difference between AddScoped, AddTransient, and AddSingleton?
+
+Answer: Singleton creates one instance per application lifetime. Scoped creates one instance per request/scope. Transient creates new instance every time. Use Singleton for stateless services, Scoped for per-request state (DbContext), Transient for lightweight stateless services.
+
+#@@@@@@@@@@
+
+85. Which of the following are Hangfire features? (Multiple correct)
+A) Background job processing
+B) Recurring jobs
+C) Delayed jobs
+D) Dashboard
+E) Persistence
+F) All of the above
+
+Answer: F - All are Hangfire features. Background jobs (fire-and-forget), Recurring (cron-based), Delayed (scheduled), Dashboard (monitoring), Persistence (SQL, Redis). Reliable background processing for .NET.
+
+#@@@@@@@@@@
+
+86. Complete this custom validation attribute:
+```csharp
+public class FutureDateAttribute : ValidationAttribute
+{
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        if (value is DateTime date)
+        {
+            if (date > DateTime.Now)
+            {
+                return ValidationResult.Success;
+            }
+
+            return new ValidationResult("Date must be in the future");
+        }
+
+        return new ValidationResult("_______________");
+    }
+}
+```
+
+Answer: `"Invalid date format"` or similar - Validate value type. Custom validation attributes extend model validation. Use for domain-specific rules. Apply to properties: `[FutureDate]`.
+
+#@@@@@@@@@@
+
+87. How do you implement global exception handling in ASP.NET Core?
+
+Answer: Use exception handling middleware: `app.UseExceptionHandler("/error")`. Create error controller/endpoint. Or custom middleware: implement IExceptionHandler (ASP.NET Core 8+) or middleware with try-catch. Log exceptions, return appropriate responses. Don't expose sensitive information.
+
+#@@@@@@@@@@
+
+88. Which of the following are C# 12 features? (Multiple correct)
+A) Primary constructors
+B) Collection expressions
+C) Inline arrays
+D) Lambda improvements
+E) All of the above
+F) A, B, C only
+
+Answer: F - Primary constructors (classes), Collection expressions ([1, 2, 3]), Inline arrays (fixed-size) are C# 12. Lambda improvements were C# 10-11. C# continues evolving with each version.
+
+#@@@@@@@@@@
+
+89. Find the bug in this code:
+```csharp
+public async Task<User> CreateUserAsync(CreateUserDto dto)
+{
+    var user = new User
+    {
+        Email = dto.Email,
+        Password = dto.Password  // Bug: storing plaintext password
+    };
+
+    await _context.Users.AddAsync(user);
+    await _context.SaveChangesAsync();
+
+    return user;
+}
+```
+
+Answer: Storing plaintext password is security vulnerability. Hash password: use BCrypt, Argon2, or ASP.NET Core Identity. `user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password)`. Never store passwords in plaintext.
+
+#@@@@@@@@@@
+
+90. What is the difference between IActionResult and ActionResult<T>?
+
+Answer: IActionResult is interface, returns any action result, no type safety. ActionResult<T> is generic, returns T or IActionResult, type-safe, better for APIs. ActionResult<T> enables automatic OpenAPI/Swagger documentation. Use ActionResult<T> for typed responses.
+
+#@@@@@@@@@@
+
+91. Which of the following are Refit features? (Multiple correct)
+A) Type-safe HTTP client
+B) Automatic serialization
+C) Attribute-based API definition
+D) HttpClient integration
+E) All of the above
+F) A, B, C only
+
+Answer: E - All are Refit features. Type-safe (interface-based), Automatic serialization (JSON), Attributes ([Get], [Post]), HttpClient (uses HttpClientFactory). Simplifies HTTP API consumption.
+
+#@@@@@@@@@@
+
+92. Complete this EF Core migration:
+```csharp
+public partial class AddUserTable : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.CreateTable(
+            name: "Users",
+            columns: table => new
+            {
+                Id = table.Column<int>(nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Email = table.Column<string>(maxLength: 256, nullable: false),
+                CreatedAt = table.Column<DateTime>(nullable: false, defaultValueSql: "_______________")
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Users", x => x.Id);
+            });
+    }
+}
+```
+
+Answer: `"GETUTCDATE()"` or `"GETDATE()"` - SQL Server function for current date/time. Migrations version database schema. Generate: `dotnet ef migrations add Name`. Apply: `dotnet ef database update`. Version control migrations.
+
+#@@@@@@@@@@
+
+93. How do you implement request/response logging in ASP.NET Core?
+
+Answer: Custom middleware: read request body (enable buffering), call next, read response body. Log both. Or use Serilog.AspNetCore with request logging. Be careful with sensitive data (passwords, tokens). Implement filtering for sensitive endpoints.
+
+#@@@@@@@@@@
+
+94. Which of the following are BenchmarkDotNet features? (Multiple correct)
+A) Performance benchmarking
+B) Memory allocation tracking
+C) Multiple runtimes comparison
+D) Statistical analysis
+E) Export results
+F) All of the above
+
+Answer: F - All are BenchmarkDotNet features. Performance (measure execution time), Memory (allocation tracking), Runtimes (.NET Framework vs Core), Statistics (mean, median, stddev), Export (HTML, CSV, Markdown). Essential for performance optimization.
+
+#@@@@@@@@@@
+
+95. Find the bug in this code:
+```csharp
+public class CacheService
+{
+    private readonly IMemoryCache _cache;
+
+    public CacheService(IMemoryCache cache)
+    {
+        _cache = cache;
+    }
+
+    public async Task<User> GetUserAsync(int id)
+    {
+        return await _cache.GetOrCreateAsync($"user_{id}", async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+            // Bug: async database call in synchronous cache factory
+            return await _repository.GetByIdAsync(id);
+        });
+    }
+}
+```
+
+Answer: No bug in this code - GetOrCreateAsync supports async factory. However, be aware of cache stampede: multiple concurrent requests for same key. Use SemaphoreSlim for locking if needed.
+
+#@@@@@@@@@@
+
+96. What is the difference between ConfigureAwait(false) and ConfigureAwait(true)?
+
+Answer: ConfigureAwait(false) doesn't capture synchronization context, continues on thread pool thread, better performance. ConfigureAwait(true) (default) captures context, continues on original context (UI thread, ASP.NET context). Use false in libraries, true in UI code.
+
+#@@@@@@@@@@
+
+97. Which of the following are Carter features? (Multiple correct)
+A) Minimal API extensions
+B) Module-based organization
+C) Request/Response validation
+D) OpenAPI support
+E) All of the above
+F) A, B, C only
+
+Answer: E - All are Carter features. Minimal API extensions (fluent syntax), Modules (organize endpoints), Validation (FluentValidation integration), OpenAPI (Swagger). Enhances ASP.NET Core Minimal APIs.
+
+#@@@@@@@@@@
+
+98. Complete this Bogus fake data generator:
+```csharp
+var faker = new Faker<User>()
+    .RuleFor(u => u.Id, f => f.IndexFaker)
+    .RuleFor(u => u.FirstName, f => f.Name.FirstName())
+    .RuleFor(u => u.LastName, f => f.Name.LastName())
+    .RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName))
+    .RuleFor(u => u.Age, f => f.Random.Int(18, _______________));
+
+var users = faker.Generate(100);
+```
+
+Answer: `65` or maximum age - Generate fake data for testing. Bogus provides realistic test data. Use for seeding databases, unit tests, demos. Supports many data types and locales.
+
+#@@@@@@@@@@
+
+99. How do you implement feature toggles in ASP.NET Core?
+
+Answer: Use Microsoft.FeatureManagement. Configure features in appsettings.json. Register: `services.AddFeatureManagement()`. Use IFeatureManager or [FeatureGate] attribute. Conditional features, A/B testing, gradual rollout. Decouple deployment from release.
+
+#@@@@@@@@@@
+
+100. Which of the following are C# best practices for async/await? (Multiple correct)
+A) Async all the way
+B) Avoid async void
+C) Use ConfigureAwait in libraries
+D) Don't block on async code
+E) Use Task.Run for CPU-bound work
+F) All of the above
+
+Answer: F - All are async/await best practices. Async all the way (no mixing), Avoid async void (except event handlers), ConfigureAwait(false) in libraries, Don't block (.Result, .Wait()), Task.Run for CPU-bound (not I/O-bound). Proper async improves scalability.
+
+#@@@@@@@@@@
+
+101. How do you implement output caching in ASP.NET Core 7+?
+
+Answer: Add output caching: `services.AddOutputCache()`. Use middleware: `app.UseOutputCache()`. Apply to endpoints: `app.MapGet("/api/data", handler).CacheOutput()`. Configure policies for duration, vary by query/header. Improves performance for cacheable responses.
+
+#@@@@@@@@@@
+
+102. Which of the following are NSwag features? (Multiple correct)
+A) OpenAPI/Swagger generation
+B) Client code generation
+C) TypeScript client generation
+D) API documentation
+E) All of the above
+
+Answer: E - All are NSwag features. OpenAPI generation (from C# code), Client generation (C#, TypeScript), Documentation (Swagger UI). Alternative to Swashbuckle. Comprehensive API tooling.
+
+#@@@@@@@@@@
+
+103. Find the bug:
+```csharp
+public class ProductService
+{
+    private readonly List<Product> _products = new();
+
+    public IEnumerable<Product> GetProducts()
+    {
+        // Bug: exposing internal collection
+        return _products;
+    }
+}
+```
+
+Answer: Returning internal collection allows external modification. Return copy or read-only: `return _products.AsReadOnly()` or `return _products.ToList()`. Encapsulation prevents unintended modifications.
+
+#@@@@@@@@@@
+
+104. What is the difference between throw and throw ex?
+
+Answer: throw preserves original stack trace, rethrows exception. throw ex resets stack trace to current location, loses original context. Always use throw for rethrowing. throw ex makes debugging harder.
+
+#@@@@@@@@@@
+
+105. Which of the following are Scrutor features? (Multiple correct)
+A) Assembly scanning
+B) Decorator pattern
+C) Convention-based registration
+D) Lifetime management
+E) All of the above
+
+Answer: E - All are Scrutor features. Assembly scanning (auto-register services), Decorators (wrap services), Conventions (register by convention), Lifetimes (scoped, singleton, transient). Simplifies DI registration.
+
+#@@@@@@@@@@
+
+106. Complete this:
+```csharp
+public class OrderService
+{
+    private readonly ILogger<OrderService> _logger;
+    private readonly IOrderRepository _repository;
+
+    public OrderService(ILogger<OrderService> logger, IOrderRepository repository)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _repository = repository ?? throw new ArgumentNullException(nameof(_______________));
+    }
+}
+```
+
+Answer: `repository` - Validate constructor parameters. Fail fast on null dependencies. Or use C# 11 required properties. Defensive programming prevents null reference exceptions.
+
+#@@@@@@@@@@
+
+107. How do you implement correlation IDs in ASP.NET Core?
+
+Answer: Middleware to generate/extract correlation ID from header. Add to HttpContext.Items. Include in logs (Serilog enricher). Pass to downstream services via header. Enables request tracing across services. Use for distributed tracing.
+
+#@@@@@@@@@@
+
+108. Which of the following are Mediatr pipeline behaviors? (Multiple correct)
+A) Logging
+B) Validation
+C) Caching
+D) Transaction management
+E) All of the above
+
+Answer: E - All are common pipeline behaviors. Logging (audit trail), Validation (FluentValidation), Caching (response caching), Transactions (unit of work). Pipeline behaviors implement cross-cutting concerns.
+
+#@@@@@@@@@@
+
+109. Find the bug:
+```csharp
+public async Task ProcessOrdersAsync()
+{
+    var orders = await GetOrdersAsync();
+
+    foreach (var order in orders)
+    {
+        // Bug: modifying collection during iteration
+        if (order.IsExpired)
+        {
+            orders.Remove(order);
+        }
+    }
+}
+```
+
+Answer: Modifying collection during iteration throws InvalidOperationException. Use for loop backwards, ToList() before iteration, or RemoveAll: `orders.RemoveAll(o => o.IsExpired)`. Don't modify collection while iterating.
+
+#@@@@@@@@@@
+
+110. What is the difference between == and Equals()?
+
+Answer: == compares references for reference types (unless overloaded), value for value types. Equals() compares values (if overridden), default is reference comparison. Override Equals() and GetHashCode() together. Use == for reference comparison, Equals() for value comparison.
+
+#@@@@@@@@@@
+
+111. Which of the following are Quartz.NET features? (Multiple correct)
+A) Job scheduling
+B) Cron expressions
+C) Job persistence
+D) Clustering
+E) All of the above
+
+Answer: E - All are Quartz.NET features. Job scheduling (trigger-based), Cron (flexible scheduling), Persistence (database storage), Clustering (distributed scheduling). Enterprise job scheduling for .NET.
+
+#@@@@@@@@@@
+
+112. Complete this:
+```csharp
+public record UserDto
+{
+    public int Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+
+    public UserDto With_______________(string newName) => this with { Name = newName };
+}
+```
+
+Answer: `Name` or descriptive method name - With expression creates copy with modified property. Records support non-destructive mutation. Immutability with flexibility.
+
+#@@@@@@@@@@
+
+113. How do you implement database seeding in EF Core?
+
+Answer: Override OnModelCreating: `modelBuilder.Entity<User>().HasData(new User { Id = 1, Name = "Admin" })`. Or create seed data class. Run migrations to apply. Use for initial data, lookup tables. Keep seed data in version control.
+
+#@@@@@@@@@@
+
+114. Which of the following are C# memory management features? (Multiple correct)
+A) Garbage collection
+B) IDisposable pattern
+C) using statement
+D) Span<T>
+E) Memory<T>
+F) All of the above
+
+Answer: F - All are memory management features. GC (automatic memory management), IDisposable (deterministic cleanup), using (automatic disposal), Span<T> (stack-based slices), Memory<T> (heap-based slices). Efficient memory usage.
+
+#@@@@@@@@@@
+
+115. Find the bug:
+```csharp
+public class UserCache
+{
+    private Dictionary<int, User> _cache = new();
+
+    public void AddUser(User user)
+    {
+        // Bug: not thread-safe
+        if (!_cache.ContainsKey(user.Id))
+        {
+            _cache.Add(user.Id, user);
+        }
+    }
+}
+```
+
+Answer: Dictionary not thread-safe, race condition. Use ConcurrentDictionary: `private ConcurrentDictionary<int, User> _cache = new()`. Or lock: `lock(_lock) { ... }`. Thread safety crucial for shared state.
+
+#@@@@@@@@@@
+
+116. What is the difference between Array and List<T>?
+
+Answer: Array is fixed size, better performance, lower-level. List<T> is dynamic size, more features (Add, Remove), built on array. Use Array for fixed size, List<T> for dynamic collections. List<T> more convenient, Array more performant.
+
+#@@@@@@@@@@
+
+117. Which of the following are SpecFlow features? (Multiple correct)
+A) BDD testing
+B) Gherkin syntax
+C) Step definitions
+D) Test automation
+E) All of the above
+
+Answer: E - All are SpecFlow features. BDD (behavior-driven development), Gherkin (Given-When-Then), Step definitions (C# implementation), Automation (executable specifications). Bridges business and technical teams.
+
+#@@@@@@@@@@
+
+118. Complete this:
+```csharp
+public class ApiClient
+{
+    private readonly HttpClient _httpClient;
+
+    public ApiClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+        _httpClient.BaseAddress = new Uri("https://api.example.com");
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", _______________);
+    }
+}
+```
+
+Answer: `"MyApp/1.0"` or application name/version - Set User-Agent header. Identifies client to server. Use IHttpClientFactory for proper HttpClient management. Configure named/typed clients.
+
+#@@@@@@@@@@
+
+119. How do you implement pessimistic locking in EF Core?
+
+Answer: Use raw SQL with locking hints: `FromSqlRaw("SELECT * FROM Users WITH (UPDLOCK, ROWLOCK) WHERE Id = {0}", id)`. Or database transactions with isolation level. Prevents concurrent modifications. Use for critical sections.
+
+#@@@@@@@@@@
+
+120. Which of the following are C# delegate types? (Multiple correct)
+A) Action
+B) Func
+C) Predicate
+D) EventHandler
+E) All of the above
+
+Answer: E - All are delegate types. Action (void return), Func (returns value), Predicate (returns bool), EventHandler (event handling). Built-in delegates reduce boilerplate. Custom delegates for specific signatures.
+
+#@@@@@@@@@@
+
+121. Find the bug:
+```csharp
+public async Task<User> GetUserAsync(int id)
+{
+    var user = await _repository.GetByIdAsync(id);
+
+    if (user == null)
+    {
+        // Bug: throwing in async method without await
+        throw new UserNotFoundException(id);
+    }
+
+    return user;
+}
+```
+
+Answer: No bug - throwing exceptions in async methods is fine. Exception wrapped in Task. Caller's await unwraps exception. Async methods can throw synchronously or asynchronously.
+
+#@@@@@@@@@@
+
+122. What is the difference between const and readonly?
+
+Answer: const is compile-time constant, value must be known at compile time, implicitly static. readonly is runtime constant, can be initialized in constructor, instance or static. Use const for true constants, readonly for runtime-determined values.
+
+#@@@@@@@@@@
+
+123. Which of the following are Testcontainers features? (Multiple correct)
+A) Docker container management
+B) Database testing
+C) Integration testing
+D) Automatic cleanup
+E) All of the above
+
+Answer: E - All are Testcontainers features. Docker containers (for testing), Database testing (real databases), Integration testing (external dependencies), Cleanup (automatic disposal). Reliable integration tests.
+
+#@@@@@@@@@@
+
+124. Complete this:
+```csharp
+public class OrderValidator : AbstractValidator<Order>
+{
+    public OrderValidator()
+    {
+        RuleFor(o => o.CustomerId).GreaterThan(0);
+        RuleFor(o => o.Items).NotEmpty();
+        RuleFor(o => o.TotalAmount)
+            .GreaterThan(0)
+            .When(o => o.Items.Any())
+            .WithMessage("_______________");
+    }
+}
+```
+
+Answer: `"Total amount must be greater than 0 when items exist"` - Custom validation message. FluentValidation provides expressive validation. Conditional rules with When(). Clear error messages.
+
+#@@@@@@@@@@
+
+125. How do you implement optimistic concurrency in EF Core?
+
+Answer: Add RowVersion/Timestamp property: `[Timestamp] public byte[] RowVersion { get; set; }`. EF Core checks version on update. Throws DbUpdateConcurrencyException if changed. Handle exception, reload and retry. Prevents lost updates.
+
+#@@@@@@@@@@
+
+126. Which of the following are C# 9 features? (Multiple correct)
+A) Records
+B) Init-only properties
+C) Top-level statements
+D) Pattern matching enhancements
+E) All of the above
+
+Answer: E - All are C# 9 features. Records (immutable data types), Init-only (init keyword), Top-level statements (no Main method), Pattern matching (relational, logical patterns). Significant language evolution.
+
+#@@@@@@@@@@
+
+127. Find the bug:
+```csharp
+public class ProductService
+{
+    public decimal CalculateDiscount(decimal price, decimal discountPercent)
+    {
+        // Bug: potential division by zero
+        return price * (discountPercent / 100);
+    }
+}
+```
+
+Answer: No division by zero bug (dividing by 100, not discountPercent). However, missing validation: discountPercent should be 0-100. Add validation: `if (discountPercent < 0 || discountPercent > 100) throw new ArgumentException()`.
+
+#@@@@@@@@@@
+
+128. What is the difference between abstract class and interface?
+
+Answer: Abstract class can have implementation, fields, constructors, single inheritance. Interface only contracts (C# 8+ allows default implementation), multiple inheritance. Use interface for contracts, abstract class for shared implementation. Prefer composition over inheritance.
+
+#@@@@@@@@@@
+
+129. Which of the following are Respawn features? (Multiple correct)
+A) Database cleanup
+B) Fast test isolation
+C) Multiple database support
+D) Schema preservation
+E) All of the above
+
+Answer: E - All are Respawn features. Database cleanup (delete data), Fast (faster than recreate), Multiple databases (SQL Server, PostgreSQL, MySQL), Schema preservation (keeps structure). Integration test isolation.
+
+#@@@@@@@@@@
+
+130. Complete this:
+```csharp
+public class CacheOptions
+{
+    public int ExpirationMinutes { get; set; } = 10;
+    public bool EnableCaching { get; set; } = true;
+}
+
+// Startup
+services.Configure<CacheOptions>(Configuration.GetSection(_______________));
+```
+
+Answer: `"CacheOptions"` or section name - Bind configuration section to options class. Options pattern for configuration. Strongly-typed configuration. Use IOptions<T> to inject.
+
+#@@@@@@@@@@
+
+131. How do you implement request throttling per user in ASP.NET Core?
+
+Answer: Use rate limiting with custom key: user ID from claims. Configure rate limiter with user-based partitioning. Track requests per user. Return 429 Too Many Requests when exceeded. Protect against abuse per user.
+
+#@@@@@@@@@@
+
+132. Which of the following are C# nullable features? (Multiple correct)
+A) Nullable value types (int?)
+B) Nullable reference types
+C) Null-conditional operator (?.)
+D) Null-coalescing operator (??)
+E) Null-coalescing assignment (??=)
+F) All of the above
+
+Answer: F - All are nullable features. Nullable value types (T?), Nullable reference types (C# 8+), Null-conditional (?.), Null-coalescing (??), Null-coalescing assignment (??=). Reduce null reference exceptions.
+
+#@@@@@@@@@@
+
+133. Find the bug:
+```csharp
+public class OrderProcessor
+{
+    public async Task ProcessAsync(Order order)
+    {
+        await ValidateAsync(order);
+        await SaveAsync(order);
+        // Bug: not awaiting
+        SendEmailAsync(order);
+    }
+
+    private async Task SendEmailAsync(Order order)
+    {
+        await _emailService.SendAsync(order.CustomerEmail, "Order confirmed");
+    }
+}
+```
+
+Answer: Not awaiting SendEmailAsync - fire-and-forget, email may not send, exceptions lost. Await: `await SendEmailAsync(order)`. Or use background job if truly fire-and-forget. Always await async methods.
+
+#@@@@@@@@@@
+
+134. What is the difference between Stack and Queue?
+
+Answer: Stack is LIFO (Last In First Out), Push/Pop operations. Queue is FIFO (First In First Out), Enqueue/Dequeue operations. Use Stack for undo/redo, recursion. Use Queue for task processing, breadth-first search.
+
+#@@@@@@@@@@
+
+135. Which of the following are MediatR request types? (Multiple correct)
+A) IRequest (no response)
+B) IRequest<TResponse>
+C) INotification
+D) IStreamRequest<TResponse>
+E) All of the above
+
+Answer: E - All are MediatR request types. IRequest (void), IRequest<T> (returns T), INotification (pub/sub), IStreamRequest<T> (streaming). Different patterns for different scenarios.
+
+#@@@@@@@@@@
+
+136. Complete this:
+```csharp
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+
+    public override bool Equals(object? obj)
+    {
+        return obj is User user && Id == user.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(_______________);
+    }
+}
+```
+
+Answer: `Id` - Hash code based on equality members. Override Equals and GetHashCode together. Use HashCode.Combine for multiple properties. Consistent hashing for collections.
+
+#@@@@@@@@@@
+
+137. How do you implement database transactions in EF Core?
+
+Answer: Use DbContext.Database.BeginTransaction(): `using var transaction = await _context.Database.BeginTransactionAsync(); try { /* operations */ await transaction.CommitAsync(); } catch { await transaction.RollbackAsync(); }`. Or use TransactionScope. Ensures atomicity.
+
+#@@@@@@@@@@
+
+138. Which of the following are C# 10 features? (Multiple correct)
+A) Global usings
+B) File-scoped namespaces
+C) Record structs
+D) Constant interpolated strings
+E) All of the above
+
+Answer: E - All are C# 10 features. Global usings (reduce repetition), File-scoped namespaces (less indentation), Record structs (value type records), Constant interpolated strings. Continuous improvements.
+
+#@@@@@@@@@@
+
+139. Find the bug:
+```csharp
+public class UserService
+{
+    private readonly IUserRepository _repository;
+
+    public UserService(IUserRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<User> CreateUserAsync(User user)
+    {
+        await _repository.AddAsync(user);
+        // Bug: not saving changes
+        return user;
+    }
+}
+```
+
+Answer: Not calling SaveChangesAsync - changes not persisted. Add: `await _repository.SaveChangesAsync()` or `await _context.SaveChangesAsync()`. Repository pattern should include save method or use Unit of Work.
+
+#@@@@@@@@@@
+
+140. What is the difference between synchronous and asynchronous programming?
+
+Answer: Synchronous blocks thread until operation completes, simple but inefficient for I/O. Asynchronous doesn't block, thread available for other work, complex but scalable. Use async for I/O-bound operations (database, HTTP, file). Improves scalability and responsiveness.
+
+#@@@@@@@@@@
+
+141. Which of the following are Wolverine features? (Multiple correct)
+A) Message bus
+B) Command/Query handling
+C) Saga support
+D) HTTP endpoints
+E) All of the above
+
+Answer: E - All are Wolverine features. Message bus (messaging), Command/Query (CQRS), Sagas (workflows), HTTP (endpoints). Next-generation application framework for .NET.
+
+#@@@@@@@@@@
+
+142. Complete this:
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy._______________;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
+    }
+}
+```
+
+Answer: `CamelCase` - JSON naming policy. CamelCase (default, camelCase), null (PascalCase), SnakeCaseLower (snake_case). Configure JSON serialization globally.
+
+#@@@@@@@@@@
+
+143. How do you implement circuit breaker pattern in C#?
+
+Answer: Use Polly: `Policy.Handle<Exception>().CircuitBreakerAsync(exceptionsAllowedBeforeBreaking: 3, durationOfBreak: TimeSpan.FromSeconds(30))`. Prevents cascading failures. Opens circuit after threshold, half-open after duration, closes on success. Essential for resilience.
+
+#@@@@@@@@@@
+
+144. Which of the following are C# access modifier combinations? (Multiple correct)
+A) protected internal
+B) private protected
+C) public static
+D) internal sealed
+E) All of the above
+
+Answer: E - All are valid combinations. protected internal (assembly OR derived), private protected (assembly AND derived), public static (accessible everywhere, class-level), internal sealed (assembly only, not inheritable). Flexible access control.
+
+#@@@@@@@@@@
+
+145. Find the bug:
+```csharp
+public class Calculator
+{
+    public int Divide(int a, int b)
+    {
+        // Bug: no division by zero check
+        return a / b;
+    }
+}
+```
+
+Answer: No division by zero check. Add validation: `if (b == 0) throw new DivideByZeroException()` or `ArgumentException`. Validate inputs, fail fast. Defensive programming prevents runtime errors.
+
+#@@@@@@@@@@
+
+146. What is the difference between early and late binding?
+
+Answer: Early binding (compile-time) uses static types, type-safe, better performance. Late binding (runtime) uses dynamic or reflection, flexible, slower. Use early binding by default, late binding for dynamic scenarios (COM interop, dynamic languages).
+
+#@@@@@@@@@@
+
+147. Which of the following are FastEndpoints features? (Multiple correct)
+A) Minimal API alternative
+B) Built-in validation
+C) Endpoint grouping
+D) Performance optimized
+E) All of the above
+
+Answer: E - All are FastEndpoints features. Minimal API alternative (REPR pattern), Validation (FluentValidation), Grouping (organize endpoints), Performance (optimized). Modern endpoint framework for ASP.NET Core.
+
+#@@@@@@@@@@
+
+148. Complete this:
+```csharp
+public class WeatherForecast
+{
+    public DateTime Date { get; set; }
+    public int TemperatureC { get; set; }
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public string Summary { get; set; } = string.Empty;
+
+    public void Deconstruct(out DateTime date, out int tempC, out string summary)
+    {
+        date = _______________;
+        tempC = TemperatureC;
+        summary = Summary;
+    }
+}
+```
+
+Answer: `Date` - Deconstruction method enables tuple-like syntax: `var (date, temp, summary) = forecast`. Custom deconstruction for any type. Convenient data extraction.
+
+#@@@@@@@@@@
+
+149. How do you implement database connection resiliency in EF Core?
+
+Answer: Configure retry policy: `optionsBuilder.UseSqlServer(connectionString, options => options.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null))`. Handles transient failures. Automatic retry with exponential backoff.
+
+#@@@@@@@@@@
+
+150. Which of the following are C# best practices? (Multiple correct)
+A) Use meaningful names
+B) Follow SOLID principles
+C) Write unit tests
+D) Handle exceptions properly
+E) Use async/await for I/O
+F) All of the above
+
+Answer: F - All are C# best practices. Meaningful names (readability), SOLID (design principles), Unit tests (quality), Exception handling (reliability), Async/await (scalability). Professional code quality standards.
+
+#@@@@@@@@@@
+
+151. How do you implement custom JSON converters in System.Text.Json?
+
+Answer: Inherit from JsonConverter<T>. Override Read and Write methods. Register: `options.Converters.Add(new CustomConverter())`. Use for custom serialization logic (dates, enums, complex types). Alternative to JsonSerializer default behavior.
+
+#@@@@@@@@@@
+
+152. Which of the following are Entity Framework Core query types? (Multiple correct)
+A) Tracking queries
+B) No-tracking queries
+C) Raw SQL queries
+D) Compiled queries
+E) All of the above
+
+Answer: E - All are EF Core query types. Tracking (change tracking enabled), No-tracking (AsNoTracking(), read-only), Raw SQL (FromSqlRaw), Compiled (EF.CompileQuery, performance). Choose based on use case.
+
+#@@@@@@@@@@
+
+153. Find the bug:
+```csharp
+public class FileService
+{
+    public async Task<string> ReadFileAsync(string path)
+    {
+        var stream = File.OpenRead(path);
+        // Bug: not disposing stream
+        using var reader = new StreamReader(stream);
+        return await reader.ReadToEndAsync();
+    }
+}
+```
+
+Answer: Stream not explicitly disposed (though StreamReader disposes it). Better: `using var stream = File.OpenRead(path)` or `await using`. Always dispose IDisposable resources. Using statement ensures disposal.
+
+#@@@@@@@@@@
+
+154. What is the difference between params and regular array parameter?
+
+Answer: params allows variable number of arguments, called with individual values or array. Regular array requires explicit array creation. params must be last parameter. Use params for convenience: `Sum(1, 2, 3)` vs `Sum(new[] {1, 2, 3})`.
+
+#@@@@@@@@@@
+
+155. Which of the following are Marten features? (Multiple correct)
+A) Document database
+B) Event sourcing
+C) PostgreSQL-based
+D) LINQ support
+E) All of the above
+
+Answer: E - All are Marten features. Document database (JSON storage), Event sourcing (event store), PostgreSQL (uses PostgreSQL), LINQ (query support). .NET document database and event store.
+
+#@@@@@@@@@@
+
+156. Complete this:
+```csharp
+public class OrderService
+{
+    private readonly IMediator _mediator;
+    private readonly ILogger<OrderService> _logger;
+
+    public async Task<Order> CreateOrderAsync(CreateOrderCommand command)
+    {
+        _logger.LogInformation("Creating order for customer {CustomerId}", command.CustomerId);
+
+        var order = await _mediator.Send(_______________);
+
+        _logger.LogInformation("Order {OrderId} created successfully", order.Id);
+
+        return order;
+    }
+}
+```
+
+Answer: `command` - Send command through mediator. MediatR decouples request from handler. Supports pipeline behaviors. Clean architecture pattern.
+
+#@@@@@@@@@@
+
+157. How do you implement database sharding in C#?
+
+Answer: Route queries based on shard key (customer ID, region). Multiple connection strings for shards. Shard resolver determines target database. Use Dapper or ADO.NET for multi-database. EF Core supports multiple contexts. Complex but enables horizontal scaling.
+
+#@@@@@@@@@@
+
+158. Which of the following are C# operator overloading operators? (Multiple correct)
+A) + (addition)
+B) == (equality)
+C) < (less than)
+D) implicit/explicit conversion
+E) All of the above
+
+Answer: E - All can be overloaded. Arithmetic (+, -, *, /), Comparison (==, !=, <, >), Conversion (implicit, explicit). Override in pairs (== with !=, < with >). Use for domain-specific types (Money, Vector).
+
+#@@@@@@@@@@
+
+159. Find the bug:
+```csharp
+public class CacheService
+{
+    private static readonly Dictionary<string, object> _cache = new();
+
+    public T Get<T>(string key)
+    {
+        if (_cache.ContainsKey(key))
+        {
+            // Bug: unsafe cast
+            return (T)_cache[key];
+        }
+
+        return default;
+    }
+}
+```
+
+Answer: Unsafe cast can throw InvalidCastException. Use pattern matching: `return _cache[key] is T value ? value : default`. Or TryGetValue with type check. Type-safe casting prevents runtime errors.
+
+#@@@@@@@@@@
+
+160. What is the difference between covariance and contravariance?
+
+Answer: Covariance (out) allows derived type as return type, IEnumerable<Derived> to IEnumerable<Base>. Contravariance (in) allows base type as parameter, Action<Base> to Action<Derived>. Use for generic variance. Enables flexible generic types.
+
+#@@@@@@@@@@
+
+161. Which of the following are Npgsql features? (Multiple correct)
+A) PostgreSQL driver
+B) High performance
+C) Full PostgreSQL support
+D) JSON support
+E) All of the above
+
+Answer: E - All are Npgsql features. PostgreSQL driver (.NET), Performance (optimized), Full support (all PostgreSQL features), JSON (JSONB support). Best PostgreSQL driver for .NET.
+
+#@@@@@@@@@@
+
+162. Complete this:
+```csharp
+public class UserController : ControllerBase
+{
+    [HttpPost]
+    [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+    {
+        var user = await _service.CreateUserAsync(dto);
+
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, _______________);
+    }
+}
+```
+
+Answer: `user` - Return created resource. CreatedAtAction returns 201 with Location header. RESTful API pattern. Provides resource location to client.
+
+#@@@@@@@@@@
+
+163. How do you implement multi-tenancy with separate databases in EF Core?
+
+Answer: Tenant resolver from HTTP context (subdomain, header, claim). Connection string per tenant. DbContext factory with tenant-specific connection. Middleware to set current tenant. Separate database per tenant for isolation.
+
+#@@@@@@@@@@
+
+164. Which of the following are C# 8 features? (Multiple correct)
+A) Nullable reference types
+B) Async streams
+C) Default interface methods
+D) Pattern matching enhancements
+E) All of the above
+
+Answer: E - All are C# 8 features. Nullable reference types (reduce null errors), Async streams (IAsyncEnumerable), Default interface methods (interface evolution), Pattern matching (switch expressions, property patterns). Major language update.
+
+#@@@@@@@@@@
+
+165. Find the bug:
+```csharp
+public class ProductService
+{
+    public async Task<decimal> GetTotalPriceAsync(List<int> productIds)
+    {
+        decimal total = 0;
+
+        await Parallel.ForEachAsync(productIds, async (id, ct) =>
+        {
+            var product = await _repository.GetByIdAsync(id);
+            // Bug: race condition on total
+            total += product.Price;
+        });
+
+        return total;
+    }
+}
+```
+
+Answer: Race condition on total variable. Use thread-safe accumulation: `var prices = await Task.WhenAll(productIds.Select(id => _repository.GetByIdAsync(id))); return prices.Sum(p => p.Price)`. Avoid shared state in parallel operations.
+
+#@@@@@@@@@@
+
+166. What is the difference between IQueryable and IEnumerable execution?
+
+Answer: IQueryable builds expression tree, executes on data source (database), server-side filtering. IEnumerable executes in memory, client-side filtering. IQueryable for databases (deferred execution), IEnumerable for in-memory collections. IQueryable more efficient for large datasets.
+
+#@@@@@@@@@@
+
+167. Which of the following are Dapper Plus features? (Multiple correct)
+A) Bulk operations
+B) Batch operations
+C) Caching
+D) Audit
+E) All of the above
+
+Answer: E - All are Dapper Plus features (commercial extension). Bulk insert/update/delete, Batch operations, Caching, Audit trails. High-performance bulk operations for Dapper.
+
+#@@@@@@@@@@
+
+168. Complete this:
+```csharp
+public class EmailService : IEmailService
+{
+    private readonly SmtpClient _smtpClient;
+
+    public async Task SendAsync(string to, string subject, string body)
+    {
+        var message = new MailMessage
+        {
+            From = new MailAddress("noreply@example.com"),
+            Subject = subject,
+            Body = body,
+            IsBodyHtml = true
+        };
+
+        message.To.Add(_______________);
+
+        await _smtpClient.SendMailAsync(message);
+    }
+}
+```
+
+Answer: `to` or `new MailAddress(to)` - Add recipient email. SmtpClient for sending emails. Consider using SendGrid, MailKit for production. Dispose MailMessage properly.
+
+#@@@@@@@@@@
+
+169. How do you implement event sourcing in C#?
+
+Answer: Store events instead of current state. Event store (Marten, EventStore). Aggregate root applies events. Rebuild state by replaying events. Projections for read models. Benefits: audit trail, temporal queries, event replay. Complex but powerful pattern.
+
+#@@@@@@@@@@
+
+170. Which of the following are C# 7 features? (Multiple correct)
+A) Tuples
+B) Pattern matching
+C) Local functions
+D) Out variables
+E) All of the above
+
+Answer: E - All are C# 7 features. Tuples (value tuples), Pattern matching (is, switch), Local functions (nested functions), Out variables (inline declaration). Significant language improvements.
+
+#@@@@@@@@@@
+
+171. Find the bug:
+```csharp
+public class OrderService
+{
+    public async Task ProcessOrderAsync(int orderId)
+    {
+        var order = await _repository.GetByIdAsync(orderId);
+
+        // Bug: potential null reference
+        order.Status = OrderStatus.Processing;
+
+        await _repository.UpdateAsync(order);
+    }
+}
+```
+
+Answer: Null reference if order not found. Add null check: `if (order == null) throw new OrderNotFoundException(orderId)`. Or use null-conditional: `order?.Status`. With nullable reference types, compiler warns. Always validate retrieved entities.
+
+#@@@@@@@@@@
+
+172. What is the difference between shallow copy and deep copy?
+
+Answer: Shallow copy copies references, shared nested objects. Deep copy copies all levels, independent objects. Use MemberwiseClone for shallow, custom logic or serialization for deep. Deep copy needed for complete independence.
+
+#@@@@@@@@@@
+
+173. Which of the following are StackExchange.Redis features? (Multiple correct)
+A) High performance
+B) Async support
+C) Pub/Sub
+D) Transactions
+E) All of the above
+
+Answer: E - All are StackExchange.Redis features. Performance (optimized), Async (async/await), Pub/Sub (messaging), Transactions (atomic operations). Best Redis client for .NET.
+
+#@@@@@@@@@@
+
+174. Complete this:
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(
+                Configuration.GetConnectionString("DefaultConnection"),
+                sqlOptions => sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: _______________
+                )
+            )
+        );
+    }
+}
+```
+
+Answer: `null` or `new int[] { }` - Additional SQL error numbers to retry. null uses default transient errors. Specify custom error numbers if needed. Connection resiliency for production.
+
+#@@@@@@@@@@
+
+175. How do you implement API key authentication in ASP.NET Core?
+
+Answer: Custom authentication handler: inherit AuthenticationHandler<T>. Extract API key from header. Validate against store. Register: `services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", null)`. Apply [Authorize] attribute.
+
+#@@@@@@@@@@
+
+176. Which of the following are C# 6 features? (Multiple correct)
+A) Null-conditional operator (?.)
+B) String interpolation ($"")
+C) Expression-bodied members
+D) Auto-property initializers
+E) All of the above
+
+Answer: E - All are C# 6 features. Null-conditional (?.), String interpolation ($"Hello {name}"), Expression-bodied (=>), Auto-property initializers (= value). Improved syntax and readability.
+
+#@@@@@@@@@@
+
+177. Find the bug:
+```csharp
+public class UserService
+{
+    private readonly IMapper _mapper;
+
+    public async Task<UserDto> GetUserAsync(int id)
+    {
+        var user = await _repository.GetByIdAsync(id);
+
+        // Bug: mapping null object
+        return _mapper.Map<UserDto>(user);
+    }
+}
+```
+
+Answer: Mapping null returns null (or throws depending on configuration). Add null check: `if (user == null) return null` or throw exception. Validate before mapping. Handle missing entities appropriately.
+
+#@@@@@@@@@@
+
+178. What is the difference between boxing and unboxing?
+
+Answer: Boxing converts value type to object (heap allocation). Unboxing converts object back to value type (must be correct type). Boxing is implicit, unboxing is explicit. Avoid boxing for performance. Use generics to avoid boxing.
+
+#@@@@@@@@@@
+
+179. Which of the following are Elasticsearch.Net features? (Multiple correct)
+A) Low-level client
+B) High-level client (NEST)
+C) Full-text search
+D) Aggregations
+E) All of the above
+
+Answer: E - All are Elasticsearch.Net features. Low-level (Elasticsearch.Net), High-level (NEST), Full-text search, Aggregations. Comprehensive Elasticsearch client for .NET.
+
+#@@@@@@@@@@
+
+180. Complete this:
+```csharp
+public class WeatherForecastController : ControllerBase
+{
+    [HttpGet]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation._______________, VaryByQueryKeys = new[] { "city" })]
+    public IActionResult GetForecast(string city)
+    {
+        var forecast = _service.GetForecast(city);
+        return Ok(forecast);
+    }
+}
+```
+
+Answer: `Any` or `Client` - Response cache location. Any (client and proxy), Client (client only), None (no caching). VaryByQueryKeys caches different responses per query parameter.
+
+#@@@@@@@@@@
+
+181. How do you implement database migrations rollback in EF Core?
+
+Answer: Rollback to specific migration: `dotnet ef database update PreviousMigrationName`. Rollback all: `dotnet ef database update 0`. Generate rollback script: `dotnet ef migrations script CurrentMigration PreviousMigration`. Test rollback in non-production first.
+
+#@@@@@@@@@@
+
+182. Which of the following are C# 5 features? (Multiple correct)
+A) Async/await
+B) Caller information attributes
+C) Both A and B
+D) Neither
+
+Answer: C - Async/await and caller information attributes ([CallerMemberName], [CallerFilePath], [CallerLineNumber]) are C# 5 features. Revolutionary async programming model. Caller info for logging and debugging.
+
+#@@@@@@@@@@
+
+183. Find the bug:
+```csharp
+public class ProductRepository
+{
+    private readonly AppDbContext _context;
+
+    public async Task<List<Product>> GetProductsAsync()
+    {
+        // Bug: loading all products into memory
+        return await _context.Products.ToListAsync();
+    }
+}
+```
+
+Answer: Loading all products inefficient for large datasets. Implement pagination: `Skip((page-1)*pageSize).Take(pageSize)`. Or return IQueryable for caller to filter. Or use AsAsyncEnumerable for streaming. Avoid loading large datasets entirely.
+
+#@@@@@@@@@@
+
+184. What is the difference between static and instance members?
+
+Answer: Static members belong to type, shared across instances, accessed via type name. Instance members belong to instance, separate per object, accessed via instance. Use static for shared state/behavior, instance for object-specific. Static initialized once.
+
+#@@@@@@@@@@
+
+185. Which of the following are MongoDB.Driver features? (Multiple correct)
+A) LINQ support
+B) Async operations
+C) Aggregation pipeline
+D) Change streams
+E) All of the above
+
+Answer: E - All are MongoDB.Driver features. LINQ (query support), Async (async/await), Aggregation (complex queries), Change streams (real-time updates). Official MongoDB driver for .NET.
+
+#@@@@@@@@@@
+
+186. Complete this:
+```csharp
+public class OrderService
+{
+    public async Task<Order> CreateOrderAsync(CreateOrderDto dto)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            var order = new Order { /* ... */ };
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
+
+            await _inventoryService.ReserveItemsAsync(order.Items);
+
+            await transaction._______________();
+
+            return order;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+}
+```
+
+Answer: `CommitAsync` - Commit transaction on success. Transactions ensure atomicity. Rollback on exception. Use for multi-step operations requiring consistency.
+
+#@@@@@@@@@@
+
+187. How do you implement custom authorization policies in ASP.NET Core?
+
+Answer: Define requirement: implement IAuthorizationRequirement. Create handler: inherit AuthorizationHandler<TRequirement>. Register: `services.AddAuthorization(options => options.AddPolicy("PolicyName", policy => policy.Requirements.Add(new CustomRequirement())))`. Apply: `[Authorize(Policy = "PolicyName")]`.
+
+#@@@@@@@@@@
+
+188. Which of the following are C# 4 features? (Multiple correct)
+A) Dynamic keyword
+B) Named arguments
+C) Optional parameters
+D) Covariance/contravariance
+E) All of the above
+
+Answer: E - All are C# 4 features. Dynamic (late binding), Named arguments (clarity), Optional parameters (default values), Variance (generic flexibility). Improved interoperability and usability.
+
+#@@@@@@@@@@
+
+189. Find the bug:
+```csharp
+public class CacheService
+{
+    private readonly IMemoryCache _cache;
+
+    public T GetOrCreate<T>(string key, Func<T> factory)
+    {
+        // Bug: not using GetOrCreate properly
+        if (!_cache.TryGetValue(key, out T value))
+        {
+            value = factory();
+            _cache.Set(key, value);
+        }
+
+        return value;
+    }
+}
+```
+
+Answer: Race condition - multiple threads can call factory simultaneously. Use GetOrCreate: `return _cache.GetOrCreate(key, entry => { entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10); return factory(); })`. Thread-safe caching.
+
+#@@@@@@@@@@
+
+190. What is the difference between sealed and abstract classes?
+
+Answer: Sealed class cannot be inherited, final implementation. Abstract class must be inherited, cannot be instantiated, can have abstract members. Use sealed to prevent inheritance, abstract for base classes. Opposite purposes.
+
+#@@@@@@@@@@
+
+191. Which of the following are RabbitMQ.Client features? (Multiple correct)
+A) AMQP protocol
+B) Publish/Subscribe
+C) Request/Reply
+D) Routing
+E) All of the above
+
+Answer: E - All are RabbitMQ.Client features. AMQP (messaging protocol), Pub/Sub (messaging pattern), Request/Reply (RPC), Routing (exchange types). Official RabbitMQ client for .NET.
+
+#@@@@@@@@@@
+
+192. Complete this:
+```csharp
+public class UserService
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public async Task<User> GetUserFromApiAsync(int id)
+    {
+        var client = _httpClientFactory.CreateClient(_______________);
+
+        var response = await client.GetAsync($"/users/{id}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<User>();
+    }
+}
+```
+
+Answer: `"UserApi"` or named client - Create named HttpClient. Configure in Startup: `services.AddHttpClient("UserApi", client => { client.BaseAddress = new Uri("https://api.example.com"); })`. Proper HttpClient management.
+
+#@@@@@@@@@@
+
+193. How do you implement idempotency in APIs?
+
+Answer: Accept idempotency key in header. Store processed requests with key. Check if key exists before processing. Return cached response for duplicate requests. Use for POST/PUT/PATCH. Prevents duplicate operations (payments, orders).
+
+#@@@@@@@@@@
+
+194. Which of the following are C# 3 features? (Multiple correct)
+A) LINQ
+B) Lambda expressions
+C) Extension methods
+D) Anonymous types
+E) All of the above
+
+Answer: E - All are C# 3 features. LINQ (query syntax), Lambda expressions (=>), Extension methods (this parameter), Anonymous types (new { }). Foundational features still widely used.
+
+#@@@@@@@@@@
+
+195. Find the bug:
+```csharp
+public class FileUploadService
+{
+    public async Task<string> UploadFileAsync(IFormFile file)
+    {
+        var fileName = file.FileName;  // Bug: using user-provided filename
+        var path = Path.Combine(_uploadPath, fileName);
+
+        using var stream = new FileStream(path, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return fileName;
+    }
+}
+```
+
+Answer: Security vulnerability - path traversal attack with malicious filename. Generate safe filename: `var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}`. Validate file type, size. Never trust user input.
+
+#@@@@@@@@@@
+
+196. What is the difference between is and as operators?
+
+Answer: is checks type, returns bool, doesn't cast. as attempts cast, returns null if fails, reference types only. Use is for type checking, as for safe casting. C# 7+ pattern matching combines both: `if (obj is string s)`.
+
+#@@@@@@@@@@
+
+197. Which of the following are Confluent.Kafka features? (Multiple correct)
+A) Apache Kafka client
+B) Producer/Consumer
+C) Streams
+D) Admin operations
+E) All of the above
+
+Answer: E - All are Confluent.Kafka features. Kafka client (.NET), Producer/Consumer (messaging), Streams (processing), Admin (topic management). High-performance Kafka client for .NET.
+
+#@@@@@@@@@@
+
+198. Complete this:
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+                builder => builder
+                    .WithOrigins("https://example.com")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    ._______________());
+        });
+    }
+}
+```
+
+Answer: `AllowCredentials` - Allow credentials (cookies, auth headers). CORS policy for cross-origin requests. Configure origins, methods, headers. Security consideration for APIs.
+
+#@@@@@@@@@@
+
+199. How do you implement database connection pooling in C#?
+
+Answer: ADO.NET and EF Core use connection pooling by default. Configure in connection string: `Pooling=true;Min Pool Size=5;Max Pool Size=100`. Reuses connections, improves performance. Don't dispose DbContext too early. Monitor pool usage.
+
+#@@@@@@@@@@
+
+200. Complete this comprehensive C# quiz - What are the key principles of C# development?
+
+Answer: C# development principles: Type safety (strong typing, compile-time checks), Object-oriented (encapsulation, inheritance, polymorphism), SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion), Async/await for I/O operations, Dependency Injection (loose coupling), Unit testing (quality assurance), Clean code (readable, maintainable), Exception handling (reliability), LINQ (declarative queries), Nullable reference types (null safety), Performance optimization (profiling, benchmarking), Security (input validation, authentication, authorization), Modern C# features (records, pattern matching, tuples), Framework knowledge (ASP.NET Core, EF Core, SignalR), Best practices (code reviews, documentation, version control). C# is powerful, versatile language for building robust, scalable applications across web, desktop, mobile, cloud, and gaming platforms.
+
+#@@@@@@@@@@

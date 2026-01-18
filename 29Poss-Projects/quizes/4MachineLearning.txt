@@ -1,0 +1,4008 @@
+MACHINE LEARNING COMPREHENSIVE QUIZ - 200 QUESTIONS
+Tech Stack: Scikit-learn, TensorFlow, PyTorch, Keras, XGBoost, LightGBM, CatBoost, Transformers, Langchain, LangGraph & Langsmith, Kaggle, LLM, ONNX, JAX
+
+#@@@@@@@@@@
+
+1. What is the difference between supervised and unsupervised learning?
+
+Answer: Supervised learning uses labeled training data to learn mapping from inputs to outputs (classification/regression). Unsupervised learning finds patterns in unlabeled data (clustering, dimensionality reduction). Semi-supervised combines both approaches.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid scikit-learn preprocessing techniques? (Multiple correct)
+A) StandardScaler
+B) MinMaxScaler
+C) LabelEncoder
+D) OneHotEncoder
+E) PCA
+F) TSNE
+
+Answer: A, B, C, D, E, F - All are valid sklearn preprocessing techniques. StandardScaler/MinMaxScaler for feature scaling, LabelEncoder/OneHotEncoder for categorical variables, PCA for dimensionality reduction, TSNE for visualization.
+
+#@@@@@@@@@@
+
+3. Find the bug in this TensorFlow model:
+```python
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu', input_shape=(784,)),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Training data: X_train shape (60000, 784), y_train shape (60000,)
+model.fit(X_train, y_train, epochs=10)
+```
+
+Answer: Label mismatch - using categorical_crossentropy loss but y_train appears to be integer labels (shape 60000,) instead of one-hot encoded (should be 60000, 10). Use sparse_categorical_crossentropy or convert labels to one-hot.
+
+#@@@@@@@@@@
+
+4. What is the purpose of cross-validation in machine learning?
+
+Answer: Cross-validation evaluates model performance by splitting data into multiple folds, training on some folds and testing on others. Provides more robust performance estimates, helps detect overfitting, and enables model selection. Common types: k-fold, stratified k-fold, leave-one-out.
+
+#@@@@@@@@@@
+
+5. Predict the output of this PyTorch code:
+```python
+import torch
+import torch.nn as nn
+
+x = torch.tensor([[1.0, 2.0, 3.0]])
+linear = nn.Linear(3, 2, bias=False)
+linear.weight.data = torch.tensor([[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]])
+
+output = linear(x)
+print(output)
+```
+
+Answer: tensor([[4., 5.]]) - Linear layer computes matrix multiplication. x @ weight.T = [1,2,3] @ [[1,0],[0,1],[1,1]] = [1*1+2*0+3*1, 1*0+2*1+3*1] = [4, 5].
+
+#@@@@@@@@@@
+
+6. How do you handle imbalanced datasets in classification?
+
+Answer: Techniques include: resampling (SMOTE, undersampling), class weights, cost-sensitive learning, ensemble methods, different evaluation metrics (precision, recall, F1, AUC-ROC), threshold tuning, and stratified sampling.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid XGBoost parameters? (Multiple correct)
+A) max_depth
+B) learning_rate
+C) n_estimators
+D) subsample
+E) colsample_bytree
+F) reg_alpha
+
+Answer: A, B, C, D, E, F - All are valid XGBoost parameters. max_depth controls tree depth, learning_rate for gradient descent, n_estimators for number of trees, subsample for row sampling, colsample_bytree for feature sampling, reg_alpha for L1 regularization.
+
+#@@@@@@@@@@
+
+8. Complete this scikit-learn pipeline:
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=10)),
+    ('classifier', _______________)
+])
+
+pipeline.fit(X_train, y_train)
+predictions = pipeline.predict(X_test)
+```
+
+Answer: `RandomForestClassifier()` - Completes the pipeline with the classifier. Pipeline chains preprocessing steps with final estimator, ensuring consistent transformations during training and prediction.
+
+#@@@@@@@@@@
+
+9. What is the difference between bagging and boosting ensemble methods?
+
+Answer: Bagging trains models in parallel on different subsets of data, reduces variance (Random Forest). Boosting trains models sequentially, each correcting previous errors, reduces bias (AdaBoost, XGBoost). Bagging for overfitting, boosting for underfitting.
+
+#@@@@@@@@@@
+
+10. Find the issue in this Keras model training:
+```python
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.LSTM(50, return_sequences=True),
+    tf.keras.layers.LSTM(50),
+    tf.keras.layers.Dense(1)
+])
+
+model.compile(optimizer='adam', loss='mse')
+
+# Time series data: X shape (1000, 10, 5), y shape (1000, 1)
+history = model.fit(X, y, batch_size=32, epochs=100)
+```
+
+Answer: No validation split or separate validation data. Model may overfit without monitoring validation loss. Should add validation_split=0.2 or validation_data parameter to track generalization performance during training.
+
+#@@@@@@@@@@
+
+11. Which activation functions are commonly used in deep learning? (Multiple correct)
+A) ReLU
+B) Sigmoid
+C) Tanh
+D) Leaky ReLU
+E) Swish
+F) GELU
+
+Answer: A, B, C, D, E, F - All are common activation functions. ReLU for hidden layers, Sigmoid for binary classification, Tanh for centered outputs, Leaky ReLU to avoid dying ReLU, Swish/GELU for improved performance in modern architectures.
+
+#@@@@@@@@@@
+
+12. What will this LightGBM code output?
+```python
+import lightgbm as lgb
+import numpy as np
+
+train_data = lgb.Dataset(np.array([[1, 2], [3, 4], [5, 6]]), 
+                        label=np.array([0, 1, 0]))
+
+params = {
+    'objective': 'binary',
+    'metric': 'binary_logloss',
+    'verbose': -1
+}
+
+model = lgb.train(params, train_data, num_boost_round=10)
+predictions = model.predict(np.array([[2, 3]]))
+print(len(predictions))
+```
+
+Answer: 1 - predict() returns array with one prediction for the single input sample [[2, 3]]. Binary classification returns probability for positive class.
+
+#@@@@@@@@@@
+
+13. How do you implement feature selection in scikit-learn?
+
+Answer: Methods include: SelectKBest for univariate selection, RFE for recursive feature elimination, SelectFromModel for model-based selection, VarianceThreshold for low-variance features, and mutual_info_classif for mutual information.
+
+#@@@@@@@@@@
+
+14. Which of the following are valid loss functions for regression? (Multiple correct)
+A) Mean Squared Error (MSE)
+B) Mean Absolute Error (MAE)
+C) Huber Loss
+D) Categorical Crossentropy
+E) Quantile Loss
+F) Log-Cosh Loss
+
+Answer: A, B, C, E, F - Categorical Crossentropy is for classification. Others are regression losses: MSE for general use, MAE for robustness to outliers, Huber for combining MSE/MAE benefits, Quantile for specific percentiles, Log-Cosh for smooth approximation.
+
+#@@@@@@@@@@
+
+15. Complete this PyTorch custom dataset:
+```python
+import torch
+from torch.utils.data import Dataset
+
+class CustomDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        sample = self.data[idx]
+        label = self.labels[idx]
+        return torch.tensor(sample, dtype=torch.float32), torch.tensor(label, dtype=_______________)
+
+# Usage
+dataset = CustomDataset(X_train, y_train)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
+```
+
+Answer: `torch.long` - For classification labels, use long (int64) dtype. For regression targets, use float32. Long dtype is required for CrossEntropyLoss and similar classification losses.
+
+#@@@@@@@@@@
+
+16. What is the purpose of regularization in machine learning?
+
+Answer: Regularization prevents overfitting by adding penalty terms to loss function. L1 (Lasso) promotes sparsity, L2 (Ridge) shrinks weights, Elastic Net combines both. Also includes dropout, batch normalization, early stopping, data augmentation.
+
+#@@@@@@@@@@
+
+17. Which of the following are valid evaluation metrics for classification? (Multiple correct)
+A) Accuracy
+B) Precision
+C) Recall
+D) F1-score
+E) AUC-ROC
+F) Mean Squared Error
+
+Answer: A, B, C, D, E - MSE is for regression. Classification metrics: Accuracy for overall performance, Precision for positive prediction quality, Recall for positive class coverage, F1-score for balanced measure, AUC-ROC for ranking quality.
+
+#@@@@@@@@@@
+
+18. Find the bug in this CatBoost implementation:
+```python
+from catboost import CatBoostClassifier
+import pandas as pd
+
+# Data with categorical features
+df = pd.DataFrame({
+    'feature1': [1, 2, 3, 4],
+    'feature2': ['A', 'B', 'A', 'C'],
+    'feature3': [0.1, 0.2, 0.3, 0.4],
+    'target': [0, 1, 0, 1]
+})
+
+X = df[['feature1', 'feature2', 'feature3']]
+y = df['target']
+
+model = CatBoostClassifier(verbose=False)
+model.fit(X, y, cat_features=['feature2'])
+```
+
+Answer: No apparent bug - this is correct CatBoost usage. CatBoost handles categorical features automatically when specified in cat_features parameter. The code properly identifies 'feature2' as categorical.
+
+#@@@@@@@@@@
+
+19. What is the difference between gradient descent variants?
+
+Answer: SGD uses single sample, fast but noisy. Batch GD uses entire dataset, stable but slow. Mini-batch GD balances both. Adam adapts learning rates, RMSprop uses moving averages, AdaGrad accumulates gradients. Modern optimizers like Adam are most common.
+
+#@@@@@@@@@@
+
+20. Predict the output:
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([0, 0, 1, 1])
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=42)
+
+rf = RandomForestClassifier(n_estimators=10, random_state=42)
+rf.fit(X_train, y_train)
+predictions = rf.predict(X_test)
+
+print(len(predictions))
+```
+
+Answer: 2 - test_size=0.5 means 50% of 4 samples = 2 samples in test set. predict() returns array with 2 predictions for the 2 test samples.
+
+#@@@@@@@@@@
+
+21. How do you handle missing values in machine learning?
+
+Answer: Strategies include: removal (listwise/pairwise deletion), imputation (mean/median/mode, KNN, iterative), indicator variables for missingness, model-based imputation, and domain-specific approaches. Choice depends on missing data mechanism (MCAR, MAR, MNAR).
+
+#@@@@@@@@@@
+
+22. Which of the following are valid dimensionality reduction techniques? (Multiple correct)
+A) Principal Component Analysis (PCA)
+B) t-SNE
+C) UMAP
+D) Linear Discriminant Analysis (LDA)
+E) Independent Component Analysis (ICA)
+F) Random Forest
+
+Answer: A, B, C, D, E - Random Forest is an ensemble method, not dimensionality reduction. Others reduce feature space: PCA for linear reduction, t-SNE/UMAP for non-linear visualization, LDA for supervised reduction, ICA for independent components.
+
+#@@@@@@@@@@
+
+23. Complete this TensorFlow data pipeline:
+```python
+import tensorflow as tf
+
+def preprocess_function(image, label):
+    image = tf.cast(image, tf.float32) / 255.0
+    return image, label
+
+dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+dataset = dataset.map(preprocess_function)
+dataset = dataset.batch(32)
+dataset = dataset._______________()
+
+model.fit(dataset, epochs=10)
+```
+
+Answer: `prefetch(tf.data.AUTOTUNE)` - Prefetching overlaps data preprocessing and model execution, improving training performance by preparing next batch while current batch is being processed.
+
+#@@@@@@@@@@
+
+24. What is the purpose of batch normalization?
+
+Answer: Batch normalization normalizes layer inputs to have zero mean and unit variance, stabilizes training, allows higher learning rates, reduces internal covariate shift, acts as regularization, and accelerates convergence in deep networks.
+
+#@@@@@@@@@@
+
+25. Find the issue in this hyperparameter tuning:
+```python
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+param_grid = {
+    'n_estimators': [10, 50, 100],
+    'max_depth': [3, 5, 7, None],
+    'min_samples_split': [2, 5, 10]
+}
+
+rf = RandomForestClassifier()
+grid_search = GridSearchCV(rf, param_grid, cv=5, scoring='accuracy')
+grid_search.fit(X_train, y_train)
+
+# Test on same data used for hyperparameter tuning
+best_score = grid_search.score(X_train, y_train)
+```
+
+Answer: Data leakage - testing on same data used for hyperparameter tuning leads to overly optimistic performance estimates. Should use separate validation set or nested cross-validation for unbiased evaluation.
+
+#@@@@@@@@@@
+
+26. How do you implement early stopping in deep learning?
+
+Answer: Monitor validation loss during training, stop when it stops improving for specified patience epochs. Prevents overfitting, saves best model weights. Implemented using callbacks in Keras/PyTorch, with parameters like patience, min_delta, restore_best_weights.
+
+#@@@@@@@@@@
+
+27. Which of the following are valid clustering algorithms? (Multiple correct)
+A) K-Means
+B) DBSCAN
+C) Hierarchical Clustering
+D) Gaussian Mixture Models
+E) Logistic Regression
+F) OPTICS
+
+Answer: A, B, C, D, F - Logistic Regression is classification, not clustering. Others are clustering algorithms: K-Means for spherical clusters, DBSCAN for density-based, Hierarchical for tree structure, GMM for probabilistic, OPTICS for varying densities.
+
+#@@@@@@@@@@
+
+28. What will this JAX code output?
+```python
+import jax.numpy as jnp
+from jax import grad
+
+def loss_fn(x):
+    return x**2 + 2*x + 1
+
+gradient_fn = grad(loss_fn)
+result = gradient_fn(3.0)
+print(result)
+```
+
+Answer: 8.0 - Gradient of f(x) = x² + 2x + 1 is f'(x) = 2x + 2. At x=3, gradient is 2*3 + 2 = 8. JAX automatically computes gradients using automatic differentiation.
+
+#@@@@@@@@@@
+
+29. How do you handle categorical features in machine learning?
+
+Answer: Techniques include: Label Encoding for ordinal data, One-Hot Encoding for nominal data, Target Encoding for high cardinality, Binary Encoding for memory efficiency, Embedding layers for deep learning, and specialized algorithms like CatBoost that handle categories natively.
+
+#@@@@@@@@@@
+
+30. Which of the following are valid neural network architectures? (Multiple correct)
+A) Feedforward Neural Network
+B) Convolutional Neural Network (CNN)
+C) Recurrent Neural Network (RNN)
+D) Long Short-Term Memory (LSTM)
+E) Transformer
+F) Decision Tree
+
+Answer: A, B, C, D, E - Decision Tree is not a neural network. Others are neural architectures: Feedforward for basic tasks, CNN for images, RNN for sequences, LSTM for long sequences, Transformer for attention-based processing.
+
+#@@@@@@@@@@
+
+31. Complete this ONNX model conversion:
+```python
+import torch
+import torch.onnx
+
+# PyTorch model
+model = torch.nn.Sequential(
+    torch.nn.Linear(10, 5),
+    torch.nn.ReLU(),
+    torch.nn.Linear(5, 1)
+)
+
+dummy_input = torch.randn(1, 10)
+
+torch.onnx.export(
+    model,
+    dummy_input,
+    "model.onnx",
+    export_params=True,
+    opset_version=11,
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: _______________}}
+)
+```
+
+Answer: `'batch_size'` - Dynamic axes allow variable batch sizes during inference. Both input and output should have the same dynamic axis name for batch dimension consistency.
+
+#@@@@@@@@@@
+
+32. What is the purpose of attention mechanisms in deep learning?
+
+Answer: Attention allows models to focus on relevant parts of input sequence, enabling better handling of long sequences, solving vanishing gradient problem in RNNs, and forming basis for Transformer architecture. Types include self-attention, multi-head attention, cross-attention.
+
+#@@@@@@@@@@
+
+33. Find the bug in this feature scaling:
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+# Train model with scaled data
+```
+
+Answer: Data leakage - fitting scaler on test data. Should only fit on training data: `X_test_scaled = scaler.transform(X_test)`. Fitting on test data leaks information about test distribution into preprocessing.
+
+#@@@@@@@@@@
+
+34. How do you implement transfer learning?
+
+Answer: Use pre-trained model as feature extractor or fine-tune layers. Freeze early layers, replace final layers for new task, use lower learning rates for pre-trained weights. Common in computer vision (ImageNet models) and NLP (BERT, GPT).
+
+#@@@@@@@@@@
+
+35. Which of the following are valid optimization algorithms? (Multiple correct)
+A) Adam
+B) SGD
+C) RMSprop
+D) AdaGrad
+E) AdamW
+F) K-Means
+
+Answer: A, B, C, D, E - K-Means is clustering, not optimization. Others are gradient-based optimizers: Adam for adaptive learning, SGD for simplicity, RMSprop for non-stationary objectives, AdaGrad for sparse gradients, AdamW for weight decay.
+
+#@@@@@@@@@@
+
+36. Predict the output:
+```python
+import numpy as np
+from sklearn.metrics import confusion_matrix
+
+y_true = np.array([0, 1, 1, 0, 1])
+y_pred = np.array([0, 1, 0, 0, 1])
+
+cm = confusion_matrix(y_true, y_pred)
+print(cm.shape)
+print(cm[0, 0])  # True Negatives
+```
+
+Answer: (2, 2) and 2 - Binary classification confusion matrix is 2x2. cm[0,0] represents True Negatives (predicted 0, actual 0). From the arrays, there are 2 true negatives (indices 0 and 3).
+
+#@@@@@@@@@@
+
+37. What is the difference between L1 and L2 regularization?
+
+Answer: L1 (Lasso) adds sum of absolute weights, promotes sparsity, performs feature selection. L2 (Ridge) adds sum of squared weights, shrinks weights uniformly, handles multicollinearity. Elastic Net combines both. L1 for feature selection, L2 for weight shrinkage.
+
+#@@@@@@@@@@
+
+38. Which of the following are valid data augmentation techniques? (Multiple correct)
+A) Rotation
+B) Flipping
+C) Scaling
+D) Noise addition
+E) Mixup
+F) Dropout
+
+Answer: A, B, C, D, E - Dropout is regularization, not data augmentation. Others augment training data: Rotation/Flipping/Scaling for geometric transforms, Noise addition for robustness, Mixup for interpolating samples.
+
+#@@@@@@@@@@
+
+39. Complete this Transformers library usage:
+```python
+from transformers import AutoTokenizer, AutoModel
+
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+text = "Hello, how are you?"
+inputs = tokenizer(text, return_tensors="pt")
+outputs = model(**inputs)
+
+# Get the last hidden state
+last_hidden_state = outputs._______________
+print(last_hidden_state.shape)
+```
+
+Answer: `last_hidden_state` - BERT model outputs include last_hidden_state containing contextualized embeddings for each token. Shape will be (batch_size, sequence_length, hidden_size).
+
+#@@@@@@@@@@
+
+40. How do you handle overfitting in machine learning?
+
+Answer: Techniques include: regularization (L1/L2), dropout, early stopping, data augmentation, cross-validation, reducing model complexity, ensemble methods, batch normalization, and collecting more training data.
+
+#@@@@@@@@@@
+
+41. Which of the following are valid time series forecasting methods? (Multiple correct)
+A) ARIMA
+B) LSTM
+C) Prophet
+D) Exponential Smoothing
+E) Random Forest
+F) Transformer
+
+Answer: A, B, C, D, E, F - All can be used for time series. ARIMA for statistical modeling, LSTM for sequential patterns, Prophet for trend/seasonality, Exponential Smoothing for weighted averages, Random Forest with lag features, Transformer for attention-based forecasting.
+
+#@@@@@@@@@@
+
+42. Find the issue in this model evaluation:
+```python
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+
+# Small dataset
+X = [[1, 2], [3, 4], [5, 6], [7, 8]]
+y = [0, 0, 1, 1]
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X, y)
+
+# Evaluate on training data
+train_accuracy = accuracy_score(y, model.predict(X))
+print(f"Accuracy: {train_accuracy}")
+```
+
+Answer: Evaluating on training data gives overly optimistic results. With small dataset and complex model (100 trees), likely to achieve 100% training accuracy but poor generalization. Should use cross-validation or hold-out validation.
+
+#@@@@@@@@@@
+
+43. What is the purpose of learning rate scheduling?
+
+Answer: Learning rate scheduling adjusts learning rate during training to improve convergence. Common schedules: step decay, exponential decay, cosine annealing, warm restarts. Helps escape local minima, fine-tune convergence, and achieve better final performance.
+
+#@@@@@@@@@@
+
+44. Which of the following are valid ensemble methods? (Multiple correct)
+A) Bagging
+B) Boosting
+C) Stacking
+D) Voting
+E) Blending
+F) Dropout
+
+Answer: A, B, C, D, E - Dropout is regularization. Ensemble methods combine multiple models: Bagging for variance reduction, Boosting for bias reduction, Stacking for meta-learning, Voting for simple combination, Blending for weighted combination.
+
+#@@@@@@@@@@
+
+45. Complete this PyTorch training loop:
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+model = nn.Linear(10, 1)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(100):
+    for batch_x, batch_y in dataloader:
+        optimizer.zero_grad()
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss._______________()
+        optimizer.step()
+```
+
+Answer: `backward()` - Computes gradients through backpropagation. The training loop: zero gradients, forward pass, compute loss, backward pass (compute gradients), update parameters.
+
+#@@@@@@@@@@
+
+46. What is the difference between precision and recall?
+
+Answer: Precision = TP/(TP+FP) - proportion of positive predictions that are correct. Recall = TP/(TP+FN) - proportion of actual positives correctly identified. Precision focuses on prediction quality, recall on coverage. F1-score balances both.
+
+#@@@@@@@@@@
+
+47. Which of the following are valid feature engineering techniques? (Multiple correct)
+A) Polynomial features
+B) Interaction terms
+C) Binning
+D) Log transformation
+E) Feature scaling
+F) Target encoding
+
+Answer: A, B, C, D, E, F - All are feature engineering techniques. Polynomial features for non-linearity, Interaction terms for feature combinations, Binning for discretization, Log transformation for skewed data, Feature scaling for normalization, Target encoding for categorical variables.
+
+#@@@@@@@@@@
+
+48. Predict the output:
+```python
+from sklearn.decomposition import PCA
+import numpy as np
+
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+pca = PCA(n_components=2)
+X_transformed = pca.fit_transform(X)
+
+print(X_transformed.shape)
+print(pca.explained_variance_ratio_.sum() > 0.99)
+```
+
+Answer: (4, 2) and True - PCA reduces 3 features to 2 components. With perfectly correlated features (each row increases by 3), first component captures most variance, so sum of explained variance ratio for 2 components is very close to 1.0.
+
+#@@@@@@@@@@
+
+49. How do you implement custom loss functions in deep learning frameworks?
+
+Answer: In TensorFlow/Keras: create function taking y_true, y_pred parameters. In PyTorch: inherit from nn.Module or create function. Must be differentiable for backpropagation. Examples: focal loss, dice loss, contrastive loss for specific tasks.
+
+#@@@@@@@@@@
+
+50. Which of the following are valid model selection techniques? (Multiple correct)
+A) Cross-validation
+B) Hold-out validation
+C) Bootstrap sampling
+D) Information criteria (AIC, BIC)
+E) Grid search
+F) Random search
+
+Answer: A, B, C, D, E, F - All are model selection techniques. Cross-validation for robust evaluation, Hold-out for simple split, Bootstrap for uncertainty estimation, Information criteria for statistical models, Grid/Random search for hyperparameter optimization.
+
+#@@@@@@@@@@
+
+51. What is the purpose of the bias-variance tradeoff?
+
+Answer: Bias measures how far predictions are from true values (underfitting), variance measures prediction sensitivity to training data changes (overfitting). Total error = bias² + variance + noise. Goal is finding optimal balance - reducing one often increases the other.
+
+#@@@@@@@@@@
+
+52. Which of the following are valid deep learning optimizers? (Multiple correct)
+A) Adam
+B) AdamW
+C) SGD with momentum
+D) RMSprop
+E) AdaGrad
+F) LBFGS
+
+Answer: A, B, C, D, E, F - All are valid optimizers. Adam for adaptive learning rates, AdamW with weight decay, SGD with momentum for acceleration, RMSprop for non-stationary objectives, AdaGrad for sparse gradients, LBFGS for small datasets.
+
+#@@@@@@@@@@
+
+53. Find the bug in this LangChain implementation:
+```python
+from langchain.llms import OpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+
+llm = OpenAI(temperature=0.7)
+prompt = PromptTemplate(
+    input_variables=["topic"],
+    template="Write a summary about {topic}"
+)
+
+chain = LLMChain(llm=llm, prompt=prompt)
+result = chain.run("machine learning")
+print(result)
+```
+
+Answer: Missing API key configuration. OpenAI LLM requires API key either as environment variable OPENAI_API_KEY or passed as openai_api_key parameter. Without it, the chain will fail with authentication error.
+
+#@@@@@@@@@@
+
+54. What is the difference between online and batch learning?
+
+Answer: Batch learning trains on entire dataset at once, requires retraining for new data. Online learning updates model incrementally with new samples, adapts to changing patterns. Online learning better for streaming data, concept drift, memory constraints.
+
+#@@@@@@@@@@
+
+55. Predict the output:
+```python
+import torch
+import torch.nn.functional as F
+
+logits = torch.tensor([[2.0, 1.0, 0.1]])
+probabilities = F.softmax(logits, dim=1)
+log_probs = F.log_softmax(logits, dim=1)
+
+print(probabilities.sum())
+print(torch.exp(log_probs).sum())
+```
+
+Answer: tensor(1.) and tensor(1.) - Both softmax and exp(log_softmax) produce probability distributions that sum to 1. log_softmax is numerically more stable than log(softmax).
+
+#@@@@@@@@@@
+
+56. How do you implement gradient clipping?
+
+Answer: Gradient clipping prevents exploding gradients by limiting gradient magnitude. Methods: clip by value (torch.clamp), clip by norm (torch.nn.utils.clip_grad_norm_), clip by global norm. Essential for RNNs and training stability.
+
+#@@@@@@@@@@
+
+57. Which of the following are valid neural network initialization methods? (Multiple correct)
+A) Xavier/Glorot initialization
+B) He initialization
+C) Zero initialization
+D) Random normal initialization
+E) Kaiming initialization
+F) LeCun initialization
+
+Answer: A, B, D, E, F - Zero initialization causes symmetry problems. Others are valid: Xavier for sigmoid/tanh, He/Kaiming for ReLU, Random normal for general use, LeCun for SELU activations.
+
+#@@@@@@@@@@
+
+58. Complete this scikit-learn model persistence:
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.externals import joblib
+import pickle
+
+# Train model
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+
+# Save model using joblib (recommended for sklearn)
+joblib.dump(rf, 'model.pkl')
+
+# Load model
+loaded_model = joblib._______________('model.pkl')
+predictions = loaded_model.predict(X_test)
+```
+
+Answer: `load` - joblib.load() loads the saved model. joblib is preferred over pickle for scikit-learn models due to better performance with NumPy arrays.
+
+#@@@@@@@@@@
+
+59. What is the purpose of feature importance in machine learning?
+
+Answer: Feature importance quantifies contribution of each feature to model predictions. Helps with feature selection, model interpretation, debugging, and understanding data relationships. Methods include permutation importance, SHAP values, tree-based importance.
+
+#@@@@@@@@@@
+
+60. Find the issue in this data preprocessing:
+```python
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+df = pd.DataFrame({
+    'category': ['A', 'B', 'C', 'A', 'B'],
+    'target': [1, 0, 1, 1, 0]
+})
+
+# Encode categorical variable
+le = LabelEncoder()
+df['category_encoded'] = le.fit_transform(df['category'])
+
+# Split data
+train_df = df[:3]
+test_df = df[3:]
+
+# Problem: test set might have unseen categories
+```
+
+Answer: LabelEncoder fitted on entire dataset before train/test split causes data leakage. Should fit encoder only on training data. Also, LabelEncoder can't handle unseen categories in test set - consider OneHotEncoder or target encoding.
+
+#@@@@@@@@@@
+
+61. How do you implement multi-class classification?
+
+Answer: Strategies include: One-vs-Rest (OvR), One-vs-One (OvO), native multi-class algorithms. Use softmax activation for neural networks, appropriate loss functions (categorical crossentropy), and multi-class metrics (macro/micro averaging).
+
+#@@@@@@@@@@
+
+62. Which of the following are valid clustering evaluation metrics? (Multiple correct)
+A) Silhouette score
+B) Calinski-Harabasz index
+C) Davies-Bouldin index
+D) Adjusted Rand Index
+E) Accuracy
+F) Inertia
+
+Answer: A, B, C, D, F - Accuracy requires true labels (supervised). Clustering metrics: Silhouette for cluster separation, Calinski-Harabasz for variance ratio, Davies-Bouldin for cluster compactness, ARI for agreement with ground truth, Inertia for within-cluster sum of squares.
+
+#@@@@@@@@@@
+
+63. What will this XGBoost feature importance code output?
+```python
+import xgboost as xgb
+import numpy as np
+
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
+y = np.array([0, 1, 0, 1])
+
+model = xgb.XGBClassifier(n_estimators=10, random_state=42)
+model.fit(X, y)
+
+importance = model.feature_importances_
+print(len(importance))
+print(importance.sum())
+```
+
+Answer: 3 and 1.0 - feature_importances_ returns importance for each feature (3 features), normalized to sum to 1.0. XGBoost provides gain-based feature importance by default.
+
+#@@@@@@@@@@
+
+64. How do you handle concept drift in machine learning?
+
+Answer: Concept drift occurs when data distribution changes over time. Solutions include: drift detection algorithms, model retraining schedules, ensemble methods, online learning, monitoring performance metrics, and adaptive learning rates.
+
+#@@@@@@@@@@
+
+65. Which of the following are valid text preprocessing techniques? (Multiple correct)
+A) Tokenization
+B) Stemming
+C) Lemmatization
+D) Stop word removal
+E) N-gram extraction
+F) PCA
+
+Answer: A, B, C, D, E - PCA is for numerical features. Text preprocessing: Tokenization splits text, Stemming reduces to root forms, Lemmatization to dictionary forms, Stop word removal eliminates common words, N-grams capture sequences.
+
+#@@@@@@@@@@
+
+66. Complete this PyTorch learning rate scheduler:
+```python
+import torch
+import torch.optim as optim
+from torch.optim.lr_scheduler import StepLR
+
+model = torch.nn.Linear(10, 1)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
+
+for epoch in range(50):
+    # Training code here
+    train_epoch()
+
+    # Update learning rate
+    scheduler._______________()
+
+    if epoch % 10 == 0:
+        print(f"Epoch {epoch}, LR: {optimizer.param_groups[0]['lr']}")
+```
+
+Answer: `step()` - scheduler.step() updates the learning rate according to the schedule. StepLR reduces LR by gamma every step_size epochs.
+
+#@@@@@@@@@@
+
+67. What is the purpose of data augmentation in deep learning?
+
+Answer: Data augmentation artificially increases training data size by applying transformations (rotation, scaling, noise). Improves generalization, reduces overfitting, helps with limited datasets, and makes models more robust to variations.
+
+#@@@@@@@@@@
+
+68. Which of the following are valid loss functions for multi-class classification? (Multiple correct)
+A) Categorical Crossentropy
+B) Sparse Categorical Crossentropy
+C) Focal Loss
+D) Mean Squared Error
+E) Hinge Loss
+F) KL Divergence
+
+Answer: A, B, C, E, F - MSE is for regression. Multi-class losses: Categorical Crossentropy for one-hot labels, Sparse Categorical for integer labels, Focal Loss for imbalanced classes, Hinge Loss for SVMs, KL Divergence for probability distributions.
+
+#@@@@@@@@@@
+
+69. Find the bug in this neural network architecture:
+```python
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, output_size)
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.softmax(x)
+        return x
+
+# Using with CrossEntropyLoss
+criterion = nn.CrossEntropyLoss()
+```
+
+Answer: Applying softmax before CrossEntropyLoss causes numerical instability. CrossEntropyLoss expects raw logits and applies log_softmax internally. Remove softmax from forward pass or use NLLLoss with log_softmax.
+
+#@@@@@@@@@@
+
+70. How do you implement stratified sampling?
+
+Answer: Stratified sampling maintains class distribution proportions in train/test splits. Use train_test_split with stratify parameter, StratifiedKFold for cross-validation, or StratifiedShuffleSplit for multiple random splits. Essential for imbalanced datasets.
+
+#@@@@@@@@@@
+
+71. Which of the following are valid recommendation system approaches? (Multiple correct)
+A) Collaborative Filtering
+B) Content-Based Filtering
+C) Matrix Factorization
+D) Deep Learning
+E) K-Means Clustering
+F) Hybrid Methods
+
+Answer: A, B, C, D, F - K-Means is clustering, not specifically for recommendations. Recommendation approaches: Collaborative Filtering uses user behavior, Content-Based uses item features, Matrix Factorization for latent factors, Deep Learning for complex patterns, Hybrid combines methods.
+
+#@@@@@@@@@@
+
+72. Predict the output:
+```python
+from sklearn.metrics import classification_report
+import numpy as np
+
+y_true = np.array([0, 1, 2, 0, 1, 2])
+y_pred = np.array([0, 1, 1, 0, 2, 2])
+
+report = classification_report(y_true, y_pred, output_dict=True)
+print(report['accuracy'])
+print(len(report) - 3)  # Subtract 'accuracy', 'macro avg', 'weighted avg'
+```
+
+Answer: 0.6666666666666666 and 3 - Accuracy is 4/6 correct predictions ≈ 0.667. Report contains entries for each class (0, 1, 2) plus accuracy, macro avg, weighted avg, so 3 classes.
+
+#@@@@@@@@@@
+
+73. What is the difference between bagging and pasting?
+
+Answer: Bagging samples with replacement (bootstrap), pasting samples without replacement. Both train multiple models on different subsets. Bagging introduces more randomness, pasting uses all data exactly once. Random Forest uses bagging, Extra Trees can use either.
+
+#@@@@@@@@@@
+
+74. Which of the following are valid techniques for handling imbalanced datasets? (Multiple correct)
+A) SMOTE
+B) Random undersampling
+C) Class weights
+D) Ensemble methods
+E) Threshold tuning
+F) Feature scaling
+
+Answer: A, B, C, D, E - Feature scaling doesn't address imbalance. Imbalance techniques: SMOTE for synthetic oversampling, Random undersampling for majority class reduction, Class weights for cost-sensitive learning, Ensemble methods for robust predictions, Threshold tuning for optimal cutoff.
+
+#@@@@@@@@@@
+
+75. Complete this TensorFlow model checkpointing:
+```python
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+
+# Create checkpoint callback
+checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath='model_checkpoint.h5',
+    save_best_only=True,
+    monitor='val_loss',
+    mode='_______________'
+)
+
+model.fit(X_train, y_train, validation_data=(X_val, y_val),
+          callbacks=[checkpoint_callback])
+```
+
+Answer: `'min'` - For validation loss, we want to save the model when loss is minimized. For accuracy metrics, use 'max'. Mode determines whether to minimize or maximize the monitored metric.
+
+#@@@@@@@@@@
+
+76. How do you implement custom metrics in deep learning frameworks?
+
+Answer: In Keras: inherit from tf.keras.metrics.Metric, implement update_state() and result(). In PyTorch: create function or class. Custom metrics enable domain-specific evaluation, business metrics, and specialized performance measures.
+
+#@@@@@@@@@@
+
+77. Which of the following are valid anomaly detection algorithms? (Multiple correct)
+A) Isolation Forest
+B) One-Class SVM
+C) Local Outlier Factor (LOF)
+D) Autoencoder
+E) DBSCAN
+F) Linear Regression
+
+Answer: A, B, C, D, E - Linear Regression is not anomaly detection. Anomaly detection: Isolation Forest for tree-based isolation, One-Class SVM for boundary learning, LOF for local density, Autoencoder for reconstruction error, DBSCAN identifies outliers as noise.
+
+#@@@@@@@@@@
+
+78. Find the issue in this model validation:
+```python
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+
+# Preprocessing
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Cross-validation
+rf = RandomForestClassifier()
+scores = cross_val_score(rf, X_scaled, y, cv=5)
+print(f"CV Score: {scores.mean()}")
+```
+
+Answer: Data leakage - scaling entire dataset before cross-validation. Scaler should be fitted only on training folds within CV. Use Pipeline to ensure proper preprocessing within each fold: Pipeline([('scaler', StandardScaler()), ('rf', RandomForestClassifier())]).
+
+#@@@@@@@@@@
+
+79. What is the purpose of dropout in neural networks?
+
+Answer: Dropout randomly sets neurons to zero during training, preventing co-adaptation and overfitting. Acts as ensemble method, improves generalization, reduces reliance on specific neurons. Only applied during training, disabled during inference.
+
+#@@@@@@@@@@
+
+80. Which of the following are valid sequence-to-sequence architectures? (Multiple correct)
+A) Encoder-Decoder
+B) Attention-based models
+C) Transformer
+D) LSTM-to-LSTM
+E) CNN-to-RNN
+F) Decision Tree
+
+Answer: A, B, C, D, E - Decision Tree doesn't handle sequences. Seq2seq architectures: Encoder-Decoder for basic structure, Attention for focus mechanisms, Transformer for self-attention, LSTM-to-LSTM for recurrent processing, CNN-to-RNN for hybrid approaches.
+
+#@@@@@@@@@@
+
+81. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+x = torch.tensor([[1.0, 2.0, 3.0, 4.0]])
+conv1d = nn.Conv1d(in_channels=1, out_channels=2, kernel_size=3, padding=1)
+
+# Reshape for Conv1d: (batch, channels, length)
+x_reshaped = x.unsqueeze(1)  # Shape: (1, 1, 4)
+output = conv1d(x_reshaped)
+
+print(output.shape)
+```
+
+Answer: torch.Size([1, 2, 4]) - Conv1d with 2 output channels, kernel_size=3, padding=1 maintains sequence length. Input (1,1,4) becomes output (1,2,4): batch=1, channels=2, length=4.
+
+#@@@@@@@@@@
+
+82. How do you implement multi-label classification?
+
+Answer: Each sample can have multiple labels. Use binary classification for each label, sigmoid activation, binary crossentropy loss. Evaluation metrics: Hamming loss, subset accuracy, F1-score variants. Libraries: MultiLabelBinarizer for preprocessing.
+
+#@@@@@@@@@@
+
+83. Which of the following are valid neural network regularization techniques? (Multiple correct)
+A) Dropout
+B) Batch Normalization
+C) Weight Decay
+D) Early Stopping
+E) Data Augmentation
+F) Learning Rate
+
+Answer: A, B, C, D, E - Learning Rate is optimization parameter. Regularization techniques: Dropout for random neuron deactivation, Batch Normalization for stable training, Weight Decay for L2 penalty, Early Stopping for preventing overfitting, Data Augmentation for generalization.
+
+#@@@@@@@@@@
+
+84. Complete this LangGraph workflow:
+```python
+from langgraph.graph import StateGraph
+from typing import TypedDict
+
+class State(TypedDict):
+    input: str
+    output: str
+
+def process_node(state: State) -> State:
+    # Process the input
+    processed = f"Processed: {state['input']}"
+    return {"input": state["input"], "output": processed}
+
+workflow = StateGraph(State)
+workflow.add_node("process", process_node)
+workflow.set_entry_point("process")
+workflow.set_finish_point("process")
+
+app = workflow._______________()
+result = app.invoke({"input": "Hello World"})
+```
+
+Answer: `compile()` - LangGraph workflows need to be compiled before execution. compile() creates the executable application from the graph definition.
+
+#@@@@@@@@@@
+
+85. What is the difference between parametric and non-parametric models?
+
+Answer: Parametric models have fixed number of parameters (linear regression, neural networks), make assumptions about data distribution. Non-parametric models adapt complexity to data (k-NN, decision trees), fewer assumptions. Parametric for interpretability, non-parametric for flexibility.
+
+#@@@@@@@@@@
+
+86. Which of the following are valid time series cross-validation strategies? (Multiple correct)
+A) Time Series Split
+B) Walk-Forward Validation
+C) Blocked Cross-Validation
+D) Random K-Fold
+E) Expanding Window
+F) Rolling Window
+
+Answer: A, B, C, E, F - Random K-Fold violates temporal order. Time series CV: Time Series Split respects chronology, Walk-Forward for sequential validation, Blocked CV for grouped periods, Expanding Window grows training set, Rolling Window maintains fixed size.
+
+#@@@@@@@@@@
+
+87. Find the bug in this gradient descent implementation:
+```python
+import numpy as np
+
+def gradient_descent(X, y, learning_rate=0.01, epochs=1000):
+    m, n = X.shape
+    theta = np.zeros(n)
+
+    for epoch in range(epochs):
+        predictions = X.dot(theta)
+        errors = predictions - y
+        gradient = X.T.dot(errors) / m
+        theta = theta - learning_rate * gradient
+
+        # Calculate cost
+        cost = np.sum(errors**2) / (2*m)
+
+    return theta
+
+# Usage with non-normalized features
+X = np.array([[1, 1000], [1, 2000], [1, 3000]])  # Large feature values
+y = np.array([100, 200, 300])
+theta = gradient_descent(X, y)
+```
+
+Answer: Features not normalized - large feature values (1000, 2000, 3000) can cause gradient explosion or slow convergence. Should normalize/standardize features before gradient descent, or use adaptive learning rates.
+
+#@@@@@@@@@@
+
+88. How do you implement attention mechanisms?
+
+Answer: Attention computes weighted sum of values based on query-key similarity. Steps: compute attention scores (query·key), apply softmax, weight values. Types: self-attention, cross-attention, multi-head attention. Core component of Transformers.
+
+#@@@@@@@@@@
+
+89. Which of the following are valid model interpretability techniques? (Multiple correct)
+A) SHAP (SHapley Additive exPlanations)
+B) LIME (Local Interpretable Model-agnostic Explanations)
+C) Feature importance
+D) Partial dependence plots
+E) Permutation importance
+F) Gradient descent
+
+Answer: A, B, C, D, E - Gradient descent is optimization. Interpretability techniques: SHAP for unified feature attribution, LIME for local explanations, Feature importance for global ranking, Partial dependence for feature effects, Permutation importance for model-agnostic ranking.
+
+#@@@@@@@@@@
+
+90. What will this ensemble method output?
+```python
+from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+import numpy as np
+
+# Simple dataset
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+y = np.array([0, 0, 1, 1])
+
+clf1 = LogisticRegression(random_state=42)
+clf2 = DecisionTreeClassifier(random_state=42)
+clf3 = SVC(probability=True, random_state=42)
+
+ensemble = VotingClassifier(
+    estimators=[('lr', clf1), ('dt', clf2), ('svc', clf3)],
+    voting='soft'
+)
+
+ensemble.fit(X, y)
+predictions = ensemble.predict([[4, 5]])
+print(len(predictions))
+```
+
+Answer: 1 - predict() returns array with one prediction for the single input sample [[4, 5]]. Soft voting averages predicted probabilities from all three classifiers.
+
+#@@@@@@@@@@
+
+91. How do you handle missing values in time series data?
+
+Answer: Time series missing value techniques: forward fill (carry last observation), backward fill, linear interpolation, seasonal decomposition, model-based imputation (ARIMA), and domain-specific methods. Consider temporal patterns and seasonality.
+
+#@@@@@@@@@@
+
+92. Which of the following are valid neural network architectures for computer vision? (Multiple correct)
+A) LeNet
+B) AlexNet
+C) VGG
+D) ResNet
+E) DenseNet
+F) BERT
+
+Answer: A, B, C, D, E - BERT is for NLP. Computer vision architectures: LeNet for digit recognition, AlexNet for ImageNet breakthrough, VGG for deep networks, ResNet for skip connections, DenseNet for dense connections.
+
+#@@@@@@@@@@
+
+93. Complete this ONNX Runtime inference:
+```python
+import onnxruntime as ort
+import numpy as np
+
+# Load ONNX model
+session = ort.InferenceSession("model.onnx")
+
+# Get input/output names
+input_name = session.get_inputs()[0].name
+output_name = session.get_outputs()[0].name
+
+# Prepare input data
+input_data = np.random.randn(1, 10).astype(np.float32)
+
+# Run inference
+outputs = session.run([output_name], {input_name: _______________})
+predictions = outputs[0]
+```
+
+Answer: `input_data` - ONNX Runtime expects input data as dictionary mapping input names to numpy arrays. The input_data should be passed as the value for the input_name key.
+
+#@@@@@@@@@@
+
+94. What is the purpose of knowledge distillation?
+
+Answer: Knowledge distillation transfers knowledge from large teacher model to smaller student model. Student learns from teacher's soft predictions (probabilities), not just hard labels. Enables model compression, faster inference, and deployment on resource-constrained devices.
+
+#@@@@@@@@@@
+
+95. Which of the following are valid techniques for handling high-dimensional data? (Multiple correct)
+A) Principal Component Analysis (PCA)
+B) t-SNE
+C) UMAP
+D) Feature selection
+E) Regularization
+F) Data augmentation
+
+Answer: A, B, C, D, E - Data augmentation increases dimensions. High-dimensional techniques: PCA for linear reduction, t-SNE/UMAP for non-linear visualization, Feature selection for relevant features, Regularization for sparse solutions.
+
+#@@@@@@@@@@
+
+96. Find the issue in this reinforcement learning setup:
+```python
+import gym
+import numpy as np
+
+env = gym.make('CartPole-v1')
+state = env.reset()
+
+# Q-learning parameters
+learning_rate = 0.1
+discount_factor = 0.99
+epsilon = 0.1
+
+# Q-table for continuous state space
+q_table = np.zeros((env.observation_space.shape[0], env.action_space.n))
+
+for episode in range(1000):
+    state = env.reset()
+    done = False
+
+    while not done:
+        # Choose action
+        if np.random.random() < epsilon:
+            action = env.action_space.sample()
+        else:
+            action = np.argmax(q_table[state])
+
+        next_state, reward, done, info = env.step(action)
+        state = next_state
+```
+
+Answer: Q-table dimensionality mismatch - CartPole has continuous state space (4 dimensions) but Q-table treats it as discrete indices. Need state discretization or use function approximation (neural networks) for continuous spaces.
+
+#@@@@@@@@@@
+
+97. How do you implement federated learning?
+
+Answer: Federated learning trains models across decentralized data without sharing raw data. Steps: local training on client devices, model aggregation (FedAvg), global model distribution. Preserves privacy, handles distributed data, challenges include communication costs and heterogeneity.
+
+#@@@@@@@@@@
+
+98. Which of the following are valid activation functions for output layers? (Multiple correct)
+A) Sigmoid (binary classification)
+B) Softmax (multi-class classification)
+C) Linear (regression)
+D) ReLU (regression)
+E) Tanh (regression)
+F) Swish (classification)
+
+Answer: A, B, C, D, E, F - All can be used for outputs depending on task. Sigmoid for binary, Softmax for multi-class, Linear for regression, ReLU for non-negative regression, Tanh for bounded regression, Swish for any task with appropriate loss.
+
+#@@@@@@@@@@
+
+99. Predict the output:
+```python
+from sklearn.cluster import KMeans
+import numpy as np
+
+X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
+kmeans = KMeans(n_clusters=2, random_state=42)
+labels = kmeans.fit_predict(X)
+
+print(len(np.unique(labels)))
+print(kmeans.cluster_centers_.shape)
+```
+
+Answer: 2 and (2, 2) - K-means with n_clusters=2 produces 2 unique labels (0 and 1). cluster_centers_ has shape (n_clusters, n_features) = (2, 2) for 2 clusters in 2D space.
+
+#@@@@@@@@@@
+
+100. How do you implement model versioning and experiment tracking?
+
+Answer: Use MLOps tools like MLflow, Weights & Biases, Neptune, or TensorBoard. Track hyperparameters, metrics, artifacts, model versions. Implement reproducible experiments with seed setting, environment management, and automated logging. Essential for production ML workflows.
+
+#@@@@@@@@@@
+
+101. Which of the following are valid techniques for neural architecture search? (Multiple correct)
+A) Random search
+B) Grid search
+C) Evolutionary algorithms
+D) Reinforcement learning
+E) Differentiable NAS
+F) Bayesian optimization
+
+Answer: A, B, C, D, E, F - All are valid NAS techniques. Random/Grid search for baseline, Evolutionary algorithms for population-based search, RL for controller-based search, Differentiable NAS for gradient-based optimization, Bayesian optimization for efficient search.
+
+#@@@@@@@@@@
+
+102. Complete this Kaggle competition workflow:
+```python
+import pandas as pd
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestRegressor
+
+# Load Kaggle data
+train_df = pd.read_csv('train.csv')
+test_df = pd.read_csv('test.csv')
+
+# Feature engineering
+X_train = train_df.drop(['target'], axis=1)
+y_train = train_df['target']
+X_test = test_df
+
+# Model training
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='neg_mean_squared_error')
+
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Create submission
+submission = pd.DataFrame({
+    'id': test_df['id'],
+    'target': predictions
+})
+submission.to_csv('submission.csv', _______________)
+```
+
+Answer: `index=False` - Kaggle submissions typically don't include row indices. to_csv() with index=False creates clean submission file with only required columns.
+
+#@@@@@@@@@@
+
+103. What is the difference between online and offline evaluation?
+
+Answer: Online evaluation tests model performance in production with real users (A/B testing, bandit algorithms). Offline evaluation uses historical data, cross-validation, holdout sets. Online captures real-world behavior but is expensive/risky. Offline is safe but may not reflect production performance.
+
+#@@@@@@@@@@
+
+104. Which of the following are valid techniques for handling catastrophic forgetting? (Multiple correct)
+A) Elastic Weight Consolidation (EWC)
+B) Progressive Neural Networks
+C) Memory replay
+D) Knowledge distillation
+E) Fine-tuning
+F) Regularization
+
+Answer: A, B, C, D, F - Fine-tuning often causes forgetting. Techniques to prevent forgetting: EWC for weight importance, Progressive networks for task isolation, Memory replay for old examples, Knowledge distillation for preserving knowledge, Regularization for stability.
+
+#@@@@@@@@@@
+
+105. Find the bug in this data pipeline:
+```python
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+# Load data
+df = pd.read_csv('data.csv')
+
+# Handle missing values
+df = df.dropna()
+
+# Feature scaling
+scaler = StandardScaler()
+df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+
+# Split data
+X = df_scaled.drop('target', axis=1)
+y = df_scaled['target']  # Bug: scaling target variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+```
+
+Answer: Target variable is scaled along with features. For regression, target scaling can be useful but requires inverse transformation for interpretation. For classification, target shouldn't be scaled. Should separate features and target before scaling.
+
+#@@@@@@@@@@
+
+106. How do you implement meta-learning?
+
+Answer: Meta-learning enables models to learn how to learn quickly from few examples. Approaches include: Model-Agnostic Meta-Learning (MAML), Prototypical Networks, Memory-Augmented Networks. Applications: few-shot learning, rapid adaptation, transfer learning.
+
+#@@@@@@@@@@
+
+107. Which of the following are valid graph neural network architectures? (Multiple correct)
+A) Graph Convolutional Network (GCN)
+B) GraphSAGE
+C) Graph Attention Network (GAT)
+D) Graph Transformer
+E) Convolutional Neural Network
+F) Message Passing Neural Network
+
+Answer: A, B, C, D, F - CNN is for grid data, not graphs. Graph architectures: GCN for spectral convolution, GraphSAGE for inductive learning, GAT for attention mechanisms, Graph Transformer for global attention, MPNN for general message passing framework.
+
+#@@@@@@@@@@
+
+108. Predict the output:
+```python
+import torch
+import torch.nn.functional as F
+
+# Contrastive loss calculation
+anchor = torch.tensor([1.0, 0.0])
+positive = torch.tensor([0.8, 0.2])
+negative = torch.tensor([0.2, 0.8])
+
+pos_distance = F.pairwise_distance(anchor.unsqueeze(0), positive.unsqueeze(0))
+neg_distance = F.pairwise_distance(anchor.unsqueeze(0), negative.unsqueeze(0))
+
+print(pos_distance < neg_distance)
+```
+
+Answer: tensor([True]) - Positive sample is closer to anchor than negative sample. pos_distance ≈ 0.28, neg_distance ≈ 1.13, so positive distance is smaller, indicating good contrastive learning setup.
+
+#@@@@@@@@@@
+
+109. What is the purpose of curriculum learning?
+
+Answer: Curriculum learning trains models on progressively difficult examples, mimicking human learning. Start with easy examples, gradually increase complexity. Improves convergence, generalization, and training stability. Useful for complex tasks, noisy data, and few-shot learning.
+
+#@@@@@@@@@@
+
+110. Which of the following are valid techniques for model compression? (Multiple correct)
+A) Pruning
+B) Quantization
+C) Knowledge distillation
+D) Low-rank factorization
+E) Neural architecture search
+F) Data augmentation
+
+Answer: A, B, C, D, E - Data augmentation doesn't compress models. Compression techniques: Pruning removes weights, Quantization reduces precision, Knowledge distillation transfers to smaller model, Low-rank factorization reduces parameters, NAS finds efficient architectures.
+
+#@@@@@@@@@@
+
+111. Complete this MLflow experiment tracking:
+```python
+import mlflow
+import mlflow.sklearn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Start MLflow run
+with mlflow.start_run():
+    # Log parameters
+    n_estimators = 100
+    max_depth = 10
+    mlflow.log_param("n_estimators", n_estimators)
+    mlflow.log_param("max_depth", max_depth)
+
+    # Train model
+    model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
+    model.fit(X_train, y_train)
+
+    # Evaluate and log metrics
+    predictions = model.predict(X_test)
+    accuracy = accuracy_score(y_test, predictions)
+    mlflow.log_metric("accuracy", accuracy)
+
+    # Log model
+    mlflow.sklearn._______________("model", model)
+```
+
+Answer: `log_model` - MLflow logs trained model artifacts for later retrieval and deployment. log_model() saves model with metadata for reproducibility and serving.
+
+#@@@@@@@@@@
+
+112. How do you handle class imbalance in deep learning?
+
+Answer: Techniques include: weighted loss functions, focal loss, oversampling (SMOTE), undersampling, data augmentation for minority classes, ensemble methods, threshold tuning, and cost-sensitive learning. Monitor precision, recall, F1-score instead of just accuracy.
+
+#@@@@@@@@@@
+
+113. Which of the following are valid self-supervised learning tasks? (Multiple correct)
+A) Masked language modeling
+B) Image rotation prediction
+C) Contrastive learning
+D) Autoencoding
+E) Next sentence prediction
+F) Supervised classification
+
+Answer: A, B, C, D, E - Supervised classification uses labels. Self-supervised tasks: Masked language modeling for BERT, Image rotation for visual features, Contrastive learning for representations, Autoencoding for reconstruction, Next sentence prediction for text understanding.
+
+#@@@@@@@@@@
+
+114. Find the issue in this distributed training setup:
+```python
+import torch
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from torch.nn.parallel import DistributedDataParallel as DDP
+
+def train(rank, world_size):
+    # Initialize process group
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+
+    # Create model
+    model = MyModel()
+    model = model.to(rank)
+    model = DDP(model, device_ids=[rank])
+
+    # Training loop
+    for epoch in range(10):
+        for batch in dataloader:
+            # Training code
+            pass
+
+    # Missing: cleanup
+    # dist.destroy_process_group()
+
+if __name__ == "__main__":
+    world_size = 4
+    mp.spawn(train, args=(world_size,), nprocs=world_size)
+```
+
+Answer: Missing dist.destroy_process_group() cleanup. Should call destroy_process_group() at end of training to properly clean up distributed resources and avoid hanging processes.
+
+#@@@@@@@@@@
+
+115. What is the difference between generative and discriminative models?
+
+Answer: Generative models learn P(X,Y) or P(X|Y), can generate new samples (GANs, VAEs, language models). Discriminative models learn P(Y|X), focus on decision boundaries (logistic regression, SVMs, most classifiers). Generative for data generation, discriminative for classification.
+
+#@@@@@@@@@@
+
+116. Which of the following are valid techniques for handling sequential data? (Multiple correct)
+A) Recurrent Neural Networks (RNN)
+B) Long Short-Term Memory (LSTM)
+C) Gated Recurrent Unit (GRU)
+D) Transformer
+E) Convolutional Neural Network
+F) Temporal Convolutional Network
+
+Answer: A, B, C, D, E, F - All can handle sequences. RNN/LSTM/GRU for recurrent processing, Transformer for attention-based modeling, CNN with 1D convolutions for local patterns, TCN for dilated convolutions over time.
+
+#@@@@@@@@@@
+
+117. Complete this hyperparameter optimization with Optuna:
+```python
+import optuna
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    # Suggest hyperparameters
+    n_estimators = trial.suggest_int('n_estimators', 10, 100)
+    max_depth = trial.suggest_int('max_depth', 3, 20)
+
+    # Create and evaluate model
+    model = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        random_state=42
+    )
+
+    scores = cross_val_score(model, X_train, y_train, cv=3)
+    return scores.mean()
+
+# Create study and optimize
+study = optuna.create_study(direction='_______________')
+study.optimize(objective, n_trials=50)
+
+print(f"Best parameters: {study.best_params}")
+```
+
+Answer: `'maximize'` - For accuracy/score metrics, we want to maximize the objective. For loss metrics, use 'minimize'. Cross-validation score should be maximized.
+
+#@@@@@@@@@@
+
+118. How do you implement active learning?
+
+Answer: Active learning selects most informative samples for labeling. Strategies include: uncertainty sampling, query by committee, expected model change, diversity sampling. Reduces labeling costs, improves model performance with fewer labeled examples.
+
+#@@@@@@@@@@
+
+119. Which of the following are valid techniques for handling concept drift? (Multiple correct)
+A) Drift detection algorithms
+B) Ensemble methods
+C) Online learning
+D) Model retraining
+E) Feature monitoring
+F) Static models
+
+Answer: A, B, C, D, E - Static models don't adapt to drift. Drift handling: Detection algorithms identify changes, Ensemble methods for robustness, Online learning for adaptation, Model retraining for updates, Feature monitoring for early warning.
+
+#@@@@@@@@@@
+
+120. Predict the output:
+```python
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+# Create dataset
+X = torch.randn(100, 10)
+y = torch.randint(0, 2, (100,))
+dataset = TensorDataset(X, y)
+
+# Create dataloader
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True, drop_last=True)
+
+# Count batches
+num_batches = len(dataloader)
+print(num_batches)
+
+# Check last batch size
+for i, (batch_x, batch_y) in enumerate(dataloader):
+    if i == num_batches - 1:
+        print(batch_x.shape[0])
+```
+
+Answer: 3 and 32 - With 100 samples, batch_size=32, drop_last=True: 100//32 = 3 complete batches. Last batch has 32 samples because incomplete batches are dropped.
+
+#@@@@@@@@@@
+
+121. What is the purpose of batch normalization in training?
+
+Answer: Batch normalization normalizes layer inputs to have zero mean and unit variance per batch. Reduces internal covariate shift, allows higher learning rates, acts as regularization, accelerates training, and makes networks less sensitive to initialization.
+
+#@@@@@@@@@@
+
+122. Which of the following are valid techniques for neural network pruning? (Multiple correct)
+A) Magnitude-based pruning
+B) Gradient-based pruning
+C) Lottery ticket hypothesis
+D) Structured pruning
+E) Unstructured pruning
+F) Data augmentation
+
+Answer: A, B, C, D, E - Data augmentation is not pruning. Pruning techniques: Magnitude-based removes small weights, Gradient-based uses gradient information, Lottery ticket finds sparse subnetworks, Structured removes entire neurons/channels, Unstructured removes individual weights.
+
+#@@@@@@@@@@
+
+123. Complete this LangSmith evaluation:
+```python
+from langsmith import Client
+from langchain.llms import OpenAI
+
+client = Client()
+llm = OpenAI()
+
+def evaluate_qa(example):
+    question = example["question"]
+    expected = example["answer"]
+
+    # Generate answer
+    actual = llm(question)
+
+    # Simple evaluation metric
+    score = 1 if expected.lower() in actual.lower() else 0
+
+    return {
+        "score": score,
+        "feedback": f"Expected: {expected}, Got: {actual}"
+    }
+
+# Run evaluation
+results = client._______________("qa_dataset", evaluate_qa)
+```
+
+Answer: `evaluate` - LangSmith's evaluate() method runs evaluation functions on datasets. It applies the evaluation function to each example and aggregates results for analysis.
+
+#@@@@@@@@@@
+
+124. How do you implement few-shot learning?
+
+Answer: Few-shot learning trains models to learn from few examples. Approaches include: meta-learning (MAML), prototypical networks, siamese networks, memory-augmented networks, and prompt engineering for large language models. Key is learning good representations and similarity metrics.
+
+#@@@@@@@@@@
+
+125. Which of the following are valid techniques for handling vanishing gradients? (Multiple correct)
+A) Residual connections
+B) LSTM/GRU
+C) Gradient clipping
+D) Batch normalization
+E) ReLU activation
+F) Sigmoid activation
+
+Answer: A, B, C, D, E - Sigmoid causes vanishing gradients. Solutions: Residual connections for skip paths, LSTM/GRU for gating, Gradient clipping for stability, Batch normalization for stable gradients, ReLU for non-saturating activation.
+
+#@@@@@@@@@@
+
+126. Find the bug in this neural network weight initialization:
+```python
+import torch
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+        # Initialize all weights to zero
+        for param in self.parameters():
+            param.data.fill_(0.0)
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+```
+
+Answer: Zero initialization breaks symmetry - all neurons learn identical features. Use proper initialization like Xavier/He initialization. Zero weights cause all gradients to be zero, preventing learning.
+
+#@@@@@@@@@@
+
+127. What is the difference between hard and soft attention?
+
+Answer: Hard attention selects specific locations (discrete, non-differentiable), requires reinforcement learning or sampling. Soft attention weights all locations (continuous, differentiable), trainable with backpropagation. Soft attention is more common due to differentiability.
+
+#@@@@@@@@@@
+
+128. Which of the following are valid techniques for model interpretability in deep learning? (Multiple correct)
+A) Grad-CAM
+B) Integrated Gradients
+C) LIME
+D) SHAP
+E) Saliency maps
+F) Dropout
+
+Answer: A, B, C, D, E - Dropout is regularization. Interpretability techniques: Grad-CAM for visual attention, Integrated Gradients for attribution, LIME for local explanations, SHAP for unified framework, Saliency maps for input importance.
+
+#@@@@@@@@@@
+
+129. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Create embedding layer
+embedding = nn.Embedding(num_embeddings=1000, embedding_dim=128)
+
+# Input: batch of token indices
+input_ids = torch.tensor([[1, 5, 10], [2, 8, 15]])
+
+# Get embeddings
+embeddings = embedding(input_ids)
+
+print(embeddings.shape)
+print(embeddings.requires_grad)
+```
+
+Answer: torch.Size([2, 3, 128]) and True - Embedding layer maps token indices to dense vectors. Shape: (batch_size=2, sequence_length=3, embedding_dim=128). Embeddings are learnable parameters with requires_grad=True.
+
+#@@@@@@@@@@
+
+130. How do you implement neural style transfer?
+
+Answer: Neural style transfer combines content and style using pre-trained CNNs (VGG). Extract content features from deep layers, style features from multiple layers using Gram matrices. Optimize image to match content and style representations through loss minimization.
+
+#@@@@@@@@@@
+
+131. Which of the following are valid techniques for handling overfitting in deep learning? (Multiple correct)
+A) Dropout
+B) Early stopping
+C) Data augmentation
+D) Regularization (L1/L2)
+E) Batch normalization
+F) Increasing model size
+
+Answer: A, B, C, D, E - Increasing model size typically increases overfitting. Overfitting solutions: Dropout for random deactivation, Early stopping for optimal timing, Data augmentation for generalization, Regularization for weight penalty, Batch normalization for stability.
+
+#@@@@@@@@@@
+
+132. Complete this PyTorch model saving:
+```python
+import torch
+import torch.nn as nn
+
+# Define model
+model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Train model (training code here)
+# ...
+
+# Save model
+torch.save({
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'epoch': epoch,
+    'loss': loss
+}, 'checkpoint.pth')
+
+# Load model
+checkpoint = torch.load('checkpoint.pth')
+model._______________(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+```
+
+Answer: `load_state_dict` - Loads saved model parameters. load_state_dict() restores model weights from saved state dictionary, enabling model resumption or inference.
+
+#@@@@@@@@@@
+
+133. What is the purpose of teacher forcing in sequence generation?
+
+Answer: Teacher forcing uses ground truth tokens as input during training instead of model predictions. Speeds up training, provides stable gradients, but can cause exposure bias. During inference, model uses its own predictions, creating train/test mismatch.
+
+#@@@@@@@@@@
+
+134. Which of the following are valid techniques for handling sequential data with variable lengths? (Multiple correct)
+A) Padding
+B) Packing
+C) Masking
+D) Bucketing
+E) Truncation
+F) Normalization
+
+Answer: A, B, C, D, E - Normalization doesn't handle variable lengths. Techniques: Padding adds zeros to match max length, Packing groups similar lengths, Masking ignores padded positions, Bucketing batches similar lengths, Truncation cuts to fixed length.
+
+#@@@@@@@@@@
+
+135. Find the issue in this learning rate schedule:
+```python
+import torch
+import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+model = torch.nn.Linear(10, 1)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5)
+
+for epoch in range(100):
+    # Training
+    train_loss = train_epoch()
+
+    # Validation
+    val_loss = validate_epoch()
+
+    # Update scheduler with training loss (should be validation loss)
+    scheduler.step(train_loss)
+```
+
+Answer: Using training loss instead of validation loss for scheduler. ReduceLROnPlateau should monitor validation loss to detect true plateaus. Training loss always decreases, so scheduler won't trigger properly.
+
+#@@@@@@@@@@
+
+136. How do you implement contrastive learning?
+
+Answer: Contrastive learning learns representations by pulling similar samples together and pushing dissimilar ones apart. Methods include SimCLR, MoCo, SwAV. Uses data augmentation to create positive pairs, contrastive loss functions, and large batch sizes for negative sampling.
+
+#@@@@@@@@@@
+
+137. Which of the following are valid techniques for neural network compression? (Multiple correct)
+A) Weight quantization
+B) Knowledge distillation
+C) Pruning
+D) Low-rank approximation
+E) Huffman coding
+F) Feature scaling
+
+Answer: A, B, C, D, E - Feature scaling doesn't compress models. Compression techniques: Weight quantization reduces precision, Knowledge distillation transfers to smaller model, Pruning removes weights, Low-rank approximation reduces parameters, Huffman coding compresses weights.
+
+#@@@@@@@@@@
+
+138. Complete this Weights & Biases logging:
+```python
+import wandb
+import torch
+import torch.nn as nn
+
+# Initialize wandb
+wandb.init(project="my-project", config={
+    "learning_rate": 0.001,
+    "epochs": 10,
+    "batch_size": 32
+})
+
+model = nn.Linear(10, 1)
+optimizer = torch.optim.Adam(model.parameters(), lr=wandb.config.learning_rate)
+
+for epoch in range(wandb.config.epochs):
+    # Training
+    train_loss = train_epoch()
+    val_loss = validate_epoch()
+
+    # Log metrics
+    wandb._______________({
+        "epoch": epoch,
+        "train_loss": train_loss,
+        "val_loss": val_loss
+    })
+
+wandb.finish()
+```
+
+Answer: `log` - wandb.log() records metrics and visualizations. Automatically creates plots and tracks experiments for comparison and analysis.
+
+#@@@@@@@@@@
+
+139. What is the difference between autoregressive and autoencoding models?
+
+Answer: Autoregressive models (GPT) generate sequences left-to-right, predict next token given previous tokens. Autoencoding models (BERT) use bidirectional context, predict masked tokens. Autoregressive for generation, autoencoding for understanding tasks.
+
+#@@@@@@@@@@
+
+140. Which of the following are valid techniques for handling class imbalance in neural networks? (Multiple correct)
+A) Weighted loss functions
+B) Focal loss
+C) Oversampling
+D) Undersampling
+E) Data augmentation
+F) Batch normalization
+
+Answer: A, B, C, D, E - Batch normalization doesn't address imbalance. Imbalance techniques: Weighted loss for cost-sensitive learning, Focal loss for hard examples, Oversampling minority class, Undersampling majority class, Data augmentation for minority class.
+
+#@@@@@@@@@@
+
+141. Predict the output:
+```python
+import torch
+import torch.nn.functional as F
+
+# Cross-entropy loss calculation
+logits = torch.tensor([[2.0, 1.0, 0.5]])
+targets = torch.tensor([0])
+
+# Manual calculation
+log_probs = F.log_softmax(logits, dim=1)
+loss_manual = -log_probs[0, targets[0]]
+
+# Built-in function
+loss_builtin = F.cross_entropy(logits, targets)
+
+print(torch.allclose(loss_manual, loss_builtin))
+```
+
+Answer: tensor(True) - Both methods compute identical cross-entropy loss. Manual calculation: log_softmax then negative log-likelihood. Built-in function combines both operations efficiently.
+
+#@@@@@@@@@@
+
+142. How do you implement multi-task learning?
+
+Answer: Multi-task learning trains single model on multiple related tasks simultaneously. Approaches include: shared representations with task-specific heads, hard/soft parameter sharing, task weighting, gradient balancing. Improves generalization and reduces overfitting through shared knowledge.
+
+#@@@@@@@@@@
+
+143. Which of the following are valid techniques for handling gradient explosion? (Multiple correct)
+A) Gradient clipping
+B) Lower learning rates
+C) Batch normalization
+D) Residual connections
+E) LSTM gates
+F) Increasing batch size
+
+Answer: A, B, C, D, E - Increasing batch size doesn't directly prevent explosion. Solutions: Gradient clipping limits magnitude, Lower learning rates reduce updates, Batch normalization stabilizes gradients, Residual connections provide stable paths, LSTM gates control information flow.
+
+#@@@@@@@@@@
+
+144. Complete this neural network debugging:
+```python
+import torch
+import torch.nn as nn
+
+class DebugModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(10, 5)
+        self.fc2 = nn.Linear(5, 1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        print(f"After fc1: {x.shape}, mean: {x.mean():.4f}, std: {x.std():.4f}")
+
+        x = torch.relu(x)
+        print(f"After ReLU: {x.shape}, mean: {x.mean():.4f}, std: {x.std():.4f}")
+
+        x = self.fc2(x)
+        print(f"After fc2: {x.shape}, mean: {x.mean():.4f}, std: {x.std():.4f}")
+
+        return x
+
+model = DebugModel()
+x = torch.randn(32, 10)
+
+# Check for NaN values
+output = model(x)
+has_nan = torch._______________(output)
+print(f"Contains NaN: {has_nan}")
+```
+
+Answer: `isnan` - torch.isnan() checks for NaN values in tensors. Essential for debugging numerical instabilities, gradient explosions, or invalid operations in neural networks.
+
+#@@@@@@@@@@
+
+145. What is the purpose of layer normalization?
+
+Answer: Layer normalization normalizes across features for each sample independently, unlike batch normalization which normalizes across batch. Better for RNNs, variable sequence lengths, and small batches. Provides stable training without batch dependencies.
+
+#@@@@@@@@@@
+
+146. Which of the following are valid techniques for neural architecture optimization? (Multiple correct)
+A) Neural Architecture Search (NAS)
+B) Evolutionary algorithms
+C) Reinforcement learning
+D) Differentiable architecture search
+E) Random search
+F) Manual design
+
+Answer: A, B, C, D, E, F - All are valid approaches. NAS automates architecture design, Evolutionary algorithms evolve architectures, RL uses controllers, Differentiable NAS enables gradient-based optimization, Random search for baselines, Manual design for domain expertise.
+
+#@@@@@@@@@@
+
+147. Find the bug in this data loading:
+```python
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+class CustomDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        # Bug: not converting to tensors
+        return self.data[idx], self.labels[idx]
+
+# Usage
+dataset = CustomDataset(data_list, label_list)
+dataloader = DataLoader(dataset, batch_size=32)
+
+for batch_data, batch_labels in dataloader:
+    # This will fail if data_list contains numpy arrays or lists
+    output = model(batch_data)
+```
+
+Answer: Not converting data to tensors in __getitem__. Should return torch.tensor(self.data[idx]) and torch.tensor(self.labels[idx]) to ensure proper tensor operations in the model.
+
+#@@@@@@@@@@
+
+148. How do you implement domain adaptation?
+
+Answer: Domain adaptation transfers knowledge between different but related domains. Techniques include: adversarial training, domain-adversarial neural networks (DANN), maximum mean discrepancy, coral loss, and fine-tuning. Addresses distribution shift between source and target domains.
+
+#@@@@@@@@@@
+
+149. Which of the following are valid techniques for handling long sequences? (Multiple correct)
+A) Attention mechanisms
+B) Hierarchical models
+C) Memory networks
+D) Truncated backpropagation
+E) Gradient checkpointing
+F) Increasing learning rate
+
+Answer: A, B, C, D, E - Increasing learning rate doesn't help with long sequences. Techniques: Attention for global dependencies, Hierarchical models for multi-scale processing, Memory networks for external memory, Truncated backpropagation for computational efficiency, Gradient checkpointing for memory efficiency.
+
+#@@@@@@@@@@
+
+150. Complete this model ensemble:
+```python
+import torch
+import torch.nn as nn
+
+class EnsembleModel(nn.Module):
+    def __init__(self, models):
+        super().__init__()
+        self.models = nn.ModuleList(models)
+
+    def forward(self, x):
+        outputs = []
+        for model in self.models:
+            outputs.append(model(x))
+
+        # Average predictions
+        ensemble_output = torch._______________(outputs, dim=0)
+        return ensemble_output
+
+# Usage
+model1 = nn.Linear(10, 1)
+model2 = nn.Linear(10, 1)
+model3 = nn.Linear(10, 1)
+
+ensemble = EnsembleModel([model1, model2, model3])
+```
+
+Answer: `mean` - torch.mean() averages predictions from multiple models. Ensemble methods combine multiple models to improve performance and reduce overfitting through variance reduction.
+
+#@@@@@@@@@@
+
+151. What is the difference between online and offline reinforcement learning?
+
+Answer: Online RL learns while interacting with environment, explores and exploits simultaneously. Offline RL learns from fixed dataset without environment interaction, safer but limited by data quality. Online for real-time learning, offline for batch learning from historical data.
+
+#@@@@@@@@@@
+
+152. Which of the following are valid techniques for neural network regularization? (Multiple correct)
+A) Dropout
+B) Weight decay
+C) Early stopping
+D) Data augmentation
+E) Batch normalization
+F) Increasing model capacity
+
+Answer: A, B, C, D, E - Increasing capacity typically reduces regularization. Regularization techniques: Dropout for random deactivation, Weight decay for L2 penalty, Early stopping for optimal timing, Data augmentation for generalization, Batch normalization for stable training.
+
+#@@@@@@@@@@
+
+153. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Create a simple autoencoder
+encoder = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 32)
+)
+
+decoder = nn.Sequential(
+    nn.Linear(32, 128),
+    nn.ReLU(),
+    nn.Linear(128, 784),
+    nn.Sigmoid()
+)
+
+# Input image (flattened MNIST)
+x = torch.randn(1, 784)
+
+# Forward pass
+encoded = encoder(x)
+decoded = decoder(encoded)
+
+print(encoded.shape)
+print(decoded.shape)
+```
+
+Answer: torch.Size([1, 32]) and torch.Size([1, 784]) - Encoder compresses 784-dimensional input to 32-dimensional latent representation. Decoder reconstructs back to original 784 dimensions.
+
+#@@@@@@@@@@
+
+154. How do you implement neural machine translation?
+
+Answer: Neural machine translation uses encoder-decoder architectures with attention. Encoder processes source language, decoder generates target language. Modern approaches use Transformers with self-attention, positional encoding, and beam search for decoding.
+
+#@@@@@@@@@@
+
+155. Which of the following are valid techniques for handling catastrophic forgetting in continual learning? (Multiple correct)
+A) Elastic Weight Consolidation (EWC)
+B) Progressive Neural Networks
+C) Memory replay
+D) Knowledge distillation
+E) L2 regularization
+F) Dropout
+
+Answer: A, B, C, D, E - Dropout doesn't prevent forgetting. Continual learning techniques: EWC for weight importance, Progressive networks for task isolation, Memory replay for old examples, Knowledge distillation for preserving knowledge, L2 regularization for stability.
+
+#@@@@@@@@@@
+
+156. Complete this neural network profiling:
+```python
+import torch
+import torch.nn as nn
+import torch.profiler
+
+model = nn.Sequential(
+    nn.Linear(1000, 500),
+    nn.ReLU(),
+    nn.Linear(500, 100),
+    nn.ReLU(),
+    nn.Linear(100, 10)
+)
+
+x = torch.randn(32, 1000)
+
+with torch.profiler.profile(
+    activities=[torch.profiler.ProfilerActivity.CPU],
+    record_shapes=True,
+    profile_memory=True
+) as prof:
+    with torch.profiler.record_function("model_inference"):
+        output = model(x)
+
+# Print profiling results
+print(prof.key_averages()._______________())
+```
+
+Answer: `table` - key_averages().table() formats profiling results as readable table showing function names, CPU time, memory usage, and other metrics for performance analysis.
+
+#@@@@@@@@@@
+
+157. What is the purpose of positional encoding in Transformers?
+
+Answer: Positional encoding adds position information to input embeddings since Transformers lack inherent sequence order awareness. Uses sinusoidal functions or learned embeddings to encode absolute or relative positions, enabling attention to consider token positions.
+
+#@@@@@@@@@@
+
+158. Which of the following are valid techniques for neural network optimization? (Multiple correct)
+A) Adam optimizer
+B) Learning rate scheduling
+C) Gradient accumulation
+D) Mixed precision training
+E) Model parallelism
+F) Random initialization
+
+Answer: A, B, C, D, E, F - All are optimization techniques. Adam for adaptive learning, Learning rate scheduling for convergence, Gradient accumulation for large batches, Mixed precision for speed, Model parallelism for large models, Random initialization for symmetry breaking.
+
+#@@@@@@@@@@
+
+159. Find the issue in this loss function:
+```python
+import torch
+import torch.nn as nn
+
+def custom_loss(predictions, targets):
+    # Mean Squared Error
+    mse = torch.mean((predictions - targets) ** 2)
+
+    # L1 regularization
+    l1_reg = 0.01 * torch.sum(torch.abs(model.parameters()))  # Bug: model not passed
+
+    total_loss = mse + l1_reg
+    return total_loss
+
+# Usage
+criterion = custom_loss
+loss = criterion(outputs, targets)  # Will fail
+```
+
+Answer: Model parameters not accessible in loss function. Should pass model as parameter or compute regularization outside loss function. Loss functions should be independent of specific model instances.
+
+#@@@@@@@@@@
+
+160. How do you implement neural ordinary differential equations (NODEs)?
+
+Answer: NODEs treat neural networks as continuous dynamical systems, solving ODEs with neural network derivatives. Use ODE solvers (Runge-Kutta) for forward pass, adjoint method for backpropagation. Enables continuous-depth networks and memory-efficient training.
+
+#@@@@@@@@@@
+
+161. Which of the following are valid techniques for handling missing data in neural networks? (Multiple correct)
+A) Mean imputation
+B) Learned embeddings for missing values
+C) Masking
+D) Multiple imputation
+E) Deletion
+F) Zero imputation
+
+Answer: A, B, C, D, E, F - All are valid approaches. Mean imputation for simple cases, Learned embeddings for complex patterns, Masking to ignore missing values, Multiple imputation for uncertainty, Deletion for small amounts, Zero imputation for specific domains.
+
+#@@@@@@@@@@
+
+162. Complete this neural network visualization:
+```python
+import torch
+import torch.nn as nn
+import matplotlib.pyplot as plt
+
+model = nn.Sequential(
+    nn.Linear(2, 10),
+    nn.ReLU(),
+    nn.Linear(10, 1)
+)
+
+# Create grid for decision boundary
+x_min, x_max = -3, 3
+y_min, y_max = -3, 3
+xx, yy = torch.meshgrid(torch.linspace(x_min, x_max, 100),
+                        torch.linspace(y_min, y_max, 100))
+
+# Flatten grid and make predictions
+grid_points = torch.stack([xx.flatten(), yy.flatten()], dim=1)
+with torch.no_grad():
+    predictions = model(grid_points)
+
+# Reshape predictions
+Z = predictions._______________(*xx.shape)
+
+plt.contour(xx, yy, Z, levels=50)
+plt.show()
+```
+
+Answer: `reshape` - Reshapes flattened predictions back to grid shape for contour plotting. reshape() or view() converts 1D predictions to 2D grid for visualization.
+
+#@@@@@@@@@@
+
+163. What is the difference between fine-tuning and feature extraction?
+
+Answer: Fine-tuning updates all or some pre-trained model parameters for new task. Feature extraction freezes pre-trained weights, only trains new classifier layers. Fine-tuning for similar tasks with sufficient data, feature extraction for limited data or very different tasks.
+
+#@@@@@@@@@@
+
+164. Which of the following are valid techniques for neural network interpretability? (Multiple correct)
+A) Attention visualization
+B) Gradient-based attribution
+C) Layer-wise relevance propagation
+D) Concept activation vectors
+E) Adversarial examples
+F) Model compression
+
+Answer: A, B, C, D - Adversarial examples and model compression are not interpretability techniques. Interpretability methods: Attention visualization for focus areas, Gradient attribution for input importance, LRP for relevance propagation, CAVs for concept understanding.
+
+#@@@@@@@@@@
+
+165. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Batch normalization behavior
+bn = nn.BatchNorm1d(10)
+x = torch.randn(32, 10)
+
+# Training mode
+bn.train()
+output_train = bn(x)
+
+# Evaluation mode
+bn.eval()
+output_eval = bn(x)
+
+print(torch.allclose(output_train, output_eval))
+```
+
+Answer: tensor(False) - Batch normalization behaves differently in training vs evaluation. Training mode uses batch statistics, evaluation mode uses running statistics. Different normalization leads to different outputs.
+
+#@@@@@@@@@@
+
+166. How do you implement neural collaborative filtering?
+
+Answer: Neural collaborative filtering uses neural networks for recommendation systems. Combines matrix factorization with deep learning, learns user/item embeddings, uses multi-layer perceptrons for interaction modeling. Captures non-linear user-item relationships better than traditional collaborative filtering.
+
+#@@@@@@@@@@
+
+167. Which of the following are valid techniques for handling sequential dependencies? (Multiple correct)
+A) Recurrent connections
+B) Attention mechanisms
+C) Convolutional layers
+D) Memory networks
+E) Transformer blocks
+F) Fully connected layers
+
+Answer: A, B, C, D, E - Fully connected layers don't capture sequential dependencies. Sequential techniques: Recurrent connections for temporal modeling, Attention for long-range dependencies, Convolutional layers for local patterns, Memory networks for external memory, Transformers for global attention.
+
+#@@@@@@@@@@
+
+168. Complete this neural network testing:
+```python
+import torch
+import torch.nn as nn
+import unittest
+
+class TestModel(unittest.TestCase):
+    def setUp(self):
+        self.model = nn.Linear(10, 1)
+        self.input = torch.randn(5, 10)
+
+    def test_output_shape(self):
+        output = self.model(self.input)
+        expected_shape = (5, 1)
+        self.assertEqual(output.shape, expected_shape)
+
+    def test_gradient_flow(self):
+        output = self.model(self.input)
+        loss = output.sum()
+        loss.backward()
+
+        # Check if gradients exist
+        for param in self.model.parameters():
+            self._______________()
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+Answer: `assertIsNotNone(param.grad)` - Tests that gradients are computed and not None. Essential for verifying backpropagation works correctly through the network.
+
+#@@@@@@@@@@
+
+169. What is the purpose of skip connections in neural networks?
+
+Answer: Skip connections (residual connections) allow gradients to flow directly to earlier layers, solving vanishing gradient problem. Enable training of very deep networks, preserve information flow, and allow learning identity mappings. Key component of ResNet architecture.
+
+#@@@@@@@@@@
+
+170. Which of the following are valid techniques for neural network acceleration? (Multiple correct)
+A) Model quantization
+B) Pruning
+C) Knowledge distillation
+D) TensorRT optimization
+E) ONNX conversion
+F) Increasing batch size
+
+Answer: A, B, C, D, E, F - All can accelerate inference. Quantization reduces precision, Pruning removes weights, Knowledge distillation creates smaller models, TensorRT optimizes for GPUs, ONNX enables cross-platform optimization, Larger batches improve throughput.
+
+#@@@@@@@@@@
+
+171. Find the bug in this custom activation function:
+```python
+import torch
+import torch.nn as nn
+
+class CustomActivation(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        # Swish activation: x * sigmoid(x)
+        return x * torch.sigmoid(x)
+
+# Usage in model
+model = nn.Sequential(
+    nn.Linear(10, 5),
+    CustomActivation(),
+    nn.Linear(5, 1)
+)
+
+# The bug is not in the activation itself, but in gradient computation
+# for very large inputs, sigmoid can saturate
+x = torch.tensor([100.0], requires_grad=True)
+activation = CustomActivation()
+output = activation(x)
+output.backward()
+
+print(x.grad)  # May be very small due to saturation
+```
+
+Answer: No explicit bug in code, but numerical issue - for large inputs, sigmoid saturates causing vanishing gradients. Consider gradient clipping or input normalization to prevent saturation.
+
+#@@@@@@@@@@
+
+172. How do you implement neural style transfer optimization?
+
+Answer: Neural style transfer optimizes input image to match content and style representations. Use pre-trained CNN (VGG), extract content features from deep layers, style features from multiple layers via Gram matrices. Minimize combined content and style loss through gradient descent on image pixels.
+
+#@@@@@@@@@@
+
+173. Which of the following are valid techniques for handling imbalanced datasets in deep learning? (Multiple correct)
+A) Class weighting
+B) Focal loss
+C) SMOTE
+D) Cost-sensitive learning
+E) Threshold tuning
+F) Batch normalization
+
+Answer: A, B, C, D, E - Batch normalization doesn't address imbalance. Imbalance techniques: Class weighting for loss adjustment, Focal loss for hard examples, SMOTE for synthetic oversampling, Cost-sensitive learning for different misclassification costs, Threshold tuning for optimal cutoff.
+
+#@@@@@@@@@@
+
+174. Complete this neural network deployment:
+```python
+import torch
+import torch.nn as nn
+import torch.jit
+
+# Define model
+model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Load trained weights
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Convert to TorchScript for deployment
+example_input = torch.randn(1, 784)
+traced_model = torch.jit._______________(model, example_input)
+
+# Save traced model
+traced_model.save('model_traced.pt')
+
+# Load and use traced model
+loaded_model = torch.jit.load('model_traced.pt')
+```
+
+Answer: `trace` - torch.jit.trace() creates TorchScript model by tracing execution with example input. Enables deployment without Python dependency and optimization for production inference.
+
+#@@@@@@@@@@
+
+175. What is the difference between discriminative and generative adversarial networks?
+
+Answer: Discriminative models (classifiers) learn P(Y|X), distinguish between classes. Generative models learn P(X) or P(X,Y), can generate new samples. GANs combine both: generator creates samples, discriminator distinguishes real from fake, trained adversarially.
+
+#@@@@@@@@@@
+
+176. Which of the following are valid techniques for neural network debugging? (Multiple correct)
+A) Gradient checking
+B) Activation visualization
+C) Loss curve analysis
+D) Weight histogram analysis
+E) Learning rate finder
+F) Random search
+
+Answer: A, B, C, D, E - Random search is hyperparameter optimization. Debugging techniques: Gradient checking for correctness, Activation visualization for layer behavior, Loss curve analysis for training progress, Weight histogram for distribution analysis, Learning rate finder for optimal rates.
+
+#@@@@@@@@@@
+
+177. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Group normalization
+x = torch.randn(2, 8, 4, 4)  # (batch, channels, height, width)
+gn = nn.GroupNorm(num_groups=2, num_channels=8)
+
+output = gn(x)
+
+print(output.shape)
+print(output.mean(dim=[2, 3]).shape)  # Mean over spatial dimensions
+```
+
+Answer: torch.Size([2, 8, 4, 4]) and torch.Size([2, 8]) - Group normalization maintains input shape. Mean over spatial dimensions (H, W) gives shape (batch, channels) for analyzing normalization effects per channel.
+
+#@@@@@@@@@@
+
+178. How do you implement neural architecture search with differentiable methods?
+
+Answer: Differentiable NAS (DARTS) treats architecture search as continuous optimization. Uses weighted combination of operations, learns architecture weights with gradient descent. Enables efficient search without training separate models, but may suffer from memory constraints and optimization challenges.
+
+#@@@@@@@@@@
+
+179. Which of the following are valid techniques for handling long-range dependencies? (Multiple correct)
+A) Attention mechanisms
+B) Memory networks
+C) Transformer architecture
+D) LSTM with attention
+E) Dilated convolutions
+F) Pooling layers
+
+Answer: A, B, C, D, E - Pooling reduces sequence length but doesn't handle dependencies. Long-range techniques: Attention for global connections, Memory networks for external storage, Transformers for self-attention, LSTM+attention for enhanced memory, Dilated convolutions for large receptive fields.
+
+#@@@@@@@@@@
+
+180. Complete this neural network monitoring:
+```python
+import torch
+import torch.nn as nn
+
+class MonitoredLinear(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.linear = nn.Linear(in_features, out_features)
+        self.register_buffer('forward_count', torch.tensor(0))
+
+    def forward(self, x):
+        self.forward_count += 1
+
+        # Monitor activation statistics
+        output = self.linear(x)
+
+        # Log statistics
+        with torch.no_grad():
+            mean_activation = output.mean()
+            std_activation = output.std()
+
+            print(f"Forward pass {self.forward_count}: "
+                  f"mean={mean_activation:.4f}, std={std_activation:.4f}")
+
+        return output
+
+# Usage
+layer = MonitoredLinear(10, 5)
+x = torch.randn(32, 10)
+
+# Multiple forward passes
+for i in range(3):
+    output = layer(x)
+
+print(f"Total forward passes: {layer._______________}")
+```
+
+Answer: `forward_count` - Accesses the registered buffer that tracks forward pass count. register_buffer() creates persistent state that's saved with model but not updated by optimizer.
+
+#@@@@@@@@@@
+
+181. What is the purpose of curriculum learning in neural networks?
+
+Answer: Curriculum learning trains models on progressively difficult examples, starting with easy samples and gradually increasing complexity. Improves convergence speed, final performance, and training stability. Mimics human learning progression from simple to complex concepts.
+
+#@@@@@@@@@@
+
+182. Which of the following are valid techniques for neural network regularization in computer vision? (Multiple correct)
+A) Data augmentation
+B) Dropout
+C) Batch normalization
+D) Cutout
+E) Mixup
+F) Label smoothing
+
+Answer: A, B, C, D, E, F - All are regularization techniques for computer vision. Data augmentation for generalization, Dropout for overfitting prevention, Batch normalization for stability, Cutout for occlusion robustness, Mixup for interpolation, Label smoothing for confidence calibration.
+
+#@@@@@@@@@@
+
+183. Find the issue in this neural network memory usage:
+```python
+import torch
+import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(1000, 1000),
+    nn.ReLU(),
+    nn.Linear(1000, 1000),
+    nn.ReLU(),
+    nn.Linear(1000, 1)
+)
+
+# Training loop with memory leak
+for epoch in range(100):
+    for batch in dataloader:
+        optimizer.zero_grad()
+
+        # Store all losses for analysis (memory leak)
+        losses = []
+        for x, y in batch:
+            output = model(x.unsqueeze(0))
+            loss = criterion(output, y.unsqueeze(0))
+            losses.append(loss)  # Accumulates computation graph
+
+        total_loss = sum(losses)
+        total_loss.backward()
+        optimizer.step()
+```
+
+Answer: Memory leak from accumulating losses with computation graphs. Each loss retains gradients. Use `loss.item()` to extract scalar values or `torch.no_grad()` context when storing intermediate results.
+
+#@@@@@@@@@@
+
+184. How do you implement neural network pruning during training?
+
+Answer: Magnitude-based pruning removes weights below threshold during training. Structured pruning removes entire neurons/channels. Gradual pruning increases sparsity over time. Use masks to zero out pruned weights, fine-tune after pruning, and consider lottery ticket hypothesis for initialization.
+
+#@@@@@@@@@@
+
+185. Which of the following are valid techniques for handling catastrophic interference? (Multiple correct)
+A) Elastic Weight Consolidation
+B) PackNet
+C) Progressive Neural Networks
+D) Memory replay
+E) Gradient episodic memory
+F) Batch normalization
+
+Answer: A, B, C, D, E - Batch normalization doesn't prevent interference. Catastrophic interference solutions: EWC for weight importance, PackNet for network partitioning, Progressive networks for task isolation, Memory replay for old examples, GEM for gradient constraints.
+
+#@@@@@@@@@@
+
+186. Complete this neural network quantization:
+```python
+import torch
+import torch.nn as nn
+import torch.quantization
+
+# Define model
+model = nn.Sequential(
+    nn.Linear(784, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Prepare for quantization
+model.eval()
+model_fp32 = torch.quantization.fuse_modules(model, [['0', '1']])  # Fuse linear + relu
+
+# Set quantization config
+model_fp32.qconfig = torch.quantization.get_default_qconfig('fbgemm')
+
+# Prepare quantized model
+model_prepared = torch.quantization._______________()
+
+# Calibrate with representative data
+with torch.no_grad():
+    for data in calibration_loader:
+        model_prepared(data)
+
+# Convert to quantized model
+model_quantized = torch.quantization.convert(model_prepared)
+```
+
+Answer: `prepare(model_fp32)` - Prepares model for quantization by inserting observers to collect statistics during calibration. Essential step before calibration and final quantization conversion.
+
+#@@@@@@@@@@
+
+187. What is the difference between static and dynamic quantization?
+
+Answer: Static quantization determines quantization parameters (scale, zero-point) during calibration phase using representative data. Dynamic quantization computes parameters at runtime. Static for better performance, dynamic for easier deployment without calibration data.
+
+#@@@@@@@@@@
+
+188. Which of the following are valid techniques for neural network optimization on mobile devices? (Multiple correct)
+A) Model quantization
+B) Pruning
+C) Knowledge distillation
+D) MobileNet architectures
+E) Depthwise separable convolutions
+F) Increasing model depth
+
+Answer: A, B, C, D, E - Increasing depth typically hurts mobile performance. Mobile optimization: Quantization for reduced precision, Pruning for sparsity, Knowledge distillation for smaller models, MobileNet for efficiency, Depthwise separable convolutions for parameter reduction.
+
+#@@@@@@@@@@
+
+189. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Depthwise separable convolution
+class DepthwiseSeparableConv(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size):
+        super().__init__()
+        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size,
+                                   groups=in_channels, padding=1)
+        self.pointwise = nn.Conv2d(in_channels, out_channels, 1)
+
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        return x
+
+# Compare parameter counts
+standard_conv = nn.Conv2d(32, 64, 3, padding=1)
+depthwise_conv = DepthwiseSeparableConv(32, 64, 3)
+
+standard_params = sum(p.numel() for p in standard_conv.parameters())
+depthwise_params = sum(p.numel() for p in depthwise_conv.parameters())
+
+print(standard_params > depthwise_params)
+```
+
+Answer: tensor(True) - Depthwise separable convolution has fewer parameters than standard convolution. Standard: 32×64×3×3 = 18,432 parameters. Depthwise: 32×3×3 + 32×64 = 288 + 2,048 = 2,336 parameters.
+
+#@@@@@@@@@@
+
+190. How do you implement neural network distillation for model compression?
+
+Answer: Knowledge distillation trains smaller student model to mimic larger teacher model. Student learns from teacher's soft predictions (probabilities) and hard labels. Use temperature scaling for softer distributions, combine distillation loss with task loss, and transfer intermediate representations.
+
+#@@@@@@@@@@
+
+191. Which of the following are valid techniques for handling noisy labels? (Multiple correct)
+A) Label smoothing
+B) Noise-robust loss functions
+C) Co-teaching
+D) DivideMix
+E) Meta-learning
+F) Data augmentation
+
+Answer: A, B, C, D, E - Data augmentation doesn't directly handle label noise. Noisy label techniques: Label smoothing for confidence reduction, Noise-robust losses for resilience, Co-teaching for mutual learning, DivideMix for sample selection, Meta-learning for noise adaptation.
+
+#@@@@@@@@@@
+
+192. Complete this neural network profiling for memory:
+```python
+import torch
+import torch.nn as nn
+
+def profile_memory(model, input_tensor):
+    torch.cuda.empty_cache()  # Clear cache
+
+    # Measure initial memory
+    initial_memory = torch.cuda.memory_allocated()
+
+    # Forward pass
+    output = model(input_tensor)
+    forward_memory = torch.cuda.memory_allocated()
+
+    # Backward pass
+    loss = output.sum()
+    loss.backward()
+    backward_memory = torch.cuda.memory_allocated()
+
+    print(f"Initial: {initial_memory / 1024**2:.2f} MB")
+    print(f"After forward: {forward_memory / 1024**2:.2f} MB")
+    print(f"After backward: {backward_memory / 1024**2:.2f} MB")
+
+    # Peak memory usage
+    peak_memory = torch.cuda._______________()
+    print(f"Peak memory: {peak_memory / 1024**2:.2f} MB")
+
+model = nn.Sequential(nn.Linear(1000, 1000), nn.ReLU(), nn.Linear(1000, 1))
+x = torch.randn(100, 1000, device='cuda')
+profile_memory(model.cuda(), x)
+```
+
+Answer: `max_memory_allocated` - Returns peak memory usage since last reset. Essential for understanding maximum memory requirements during training and optimizing memory usage.
+
+#@@@@@@@@@@
+
+193. What is the purpose of gradient accumulation in neural network training?
+
+Answer: Gradient accumulation simulates larger batch sizes by accumulating gradients over multiple mini-batches before updating parameters. Enables training with large effective batch sizes on limited memory, improves gradient estimates, and maintains training stability.
+
+#@@@@@@@@@@
+
+194. Which of the following are valid techniques for neural network initialization? (Multiple correct)
+A) Xavier/Glorot initialization
+B) He initialization
+C) LeCun initialization
+D) Orthogonal initialization
+E) Zero initialization
+F) LSUV initialization
+
+Answer: A, B, C, D, F - Zero initialization breaks symmetry. Initialization techniques: Xavier for sigmoid/tanh, He for ReLU, LeCun for SELU, Orthogonal for RNNs, LSUV for layer-sequential unit-variance initialization.
+
+#@@@@@@@@@@
+
+195. Find the bug in this mixed precision training:
+```python
+import torch
+import torch.nn as nn
+from torch.cuda.amp import autocast, GradScaler
+
+model = nn.Linear(100, 10).cuda()
+optimizer = torch.optim.Adam(model.parameters())
+scaler = GradScaler()
+
+for epoch in range(10):
+    for batch in dataloader:
+        optimizer.zero_grad()
+
+        with autocast():
+            output = model(batch)
+            loss = criterion(output, targets)
+
+        # Bug: not using scaler for backward pass
+        loss.backward()
+        optimizer.step()
+```
+
+Answer: Not using GradScaler for backward pass and optimizer step. Should use `scaler.scale(loss).backward()` and `scaler.step(optimizer)` followed by `scaler.update()` for proper mixed precision training.
+
+#@@@@@@@@@@
+
+196. How do you implement neural network ensembling for uncertainty quantification?
+
+Answer: Ensemble methods for uncertainty include: Monte Carlo Dropout (multiple forward passes with dropout), Deep Ensembles (multiple independently trained models), Bayesian Neural Networks, and Test-Time Augmentation. Combine predictions to estimate epistemic and aleatoric uncertainty.
+
+#@@@@@@@@@@
+
+197. Which of the following are valid techniques for handling distribution shift? (Multiple correct)
+A) Domain adaptation
+B) Adversarial training
+C) Data augmentation
+D) Robust optimization
+E) Continual learning
+F) Batch normalization
+
+Answer: A, B, C, D, E - Batch normalization doesn't directly handle distribution shift. Distribution shift techniques: Domain adaptation for different domains, Adversarial training for robustness, Data augmentation for generalization, Robust optimization for worst-case scenarios, Continual learning for evolving distributions.
+
+#@@@@@@@@@@
+
+198. Complete this neural network hyperparameter search:
+```python
+import optuna
+import torch
+import torch.nn as nn
+
+def objective(trial):
+    # Suggest hyperparameters
+    lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
+    batch_size = trial.suggest_categorical('batch_size', [16, 32, 64, 128])
+    hidden_size = trial.suggest_int('hidden_size', 64, 512)
+    dropout_rate = trial.suggest_float('dropout_rate', 0.1, 0.5)
+
+    # Create model
+    model = nn.Sequential(
+        nn.Linear(784, hidden_size),
+        nn.ReLU(),
+        nn.Dropout(dropout_rate),
+        nn.Linear(hidden_size, 10)
+    )
+
+    # Train and evaluate
+    accuracy = train_and_evaluate(model, lr, batch_size)
+
+    return accuracy
+
+# Create study
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)
+
+print(f"Best trial: {study._______________}")
+print(f"Best params: {study.best_params}")
+```
+
+Answer: `best_trial` - Returns the trial object with the best objective value. Contains complete information about the best hyperparameter configuration and its performance.
+
+#@@@@@@@@@@
+
+199. What is the difference between model parallelism and data parallelism?
+
+Answer: Data parallelism replicates model across devices, splits data batches. Model parallelism splits model across devices, processes same data. Data parallelism for large datasets, model parallelism for large models that don't fit on single device. Can combine both approaches.
+
+#@@@@@@@@@@
+
+200. Which of the following are valid techniques for neural network deployment optimization? (Multiple correct)
+A) TensorRT optimization
+B) ONNX conversion
+C) TorchScript compilation
+D) Model quantization
+E) Batch size optimization
+F) Learning rate tuning
+
+Answer: A, B, C, D, E - Learning rate tuning is for training, not deployment. Deployment optimization: TensorRT for GPU acceleration, ONNX for cross-platform compatibility, TorchScript for production inference, Quantization for reduced precision, Batch size optimization for throughput.
+
+#@@@@@@@@@@ samples (4 samples dropped due to drop_last=True).
+
+#@@@@@@@@@@
+
+121. What is the purpose of batch normalization in training?
+
+Answer: Batch normalization normalizes layer inputs, reduces internal covariate shift, enables higher learning rates, acts as regularization, accelerates training convergence, and reduces sensitivity to initialization. Applied before or after activation functions.
+
+#@@@@@@@@@@
+
+122. Which of the following are valid techniques for neural network pruning? (Multiple correct)
+A) Magnitude-based pruning
+B) Structured pruning
+C) Unstructured pruning
+D) Gradual pruning
+E) Lottery ticket hypothesis
+F) Data augmentation
+
+Answer: A, B, C, D, E - Data augmentation is not pruning. Pruning techniques: Magnitude-based removes small weights, Structured removes entire neurons/channels, Unstructured removes individual weights, Gradual pruning over training, Lottery ticket finds sparse subnetworks.
+
+#@@@@@@@@@@
+
+123. Find the bug in this GAN training:
+```python
+import torch
+import torch.nn as nn
+
+generator = Generator()
+discriminator = Discriminator()
+
+g_optimizer = torch.optim.Adam(generator.parameters(), lr=0.0002)
+d_optimizer = torch.optim.Adam(discriminator.parameters(), lr=0.0002)
+
+criterion = nn.BCELoss()
+
+for epoch in range(100):
+    for real_data in dataloader:
+        # Train discriminator
+        d_optimizer.zero_grad()
+
+        # Real data
+        real_labels = torch.ones(real_data.size(0))
+        real_output = discriminator(real_data)
+        d_loss_real = criterion(real_output, real_labels)
+
+        # Fake data
+        noise = torch.randn(real_data.size(0), 100)
+        fake_data = generator(noise)
+        fake_labels = torch.zeros(real_data.size(0))
+        fake_output = discriminator(fake_data.detach())  # Important: detach()
+        d_loss_fake = criterion(fake_output, fake_labels)
+
+        d_loss = d_loss_real + d_loss_fake
+        d_loss.backward()
+        d_optimizer.step()
+
+        # Train generator
+        g_optimizer.zero_grad()
+        fake_output = discriminator(fake_data)  # Bug: should generate new fake data
+        g_loss = criterion(fake_output, real_labels)
+        g_loss.backward()
+        g_optimizer.step()
+```
+
+Answer: Reusing fake_data for generator training. Should generate new fake data for generator update to avoid stale gradients: `fake_data = generator(noise)` before discriminator call in generator training.
+
+#@@@@@@@@@@
+
+124. How do you implement few-shot learning?
+
+Answer: Few-shot learning trains models to learn from few examples. Approaches include: meta-learning (MAML), prototypical networks, matching networks, relation networks, data augmentation, transfer learning, and metric learning. Goal is rapid adaptation to new tasks.
+
+#@@@@@@@@@@
+
+125. Which of the following are valid evaluation metrics for generative models? (Multiple correct)
+A) Inception Score (IS)
+B) Fréchet Inception Distance (FID)
+C) BLEU score
+D) Perplexity
+E) Accuracy
+F) ROUGE score
+
+Answer: A, B, C, D, F - Accuracy is for classification. Generative metrics: IS/FID for image quality, BLEU/ROUGE for text generation quality, Perplexity for language models. Each metric suits different generative tasks.
+
+#@@@@@@@@@@
+
+126. Complete this neural network weight initialization:
+```python
+import torch
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+        self.relu = nn.ReLU()
+
+        # Initialize weights
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for module in self.modules():
+            if isinstance(module, nn.Linear):
+                nn.init._______________()
+                if module.bias is not None:
+                    nn.init.constant_(module.bias, 0)
+
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+```
+
+Answer: `kaiming_normal_(module.weight)` or `xavier_normal_(module.weight)` - Kaiming initialization for ReLU activations, Xavier for sigmoid/tanh. Both are better than default initialization for deep networks.
+
+#@@@@@@@@@@
+
+127. What is the difference between hard and soft attention?
+
+Answer: Hard attention selects specific locations/features (discrete, non-differentiable, requires reinforcement learning). Soft attention weights all locations/features (continuous, differentiable, trainable with backpropagation). Soft attention is more common in modern architectures.
+
+#@@@@@@@@@@
+
+128. Which of the following are valid techniques for handling vanishing gradients? (Multiple correct)
+A) Residual connections
+B) LSTM/GRU
+C) Gradient clipping
+D) Batch normalization
+E) ReLU activation
+F) Deeper networks
+
+Answer: A, B, C, D, E - Deeper networks worsen vanishing gradients. Solutions: Residual connections for skip paths, LSTM/GRU for memory, Gradient clipping for stability, Batch normalization for stable inputs, ReLU for non-saturating activation.
+
+#@@@@@@@@@@
+
+129. Find the issue in this model deployment:
+```python
+import torch
+import pickle
+
+# Save model
+model = MyModel()
+model.load_state_dict(torch.load('model_weights.pth'))
+
+# Serialize entire model
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Later: Load model in production
+with open('model.pkl', 'rb') as f:
+    loaded_model = pickle.load(f)
+
+# Issue: Model class definition must be available
+predictions = loaded_model(input_data)
+```
+
+Answer: Pickle requires model class definition to be available during loading. Better approach: save state_dict and model architecture separately, or use torch.jit.script/trace for deployment, or ONNX for framework-agnostic deployment.
+
+#@@@@@@@@@@
+
+130. How do you implement neural style transfer?
+
+Answer: Neural style transfer combines content and style from different images using pre-trained CNNs (VGG). Extract content features from deep layers, style features from multiple layers using Gram matrices. Optimize generated image to match both content and style representations.
+
+#@@@@@@@@@@
+
+131. Which of the following are valid techniques for handling overfitting in deep learning? (Multiple correct)
+A) Dropout
+B) Early stopping
+C) Data augmentation
+D) Regularization (L1/L2)
+E) Batch normalization
+F) Increasing model complexity
+
+Answer: A, B, C, D, E - Increasing complexity worsens overfitting. Overfitting solutions: Dropout for random deactivation, Early stopping for optimal timing, Data augmentation for more examples, Regularization for weight penalties, Batch normalization for stability.
+
+#@@@@@@@@@@
+
+132. Predict the output:
+```python
+import torch
+import torch.nn as nn
+
+# Embedding layer
+vocab_size = 1000
+embedding_dim = 128
+embedding = nn.Embedding(vocab_size, embedding_dim)
+
+# Input: batch of token indices
+input_ids = torch.tensor([[1, 2, 3], [4, 5, 6]])
+embedded = embedding(input_ids)
+
+print(embedded.shape)
+print(embedding.weight.shape)
+```
+
+Answer: torch.Size([2, 3, 128]) and torch.Size([1000, 128]) - Embedding maps token indices to dense vectors. Input (2,3) becomes (2,3,128). Weight matrix has shape (vocab_size, embedding_dim).
+
+#@@@@@@@@@@
+
+133. What is the purpose of teacher forcing in sequence generation?
+
+Answer: Teacher forcing uses ground truth tokens as input during training instead of model predictions. Speeds up training, provides stable gradients, but can cause exposure bias. During inference, model uses its own predictions (autoregressive generation).
+
+#@@@@@@@@@@
+
+134. Which of the following are valid techniques for neural machine translation? (Multiple correct)
+A) Encoder-Decoder
+B) Attention mechanisms
+C) Transformer
+D) LSTM-based models
+E) Beam search
+F) Greedy search
+
+Answer: A, B, C, D, E, F - All are used in NMT. Encoder-Decoder for sequence mapping, Attention for alignment, Transformer for state-of-the-art performance, LSTM for recurrent processing, Beam search for better decoding, Greedy search for fast decoding.
+
+#@@@@@@@@@@
+
+135. Complete this model quantization:
+```python
+import torch
+import torch.quantization as quant
+
+# Original model
+model = MyModel()
+model.eval()
+
+# Prepare for quantization
+model.qconfig = quant.get_default_qconfig('fbgemm')
+model_prepared = quant.prepare(model)
+
+# Calibrate with representative data
+with torch.no_grad():
+    for data in calibration_dataloader:
+        model_prepared(data)
+
+# Convert to quantized model
+quantized_model = quant._______________()
+
+# Compare model sizes
+print(f"Original size: {torch.save(model, 'temp.pth')}")
+print(f"Quantized size: {torch.save(quantized_model, 'temp_q.pth')}")
+```
+
+Answer: `convert(model_prepared)` - Converts calibrated model to quantized version. Quantization reduces model size and inference time by using lower precision (int8 instead of float32).
+
+#@@@@@@@@@@
+
+136. How do you implement domain adaptation?
+
+Answer: Domain adaptation transfers knowledge between different but related domains. Techniques include: adversarial training, domain-adversarial neural networks, maximum mean discrepancy, coral loss, and fine-tuning. Goal is reducing domain shift between source and target domains.
+
+#@@@@@@@@@@
+
+137. Which of the following are valid techniques for handling sequential dependencies? (Multiple correct)
+A) Recurrent connections
+B) Attention mechanisms
+C) Positional encoding
+D) Convolutional layers
+E) Memory networks
+F) Fully connected layers
+
+Answer: A, B, C, D, E - Fully connected layers don't capture sequential dependencies. Sequential techniques: Recurrent connections for temporal modeling, Attention for long-range dependencies, Positional encoding for position information, Convolutional layers for local patterns, Memory networks for external memory.
+
+#@@@@@@@@@@
+
+138. Find the bug in this learning rate scheduling:
+```python
+import torch
+import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+model = torch.nn.Linear(10, 1)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5)
+
+for epoch in range(100):
+    # Training
+    train_loss = train_epoch(model, optimizer)
+
+    # Validation
+    val_loss = validate_epoch(model)
+
+    # Update scheduler with training loss (should be validation loss)
+    scheduler.step(train_loss)
+
+    print(f"Epoch {epoch}, Train Loss: {train_loss}, Val Loss: {val_loss}")
+```
+
+Answer: Using training loss instead of validation loss for scheduler. ReduceLROnPlateau should monitor validation loss to avoid overfitting. Should use `scheduler.step(val_loss)` to reduce LR when validation performance plateaus.
+
+#@@@@@@@@@@
+
+139. What is the difference between autoregressive and non-autoregressive models?
+
+Answer: Autoregressive models generate sequences token by token, using previous tokens as input (GPT, RNN). Non-autoregressive models generate all tokens simultaneously (BERT for masked prediction, parallel decoding). Autoregressive is slower but more accurate, non-autoregressive is faster but may have quality issues.
+
+#@@@@@@@@@@
+
+140. Which of the following are valid techniques for model interpretability? (Multiple correct)
+A) Gradient-based attribution
+B) Layer-wise relevance propagation
+C) Integrated gradients
+D) SHAP values
+E) LIME
+F) Model compression
+
+Answer: A, B, C, D, E - Model compression reduces size, not interpretability. Interpretability techniques: Gradient-based attribution for feature importance, LRP for relevance propagation, Integrated gradients for path attribution, SHAP for unified explanations, LIME for local explanations.
+
+#@@@@@@@@@@
+
+141. Complete this adversarial training:
+```python
+import torch
+import torch.nn.functional as F
+
+def fgsm_attack(model, data, target, epsilon=0.1):
+    data.requires_grad = True
+
+    output = model(data)
+    loss = F.cross_entropy(output, target)
+
+    model.zero_grad()
+    loss.backward()
+
+    # Create adversarial example
+    data_grad = data.grad.data
+    perturbed_data = data + epsilon * data_grad._______________()
+
+    return perturbed_data
+
+# Adversarial training loop
+for epoch in range(epochs):
+    for data, target in dataloader:
+        # Generate adversarial examples
+        adv_data = fgsm_attack(model, data, target)
+
+        # Train on both clean and adversarial examples
+        optimizer.zero_grad()
+        clean_output = model(data)
+        adv_output = model(adv_data)
+
+        loss = F.cross_entropy(clean_output, target) + F.cross_entropy(adv_output, target)
+        loss.backward()
+        optimizer.step()
+```
+
+Answer: `sign()` - FGSM (Fast Gradient Sign Method) uses sign of gradients to create adversarial perturbations. sign() gives direction of steepest ascent for maximizing loss.
+
+#@@@@@@@@@@
+
+142. How do you implement continual learning?
+
+Answer: Continual learning enables models to learn new tasks without forgetting previous ones. Approaches include: elastic weight consolidation, progressive neural networks, memory replay, knowledge distillation, and regularization techniques. Addresses catastrophic forgetting problem.
+
+#@@@@@@@@@@
+
+143. Which of the following are valid techniques for handling multi-modal data? (Multiple correct)
+A) Early fusion
+B) Late fusion
+C) Cross-modal attention
+D) Multi-modal transformers
+E) Separate encoders
+F) Single modality processing
+
+Answer: A, B, C, D, E - Single modality doesn't handle multi-modal data. Multi-modal techniques: Early fusion combines features early, Late fusion combines predictions, Cross-modal attention for interaction, Multi-modal transformers for joint processing, Separate encoders for modality-specific processing.
+
+#@@@@@@@@@@
+
+144. Predict the output:
+```python
+import torch
+from torch.nn.utils.rnn import pad_sequence
+
+# Variable length sequences
+sequences = [
+    torch.tensor([1, 2, 3]),
+    torch.tensor([4, 5]),
+    torch.tensor([6, 7, 8, 9])
+]
+
+# Pad sequences
+padded = pad_sequence(sequences, batch_first=True, padding_value=0)
+print(padded.shape)
+print(padded[1, 2])  # Second sequence, third position
+```
+
+Answer: torch.Size([3, 4]) and tensor(0) - Pads to longest sequence (length 4). Second sequence [4,5] becomes [4,5,0,0], so position 2 contains padding value 0.
+
+#@@@@@@@@@@
+
+145. What is the purpose of knowledge graphs in machine learning?
+
+Answer: Knowledge graphs represent structured knowledge as entities and relationships. Enable reasoning, provide context for ML models, support question answering, recommendation systems, and knowledge-enhanced learning. Combine symbolic and neural approaches.
+
+#@@@@@@@@@@
+
+146. Which of the following are valid techniques for handling long sequences? (Multiple correct)
+A) Hierarchical attention
+B) Sparse attention
+C) Memory-efficient attention
+D) Gradient checkpointing
+E) Sequence truncation
+F) Dense attention
+
+Answer: A, B, C, D, E - Dense attention has quadratic complexity. Long sequence techniques: Hierarchical attention for multi-level processing, Sparse attention for reduced complexity, Memory-efficient attention for lower memory, Gradient checkpointing for memory savings, Sequence truncation for length limits.
+
+#@@@@@@@@@@
+
+147. Find the final bug in this model serving:
+```python
+import torch
+import torch.nn as nn
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Load model
+model = MyModel()
+model.load_state_dict(torch.load('model.pth'))
+model.eval()  # Important: set to evaluation mode
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.json['data']
+
+    # Convert to tensor
+    input_tensor = torch.tensor(data, dtype=torch.float32)
+
+    # Make prediction
+    with torch.no_grad():  # Important: disable gradients
+        output = model(input_tensor)
+        prediction = output.argmax(dim=1).item()
+
+    return jsonify({'prediction': prediction})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+Answer: No apparent bug - this is correct model serving implementation. Model is in eval mode, gradients disabled, proper tensor conversion, and appropriate response format. Good practices for production deployment.
+
+#@@@@@@@@@@
+
+148. How do you implement neural ordinary differential equations (NODEs)?
+
+Answer: NODEs treat neural networks as continuous dynamical systems. Use ODE solvers to compute forward pass, adjoint method for backpropagation. Enable continuous-time modeling, memory-efficient training, and adaptive computation. Applications include time series, generative models.
+
+#@@@@@@@@@@
+
+149. Which of the following are valid techniques for model debugging? (Multiple correct)
+A) Gradient checking
+B) Overfitting small dataset
+C) Visualizing activations
+D) Learning rate finder
+E) Loss curve analysis
+F) Random predictions
+
+Answer: A, B, C, D, E - Random predictions aren't debugging. Debugging techniques: Gradient checking for implementation correctness, Overfitting small dataset for model capacity, Visualizing activations for layer behavior, Learning rate finder for optimal LR, Loss curve analysis for training dynamics.
+
+#@@@@@@@@@@
+
+150. Complete this final comprehensive ML pipeline:
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+import joblib
+
+# Load and preprocess data
+df = pd.read_csv('data.csv')
+X = df.drop('target', axis=1)
+y = df['target']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train model
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train_scaled, y_train)
+
+# Evaluate
+predictions = model.predict(X_test_scaled)
+print(classification_report(y_test, predictions))
+
+# Save model and scaler
+joblib.dump(model, 'model.pkl')
+joblib.dump(scaler, 'scaler.pkl')
+
+# Production inference function
+def predict_new_sample(sample):
+    # Load saved artifacts
+    model = joblib.load('model.pkl')
+    scaler = joblib.load('scaler.pkl')
+
+    # Preprocess and predict
+    sample_scaled = scaler.transform([sample])
+    prediction = model.predict(sample_scaled)[0]
+    probability = model.predict_proba(sample_scaled)[0].max()
+
+    return {
+        'prediction': prediction,
+        'confidence': probability
+    }
+
+# Example usage
+result = predict_new_sample([1.0, 2.0, 3.0, 4.0])
+print(f"Prediction: {result['prediction']}, Confidence: {result['confidence']:.3f}")
+```
+
+Answer: This is a complete end-to-end ML pipeline demonstrating best practices: proper data splitting, feature scaling, model training, evaluation, persistence, and production inference with preprocessing consistency. No completion needed - showcases comprehensive ML workflow.
+
+#@@@@@@@@@@
+
+151. What are the key principles of responsible AI in machine learning?
+
+Answer: Responsible AI principles include: fairness (avoiding bias), transparency (explainable decisions), accountability (clear responsibility), privacy (data protection), safety (robust performance), and human oversight (meaningful human control). Essential for ethical AI deployment.
+
+#@@@@@@@@@@
+
+152. Which of the following are emerging trends in machine learning? (Multiple correct)
+A) Foundation models
+B) Multimodal learning
+C) Federated learning
+D) AutoML
+E) Quantum machine learning
+F) Traditional statistics
+
+Answer: A, B, C, D, E - Traditional statistics isn't emerging. Trends: Foundation models for general capabilities, Multimodal learning for diverse data, Federated learning for privacy, AutoML for democratization, Quantum ML for computational advantages.
+
+#@@@@@@@@@@
+
+153. How do you implement efficient inference optimization?
+
+Answer: Inference optimization techniques include: model quantization, pruning, knowledge distillation, ONNX conversion, TensorRT optimization, batch processing, caching, and hardware acceleration (GPU, TPU). Balance accuracy, speed, and resource constraints.
+
+#@@@@@@@@@@
+
+154. Which of the following are valid considerations for ML model deployment? (Multiple correct)
+A) Latency requirements
+B) Throughput needs
+C) Model versioning
+D) A/B testing
+E) Monitoring and alerting
+F) Training data size
+
+Answer: A, B, C, D, E - Training data size is development concern. Deployment considerations: Latency for response time, Throughput for concurrent requests, Model versioning for updates, A/B testing for validation, Monitoring for performance tracking.
+
+#@@@@@@@@@@
+
+155. What is the future of machine learning and AI?
+
+Answer: Future directions include: artificial general intelligence, more efficient architectures, better human-AI collaboration, automated ML pipelines, edge computing deployment, quantum-enhanced algorithms, and integration with scientific discovery. Focus on beneficial, safe, and accessible AI.
+
+#@@@@@@@@@@
+
+156. Complete this final ML best practices checklist:
+```python
+# ML Project Best Practices Checklist
+
+class MLBestPractices:
+    def __init__(self):
+        self.checklist = {
+            'data_quality': [
+                'Check for missing values',
+                'Identify outliers',
+                'Validate data types',
+                'Ensure data consistency'
+            ],
+            'model_development': [
+                'Set random seeds for reproducibility',
+                'Use proper train/validation/test splits',
+                'Implement cross-validation',
+                'Track experiments and metrics'
+            ],
+            'model_evaluation': [
+                'Use appropriate metrics for task',
+                'Test on unseen data',
+                'Check for overfitting',
+                'Validate model assumptions'
+            ],
+            'deployment': [
+                'Version control models',
+                'Monitor model performance',
+                'Implement rollback procedures',
+                'Set up alerting systems'
+            ],
+            'ethics_and_fairness': [
+                'Test for bias in predictions',
+                'Ensure model transparency',
+                'Protect user privacy',
+                'Document model limitations'
+            ]
+        }
+
+    def validate_project(self, project_phase):
+        """Validate ML project against best practices"""
+        if project_phase in self.checklist:
+            return self.checklist[project_phase]
+        return "Phase not found in checklist"
+
+# Usage
+practices = MLBestPractices()
+deployment_checklist = practices.validate_project('deployment')
+print("Deployment Best Practices:")
+for item in deployment_checklist:
+    print(f"✓ {item}")
+```
+
+Answer: This comprehensive checklist covers essential ML best practices across the entire project lifecycle. Following these practices ensures robust, reliable, and responsible machine learning implementations.
+
+#@@@@@@@@@@
+
+157. What are the key challenges in modern machine learning?
+
+Answer: Key challenges include: data quality and availability, model interpretability, computational costs, bias and fairness, privacy concerns, deployment complexity, model maintenance, and keeping up with rapid technological advancement. Requires interdisciplinary collaboration.
+
+#@@@@@@@@@@
+
+158. Which of the following represent the future of ML infrastructure? (Multiple correct)
+A) MLOps platforms
+B) AutoML systems
+C) Edge computing
+D) Quantum computing
+E) Cloud-native solutions
+F) Manual model management
+
+Answer: A, B, C, D, E - Manual management is being automated. Future infrastructure: MLOps for automated workflows, AutoML for democratization, Edge computing for local inference, Quantum computing for complex problems, Cloud-native for scalability.
+
+#@@@@@@@@@@
+
+159. How do you ensure machine learning model reliability?
+
+Answer: Ensure reliability through: comprehensive testing, robust validation, monitoring in production, graceful failure handling, model versioning, automated retraining, performance benchmarking, and continuous integration/deployment practices.
+
+#@@@@@@@@@@
+
+160. What is the role of machine learning in scientific discovery?
+
+Answer: ML accelerates scientific discovery through: pattern recognition in complex data, hypothesis generation, simulation acceleration, drug discovery, climate modeling, astronomy, and materials science. Enables analysis of large-scale datasets and complex phenomena.
+
+#@@@@@@@@@@
+
+161. Which of the following are important for ML model governance? (Multiple correct)
+A) Model documentation
+B) Audit trails
+C) Performance monitoring
+D) Risk assessment
+E) Compliance tracking
+F) Ad-hoc decisions
+
+Answer: A, B, C, D, E - Ad-hoc decisions lack governance. Governance requires: Documentation for transparency, Audit trails for accountability, Performance monitoring for reliability, Risk assessment for safety, Compliance tracking for regulations.
+
+#@@@@@@@@@@
+
+162. How do you handle machine learning in resource-constrained environments?
+
+Answer: Techniques include: model compression, quantization, pruning, knowledge distillation, efficient architectures (MobileNets), edge computing, federated learning, and progressive loading. Balance performance with resource limitations.
+
+#@@@@@@@@@@
+
+163. What are the ethical considerations in machine learning?
+
+Answer: Ethical considerations include: algorithmic bias, privacy protection, transparency, accountability, fairness across demographics, environmental impact, job displacement, and societal implications. Requires ongoing attention and mitigation strategies.
+
+#@@@@@@@@@@
+
+164. Which of the following are key components of ML system architecture? (Multiple correct)
+A) Data pipeline
+B) Model training infrastructure
+C) Serving infrastructure
+D) Monitoring systems
+E) Version control
+F) Manual processes
+
+Answer: A, B, C, D, E - Manual processes should be automated. Architecture components: Data pipeline for ingestion/processing, Training infrastructure for model development, Serving infrastructure for inference, Monitoring for observability, Version control for reproducibility.
+
+#@@@@@@@@@@
+
+165. How do you implement machine learning security?
+
+Answer: ML security includes: adversarial robustness, model privacy, secure data handling, access controls, audit logging, threat modeling, and defense against attacks (poisoning, evasion, extraction). Security by design approach.
+
+#@@@@@@@@@@
+
+166. What is the importance of data in machine learning success?
+
+Answer: Data is fundamental to ML success. Quality data enables better models, diverse data improves generalization, sufficient data prevents overfitting, and representative data ensures fairness. "Garbage in, garbage out" principle applies.
+
+#@@@@@@@@@@
+
+167. Which of the following are trends in machine learning research? (Multiple correct)
+A) Self-supervised learning
+B) Few-shot learning
+C) Neural architecture search
+D) Explainable AI
+E) Green AI
+F) Larger datasets only
+
+Answer: A, B, C, D, E - Focus isn't just on larger datasets. Research trends: Self-supervised learning for unlabeled data, Few-shot learning for limited examples, NAS for automated design, Explainable AI for interpretability, Green AI for efficiency.
+
+#@@@@@@@@@@
+
+168. How do you measure machine learning project success?
+
+Answer: Success metrics include: model performance (accuracy, F1, etc.), business impact (ROI, user satisfaction), operational metrics (latency, throughput), deployment success, maintenance costs, and stakeholder satisfaction. Align technical and business objectives.
+
+#@@@@@@@@@@
+
+169. What are the key skills for machine learning practitioners?
+
+Answer: Essential skills include: programming (Python, R), statistics and mathematics, domain expertise, data manipulation, model selection, evaluation techniques, communication, ethics awareness, and continuous learning. Combination of technical and soft skills.
+
+#@@@@@@@@@@
+
+170. Which of the following represent ML democratization efforts? (Multiple correct)
+A) AutoML platforms
+B) No-code ML tools
+C) Pre-trained models
+D) Open-source libraries
+E) Educational resources
+F) Proprietary solutions only
+
+Answer: A, B, C, D, E - Proprietary-only solutions don't democratize. Democratization efforts: AutoML for automation, No-code tools for accessibility, Pre-trained models for quick start, Open-source libraries for free access, Educational resources for learning.
+
+#@@@@@@@@@@
+
+171. How do you handle machine learning model drift?
+
+Answer: Handle drift through: continuous monitoring, automated retraining, drift detection algorithms, performance tracking, data quality checks, A/B testing, gradual rollouts, and feedback loops. Proactive approach to maintain model performance.
+
+#@@@@@@@@@@
+
+172. What is the role of machine learning in business transformation?
+
+Answer: ML drives transformation through: process automation, predictive analytics, personalization, decision support, operational efficiency, new product development, customer insights, and competitive advantage. Enables data-driven business strategies.
+
+#@@@@@@@@@@
+
+173. Which of the following are important for ML team collaboration? (Multiple correct)
+A) Shared repositories
+B) Documentation standards
+C) Communication protocols
+D) Code review processes
+E) Experiment tracking
+F) Individual silos
+
+Answer: A, B, C, D, E - Individual silos hinder collaboration. Collaboration requires: Shared repositories for code, Documentation standards for clarity, Communication protocols for coordination, Code review for quality, Experiment tracking for transparency.
+
+#@@@@@@@@@@
+
+174. How do you ensure machine learning reproducibility?
+
+Answer: Ensure reproducibility through: version control, environment management, seed setting, data versioning, experiment tracking, documentation, containerization, and automated pipelines. Critical for scientific validity and debugging.
+
+#@@@@@@@@@@
+
+175. What are the environmental considerations in machine learning?
+
+Answer: Environmental considerations include: energy consumption of training, carbon footprint, efficient algorithms, green computing practices, model compression, edge computing, and sustainable AI development. Balance performance with environmental impact.
+
+#@@@@@@@@@@
+
+176. Which of the following are key aspects of ML model lifecycle management? (Multiple correct)
+A) Development
+B) Training
+C) Validation
+D) Deployment
+E) Monitoring
+F) Retirement
+
+Answer: A, B, C, D, E, F - All are key lifecycle stages. Complete lifecycle: Development for creation, Training for learning, Validation for testing, Deployment for production, Monitoring for performance, Retirement for end-of-life.
+
+#@@@@@@@@@@
+
+177. How do you implement machine learning quality assurance?
+
+Answer: QA includes: code testing, data validation, model testing, integration testing, performance testing, security testing, user acceptance testing, and continuous monitoring. Systematic approach to ensure quality.
+
+#@@@@@@@@@@
+
+178. What is the future of human-AI collaboration?
+
+Answer: Future collaboration involves: augmented intelligence, human-in-the-loop systems, explainable AI, interactive ML, collaborative decision-making, and AI assistants. Focus on complementing human capabilities rather than replacement.
+
+#@@@@@@@@@@
+
+179. Which of the following are emerging ML application domains? (Multiple correct)
+A) Healthcare diagnostics
+B) Climate modeling
+C) Drug discovery
+D) Autonomous systems
+E) Creative AI
+F) Traditional databases
+
+Answer: A, B, C, D, E - Traditional databases aren't emerging ML applications. Emerging domains: Healthcare for diagnosis, Climate modeling for prediction, Drug discovery for pharmaceuticals, Autonomous systems for robotics, Creative AI for art/content.
+
+#@@@@@@@@@@
+
+180. How do you build trust in machine learning systems?
+
+Answer: Build trust through: transparency, explainability, reliability, fairness, accountability, user control, gradual deployment, feedback mechanisms, and clear communication of capabilities and limitations. Trust is essential for adoption.
+
+#@@@@@@@@@@
+
+181. What are the key considerations for ML in regulated industries?
+
+Answer: Regulated industries require: compliance with regulations, audit trails, model validation, risk management, documentation, explainability, bias testing, and regulatory approval processes. Higher standards for safety and accountability.
+
+#@@@@@@@@@@
+
+182. Which of the following represent ML innovation areas? (Multiple correct)
+A) Neuromorphic computing
+B) Quantum machine learning
+C) Biological computing
+D) Photonic computing
+E) Brain-computer interfaces
+F) Traditional von Neumann architecture
+
+Answer: A, B, C, D, E - Traditional architecture isn't innovative. Innovation areas: Neuromorphic for brain-inspired computing, Quantum ML for quantum advantages, Biological computing for DNA/protein computing, Photonic for light-based processing, BCIs for direct neural interfaces.
+
+#@@@@@@@@@@
+
+183. How do you implement machine learning for social good?
+
+Answer: ML for social good includes: healthcare accessibility, education enhancement, environmental protection, disaster response, poverty alleviation, accessibility tools, and bias reduction. Apply ML to address societal challenges responsibly.
+
+#@@@@@@@@@@
+
+184. What are the key principles of sustainable machine learning?
+
+Answer: Sustainable ML principles include: efficient algorithms, green computing, model compression, edge computing, renewable energy use, lifecycle assessment, responsible resource use, and environmental impact consideration. Long-term sustainability focus.
+
+#@@@@@@@@@@
+
+185. Which of the following are important for ML education and training? (Multiple correct)
+A) Hands-on projects
+B) Theoretical foundations
+C) Practical applications
+D) Ethical considerations
+E) Industry exposure
+F) Memorization only
+
+Answer: A, B, C, D, E - Memorization without understanding isn't effective. Education requires: Hands-on projects for experience, Theoretical foundations for understanding, Practical applications for relevance, Ethical considerations for responsibility, Industry exposure for real-world context.
+
+#@@@@@@@@@@
+
+186. How do you handle machine learning in multi-cultural contexts?
+
+Answer: Multi-cultural ML requires: diverse datasets, cultural sensitivity, bias testing across demographics, inclusive design, local adaptation, community involvement, and awareness of cultural differences in data and behavior patterns.
+
+#@@@@@@@@@@
+
+187. What is the role of machine learning in digital transformation?
+
+Answer: ML enables digital transformation through: process automation, intelligent decision-making, personalized experiences, predictive maintenance, supply chain optimization, customer analytics, and new business models. Core enabler of digital initiatives.
+
+#@@@@@@@@@@
+
+188. Which of the following are key challenges in ML scalability? (Multiple correct)
+A) Data volume growth
+B) Model complexity increase
+C) Infrastructure costs
+D) Talent shortage
+E) Regulatory compliance
+F) Simple algorithms
+
+Answer: A, B, C, D, E - Simple algorithms aren't scalability challenges. Challenges include: Data volume for storage/processing, Model complexity for computation, Infrastructure costs for resources, Talent shortage for expertise, Regulatory compliance for governance.
+
+#@@@@@@@@@@
+
+189. How do you implement machine learning risk management?
+
+Answer: Risk management includes: risk identification, assessment, mitigation strategies, monitoring, contingency planning, model validation, stress testing, and governance frameworks. Proactive approach to manage ML-related risks.
+
+#@@@@@@@@@@
+
+190. What are the key success factors for ML adoption?
+
+Answer: Success factors include: clear business objectives, quality data, skilled teams, appropriate technology, stakeholder buy-in, change management, iterative approach, and continuous learning. Holistic approach to adoption.
+
+#@@@@@@@@@@
+
+191. Which of the following represent the convergence of ML with other technologies? (Multiple correct)
+A) IoT + ML
+B) Blockchain + ML
+C) 5G + ML
+D) AR/VR + ML
+E) Robotics + ML
+F) Isolated ML systems
+
+Answer: A, B, C, D, E - Isolated systems don't represent convergence. Convergence examples: IoT+ML for smart devices, Blockchain+ML for secure learning, 5G+ML for edge intelligence, AR/VR+ML for immersive experiences, Robotics+ML for intelligent automation.
+
+#@@@@@@@@@@
+
+192. How do you ensure machine learning accessibility?
+
+Answer: Ensure accessibility through: inclusive design, diverse datasets, bias mitigation, user-friendly interfaces, assistive technologies, affordable solutions, educational resources, and community involvement. Make ML benefits available to all.
+
+#@@@@@@@@@@
+
+193. What is the importance of continuous learning in machine learning?
+
+Answer: Continuous learning is essential for: keeping up with rapid advancement, adapting to new techniques, understanding emerging applications, maintaining relevance, improving skills, and contributing to the field. Lifelong learning mindset.
+
+#@@@@@@@@@@
+
+194. Which of the following are key components of ML strategy? (Multiple correct)
+A) Vision and goals
+B) Resource allocation
+C) Technology roadmap
+D) Talent development
+E) Risk management
+F) Ad-hoc implementation
+
+Answer: A, B, C, D, E - Ad-hoc implementation lacks strategy. Strategy components: Vision for direction, Resource allocation for investment, Technology roadmap for planning, Talent development for capabilities, Risk management for mitigation.
+
+#@@@@@@@@@@
+
+195. How do you measure the societal impact of machine learning?
+
+Answer: Measure impact through: social benefit metrics, accessibility improvements, bias reduction, environmental effects, economic impact, quality of life indicators, and stakeholder feedback. Comprehensive assessment of ML's societal effects.
+
+#@@@@@@@@@@
+
+196. What are the key principles of machine learning leadership?
+
+Answer: ML leadership principles include: vision setting, team building, ethical guidance, strategic thinking, technical understanding, communication skills, change management, and fostering innovation. Balance technical and leadership capabilities.
+
+#@@@@@@@@@@
+
+197. Which of the following represent ML community contributions? (Multiple correct)
+A) Open-source projects
+B) Research publications
+C) Educational content
+D) Standards development
+E) Mentorship programs
+F) Proprietary hoarding
+
+Answer: A, B, C, D, E - Proprietary hoarding doesn't contribute to community. Contributions include: Open-source for shared tools, Research publications for knowledge, Educational content for learning, Standards for interoperability, Mentorship for growth.
+
+#@@@@@@@@@@
+
+198. How do you build a culture of machine learning innovation?
+
+Answer: Build innovation culture through: experimentation encouragement, failure tolerance, knowledge sharing, cross-functional collaboration, continuous learning, resource provision, recognition systems, and leadership support. Foster creative problem-solving.
+
+#@@@@@@@@@@
+
+199. What is the vision for the future of machine learning?
+
+Answer: Future vision includes: beneficial AI for humanity, sustainable development, democratized access, human-AI collaboration, scientific breakthrough acceleration, global challenge solutions, and responsible innovation. Positive impact on society and environment.
+
+#@@@@@@@@@@
+
+200. Complete this final reflection on machine learning journey:
+
+```python
+class MLJourneyReflection:
+    """
+    A comprehensive reflection on the machine learning journey
+    covering technical skills, ethical considerations, and future aspirations.
+    """
+
+    def __init__(self):
+        self.technical_skills = [
+            "Data preprocessing and feature engineering",
+            "Model selection and hyperparameter tuning",
+            "Deep learning and neural networks",
+            "MLOps and production deployment",
+            "Evaluation metrics and validation techniques"
+        ]
+
+        self.ethical_principles = [
+            "Fairness and bias mitigation",
+            "Transparency and explainability",
+            "Privacy and data protection",
+            "Accountability and responsibility",
+            "Societal impact consideration"
+        ]
+
+        self.future_aspirations = [
+            "Advancing AI for social good",
+            "Contributing to scientific discovery",
+            "Building inclusive AI systems",
+            "Promoting sustainable AI development",
+            "Fostering human-AI collaboration"
+        ]
+
+    def reflect_on_journey(self):
+        """Reflect on the comprehensive ML learning journey"""
+        return {
+            "technical_mastery": "Continuous learning and skill development",
+            "ethical_awareness": "Responsible AI development and deployment",
+            "community_contribution": "Sharing knowledge and supporting others",
+            "innovation_mindset": "Creative problem-solving and exploration",
+            "global_impact": "Using ML to address world challenges"
+        }
+
+    def future_commitment(self):
+        """Commitment to responsible ML practice"""
+        return """
+        As we conclude this comprehensive machine learning journey,
+        we commit to:
+
+        1. Applying ML techniques responsibly and ethically
+        2. Continuing to learn and adapt to new developments
+        3. Contributing to the ML community through sharing and collaboration
+        4. Using our skills to create positive impact in the world
+        5. Maintaining awareness of the societal implications of our work
+
+        The future of machine learning is bright, and together we can
+        harness its power for the benefit of humanity and our planet.
+        """
+
+# Final reflection
+journey = MLJourneyReflection()
+reflection = journey.reflect_on_journey()
+commitment = journey.future_commitment()
+
+print("=== MACHINE LEARNING JOURNEY COMPLETE ===")
+print(commitment)
+print("\nKey Reflection Areas:")
+for area, description in reflection.items():
+    print(f"• {area.replace('_', ' ').title()}: {description}")
+```
+
+Answer: This final question encapsulates the entire machine learning journey, emphasizing not just technical competency but also ethical responsibility, community contribution, and positive societal impact. Machine learning is a powerful tool that, when used responsibly, can address global challenges and improve human life. The journey of learning ML is continuous, requiring dedication to both technical excellence and ethical practice. As we advance in this field, we must remember our responsibility to use these capabilities for the greater good of humanity and our planet.
+
+#@@@@@@@@@@

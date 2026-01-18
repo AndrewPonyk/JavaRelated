@@ -1,0 +1,2754 @@
+Compilers Quiz - 200 Questions
+Tech Stack: Compilers/Translator design, Language theory, Parsing theory, LLVM, JIT/AOT techniques, static analysis, type systems
+
+1. Which of the following are compiler phases? (Multiple correct)
+A) Lexical analysis
+B) Syntax analysis
+C) Semantic analysis
+D) Code generation
+E) Code optimization
+F) Symbol table management
+
+Answer: A, B, C, D, E, F - All are compiler phases. Lexical analysis (tokenization), Syntax analysis (parsing), Semantic analysis (type checking), Code generation (target code), Code optimization (performance), Symbol table management (identifier tracking).
+
+#@@@@@@@@@@
+
+2. Complete this lexical analyzer (lexer) code:
+```c
+typedef enum {
+    TOKEN_NUMBER,
+    TOKEN_IDENTIFIER,
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_EOF
+} TokenType;
+
+typedef struct {
+    TokenType type;
+    char* value;
+} Token;
+
+Token getNextToken(char** input) {
+    while (isspace(**input)) (*input)++;
+
+    if (**input == '\0') {
+        return (Token){TOKEN_EOF, NULL};
+    }
+
+    if (isdigit(**input)) {
+        // Parse number
+        char* start = *input;
+        while (isdigit(**input)) (*input)++;
+        int len = *input - start;
+        char* value = malloc(len + 1);
+        strncpy(value, start, len);
+        value[len] = '\0';
+        return (Token){_______________};
+    }
+
+    // Handle other tokens...
+}
+```
+
+Answer: `TOKEN_NUMBER, value` - Return a number token with the parsed value. The lexer tokenizes input into meaningful symbols for the parser.
+
+#@@@@@@@@@@
+
+3. What is the difference between LL and LR parsing?
+
+Answer: LL parsing is top-down, left-to-right scan, leftmost derivation, predictive, simpler but less powerful. LR parsing is bottom-up, left-to-right scan, rightmost derivation, shift-reduce, more powerful but complex. LL(k) looks ahead k tokens, LR(k) uses k tokens of lookahead.
+
+#@@@@@@@@@@
+
+4. Which of the following are context-free grammar components? (Multiple correct)
+A) Terminals
+B) Non-terminals
+C) Production rules
+D) Start symbol
+E) Epsilon productions
+F) Left recursion
+
+Answer: A, B, C, D, E, F - All are CFG components. Terminals (leaf symbols), Non-terminals (variables), Production rules (derivations), Start symbol (root), Epsilon productions (empty derivations), Left recursion (recursive productions).
+
+#@@@@@@@@@@
+
+5. Find the issue in this grammar:
+```
+E -> E + T | T
+T -> T * F | F
+F -> ( E ) | id | num
+
+// Left recursive grammar
+```
+
+Answer: Left recursion in E -> E + T and T -> T * F. This causes infinite recursion in top-down parsers. Fix by eliminating left recursion: E -> T E', E' -> + T E' | ε, T -> F T', T' -> * F T' | ε.
+
+#@@@@@@@@@@
+
+6. How do you implement static analysis in a compiler?
+
+Answer: Build Abstract Syntax Tree (AST), traverse with visitors, implement analysis passes (type checking, dead code detection, control flow analysis), maintain symbol tables, report errors/warnings, use data flow analysis for optimization opportunities.
+
+#@@@@@@@@@@
+
+7. Which of the following are LLVM components? (Multiple correct)
+A) LLVM IR
+B) Frontend (Clang)
+C) Backend
+D) Optimizer
+E) JIT compiler
+F) Bitcode
+
+Answer: A, B, C, D, E, F - All are LLVM components. LLVM IR (intermediate representation), Frontend (language-specific), Backend (target-specific), Optimizer (transformations), JIT compiler (runtime compilation), Bitcode (serialized IR).
+
+#@@@@@@@@@@
+
+8. Complete this type checker implementation:
+```c
+typedef enum {
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_BOOL,
+    TYPE_ERROR
+} Type;
+
+Type checkBinaryOp(Type left, Type right, char op) {
+    switch (op) {
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+            if (left == TYPE_INT && right == TYPE_INT) {
+                return TYPE_INT;
+            } else if ((left == TYPE_FLOAT || left == TYPE_INT) &&
+                      (right == TYPE_FLOAT || right == TYPE_INT)) {
+                return TYPE_FLOAT;
+            }
+            return _______________
+
+        case '<':
+        case '>':
+        case '==':
+            if ((left == TYPE_INT || left == TYPE_FLOAT) &&
+                (right == TYPE_INT || right == TYPE_FLOAT)) {
+                return TYPE_BOOL;
+            }
+            return TYPE_ERROR;
+    }
+    return TYPE_ERROR;
+}
+```
+
+Answer: `TYPE_ERROR` - Return error type for invalid type combinations. Type checking ensures operations are performed on compatible types.
+
+#@@@@@@@@@@
+
+9. What is the difference between JIT and AOT compilation?
+
+Answer: JIT (Just-In-Time) compiles at runtime, adaptive optimization, slower startup, better runtime performance. AOT (Ahead-Of-Time) compiles before execution, faster startup, no runtime compilation overhead, less adaptive optimization. Choose based on deployment requirements.
+
+#@@@@@@@@@@
+
+10. Which of the following are code optimization techniques? (Multiple correct)
+A) Dead code elimination
+B) Constant folding
+C) Loop unrolling
+D) Inlining
+E) Register allocation
+F) Peephole optimization
+
+Answer: A, B, C, D, E, F - All are optimization techniques. Dead code elimination (remove unused code), Constant folding (evaluate constants), Loop unrolling (reduce loop overhead), Inlining (replace calls), Register allocation (efficient register use), Peephole optimization (local improvements).
+
+#@@@@@@@@@@
+
+11. Predict the output of this parser for input "2 + 3 * 4":
+```
+Grammar:
+E -> E + T | T
+T -> T * F | F
+F -> num | ( E )
+
+Precedence: * higher than +
+Associativity: Left-to-right
+```
+
+Answer: Parse tree: E -> E + T -> T + T -> num + T -> num + T * F -> num + num * num. Result: 2 + (3 * 4) = 14. Multiplication has higher precedence than addition.
+
+#@@@@@@@@@@
+
+12. How do you implement garbage collection in a compiler?
+
+Answer: Track object references, implement mark-and-sweep or copying GC, insert GC calls in generated code, maintain object metadata, handle root set (stack/globals), implement write barriers for generational GC, optimize allocation patterns.
+
+#@@@@@@@@@@
+
+13. Which of the following are intermediate representations? (Multiple correct)
+A) Three-address code
+B) Abstract Syntax Tree (AST)
+C) Control Flow Graph (CFG)
+D) Static Single Assignment (SSA)
+E) Bytecode
+F) LLVM IR
+
+Answer: A, B, C, D, E, F - All are intermediate representations. Three-address code (simple instructions), AST (tree structure), CFG (control flow), SSA (single assignment), Bytecode (virtual machine), LLVM IR (typed assembly).
+
+#@@@@@@@@@@
+
+14. Complete this register allocation algorithm:
+```c
+typedef struct {
+    int* registers;
+    int num_registers;
+    int* variable_to_register;
+    bool* register_used;
+} RegisterAllocator;
+
+int allocateRegister(RegisterAllocator* alloc, int variable) {
+    // Find free register
+    for (int i = 0; i < alloc->num_registers; i++) {
+        if (!alloc->register_used[i]) {
+            alloc->register_used[i] = true;
+            alloc->variable_to_register[variable] = i;
+            return i;
+        }
+    }
+
+    // No free register, need to _______________
+    return spillVariable(alloc, variable);
+}
+```
+
+Answer: `spill` - Spill a variable to memory when no registers are available. Register allocation maps variables to limited hardware registers, spilling to memory when needed.
+
+#@@@@@@@@@@
+
+15. What is the difference between strong and weak typing in type systems?
+
+Answer: Strong typing prevents implicit type conversions, catches type errors at compile time, more restrictive but safer. Weak typing allows implicit conversions, more flexible but error-prone. Static typing checks at compile time, dynamic typing checks at runtime. Choose based on safety vs flexibility requirements.
+
+#@@@@@@@@@@
+
+16. Which of the following are compiler optimization levels? (Multiple correct)
+A) -O0 (no optimization)
+B) -O1 (basic optimization)
+C) -O2 (moderate optimization)
+D) -O3 (aggressive optimization)
+E) -Os (optimize for size)
+F) -Ofast (maximum speed, may break standards)
+
+Answer: A, B, C, D, E, F - All are GCC/Clang optimization levels. -O0 (debugging), -O1 (basic), -O2 (recommended), -O3 (aggressive), -Os (size), -Ofast (speed, unsafe). Choose based on requirements.
+
+#@@@@@@@@@@
+
+17. Complete this LLVM IR code generation:
+```cpp
+// Generate LLVM IR for: int add(int a, int b) { return a + b; }
+Function *createAddFunction(Module *M) {
+    LLVMContext &Context = M->getContext();
+
+    // Function type: int (int, int)
+    FunctionType *FT = FunctionType::get(
+        Type::getInt32Ty(Context),
+        {Type::getInt32Ty(Context), Type::getInt32Ty(Context)},
+        false
+    );
+
+    Function *F = Function::Create(FT, Function::ExternalLinkage, "add", M);
+
+    BasicBlock *BB = BasicBlock::Create(Context, "entry", F);
+    IRBuilder<> Builder(BB);
+
+    Value *A = F->arg_begin();
+    Value *B = F->arg_begin() + 1;
+
+    Value *Sum = Builder.CreateAdd(A, B, "sum");
+    Builder._______________( Sum);
+
+    return F;
+}
+```
+
+Answer: `CreateRet` - Create return instruction. LLVM IR is SSA-based intermediate representation. IRBuilder simplifies IR construction.
+
+#@@@@@@@@@@
+
+18. What is the purpose of constant folding in compilers?
+
+Answer: Constant folding evaluates constant expressions at compile time. Example: `x = 2 + 3` becomes `x = 5`. Reduces runtime computation, smaller code. Part of constant propagation. Essential optimization for performance.
+
+#@@@@@@@@@@
+
+19. How do you implement a simple interpreter?
+
+Answer: Parse source to AST, traverse AST evaluating nodes. Environment stores variables. `eval(node)` recursively evaluates: literals return value, variables lookup environment, operators apply operation to operands. Simpler than compilation, slower execution.
+
+#@@@@@@@@@@
+
+20. Which of the following are parser types? (Multiple correct)
+A) Recursive descent
+B) LL parser
+C) LR parser
+D) LALR parser
+E) Earley parser
+F) PEG parser
+
+Answer: A, B, C, D, E, F - All are parser types. Recursive descent (hand-written, top-down), LL (top-down), LR (bottom-up, powerful), LALR (efficient LR), Earley (handles ambiguity), PEG (Parsing Expression Grammar). Choose based on grammar complexity.
+
+#@@@@@@@@@@
+
+21. Complete this type checking code:
+```cpp
+Type* typeCheck(ASTNode *node, SymbolTable *symtab) {
+    switch (node->kind) {
+        case NODE_INT_LITERAL:
+            return IntType;
+
+        case NODE_VARIABLE:
+            return symtab->lookup(node->name);
+
+        case NODE_BINARY_OP:
+            Type *left = typeCheck(node->left, symtab);
+            Type *right = typeCheck(node->right, symtab);
+
+            if (!typesCompatible(left, right)) {
+                error("Type mismatch");
+            }
+
+            return _______________;
+    }
+}
+```
+
+Answer: `left` or `resultType(node->op, left, right)` - Return result type of operation. Type checking ensures type safety. Infer or check types based on language semantics.
+
+#@@@@@@@@@@
+
+22. What is the difference between interpretation and JIT compilation?
+
+Answer: Interpretation executes source/bytecode directly, slow, no compilation delay. JIT (Just-In-Time) compiles to native code at runtime, fast execution, compilation overhead. JIT combines interpretation flexibility with compilation speed. Used in Java, JavaScript, Python (PyPy).
+
+#@@@@@@@@@@
+
+23. How do you implement dead code elimination?
+
+Answer: Identify unreachable code (after return, in false branches). Mark live code from entry, sweep unmarked code. Control flow analysis finds unreachable blocks. Remove unused variables, functions. Reduces code size, improves performance.
+
+#@@@@@@@@@@
+
+24. Which of the following are intermediate representations? (Multiple correct)
+A) Three-address code
+B) SSA (Static Single Assignment)
+C) LLVM IR
+D) Java bytecode
+E) Abstract syntax tree (AST)
+F) Control flow graph (CFG)
+
+Answer: A, B, C, D, E, F - All are IRs. Three-address code (simple), SSA (single assignment), LLVM IR (industry standard), Java bytecode (stack-based), AST (tree), CFG (graph). Different levels of abstraction.
+
+#@@@@@@@@@@
+
+25. Complete this peephole optimization:
+```cpp
+// Optimize: x = x + 0 -> (remove)
+// Optimize: x = x * 1 -> (remove)
+// Optimize: x = x * 0 -> x = 0
+
+void peepholeOptimize(Instruction *inst) {
+    if (inst->op == ADD && inst->right->isConstant(0)) {
+        // x + 0 = x, remove instruction
+        inst->_______________();
+    }
+    else if (inst->op == MUL && inst->right->isConstant(1)) {
+        // x * 1 = x, remove instruction
+        inst->remove();
+    }
+    else if (inst->op == MUL && inst->right->isConstant(0)) {
+        // x * 0 = 0, replace with constant
+        inst->replaceWith(new ConstantInst(0));
+    }
+}
+```
+
+Answer: `remove` - Remove redundant instruction. Peephole optimization examines small instruction windows. Simple but effective optimizations.
+
+#@@@@@@@@@@
+
+26. What is the purpose of loop unrolling?
+
+Answer: Loop unrolling duplicates loop body to reduce loop overhead (counter increment, branch). Example: `for(i=0;i<4;i++) a[i]=0` becomes `a[0]=0; a[1]=0; a[2]=0; a[3]=0`. Reduces branches, enables more optimizations. Trade-off: code size vs speed.
+
+#@@@@@@@@@@
+
+27. How do you implement function inlining?
+
+Answer: Replace function call with function body. Copy parameters to arguments, substitute return with result variable. Reduces call overhead, enables interprocedural optimization. Heuristics: inline small functions, hot paths. Trade-off: code size vs speed.
+
+#@@@@@@@@@@
+
+28. Which of the following are calling conventions? (Multiple correct)
+A) cdecl (C declaration)
+B) stdcall (standard call)
+C) fastcall (register parameters)
+D) thiscall (C++ member functions)
+E) System V AMD64 ABI
+F) Microsoft x64 calling convention
+
+Answer: A, B, C, D, E, F - All are calling conventions. Define parameter passing (stack/registers), stack cleanup, return values. Platform-specific. Must match for interoperability.
+
+#@@@@@@@@@@
+
+29. Complete this control flow graph construction:
+```cpp
+void buildCFG(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        Instruction *terminator = BB->getTerminator();
+
+        if (BranchInst *br = dyn_cast<BranchInst>(terminator)) {
+            if (br->isConditional()) {
+                BB->addSuccessor(br->getTrueBranch());
+                BB->addSuccessor(br->getFalseBranch());
+            } else {
+                BB->addSuccessor(br->_______________());
+            }
+        }
+    }
+}
+```
+
+Answer: `getTarget` or `getSuccessor` - Get unconditional branch target. CFG represents control flow for analysis and optimization.
+
+#@@@@@@@@@@
+
+30. What is the difference between ahead-of-time and just-in-time compilation?
+
+Answer: AOT (Ahead-Of-Time) compiles before execution, faster startup, larger binaries, platform-specific. JIT compiles during execution, slower startup, runtime optimization, cross-platform bytecode. AOT for native apps, JIT for managed languages (Java, C#).
+
+#@@@@@@@@@@
+
+31. How do you implement common subexpression elimination?
+
+Answer: Find expressions computed multiple times with same operands. Compute once, reuse result. Example: `a=b+c; d=b+c` becomes `t=b+c; a=t; d=t`. Use value numbering or hash table. Reduces redundant computation.
+
+#@@@@@@@@@@
+
+32. Which of the following are compiler phases? (Multiple correct)
+A) Lexical analysis
+B) Syntax analysis
+C) Semantic analysis
+D) Intermediate code generation
+E) Optimization
+F) Code generation
+
+Answer: A, B, C, D, E, F - All are compiler phases. Lexical (tokenize), Syntax (parse), Semantic (type check), IR generation, Optimization (improve code), Code generation (target code). Multi-pass compilation.
+
+#@@@@@@@@@@
+
+33. Complete this symbol table implementation:
+```cpp
+class SymbolTable {
+    std::map<std::string, Symbol*> symbols;
+    SymbolTable *parent;  // For nested scopes
+
+public:
+    void insert(const std::string &name, Symbol *sym) {
+        symbols[name] = sym;
+    }
+
+    Symbol* lookup(const std::string &name) {
+        auto it = symbols.find(name);
+        if (it != symbols.end()) {
+            return it->second;
+        }
+
+        // Search parent scope
+        if (parent) {
+            return parent->_______________( name);
+        }
+
+        return nullptr;  // Not found
+    }
+};
+```
+
+Answer: `lookup` - Recursively search parent scopes. Symbol table maps identifiers to declarations. Supports nested scopes with parent chain.
+
+#@@@@@@@@@@
+
+34. What is the purpose of strength reduction in optimization?
+
+Answer: Strength reduction replaces expensive operations with cheaper ones. Example: `x * 2` becomes `x << 1`, `x * 4` becomes `x << 2`. Multiplication by power of 2 becomes shift. Division becomes multiplication by reciprocal. Significant performance improvement.
+
+#@@@@@@@@@@
+
+35. How do you implement a garbage collector?
+
+Answer: Mark-and-sweep: mark reachable objects from roots, sweep unmarked. Copying GC: copy live objects to new space. Reference counting: track references, free when zero. Generational: separate young/old objects. Trade-offs: pause time, throughput, memory overhead.
+
+#@@@@@@@@@@
+
+36. Which of the following are register allocation algorithms? (Multiple correct)
+A) Linear scan
+B) Graph coloring
+C) Chaitin's algorithm
+D) Iterated register coalescing
+E) Second-chance binpacking
+F) Greedy allocation
+
+Answer: A, B, C, D, E, F - All are register allocation algorithms. Linear scan (fast, simple), Graph coloring (optimal, NP-complete), Chaitin (classic), Iterated coalescing (improved), Second-chance (LLVM), Greedy (simple). Trade-off: compile time vs code quality.
+
+#@@@@@@@@@@
+
+37. Complete this data flow analysis:
+```cpp
+// Reaching definitions analysis
+void reachingDefinitions(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        BB->gen = computeGen(BB);  // Definitions generated
+        BB->kill = computeKill(BB);  // Definitions killed
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (BasicBlock *BB : func->getBasicBlocks()) {
+            Set oldOut = BB->out;
+
+            // IN = union of OUT of predecessors
+            BB->in = unionOfPredecessors(BB);
+
+            // OUT = GEN union (IN - KILL)
+            BB->out = BB->gen._______________( BB->in.difference(BB->kill));
+
+            if (BB->out != oldOut) {
+                changed = true;
+            }
+        }
+    }
+}
+```
+
+Answer: `unionWith` or `merge` - Union sets. Data flow analysis propagates information through CFG. Iterative algorithm reaches fixed point.
+
+#@@@@@@@@@@
+
+38. What is the difference between static and dynamic linking?
+
+Answer: Static linking includes library code in executable, larger binary, no runtime dependencies, faster load. Dynamic linking references shared libraries, smaller binary, runtime dependencies, slower load, shared memory. Static for deployment simplicity, dynamic for updates and memory efficiency.
+
+#@@@@@@@@@@
+
+39. How do you implement tail call optimization?
+
+Answer: Tail call is function call as last operation. Reuse current stack frame instead of creating new one. Transform recursion to iteration. Example: tail-recursive factorial becomes loop. Prevents stack overflow, improves performance. Essential for functional languages.
+
+#@@@@@@@@@@
+
+40. Which of the following are code generation strategies? (Multiple correct)
+A) Template-based
+B) Tree pattern matching
+C) Dynamic programming (BURS)
+D) Peephole optimization
+E) Register allocation
+F) Instruction selection
+
+Answer: A, B, C, D, E, F - All are code generation strategies. Template (simple), Tree matching (optimal), BURS (Bottom-Up Rewrite System), Peephole (local), Register allocation (assign registers), Instruction selection (choose instructions). Multi-phase process.
+
+#@@@@@@@@@@
+
+41. Complete this loop invariant code motion:
+```cpp
+// Move loop-invariant code outside loop
+void hoistInvariants(Loop *loop) {
+    BasicBlock *preheader = loop->getPreheader();
+
+    for (Instruction *inst : loop->getInstructions()) {
+        if (isLoopInvariant(inst, loop)) {
+            // Move to preheader
+            inst->_______________( preheader);
+        }
+    }
+}
+
+bool isLoopInvariant(Instruction *inst, Loop *loop) {
+    // All operands defined outside loop
+    for (Value *operand : inst->getOperands()) {
+        if (loop->contains(operand->getDefiningInstruction())) {
+            return false;
+        }
+    }
+    return true;
+}
+```
+
+Answer: `moveTo` - Move instruction to loop preheader. LICM reduces redundant computation in loops. Significant performance improvement.
+
+#@@@@@@@@@@
+
+42. What is the purpose of escape analysis?
+
+Answer: Escape analysis determines if object escapes function scope. Non-escaping objects can be stack-allocated instead of heap-allocated. Reduces GC pressure, improves performance. Used in Java HotSpot, Go compiler. Enables scalar replacement, synchronization elimination.
+
+#@@@@@@@@@@
+
+43. How do you implement method devirtualization?
+
+Answer: Replace virtual call with direct call when type known. Use type analysis, class hierarchy analysis. Example: if variable always holds specific subclass, call method directly. Enables inlining, improves performance. Important for OOP languages.
+
+#@@@@@@@@@@
+
+44. Which of the following are compiler intermediate representations? (Multiple correct)
+A) High-level IR (close to source)
+B) Mid-level IR (language-independent)
+C) Low-level IR (close to machine)
+D) SSA form
+E) CPS (Continuation-Passing Style)
+F) ANF (A-Normal Form)
+
+Answer: A, B, C, D, E, F - All are IR types/forms. High-level (AST), Mid-level (LLVM IR), Low-level (assembly-like), SSA (single assignment), CPS (functional), ANF (normalized). Different levels for different optimizations.
+
+#@@@@@@@@@@
+
+45. Complete this instruction scheduling:
+```cpp
+// Schedule instructions to minimize pipeline stalls
+void scheduleInstructions(BasicBlock *BB) {
+    std::vector<Instruction*> ready;
+    std::vector<Instruction*> scheduled;
+
+    // Initialize ready list with instructions having no dependencies
+    for (Instruction *inst : BB->getInstructions()) {
+        if (inst->getDependencies().empty()) {
+            ready.push_back(inst);
+        }
+    }
+
+    while (!ready.empty()) {
+        // Select instruction with highest priority
+        Instruction *inst = selectBest(ready);
+        scheduled.push_back(inst);
+        ready._______________( inst);
+
+        // Update ready list
+        for (Instruction *dependent : inst->getDependents()) {
+            if (allDependenciesScheduled(dependent, scheduled)) {
+                ready.push_back(dependent);
+            }
+        }
+    }
+}
+```
+
+Answer: `erase` or `remove` - Remove scheduled instruction from ready list. Instruction scheduling reorders instructions to minimize stalls, maximize ILP (Instruction-Level Parallelism).
+
+#@@@@@@@@@@
+
+46. What is the difference between local and global optimization?
+
+Answer: Local optimization within single basic block, simple, fast (constant folding, algebraic simplification). Global optimization across basic blocks, complex, powerful (dead code elimination, CSE). Local is subset of global. Both important for performance.
+
+#@@@@@@@@@@
+
+47. How do you implement auto-vectorization?
+
+Answer: Detect vectorizable loops (no dependencies, uniform operations). Transform scalar operations to vector operations (SIMD). Example: `for(i=0;i<n;i++) a[i]=b[i]+c[i]` becomes vector add. Check alignment, data dependencies. Significant speedup on modern CPUs.
+
+#@@@@@@@@@@
+
+48. Which of the following are compiler error types? (Multiple correct)
+A) Lexical errors
+B) Syntax errors
+C) Semantic errors
+D) Type errors
+E) Linker errors
+F) Runtime errors
+
+Answer: A, B, C, D, E - Lexical (invalid tokens), Syntax (grammar violations), Semantic (type mismatches), Type (type errors), Linker (undefined references) are compile-time. Runtime errors occur during execution, not compiler errors.
+
+#@@@@@@@@@@
+
+49. Complete this alias analysis:
+```cpp
+// Determine if two pointers may alias
+AliasResult aliasAnalysis(Value *ptr1, Value *ptr2) {
+    // Same pointer
+    if (ptr1 == ptr2) {
+        return MustAlias;
+    }
+
+    // Different allocations
+    if (isDifferentAllocation(ptr1, ptr2)) {
+        return NoAlias;
+    }
+
+    // Type-based alias analysis
+    if (ptr1->getType() != ptr2->getType()) {
+        return _______________;
+    }
+
+    // Conservative: may alias
+    return MayAlias;
+}
+```
+
+Answer: `NoAlias` - Different types don't alias (TBAA - Type-Based Alias Analysis). Alias analysis determines if pointers reference same memory. Critical for optimization correctness.
+
+#@@@@@@@@@@
+
+50. What is the purpose of profile-guided optimization?
+
+Answer: PGO uses runtime profiling data to guide optimization. Run program with representative input, collect profile (hot paths, branch probabilities). Recompile with profile data. Optimize hot code, inline frequently called functions. Significant performance improvement. Used in production compilers.
+
+#@@@@@@@@@@
+
+51. How do you implement copy propagation?
+
+Answer: Replace variable uses with their assigned values. Example: `x=y; z=x+1` becomes `x=y; z=y+1`. Track assignments, substitute uses. Enables further optimizations (dead code elimination). Part of constant propagation framework.
+
+#@@@@@@@@@@
+
+52. Which of the following are optimization passes in LLVM? (Multiple correct)
+A) mem2reg (promote memory to registers)
+B) instcombine (instruction combining)
+C) simplifycfg (simplify control flow)
+D) inline (function inlining)
+E) gvn (global value numbering)
+F) licm (loop invariant code motion)
+
+Answer: A, B, C, D, E, F - All are LLVM optimization passes. mem2reg (SSA construction), instcombine (peephole), simplifycfg (CFG cleanup), inline (inlining), gvn (CSE), licm (loop optimization). Composable passes in optimization pipeline.
+
+#@@@@@@@@@@
+
+53. Complete this dominator tree construction:
+```cpp
+// Build dominator tree using iterative algorithm
+void buildDominatorTree(Function *func) {
+    BasicBlock *entry = func->getEntryBlock();
+
+    // Initialize: entry dominates itself, others dominated by all
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        if (BB == entry) {
+            BB->dominators = {entry};
+        } else {
+            BB->dominators = allBlocks;
+        }
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (BasicBlock *BB : func->getBasicBlocks()) {
+            if (BB == entry) continue;
+
+            Set newDom = {BB};
+            newDom = newDom.unionWith(
+                _______________(BB->getPredecessors())
+            );
+
+            if (newDom != BB->dominators) {
+                BB->dominators = newDom;
+                changed = true;
+            }
+        }
+    }
+}
+```
+
+Answer: `intersectionOfDominators` - Intersect dominators of predecessors. Dominator tree represents dominance relationships. Used for SSA construction, optimization.
+
+#@@@@@@@@@@
+
+54. What is the difference between may-alias and must-alias?
+
+Answer: May-alias means pointers might reference same location, conservative assumption. Must-alias means pointers definitely reference same location, precise knowledge. May-alias prevents optimization, must-alias enables it. Alias analysis tries to prove no-alias or must-alias.
+
+#@@@@@@@@@@
+
+55. How do you implement loop fusion?
+
+Answer: Combine adjacent loops with same iteration space. Example: `for(i=0;i<n;i++) a[i]++; for(i=0;i<n;i++) b[i]++` becomes `for(i=0;i<n;i++) {a[i]++; b[i]++}`. Reduces loop overhead, improves cache locality. Check for dependencies.
+
+#@@@@@@@@@@
+
+56. Which of the following are compiler backends? (Multiple correct)
+A) x86/x86-64
+B) ARM/AArch64
+C) RISC-V
+D) MIPS
+E) PowerPC
+F) WebAssembly
+
+Answer: A, B, C, D, E, F - All are compiler backends/targets. x86 (Intel/AMD), ARM (mobile), RISC-V (open), MIPS (embedded), PowerPC (legacy), WebAssembly (web). Compiler generates code for target architecture.
+
+#@@@@@@@@@@
+
+57. Complete this SSA construction (phi insertion):
+```cpp
+// Insert phi functions for SSA form
+void insertPhiFunctions(Function *func) {
+    // For each variable
+    for (Variable *var : func->getVariables()) {
+        Set defBlocks = getDefiningBlocks(var);
+        Set phiBlocks;
+
+        // Insert phi at dominance frontiers
+        for (BasicBlock *defBB : defBlocks) {
+            for (BasicBlock *df : defBB->getDominanceFrontier()) {
+                if (!phiBlocks.contains(df)) {
+                    // Insert phi function
+                    PhiNode *phi = new PhiNode(var);
+                    df->_______________( phi);
+                    phiBlocks.insert(df);
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `insertPhi` or `prependInstruction` - Insert phi function at block start. SSA requires phi functions at join points. Dominance frontier determines phi placement.
+
+#@@@@@@@@@@
+
+58. What is the purpose of loop unrolling and jamming?
+
+Answer: Loop unroll-and-jam combines unrolling outer loop with jamming (fusing) inner loop iterations. Improves instruction-level parallelism, cache locality. Example: nested loops become larger single loop body. More aggressive than simple unrolling.
+
+#@@@@@@@@@@
+
+59. How do you implement interprocedural analysis?
+
+Answer: Analyze across function boundaries. Build call graph, propagate information bottom-up (callees to callers) or top-down. Examples: interprocedural constant propagation, escape analysis, alias analysis. More precise than intraprocedural but more expensive.
+
+#@@@@@@@@@@
+
+60. Which of the following are compiler warning types? (Multiple correct)
+A) Unused variables
+B) Uninitialized variables
+C) Type mismatches
+D) Deprecated features
+E) Potential null dereference
+F) Dead code
+
+Answer: A, B, C, D, E, F - All are compiler warnings. Unused (declared but not used), Uninitialized (used before assigned), Type mismatches (implicit conversions), Deprecated (old features), Null dereference (potential crash), Dead code (unreachable). Enable warnings for code quality.
+
+#@@@@@@@@@@
+
+61. Complete this liveness analysis:
+```cpp
+// Compute live variables at each program point
+void livenessAnalysis(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        BB->use = computeUse(BB);  // Variables used before defined
+        BB->def = computeDef(BB);  // Variables defined
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (BasicBlock *BB : reverse(func->getBasicBlocks())) {
+            Set oldIn = BB->liveIn;
+
+            // OUT = union of IN of successors
+            BB->liveOut = unionOfSuccessors(BB);
+
+            // IN = USE union (OUT - DEF)
+            BB->liveIn = BB->use.unionWith(
+                BB->liveOut._______________( BB->def)
+            );
+
+            if (BB->liveIn != oldIn) {
+                changed = true;
+            }
+        }
+    }
+}
+```
+
+Answer: `difference` or `minus` - Set difference. Liveness analysis determines which variables are live. Used for register allocation, dead code elimination.
+
+#@@@@@@@@@@
+
+62. What is the difference between forward and backward data flow analysis?
+
+Answer: Forward analysis propagates information from entry to exit (reaching definitions, available expressions). Backward analysis propagates from exit to entry (liveness, very busy expressions). Direction depends on problem. Both use iterative fixed-point algorithm.
+
+#@@@@@@@@@@
+
+63. How do you implement software pipelining?
+
+Answer: Overlap iterations of loop to exploit instruction-level parallelism. Rearrange loop body so iteration i+1 starts before iteration i completes. Requires modulo scheduling. Effective for loops with long latency operations. Used in high-performance compilers.
+
+#@@@@@@@@@@
+
+64. Which of the following are compiler optimization techniques for cache? (Multiple correct)
+A) Loop tiling/blocking
+B) Array padding
+C) Loop interchange
+D) Data layout optimization
+E) Prefetching
+F) Cache-oblivious algorithms
+
+Answer: A, B, C, D, E, F - All optimize cache usage. Loop tiling (block for cache), Array padding (avoid conflicts), Loop interchange (improve locality), Data layout (structure packing), Prefetching (load ahead), Cache-oblivious (automatic blocking). Critical for performance.
+
+#@@@@@@@@@@
+
+65. Complete this constant propagation:
+```cpp
+// Propagate constants through program
+void constantPropagation(Function *func) {
+    std::map<Variable*, Value*> constants;
+
+    for (Instruction *inst : func->getInstructions()) {
+        if (inst->isAssignment()) {
+            Value *rhs = inst->getRHS();
+
+            // Substitute known constants in RHS
+            rhs = substitute(rhs, constants);
+
+            // If RHS is constant, record it
+            if (rhs->isConstant()) {
+                constants[inst->getLHS()] = rhs;
+            }
+
+            // Replace instruction RHS
+            inst->_______________( rhs);
+        }
+    }
+}
+```
+
+Answer: `setRHS` - Update instruction with propagated constant. Constant propagation replaces variables with constant values. Enables constant folding.
+
+#@@@@@@@@@@
+
+66. What is the purpose of polyhedral optimization?
+
+Answer: Polyhedral model represents loop nests as mathematical polyhedra. Enables complex transformations (tiling, fusion, interchange) with correctness guarantees. Analyzes dependencies precisely. Used for scientific computing, high-performance code. Tools: Pluto, PolyOpt.
+
+#@@@@@@@@@@
+
+67. How do you implement bounds check elimination?
+
+Answer: Prove array accesses are within bounds, remove runtime checks. Use range analysis, induction variable analysis. Example: `for(i=0;i<n;i++) a[i]=0` - i provably in bounds. Significant performance improvement for safe languages (Java, C#).
+
+#@@@@@@@@@@
+
+68. Which of the following are compiler sanitizers? (Multiple correct)
+A) AddressSanitizer (ASan)
+B) MemorySanitizer (MSan)
+C) ThreadSanitizer (TSan)
+D) UndefinedBehaviorSanitizer (UBSan)
+E) LeakSanitizer (LSan)
+F) DataFlowSanitizer (DFSan)
+
+Answer: A, B, C, D, E, F - All are compiler sanitizers. ASan (memory errors), MSan (uninitialized memory), TSan (data races), UBSan (undefined behavior), LSan (memory leaks), DFSan (data flow). Instrumentation for bug detection.
+
+#@@@@@@@@@@
+
+69. Complete this loop distribution:
+```cpp
+// Split loop into multiple loops
+void distributeLoop(Loop *loop) {
+    std::vector<Loop*> newLoops;
+
+    // Partition loop body by dependencies
+    std::vector<Set<Instruction*>> partitions = partitionByDependencies(loop);
+
+    for (Set<Instruction*> partition : partitions) {
+        Loop *newLoop = createLoop(loop->getHeader());
+
+        for (Instruction *inst : partition) {
+            newLoop->_______________( inst);
+        }
+
+        newLoops.push_back(newLoop);
+    }
+
+    // Replace original loop with distributed loops
+    replaceLoop(loop, newLoops);
+}
+```
+
+Answer: `addInstruction` - Add instruction to new loop. Loop distribution splits loop to enable other optimizations (vectorization, parallelization). Opposite of loop fusion.
+
+#@@@@@@@@@@
+
+70. What is the difference between sparse and dense data flow analysis?
+
+Answer: Dense analysis represents data flow facts as bit vectors, fast operations, limited to finite domains. Sparse analysis uses SSA form, more precise, handles infinite domains. Sparse more efficient for many problems. Modern compilers use sparse analysis.
+
+#@@@@@@@@@@
+
+71. How do you implement partial redundancy elimination?
+
+Answer: PRE eliminates partially redundant expressions (redundant on some paths). Insert computations to make fully redundant, then eliminate. Subsumes CSE, loop invariant code motion. Uses data flow analysis (anticipation, availability). Powerful optimization.
+
+#@@@@@@@@@@
+
+72. Which of the following are compiler directive types? (Multiple correct)
+A) #pragma omp (OpenMP)
+B) #pragma unroll
+C) __attribute__ (GCC)
+D) [[likely]]/[[unlikely]] (C++20)
+E) #pragma STDC
+F) __declspec (MSVC)
+
+Answer: A, B, C, D, E, F - All are compiler directives. OpenMP (parallelization), unroll (loop unrolling), attribute (GCC extensions), likely/unlikely (branch hints), STDC (standard), declspec (MSVC). Guide compiler optimization.
+
+#@@@@@@@@@@
+
+73. Complete this scalar replacement of aggregates:
+```cpp
+// Replace struct with individual scalars
+void scalarReplacement(Function *func) {
+    for (AllocaInst *alloca : func->getAllocas()) {
+        if (alloca->getType()->isStructType()) {
+            StructType *structTy = alloca->getType();
+
+            // Create scalar for each field
+            std::vector<AllocaInst*> scalars;
+            for (int i = 0; i < structTy->getNumFields(); i++) {
+                AllocaInst *scalar = new AllocaInst(structTy->getFieldType(i));
+                scalars.push_back(scalar);
+            }
+
+            // Replace struct accesses with scalar accesses
+            for (User *user : alloca->getUsers()) {
+                if (GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(user)) {
+                    int fieldIndex = gep->getFieldIndex();
+                    gep->_______________( scalars[fieldIndex]);
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `replaceAllUsesWith` - Replace struct access with scalar. Scalar replacement promotes struct fields to registers. Enables more optimization.
+
+#@@@@@@@@@@
+
+74. What is the purpose of link-time optimization (LTO)?
+
+Answer: LTO performs optimization across translation units at link time. Whole-program analysis, interprocedural optimization. Inline across files, dead code elimination of unused functions. Requires compiler and linker cooperation. Significant performance improvement.
+
+#@@@@@@@@@@
+
+75. How do you implement auto-parallelization?
+
+Answer: Detect parallelizable loops (no loop-carried dependencies). Transform to parallel execution (OpenMP, threads). Analyze dependencies with dependence analysis. Consider overhead, granularity. Example: independent loop iterations run in parallel. Requires careful analysis for correctness.
+
+#@@@@@@@@@@
+
+76. Which of the following are compiler testing techniques? (Multiple correct)
+A) Unit testing
+B) Fuzzing (random input generation)
+C) Differential testing (compare outputs)
+D) Metamorphic testing
+E) Regression testing
+F) Formal verification
+
+Answer: A, B, C, D, E, F - All are compiler testing techniques. Unit (test components), Fuzzing (find crashes), Differential (compare compilers), Metamorphic (equivalent transformations), Regression (prevent bugs), Formal verification (prove correctness). Compilers are complex, need thorough testing.
+
+#@@@@@@@@@@
+
+77. Complete this induction variable analysis:
+```cpp
+// Analyze induction variables in loop
+void analyzeInductionVariables(Loop *loop) {
+    for (PHINode *phi : loop->getHeader()->getPhis()) {
+        // Check if phi is induction variable
+        // Pattern: phi = phi(init, phi + step)
+
+        Value *init = phi->getIncomingValueForBlock(loop->getPreheader());
+        Value *update = phi->getIncomingValueForBlock(loop->getLatch());
+
+        if (BinaryOperator *binop = dyn_cast<BinaryOperator>(update)) {
+            if (binop->getOpcode() == Add && binop->getOperand(0) == phi) {
+                Value *step = binop->getOperand(1);
+
+                if (step->isConstant()) {
+                    // Found induction variable
+                    InductionVariable iv = {phi, init, step};
+                    loop->_______________( iv);
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `addInductionVariable` - Record induction variable. IV analysis identifies loop counters. Enables strength reduction, loop optimization.
+
+#@@@@@@@@@@
+
+78. What is the difference between tree-based and graph-based IR?
+
+Answer: Tree-based IR (AST) represents program as tree, simple, no sharing. Graph-based IR (CFG, SSA) represents as graph, allows sharing, more compact. Tree for high-level, graph for low-level. Graph enables more optimization. Modern compilers use both.
+
+#@@@@@@@@@@
+
+79. How do you implement loop-invariant code motion with SSA?
+
+Answer: In SSA form, loop-invariant instructions have all operands defined outside loop. Check if instruction dominates all loop exits. Move to loop preheader. SSA makes LICM simpler - no need for complex data flow analysis. Efficient optimization.
+
+#@@@@@@@@@@
+
+80. Which of the following are compiler security features? (Multiple correct)
+A) Stack canaries
+B) ASLR (Address Space Layout Randomization)
+C) DEP/NX (Data Execution Prevention)
+D) Control Flow Integrity (CFI)
+E) SafeStack
+F) Shadow stack
+
+Answer: A, B, C, D, E, F - All are security features. Stack canaries (buffer overflow), ASLR (randomize addresses), DEP (no execute data), CFI (prevent hijacking), SafeStack (separate stacks), Shadow stack (return address protection). Compiler-based security hardening.
+
+#@@@@@@@@@@
+
+81. Complete this loop vectorization check:
+```cpp
+bool canVectorize(Loop *loop) {
+    // Check for vectorization inhibitors
+
+    // 1. Must have countable trip count
+    if (!loop->hasCountableTripCount()) return false;
+
+    // 2. No function calls (except vectorizable intrinsics)
+    if (loop->hasNonVectorizableCalls()) return false;
+
+    // 3. No loop-carried dependencies
+    if (loop->_______________()) return false;
+
+    // 4. Memory accesses must be vectorizable
+    if (!loop->hasVectorizableMemoryAccesses()) return false;
+
+    return true;
+}
+```
+
+Answer: `hasLoopCarriedDependencies` - Check for dependencies between iterations. Vectorization requires independent iterations. SIMD executes multiple iterations simultaneously.
+
+#@@@@@@@@@@
+
+82. What is the purpose of trace scheduling?
+
+Answer: Trace scheduling optimizes frequently executed paths (traces) through code. Profile-guided, select hot trace, schedule aggressively, add compensation code for off-trace paths. Improves performance of common case. Used in VLIW compilers.
+
+#@@@@@@@@@@
+
+83. How do you implement function cloning?
+
+Answer: Create copy of function with specialized parameters. Clone for constant arguments, specific types, or calling contexts. Enables more aggressive optimization of clone. Example: clone function called with constant, inline constant. Trade-off: code size vs performance.
+
+#@@@@@@@@@@
+
+84. Which of the following are compiler IR properties? (Multiple correct)
+A) Language independence
+B) Ease of optimization
+C) Compactness
+D) Ease of code generation
+E) Debuggability
+F) Human readability
+
+Answer: A, B, C, D, E, F - All are desirable IR properties. Language independence (multiple frontends), Ease of optimization (SSA form), Compactness (memory efficiency), Ease of code generation (close to machine), Debuggability (source mapping), Human readability (LLVM IR text form). Trade-offs between properties.
+
+#@@@@@@@@@@
+
+85. Complete this memory dependence analysis:
+```cpp
+bool mayDependence(MemoryAccess *access1, MemoryAccess *access2) {
+    // Check if two memory accesses may depend
+
+    // 1. Alias analysis
+    if (aliasAnalysis(access1->getPointer(), access2->getPointer()) == NoAlias) {
+        return false;
+    }
+
+    // 2. At least one must be write
+    if (!access1->isWrite() && !access2->isWrite()) {
+        return false;
+    }
+
+    // 3. Check if accesses can occur in same iteration
+    if (!_______________( access1, access2)) {
+        return false;
+    }
+
+    return true;  // Conservative: may depend
+}
+```
+
+Answer: `mayExecuteTogether` or `mayReach` - Check if accesses can execute in same dynamic instance. Memory dependence analysis determines if memory operations can be reordered. Critical for optimization correctness.
+
+#@@@@@@@@@@
+
+86. What is the difference between speculative and predicated execution?
+
+Answer: Speculative execution executes code before knowing if needed, rollback if wrong (branch prediction). Predicated execution converts control dependencies to data dependencies, execute both paths, select result (predicate). Speculative for hardware, predicated for compiler. Both reduce branch penalties.
+
+#@@@@@@@@@@
+
+87. How do you implement global value numbering?
+
+Answer: GVN assigns numbers to expressions, identical expressions get same number. Hash table maps expressions to values. Detect redundant computations across basic blocks. More powerful than local CSE. Example: `a=x+y; b=x+y` - both get same value number, eliminate second.
+
+#@@@@@@@@@@
+
+88. Which of the following are compiler frameworks? (Multiple correct)
+A) LLVM
+B) GCC
+C) MLIR (Multi-Level IR)
+D) Cranelift
+E) QBE (Quick Backend)
+F) Graal
+
+Answer: A, B, C, D, E, F - All are compiler frameworks. LLVM (modular), GCC (GNU), MLIR (multi-level), Cranelift (Rust, WebAssembly), QBE (simple), Graal (JVM). Different design philosophies, use cases.
+
+#@@@@@@@@@@
+
+89. Complete this reaching definitions analysis:
+```cpp
+void computeReachingDefinitions(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        BB->gen = computeGen(BB);
+        BB->kill = computeKill(BB);
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (BasicBlock *BB : func->getBasicBlocks()) {
+            Set oldIn = BB->in;
+
+            // IN[BB] = union of OUT of predecessors
+            BB->in.clear();
+            for (BasicBlock *pred : BB->getPredecessors()) {
+                BB->in = BB->in._______________( pred->out);
+            }
+
+            // OUT[BB] = GEN[BB] union (IN[BB] - KILL[BB])
+            BB->out = BB->gen.unionWith(BB->in.difference(BB->kill));
+
+            if (BB->in != oldIn) changed = true;
+        }
+    }
+}
+```
+
+Answer: `unionWith` - Union sets. Reaching definitions determines which definitions reach each program point. Used for constant propagation, dead code elimination.
+
+#@@@@@@@@@@
+
+90. What is the purpose of loop peeling?
+
+Answer: Loop peeling separates first/last iteration from loop body. Enables optimization of special cases. Example: peel first iteration to eliminate initialization check. Peel last iteration for cleanup. Improves vectorization, reduces overhead.
+
+#@@@@@@@@@@
+
+91. How do you implement type inference?
+
+Answer: Assign type variables to expressions, generate constraints from operations, solve constraints. Unification algorithm finds most general type. Example: Hindley-Milner for ML, Haskell. Enables static typing without annotations. Complex but powerful.
+
+#@@@@@@@@@@
+
+92. Which of the following are compiler code generation patterns? (Multiple correct)
+A) Maximal munch
+B) Dynamic programming
+C) Tree rewriting
+D) Macro expansion
+E) Template instantiation
+F) Peephole optimization
+
+Answer: A, B, C, D, E, F - All are code generation patterns. Maximal munch (greedy matching), Dynamic programming (optimal tiling), Tree rewriting (pattern matching), Macro expansion (simple substitution), Template instantiation (C++), Peephole (local optimization). Different approaches for different needs.
+
+#@@@@@@@@@@
+
+93. Complete this phi node elimination (out of SSA):
+```cpp
+void eliminatePhis(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        for (PHINode *phi : BB->getPhis()) {
+            // Create temporary variable
+            Variable *temp = createTemp(phi->getType());
+
+            // Insert copies in predecessor blocks
+            for (int i = 0; i < phi->getNumIncomingValues(); i++) {
+                BasicBlock *pred = phi->getIncomingBlock(i);
+                Value *value = phi->getIncomingValue(i);
+
+                // Insert: temp = value at end of pred
+                pred->_______________( new CopyInst(temp, value));
+            }
+
+            // Replace phi with temp
+            phi->replaceAllUsesWith(temp);
+            phi->eraseFromParent();
+        }
+    }
+}
+```
+
+Answer: `insertAtEnd` or `appendInstruction` - Insert copy before terminator. Phi elimination converts SSA back to non-SSA. Required for code generation.
+
+#@@@@@@@@@@
+
+94. What is the difference between lazy and eager evaluation in compilers?
+
+Answer: Lazy evaluation delays computation until value needed, enables infinite data structures, complex control flow. Eager evaluation computes immediately, simpler, predictable performance. Lazy for functional languages (Haskell), eager for imperative (C, Java). Compiler must handle evaluation strategy.
+
+#@@@@@@@@@@
+
+95. How do you implement superblock formation?
+
+Answer: Superblock is single-entry, multiple-exit region. Trace scheduling creates superblocks from hot paths. Duplicate code to create single entry. Optimize aggressively within superblock. Add compensation code for side exits. Improves ILP, simplifies scheduling.
+
+#@@@@@@@@@@
+
+96. Which of the following are compiler analysis types? (Multiple correct)
+A) Control flow analysis
+B) Data flow analysis
+C) Dependence analysis
+D) Alias analysis
+E) Escape analysis
+F) Points-to analysis
+
+Answer: A, B, C, D, E, F - All are compiler analyses. Control flow (CFG), Data flow (reaching definitions, liveness), Dependence (memory dependencies), Alias (pointer analysis), Escape (object lifetime), Points-to (pointer targets). Foundation for optimization.
+
+#@@@@@@@@@@
+
+97. Complete this loop interchange:
+```cpp
+// Interchange nested loops for better cache locality
+void interchangeLoops(Loop *outer, Loop *inner) {
+    // Check legality: no loop-carried dependencies preventing interchange
+    if (!canInterchange(outer, inner)) return;
+
+    // Swap loop headers
+    BasicBlock *outerHeader = outer->getHeader();
+    BasicBlock *innerHeader = inner->getHeader();
+
+    // Swap induction variables
+    PHINode *outerIV = outer->getInductionVariable();
+    PHINode *innerIV = inner->getInductionVariable();
+
+    // Swap loop bounds and steps
+    swapLoopBounds(outer, inner);
+
+    // Update loop structure
+    outer->_______________( innerHeader);
+    inner->setHeader(outerHeader);
+
+    // Update parent-child relationship
+    outer->setInnerLoop(nullptr);
+    inner->setOuterLoop(outer);
+}
+```
+
+Answer: `setHeader` - Update loop header. Loop interchange changes loop nesting order. Improves cache locality by accessing memory in storage order.
+
+#@@@@@@@@@@
+
+98. What is the purpose of register coalescing?
+
+Answer: Register coalescing merges live ranges of copy-related variables. Eliminates copy instructions by assigning same register. Example: `x=y` - assign x and y to same register if live ranges don't interfere. Reduces register pressure, eliminates copies. Part of register allocation.
+
+#@@@@@@@@@@
+
+99. How do you implement exception handling in compilers?
+
+Answer: Generate exception tables mapping code ranges to handlers. Insert cleanup code for stack unwinding. Use setjmp/longjmp or OS mechanisms. Zero-cost exceptions: no overhead when no exception thrown. Compiler generates landing pads, personality functions. Complex but essential for C++, Java.
+
+#@@@@@@@@@@
+
+100. Which of the following are compiler intermediate languages? (Multiple correct)
+A) LLVM IR
+B) GIMPLE (GCC)
+C) RTL (Register Transfer Language)
+D) CIL (Common Intermediate Language)
+E) Java bytecode
+F) WebAssembly
+
+Answer: A, B, C, D, E, F - All are intermediate languages. LLVM IR (LLVM), GIMPLE (GCC high-level), RTL (GCC low-level), CIL (.NET), Java bytecode (JVM), WebAssembly (web). Different compilers, different IRs.
+
+#@@@@@@@@@@
+
+101. Complete this available expressions analysis:
+```cpp
+void availableExpressions(Function *func) {
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        BB->gen = computeGenExpressions(BB);
+        BB->kill = computeKillExpressions(BB);
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (BasicBlock *BB : func->getBasicBlocks()) {
+            Set oldOut = BB->out;
+
+            // IN[BB] = intersection of OUT of predecessors
+            if (BB->getPredecessors().empty()) {
+                BB->in.clear();
+            } else {
+                BB->in = _______________( BB->getPredecessors());
+            }
+
+            // OUT[BB] = GEN[BB] union (IN[BB] - KILL[BB])
+            BB->out = BB->gen.unionWith(BB->in.difference(BB->kill));
+
+            if (BB->out != oldOut) changed = true;
+        }
+    }
+}
+```
+
+Answer: `intersectionOfOutSets` - Intersect OUT sets of predecessors. Available expressions analysis finds expressions available at each point. Used for common subexpression elimination.
+
+#@@@@@@@@@@
+
+102. What is the difference between intraprocedural and interprocedural optimization?
+
+Answer: Intraprocedural optimizes within single function, fast, limited scope. Interprocedural optimizes across functions, slower, more powerful. Interprocedural requires call graph, whole-program analysis. Examples: inlining, constant propagation across calls. Modern compilers do both.
+
+#@@@@@@@@@@
+
+103. How do you implement loop tiling/blocking?
+
+Answer: Loop tiling divides iteration space into blocks (tiles) that fit in cache. Nested loops iterate over tiles, then within tiles. Improves cache locality, reduces cache misses. Example: matrix multiplication - tile to fit in L1 cache. Critical for performance on modern CPUs.
+
+#@@@@@@@@@@
+
+104. Which of the following are compiler debugging features? (Multiple correct)
+A) Debug symbols (DWARF, PDB)
+B) Line number information
+C) Variable location tracking
+D) Optimization remarks
+E) Sanitizer instrumentation
+F) Profiling instrumentation
+
+Answer: A, B, C, D, E, F - All are debugging features. Debug symbols (type info), Line numbers (source mapping), Variable locations (watch variables), Optimization remarks (why optimized), Sanitizers (bug detection), Profiling (performance analysis). Essential for development.
+
+#@@@@@@@@@@
+
+105. Complete this strength reduction:
+```cpp
+void strengthReduction(Loop *loop) {
+    for (InductionVariable iv : loop->getInductionVariables()) {
+        // Find multiplications by induction variable
+        for (Instruction *inst : loop->getInstructions()) {
+            if (inst->getOpcode() == Mul) {
+                if (inst->getOperand(0) == iv.phi) {
+                    Value *multiplier = inst->getOperand(1);
+
+                    // Replace i*c with new induction variable
+                    // New IV: init=0, step=c
+                    PHINode *newIV = createInductionVariable(
+                        loop,
+                        ConstantInt::get(0),
+                        _______________
+                    );
+
+                    inst->replaceAllUsesWith(newIV);
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `multiplier` - Step is the multiplier. Strength reduction replaces expensive operations (multiplication) with cheaper ones (addition). Significant performance improvement in loops.
+
+#@@@@@@@@@@
+
+106. What is the purpose of loop versioning?
+
+Answer: Loop versioning creates two versions of loop: optimized (with assumptions) and safe (fallback). Runtime check selects version. Example: version for aligned memory, fallback for unaligned. Enables aggressive optimization with safety. Used for vectorization, parallelization.
+
+#@@@@@@@@@@
+
+107. How do you implement tail recursion elimination?
+
+Answer: Detect tail-recursive calls (recursive call is last operation). Transform to loop: replace call with jump to function start, update parameters. Eliminates stack growth, prevents overflow. Example: tail-recursive factorial becomes iterative. Essential for functional languages.
+
+#@@@@@@@@@@
+
+108. Which of the following are compiler memory models? (Multiple correct)
+A) Sequential consistency
+B) Total store order (TSO)
+C) Partial store order (PSO)
+D) Relaxed memory order
+E) Acquire-release
+F) Consume
+
+Answer: A, B, C, D, E, F - All are memory models. Sequential consistency (strongest), TSO (x86), PSO (SPARC), Relaxed (weakest), Acquire-release (C++11), Consume (dependency ordering). Compiler must respect memory model for correctness.
+
+#@@@@@@@@@@
+
+109. Complete this loop-carried dependence analysis:
+```cpp
+bool hasLoopCarriedDependence(Loop *loop, MemoryAccess *write, MemoryAccess *read) {
+    // Check if write in iteration i affects read in iteration j > i
+
+    // 1. Must access same memory location
+    if (aliasAnalysis(write->getPointer(), read->getPointer()) != MustAlias) {
+        return false;  // Conservative
+    }
+
+    // 2. Analyze array subscripts
+    if (write->isArrayAccess() && read->isArrayAccess()) {
+        ArrayAccess *writeArray = write->getArrayAccess();
+        ArrayAccess *readArray = read->getArrayAccess();
+
+        // Check if subscripts can be equal in different iterations
+        return _______________( writeArray->getSubscript(), readArray->getSubscript(), loop);
+    }
+
+    return true;  // Conservative
+}
+```
+
+Answer: `mayBeEqualAcrossIterations` or `subscriptTest` - Test if array subscripts can match across iterations. Loop-carried dependence prevents parallelization, vectorization. Precise analysis enables optimization.
+
+#@@@@@@@@@@
+
+110. What is the difference between static and dynamic dispatch?
+
+Answer: Static dispatch resolves function call at compile time, direct call, faster. Dynamic dispatch resolves at runtime (virtual functions), indirect call, slower but flexible. Static for non-virtual, dynamic for polymorphism. Compiler can devirtualize when type known.
+
+#@@@@@@@@@@
+
+111. How do you implement loop skewing?
+
+Answer: Loop skewing transforms loop to enable parallelization. Change iteration space by adding outer loop index to inner. Breaks diagonal dependencies into parallel wavefronts. Example: `a[i][j] = a[i-1][j+1]` - skew to parallelize. Used in parallelizing compilers.
+
+#@@@@@@@@@@
+
+112. Which of the following are compiler profiling techniques? (Multiple correct)
+A) Instrumentation-based profiling
+B) Sampling-based profiling
+C) Hardware performance counters
+D) Edge profiling
+E) Path profiling
+F) Value profiling
+
+Answer: A, B, C, D, E, F - All are profiling techniques. Instrumentation (insert counters), Sampling (periodic sampling), Hardware counters (CPU events), Edge profiling (CFG edges), Path profiling (execution paths), Value profiling (value distributions). Different overhead/precision trade-offs.
+
+#@@@@@@@@@@
+
+113. Complete this dead store elimination:
+```cpp
+void eliminateDeadStores(Function *func) {
+    // Compute liveness information
+    livenessAnalysis(func);
+
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        Set liveOut = BB->liveOut;
+
+        // Traverse instructions backward
+        for (Instruction *inst : reverse(BB->getInstructions())) {
+            if (inst->isStore()) {
+                Variable *var = inst->getTarget();
+
+                // If variable not live after store, it's dead
+                if (!liveOut.contains(var)) {
+                    inst->_______________();
+                }
+            }
+
+            // Update liveness
+            liveOut = updateLiveness(liveOut, inst);
+        }
+    }
+}
+```
+
+Answer: `eraseFromParent` or `remove` - Remove dead store. Dead store elimination removes stores to variables never read. Reduces memory traffic, improves performance.
+
+#@@@@@@@@@@
+
+114. What is the purpose of loop splitting?
+
+Answer: Loop splitting divides loop into multiple loops based on conditions. Separate iterations with different behavior. Example: split loop with if-statement into two loops. Enables better optimization of each part. Reduces branch mispredictions.
+
+#@@@@@@@@@@
+
+115. How do you implement constant folding in SSA form?
+
+Answer: In SSA, constant folding is simpler - each variable has single definition. If definition is constant expression, evaluate and replace. Propagate through phi functions. Example: `x = 2 + 3` becomes `x = 5`. SSA makes data flow explicit, simplifies optimization.
+
+#@@@@@@@@@@
+
+116. Which of the following are compiler language features requiring special handling? (Multiple correct)
+A) Exceptions
+B) Closures/Lambdas
+C) Coroutines
+D) Generators
+E) Async/await
+F) Pattern matching
+
+Answer: A, B, C, D, E, F - All require special compiler support. Exceptions (unwinding), Closures (capture environment), Coroutines (suspend/resume), Generators (yield), Async/await (state machine), Pattern matching (decision tree). Complex transformations required.
+
+#@@@@@@@@@@
+
+117. Complete this loop reversal:
+```cpp
+// Reverse loop iteration order
+void reverseLoop(Loop *loop) {
+    // Original: for (i = start; i < end; i += step)
+    // Reversed: for (i = end-1; i >= start; i -= step)
+
+    PHINode *iv = loop->getInductionVariable();
+    Value *start = iv->getInitialValue();
+    Value *end = loop->getUpperBound();
+    Value *step = iv->getStep();
+
+    // New initial value: end - 1
+    Value *newInit = createSub(end, ConstantInt::get(1));
+
+    // New step: -step
+    Value *newStep = createNeg(step);
+
+    // New condition: i >= start
+    loop->setCondition(_______________);
+
+    iv->setInitialValue(newInit);
+    iv->setStep(newStep);
+}
+```
+
+Answer: `ICmpInst::ICMP_SGE` or `GreaterOrEqual` - Greater-or-equal comparison. Loop reversal changes iteration order. Can improve cache locality, enable other optimizations.
+
+#@@@@@@@@@@
+
+118. What is the difference between forward and backward slicing?
+
+Answer: Forward slicing finds all statements affected by given statement (what depends on this). Backward slicing finds all statements affecting given statement (what does this depend on). Forward for impact analysis, backward for debugging. Both use data/control dependencies.
+
+#@@@@@@@@@@
+
+119. How do you implement loop normalization?
+
+Answer: Loop normalization transforms loops to canonical form. Start at 0, increment by 1, simple comparison. Example: `for(i=10;i<100;i+=5)` becomes `for(i=0;i<18;i++)` with scaling. Simplifies analysis, enables optimization. Standard preprocessing step.
+
+#@@@@@@@@@@
+
+120. Which of the following are compiler correctness concerns? (Multiple correct)
+A) Preserving program semantics
+B) Handling undefined behavior
+C) Memory safety
+D) Type safety
+E) Concurrency correctness
+F) Floating-point accuracy
+
+Answer: A, B, C, D, E, F - All are correctness concerns. Preserving semantics (optimization must not change behavior), Undefined behavior (compiler can assume doesn't occur), Memory safety (bounds checking), Type safety (type system), Concurrency (memory model), Floating-point (rounding, NaN). Correctness is paramount.
+
+#@@@@@@@@@@
+
+121. Complete this loop fusion legality check:
+```cpp
+bool canFuseLoops(Loop *loop1, Loop *loop2) {
+    // Check if two adjacent loops can be fused
+
+    // 1. Must have same iteration space
+    if (!haveSameIterationSpace(loop1, loop2)) return false;
+
+    // 2. No dependencies from loop1 to loop2
+    if (_______________( loop1, loop2)) return false;
+
+    // 3. No intervening code with side effects
+    if (hasInterveningCode(loop1, loop2)) return false;
+
+    return true;
+}
+```
+
+Answer: `hasDependence` - Check for dependencies between loops. Loop fusion combines loops to reduce overhead, improve locality. Must preserve dependencies.
+
+#@@@@@@@@@@
+
+122. What is the purpose of loop unswitching?
+
+Answer: Loop unswitching moves loop-invariant conditionals outside loop. Creates two loops: one for true branch, one for false. Eliminates repeated condition evaluation. Example: `for(i=0;i<n;i++) if(flag) a[i]++` becomes `if(flag) for(i=0;i<n;i++) a[i]++`. Reduces branches in loop.
+
+#@@@@@@@@@@
+
+123. How do you implement sparse conditional constant propagation?
+
+Answer: SCCP combines constant propagation with dead code elimination. Use SSA form, worklist algorithm. Track lattice values (undefined, constant, overdefined). Propagate constants through executable paths only. More powerful than separate passes. Kildall's algorithm variant.
+
+#@@@@@@@@@@
+
+124. Which of the following are compiler optimization levels in practice? (Multiple correct)
+A) Debug build (-O0, -g)
+B) Release build (-O2, -O3)
+C) Size-optimized (-Os, -Oz)
+D) Profile-guided (-O3 -fprofile-use)
+E) Link-time optimized (-flto)
+F) Fast math (-Ofast, -ffast-math)
+
+Answer: A, B, C, D, E, F - All are practical optimization levels. Debug (no optimization, debug info), Release (balanced), Size (minimize size), PGO (profile-guided), LTO (whole-program), Fast math (aggressive, may break IEEE). Choose based on requirements.
+
+#@@@@@@@@@@
+
+125. Complete this use-def chain construction:
+```cpp
+void buildUseDefChains(Function *func) {
+    // For each variable use, find all reaching definitions
+
+    reachingDefinitions(func);
+
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        for (Instruction *inst : BB->getInstructions()) {
+            for (Value *operand : inst->getOperands()) {
+                if (Variable *var = dyn_cast<Variable>(operand)) {
+                    // Find definitions reaching this use
+                    Set defs = BB->in.getDefinitions(var);
+
+                    for (Instruction *def : defs) {
+                        // Add use-def edge
+                        def->_______________( inst);
+                        inst->addDef(def);
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `addUse` - Add use to definition's use list. Use-def chains link uses to definitions. Enables efficient data flow queries. SSA form makes this simpler.
+
+#@@@@@@@@@@
+
+126. What is the difference between may-analysis and must-analysis?
+
+Answer: May-analysis computes what may be true (conservative over-approximation), used for correctness. Must-analysis computes what must be true (conservative under-approximation), used for optimization. Example: may-alias (correctness), must-alias (optimization). Different safety requirements.
+
+#@@@@@@@@@@
+
+127. How do you implement loop strip-mining?
+
+Answer: Strip-mining divides loop into outer loop (strips) and inner loop (within strip). Controls iteration granularity. Example: `for(i=0;i<n;i++)` becomes `for(i=0;i<n;i+=s) for(j=i;j<min(i+s,n);j++)`. Enables tiling, vectorization. Adjusts for cache, vector length.
+
+#@@@@@@@@@@
+
+128. Which of the following are compiler parallelization techniques? (Multiple correct)
+A) Loop parallelization
+B) Task parallelization
+C) SIMD vectorization
+D) Thread-level parallelism
+E) Instruction-level parallelism
+F) Data parallelism
+
+Answer: A, B, C, D, E, F - All are parallelization techniques. Loop (parallel loops), Task (parallel tasks), SIMD (vector operations), Thread-level (multi-threading), Instruction-level (pipelining), Data (parallel data operations). Different granularities, different hardware.
+
+#@@@@@@@@@@
+
+129. Complete this redundant load elimination:
+```cpp
+void eliminateRedundantLoads(Function *func) {
+    // Track available loads
+    std::map<MemoryLocation, Value*> availableLoads;
+
+    for (BasicBlock *BB : func->getBasicBlocks()) {
+        for (Instruction *inst : BB->getInstructions()) {
+            if (LoadInst *load = dyn_cast<LoadInst>(inst)) {
+                MemoryLocation loc = load->getLocation();
+
+                // Check if load is available
+                if (availableLoads.count(loc)) {
+                    // Replace with previous load
+                    load->_______________( availableLoads[loc]);
+                } else {
+                    // Record this load
+                    availableLoads[loc] = load;
+                }
+            }
+            else if (StoreInst *store = dyn_cast<StoreInst>(inst)) {
+                // Invalidate loads to this location
+                availableLoads.erase(store->getLocation());
+            }
+        }
+    }
+}
+```
+
+Answer: `replaceAllUsesWith` - Replace redundant load with previous value. Redundant load elimination reuses loaded values. Reduces memory traffic.
+
+#@@@@@@@@@@
+
+130. What is the purpose of loop distribution/fission?
+
+Answer: Loop distribution splits single loop into multiple loops. Opposite of fusion. Enables vectorization of vectorizable parts. Separates independent computations. Example: split loop with dependencies from loop without. Improves parallelization opportunities.
+
+#@@@@@@@@@@
+
+131. How do you implement algebraic simplification?
+
+Answer: Apply algebraic identities to simplify expressions. Examples: `x+0=x`, `x*1=x`, `x*0=0`, `x-x=0`, `x/x=1`. Pattern matching on expression trees. Reduces computation, enables further optimization. Part of instruction combining.
+
+#@@@@@@@@@@
+
+132. Which of the following are compiler code size optimization techniques? (Multiple correct)
+A) Function outlining
+B) Tail merging
+C) Cross-jumping
+D) Code compression
+E) Dead code elimination
+F) Constant pooling
+
+Answer: A, B, C, D, E, F - All reduce code size. Function outlining (extract common code), Tail merging (merge identical tails), Cross-jumping (merge identical code), Code compression (compress binary), Dead code elimination (remove unused), Constant pooling (share constants). Important for embedded systems.
+
+#@@@@@@@@@@
+
+133. Complete this loop-invariant detection:
+```cpp
+bool isLoopInvariant(Value *value, Loop *loop) {
+    // Check if value is loop-invariant
+
+    // Constants are invariant
+    if (value->isConstant()) return true;
+
+    // Arguments are invariant
+    if (isa<Argument>(value)) return true;
+
+    // Instructions defined outside loop are invariant
+    if (Instruction *inst = dyn_cast<Instruction>(value)) {
+        if (!loop->contains(inst->getParent())) {
+            return true;
+        }
+
+        // Instruction in loop is invariant if all operands are invariant
+        for (Value *operand : inst->getOperands()) {
+            if (!_______________( operand, loop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+```
+
+Answer: `isLoopInvariant` - Recursive check. Loop-invariant values don't change across iterations. Can be hoisted out of loop.
+
+#@@@@@@@@@@
+
+134. What is the difference between local and global register allocation?
+
+Answer: Local register allocation within single basic block, simple, fast, suboptimal. Global register allocation across entire function, complex, optimal, uses graph coloring or linear scan. Local for quick compilation, global for performance. Modern compilers use global.
+
+#@@@@@@@@@@
+
+135. How do you implement function specialization?
+
+Answer: Create specialized version of function for specific argument values or types. Clone function, substitute constants, optimize. Example: specialize for null pointer, specific type. Enables aggressive optimization. Trade-off: code size vs performance. Used in template instantiation, generics.
+
+#@@@@@@@@@@
+
+136. Which of the following are compiler diagnostic levels? (Multiple correct)
+A) Error (compilation fails)
+B) Warning (potential issue)
+C) Note (additional information)
+D) Remark (optimization info)
+E) Fatal error (cannot continue)
+F) Ignored (suppressed warning)
+
+Answer: A, B, C, D, E, F - All are diagnostic levels. Error (must fix), Warning (should fix), Note (context), Remark (FYI), Fatal (crash), Ignored (disabled). Configure with flags (-Werror, -Wno-*). Good diagnostics improve code quality.
+
+#@@@@@@@@@@
+
+137. Complete this loop rotation:
+```cpp
+void rotateLoop(Loop *loop) {
+    // Transform while-loop to do-while loop
+    // Original: while (cond) { body }
+    // Rotated: if (cond) { do { body } while (cond) }
+
+    BasicBlock *header = loop->getHeader();
+    BasicBlock *latch = loop->getLatch();
+    BasicBlock *exit = loop->getExit();
+
+    // Create new preheader with condition check
+    BasicBlock *newPreheader = createBasicBlock("rotated.preheader");
+
+    // Clone condition to preheader
+    Value *cond = header->getTerminator()->getCondition();
+    newPreheader->setTerminator(
+        createBranch(cond, header, exit)
+    );
+
+    // Move condition to latch
+    latch->setTerminator(
+        createBranch(cond, _______________, exit)
+    );
+
+    loop->setPreheader(newPreheader);
+}
+```
+
+Answer: `header` - Branch back to header. Loop rotation moves loop test to bottom. Eliminates one branch per iteration. Enables other optimizations.
+
+#@@@@@@@@@@
+
+138. What is the purpose of value numbering?
+
+Answer: Value numbering assigns unique numbers to values. Identical expressions get same number. Detects redundant computations. Local value numbering (within block), global value numbering (across blocks). Foundation for CSE, constant propagation. Efficient with hash tables.
+
+#@@@@@@@@@@
+
+139. How do you implement loop collapsing?
+
+Answer: Loop collapsing combines nested loops into single loop. Flattens iteration space. Example: `for(i=0;i<n;i++) for(j=0;j<m;j++)` becomes `for(k=0;k<n*m;k++) {i=k/m; j=k%m}`. Simplifies parallelization. Requires rectangular iteration space.
+
+#@@@@@@@@@@
+
+140. Which of the following are compiler metadata types? (Multiple correct)
+A) Debug information
+B) Optimization hints
+C) Type information
+D) Alias information
+E) Profiling data
+F) Source location
+
+Answer: A, B, C, D, E, F - All are compiler metadata. Debug info (DWARF), Optimization hints (pragmas), Type info (RTTI), Alias info (noalias), Profiling data (PGO), Source location (diagnostics). Metadata guides compilation without affecting semantics.
+
+#@@@@@@@@@@
+
+141. Complete this instruction combining:
+```cpp
+Instruction* combineInstructions(Instruction *inst) {
+    // Combine instruction patterns
+
+    // Pattern: (x + c1) + c2 -> x + (c1 + c2)
+    if (inst->getOpcode() == Add) {
+        if (BinaryOperator *left = dyn_cast<BinaryOperator>(inst->getOperand(0))) {
+            if (left->getOpcode() == Add) {
+                if (Constant *c1 = dyn_cast<Constant>(left->getOperand(1))) {
+                    if (Constant *c2 = dyn_cast<Constant>(inst->getOperand(1))) {
+                        Constant *sum = _______________( c1, c2);
+                        return createAdd(left->getOperand(0), sum);
+                    }
+                }
+            }
+        }
+    }
+
+    return nullptr;  // No combination
+}
+```
+
+Answer: `ConstantExpr::getAdd` or `constantFold` - Fold constants. Instruction combining merges instruction sequences. Powerful local optimization.
+
+#@@@@@@@@@@
+
+142. What is the difference between pessimistic and optimistic optimization?
+
+Answer: Pessimistic optimization assumes worst case, always safe, may miss opportunities. Optimistic optimization assumes best case, uses speculation, may need rollback. Pessimistic for correctness-critical, optimistic for performance. Example: alias analysis (pessimistic), speculative execution (optimistic).
+
+#@@@@@@@@@@
+
+143. How do you implement loop rerolling?
+
+Answer: Loop rerolling is opposite of unrolling. Detect unrolled patterns, combine back into loop. Reduces code size. Example: `a[0]=0; a[1]=0; a[2]=0; a[3]=0` becomes `for(i=0;i<4;i++) a[i]=0`. Useful for code size optimization.
+
+#@@@@@@@@@@
+
+144. Which of the following are compiler pipeline stages? (Multiple correct)
+A) Frontend (parsing, semantic analysis)
+B) Middle-end (optimization)
+C) Backend (code generation)
+D) Assembler
+E) Linker
+F) Loader
+
+Answer: A, B, C, D, E - Frontend, Middle-end, Backend, Assembler, Linker are compilation pipeline. Loader is OS component, not compiler. Frontend (source to IR), Middle-end (IR optimization), Backend (IR to assembly), Assembler (assembly to object), Linker (object to executable).
+
+#@@@@@@@@@@
+
+145. Complete this memory access coalescing:
+```cpp
+void coalesceMemoryAccesses(Loop *loop) {
+    // Combine multiple small memory accesses into larger ones
+
+    std::vector<LoadInst*> loads;
+
+    // Find consecutive loads
+    for (Instruction *inst : loop->getInstructions()) {
+        if (LoadInst *load = dyn_cast<LoadInst>(inst)) {
+            loads.push_back(load);
+        }
+    }
+
+    // Group consecutive loads
+    for (int i = 0; i < loads.size() - 1; i++) {
+        if (areConsecutive(loads[i], loads[i+1])) {
+            // Replace with vector load
+            VectorType *vecTy = VectorType::get(loads[i]->getType(), 2);
+            LoadInst *vecLoad = new LoadInst(vecTy, loads[i]->getPointer());
+
+            // Extract elements
+            loads[i]->replaceAllUsesWith(
+                createExtractElement(vecLoad, _______________)
+            );
+            loads[i+1]->replaceAllUsesWith(
+                createExtractElement(vecLoad, 1)
+            );
+        }
+    }
+}
+```
+
+Answer: `0` - Extract first element. Memory access coalescing combines accesses for efficiency. Important for GPU, SIMD.
+
+#@@@@@@@@@@
+
+146. What is the purpose of loop idiom recognition?
+
+Answer: Loop idiom recognition detects common loop patterns, replaces with optimized library calls. Examples: memset (zero array), memcpy (copy array), popcount (count bits). Pattern matching on loop structure. Significant performance improvement. Compiler knows efficient implementations.
+
+#@@@@@@@@@@
+
+147. How do you implement if-conversion?
+
+Answer: If-conversion transforms control dependencies to data dependencies. Replace branches with predicated/conditional instructions. Example: `if(c) x=a else x=b` becomes `x = c ? a : b`. Eliminates branches, improves pipeline efficiency. Requires predicated instructions or select.
+
+#@@@@@@@@@@
+
+148. Which of the following are compiler transformation categories? (Multiple correct)
+A) Algebraic transformations
+B) Loop transformations
+C) Procedure transformations
+D) Data structure transformations
+E) Control flow transformations
+F) Memory transformations
+
+Answer: A, B, C, D, E, F - All are transformation categories. Algebraic (simplification), Loop (optimization), Procedure (inlining, cloning), Data structure (layout), Control flow (if-conversion), Memory (access optimization). Comprehensive optimization requires all categories.
+
+#@@@@@@@@@@
+
+149. Complete this branch probability estimation:
+```cpp
+float estimateBranchProbability(BranchInst *branch) {
+    // Estimate probability of taking true branch
+
+    // Use profile data if available
+    if (branch->hasProfileData()) {
+        return branch->_______________();
+    }
+
+    // Heuristics:
+    // 1. Loop back edges are likely taken
+    if (isLoopBackEdge(branch)) return 0.9;
+
+    // 2. Null pointer checks unlikely
+    if (isNullCheck(branch)) return 0.1;
+
+    // 3. Error handling unlikely
+    if (isErrorHandling(branch)) return 0.05;
+
+    // Default: 50-50
+    return 0.5;
+}
+```
+
+Answer: `getProfileProbability` - Get profiled probability. Branch probability guides optimization (code layout, inlining). Profile-guided most accurate, heuristics for unprofiled code.
+
+#@@@@@@@@@@
+
+150. What is the difference between forward and backward code motion?
+
+Answer: Forward code motion moves code later in program (lazy code motion, sink). Backward code motion moves code earlier (eager code motion, hoist). Forward reduces register pressure, backward enables early execution. Trade-offs: register pressure vs latency. Both used in optimization.
+
+#@@@@@@@@@@
+
+151. How do you implement loop-aware register allocation?
+
+Answer: Loop-aware register allocation prioritizes loop variables. Assign registers to loop-carried values, spill non-loop values. Reduces spills in hot code. Use loop nesting depth as priority. Significant performance improvement. Integrated with loop optimization.
+
+#@@@@@@@@@@
+
+152. Which of the following are compiler performance metrics? (Multiple correct)
+A) Compilation time
+B) Code size
+C) Execution speed
+D) Memory usage
+E) Power consumption
+F) Compilation throughput
+
+Answer: A, B, C, D, E, F - All are performance metrics. Compilation time (developer productivity), Code size (embedded systems), Execution speed (runtime performance), Memory usage (footprint), Power consumption (mobile), Throughput (CI/CD). Different priorities for different use cases.
+
+#@@@@@@@@@@
+
+153. Complete this loop bound analysis:
+```cpp
+int analyzeLoopBound(Loop *loop) {
+    // Determine maximum number of iterations
+
+    PHINode *iv = loop->getInductionVariable();
+    Value *init = iv->getInitialValue();
+    Value *bound = loop->getUpperBound();
+    Value *step = iv->getStep();
+
+    // If all are constants, compute trip count
+    if (ConstantInt *initConst = dyn_cast<ConstantInt>(init)) {
+        if (ConstantInt *boundConst = dyn_cast<ConstantInt>(bound)) {
+            if (ConstantInt *stepConst = dyn_cast<ConstantInt>(step)) {
+                int tripCount = (boundConst->getValue() - initConst->getValue()) /
+                                stepConst->getValue();
+                return _______________;
+            }
+        }
+    }
+
+    // Unknown bound
+    return -1;
+}
+```
+
+Answer: `tripCount` - Return computed trip count. Loop bound analysis determines iteration count. Enables unrolling, vectorization decisions.
+
+#@@@@@@@@@@
+
+154. What is the purpose of loop alignment?
+
+Answer: Loop alignment pads loop entry to cache line or instruction fetch boundary. Improves instruction fetch efficiency, reduces cache misses. Compiler inserts NOPs before loop. Trade-off: code size vs performance. Particularly important for tight loops.
+
+#@@@@@@@@@@
+
+155. How do you implement cross-module optimization?
+
+Answer: Cross-module optimization optimizes across compilation units. Requires whole-program visibility. Link-time optimization (LTO) enables this. Inline across modules, dead code elimination of unused exports. Significant performance improvement. Requires special linker support.
+
+#@@@@@@@@@@
+
+156. Which of the following are compiler error recovery strategies? (Multiple correct)
+A) Panic mode (skip to synchronization point)
+B) Phrase-level recovery (local correction)
+C) Error productions (grammar rules for errors)
+D) Global correction (minimal changes)
+E) Continue parsing (report multiple errors)
+F) Fail fast (stop at first error)
+
+Answer: A, B, C, D, E, F - All are error recovery strategies. Panic mode (simple), Phrase-level (better), Error productions (specific errors), Global correction (optimal but expensive), Continue (find more errors), Fail fast (quick feedback). Trade-offs: error quality vs compilation time.
+
+#@@@@@@@@@@
+
+157. Complete this loop dependence testing:
+```cpp
+bool testDependence(ArrayAccess *access1, ArrayAccess *access2, Loop *loop) {
+    // Test if two array accesses may depend
+
+    // GCD test: if gcd(step1, step2) doesn't divide (offset1 - offset2), no dependence
+    if (access1->isLinear() && access2->isLinear()) {
+        int step1 = access1->getStep();
+        int step2 = access2->getStep();
+        int offset1 = access1->getOffset();
+        int offset2 = access2->getOffset();
+
+        int g = gcd(step1, step2);
+        if ((offset1 - offset2) % g != 0) {
+            return false;  // No dependence
+        }
+    }
+
+    // Banerjee test: check bounds
+    if (!_______________( access1, access2, loop)) {
+        return false;
+    }
+
+    return true;  // May depend
+}
+```
+
+Answer: `banerjeeTest` or `boundsIntersect` - Test if iteration spaces intersect. Dependence testing determines if loop iterations can be reordered. Critical for parallelization, vectorization.
+
+#@@@@@@@@@@
+
+158. What is the difference between static and dynamic compilation?
+
+Answer: Static compilation compiles entire program before execution, AOT, platform-specific binary. Dynamic compilation compiles during execution, JIT, platform-independent bytecode. Static for native apps (C, C++), dynamic for managed languages (Java, C#). Hybrid approaches combine both.
+
+#@@@@@@@@@@
+
+159. How do you implement loop pipelining?
+
+Answer: Loop pipelining overlaps iterations in hardware pipeline. Software pipelining schedules instructions from different iterations. Modulo scheduling finds repeating pattern (kernel). Fills pipeline (prologue), steady state (kernel), drains (epilogue). Exploits ILP in loops. Complex but effective.
+
+#@@@@@@@@@@
+
+160. Which of the following are compiler optimization barriers? (Multiple correct)
+A) Function calls (unknown side effects)
+B) Volatile variables
+C) Inline assembly
+D) Memory barriers
+E) Compiler fences
+F) Opaque predicates
+
+Answer: A, B, C, D, E, F - All are optimization barriers. Function calls (may alias), Volatile (must access), Inline assembly (unknown effects), Memory barriers (ordering), Compiler fences (prevent reordering), Opaque predicates (unknown value). Prevent optimization for correctness.
+
+#@@@@@@@@@@
+
+161. Complete this loop strip-mining for vectorization:
+```cpp
+void stripMineForVectorization(Loop *loop, int vectorWidth) {
+    // Transform: for(i=0; i<n; i++) body
+    // To: for(i=0; i<n; i+=vectorWidth) for(j=i; j<min(i+vectorWidth,n); j++) body
+
+    PHINode *iv = loop->getInductionVariable();
+    Value *bound = loop->getUpperBound();
+
+    // Create outer loop (strips)
+    Loop *outerLoop = createLoop();
+    PHINode *outerIV = createPHI(outerLoop, 0, vectorWidth);
+
+    // Create inner loop (within strip)
+    Loop *innerLoop = createLoop();
+    PHINode *innerIV = createPHI(innerLoop, outerIV, 1);
+
+    // Inner loop bound: min(outerIV + vectorWidth, bound)
+    Value *innerBound = createMin(
+        createAdd(outerIV, ConstantInt::get(vectorWidth)),
+        _______________
+    );
+
+    innerLoop->setUpperBound(innerBound);
+    outerLoop->setInnerLoop(innerLoop);
+}
+```
+
+Answer: `bound` - Original loop bound. Strip-mining prepares loop for vectorization. Inner loop processes vector width elements.
+
+#@@@@@@@@@@
+
+162. What is the purpose of loop-invariant hoisting?
+
+Answer: Loop-invariant hoisting moves loop-invariant code before loop. Reduces redundant computation. Example: `for(i=0;i<n;i++) a[i]=x*y` - hoist `x*y` out. Same as LICM (Loop-Invariant Code Motion). Significant performance improvement for loops.
+
+#@@@@@@@@@@
+
+163. How do you implement partial evaluation?
+
+Answer: Partial evaluation specializes program for known inputs. Evaluate parts of program at compile time. Example: interpreter + program = compiled program. Futamura projections. Enables aggressive optimization. Used in meta-programming, JIT compilation.
+
+#@@@@@@@@@@
+
+164. Which of the following are compiler intermediate code properties? (Multiple correct)
+A) Platform independence
+B) Ease of optimization
+C) Compactness
+D) Type preservation
+E) Debuggability
+F) Analyzability
+
+Answer: A, B, C, D, E, F - All are desirable IR properties. Platform independence (portability), Ease of optimization (SSA), Compactness (memory), Type preservation (safety), Debuggability (source mapping), Analyzability (data flow). Good IR balances these properties.
+
+#@@@@@@@@@@
+
+165. Complete this loop distribution for vectorization:
+```cpp
+void distributeForVectorization(Loop *loop) {
+    // Separate vectorizable and non-vectorizable statements
+
+    std::vector<Instruction*> vectorizable;
+    std::vector<Instruction*> nonVectorizable;
+
+    for (Instruction *inst : loop->getBody()) {
+        if (canVectorize(inst)) {
+            vectorizable.push_back(inst);
+        } else {
+            nonVectorizable.push_back(inst);
+        }
+    }
+
+    // Create two loops
+    Loop *vecLoop = createLoop(loop->getHeader());
+    Loop *scalarLoop = createLoop(loop->getHeader());
+
+    for (Instruction *inst : vectorizable) {
+        vecLoop->_______________( inst);
+    }
+
+    for (Instruction *inst : nonVectorizable) {
+        scalarLoop->addInstruction(inst);
+    }
+
+    // Vectorize the vectorizable loop
+    vectorizeLoop(vecLoop);
+}
+```
+
+Answer: `addInstruction` - Add instruction to vectorizable loop. Loop distribution separates vectorizable code. Enables partial vectorization.
+
+#@@@@@@@@@@
+
+166. What is the difference between early and late optimization?
+
+Answer: Early optimization in frontend/middle-end, high-level IR, language-specific. Late optimization in backend, low-level IR, target-specific. Early enables more optimization (inlining, constant propagation), late closer to machine (instruction selection, register allocation). Both important.
+
+#@@@@@@@@@@
+
+167. How do you implement loop interchange legality check?
+
+Answer: Check if loop interchange preserves dependencies. Use direction vectors, distance vectors. Interchange legal if no negative distance in outer loop after interchange. Example: `a[i][j] = a[i-1][j+1]` - can't interchange (negative distance in i). Precise dependence analysis required.
+
+#@@@@@@@@@@
+
+168. Which of the following are compiler code layout optimizations? (Multiple correct)
+A) Basic block reordering
+B) Function reordering
+C) Hot-cold splitting
+D) Code alignment
+E) Branch elimination
+F) Fall-through optimization
+
+Answer: A, B, C, D, E, F - All are code layout optimizations. Basic block reordering (reduce branches), Function reordering (locality), Hot-cold splitting (separate hot/cold code), Code alignment (cache lines), Branch elimination (fall-through), Fall-through optimization (likely path). Improve instruction cache, branch prediction.
+
+#@@@@@@@@@@
+
+169. Complete this loop bound substitution:
+```cpp
+void substituteLoopBound(Loop *loop, Value *newBound) {
+    // Replace loop bound with new value
+
+    BranchInst *branch = loop->getHeader()->getTerminator();
+    ICmpInst *cmp = dyn_cast<ICmpInst>(branch->getCondition());
+
+    // Replace old bound with new bound
+    Value *oldBound = cmp->getOperand(1);
+    cmp->_______________( 1, newBound);
+
+    // Update loop metadata
+    loop->setUpperBound(newBound);
+
+    // Invalidate cached trip count
+    loop->invalidateTripCount();
+}
+```
+
+Answer: `setOperand` - Set comparison operand. Loop bound substitution changes iteration count. Used in loop transformations.
+
+#@@@@@@@@@@
+
+170. What is the purpose of loop-carried dependence distance?
+
+Answer: Dependence distance is number of iterations between dependent operations. Distance 0 (same iteration), distance 1 (next iteration), etc. Determines parallelization potential. Large distance enables more parallelism. Used in dependence analysis, loop transformation.
+
+#@@@@@@@@@@
+
+171. How do you implement loop-aware instruction scheduling?
+
+Answer: Loop-aware scheduling considers loop structure. Schedule loop-invariant code early, loop-carried dependencies carefully. Minimize register pressure in loops. Software pipelining for aggressive scheduling. Balance ILP with register pressure. Critical for performance.
+
+#@@@@@@@@@@
+
+172. Which of the following are compiler testing methodologies? (Multiple correct)
+A) Compiler validation suites
+B) Fuzzing (random program generation)
+C) Equivalence checking
+D) Regression testing
+E) Performance benchmarking
+F) Correctness proofs
+
+Answer: A, B, C, D, E, F - All are testing methodologies. Validation suites (standard tests), Fuzzing (find bugs), Equivalence checking (verify optimization), Regression testing (prevent regressions), Performance benchmarking (measure performance), Correctness proofs (formal verification). Comprehensive testing essential.
+
+#@@@@@@@@@@
+
+173. Complete this loop-invariant address computation hoisting:
+```cpp
+void hoistAddressComputation(Loop *loop) {
+    // Hoist loop-invariant address calculations
+
+    for (Instruction *inst : loop->getInstructions()) {
+        if (LoadInst *load = dyn_cast<LoadInst>(inst)) {
+            Value *ptr = load->getPointerOperand();
+
+            // Check if pointer calculation is loop-invariant
+            if (GetElementPtrInst *gep = dyn_cast<GetElementPtrInst>(ptr)) {
+                if (isLoopInvariant(gep, loop)) {
+                    // Move GEP to preheader
+                    gep->moveBefore(loop->getPreheader()->_______________());
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `getTerminator` - Insert before terminator. Address computation hoisting reduces redundant address calculations in loops.
+
+#@@@@@@@@@@
+
+174. What is the difference between flow-sensitive and flow-insensitive analysis?
+
+Answer: Flow-sensitive analysis considers control flow, different values at different program points, precise but expensive. Flow-insensitive analysis ignores control flow, single value for entire program, imprecise but fast. Flow-sensitive for optimization, flow-insensitive for quick analysis.
+
+#@@@@@@@@@@
+
+175. How do you implement loop-aware constant propagation?
+
+Answer: Loop-aware constant propagation tracks constants across loop iterations. Handle phi nodes specially. Detect induction variables with constant step. Propagate constants into loop body. More powerful than simple constant propagation. Enables loop optimization.
+
+#@@@@@@@@@@
+
+176. Which of the following are compiler design patterns? (Multiple correct)
+A) Visitor pattern (AST traversal)
+B) Builder pattern (IR construction)
+C) Factory pattern (object creation)
+D) Strategy pattern (optimization selection)
+E) Observer pattern (dependency tracking)
+F) Command pattern (transformation)
+
+Answer: A, B, C, D, E, F - All are useful compiler design patterns. Visitor (tree traversal), Builder (IR building), Factory (node creation), Strategy (pluggable optimizations), Observer (use-def chains), Command (undo/redo transformations). Good software engineering practices.
+
+#@@@@@@@@@@
+
+177. Complete this loop-aware dead code elimination:
+```cpp
+void eliminateDeadCodeInLoop(Loop *loop) {
+    // Remove dead code from loop
+
+    Set liveVars;
+
+    // Mark live variables (used outside loop)
+    for (BasicBlock *exit : loop->getExits()) {
+        for (PHINode *phi : exit->getPhis()) {
+            for (Value *incoming : phi->getIncomingValues()) {
+                if (loop->contains(incoming)) {
+                    liveVars.insert(incoming);
+                }
+            }
+        }
+    }
+
+    // Backward propagation of liveness
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (Instruction *inst : reverse(loop->getInstructions())) {
+            if (liveVars.contains(inst)) {
+                for (Value *operand : inst->getOperands()) {
+                    if (!liveVars.contains(operand)) {
+                        liveVars.insert(operand);
+                        changed = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Remove dead instructions
+    for (Instruction *inst : loop->getInstructions()) {
+        if (!liveVars.contains(inst)) {
+            inst->_______________();
+        }
+    }
+}
+```
+
+Answer: `eraseFromParent` - Remove dead instruction. Loop-aware DCE considers loop exits. More aggressive than general DCE.
+
+#@@@@@@@@@@
+
+178. What is the purpose of loop-aware alias analysis?
+
+Answer: Loop-aware alias analysis considers loop structure. Analyze array subscripts, induction variables. Prove non-aliasing across iterations. Enables vectorization, parallelization. More precise than general alias analysis. Critical for loop optimization.
+
+#@@@@@@@@@@
+
+179. How do you implement loop-aware strength reduction?
+
+Answer: Loop-aware strength reduction replaces expensive operations in loops. Detect induction variable uses, create derived induction variables. Example: `a[i*4]` - create IV with step 4 instead of multiplying. Reduces computation in loop body. Significant performance improvement.
+
+#@@@@@@@@@@
+
+180. Which of the following are compiler optimization trade-offs? (Multiple correct)
+A) Compilation time vs code quality
+B) Code size vs execution speed
+C) Register pressure vs ILP
+D) Precision vs scalability
+E) Safety vs performance
+F) Portability vs optimization
+
+Answer: A, B, C, D, E, F - All are optimization trade-offs. Compilation time vs quality (optimization levels), Code size vs speed (space-time), Register pressure vs ILP (spilling vs parallelism), Precision vs scalability (analysis complexity), Safety vs performance (bounds checking), Portability vs optimization (target-specific). Compiler must balance trade-offs.
+
+#@@@@@@@@@@
+
+181. Complete this loop-aware value numbering:
+```cpp
+void valueNumberingInLoop(Loop *loop) {
+    // Assign value numbers considering loop structure
+
+    std::map<Expression, int> valueNumbers;
+    int nextNumber = 0;
+
+    for (Instruction *inst : loop->getInstructions()) {
+        Expression expr = createExpression(inst);
+
+        // Check if expression already has value number
+        if (valueNumbers.count(expr)) {
+            int vn = valueNumbers[expr];
+
+            // Check if definition dominates use
+            if (_______________( getDefinition(vn), inst)) {
+                // Replace with previous computation
+                inst->replaceAllUsesWith(getDefinition(vn));
+            }
+        } else {
+            // Assign new value number
+            valueNumbers[expr] = nextNumber++;
+        }
+    }
+}
+```
+
+Answer: `dominates` - Check dominance. Loop-aware value numbering considers loop structure. More precise than simple value numbering.
+
+#@@@@@@@@@@
+
+182. What is the difference between must-analysis and may-analysis in loops?
+
+Answer: Must-analysis determines what must happen in all iterations (conservative under-approximation). May-analysis determines what may happen in any iteration (conservative over-approximation). Must for optimization (must-alias), may for correctness (may-alias). Different safety requirements.
+
+#@@@@@@@@@@
+
+183. How do you implement loop-aware copy propagation?
+
+Answer: Loop-aware copy propagation tracks copies across iterations. Handle phi nodes, loop-carried copies. Propagate copies within loop, across iterations if safe. More aggressive than simple copy propagation. Reduces register pressure, enables further optimization.
+
+#@@@@@@@@@@
+
+184. Which of the following are compiler optimization metrics? (Multiple correct)
+A) Speedup (execution time improvement)
+B) Code size reduction
+C) Compilation time overhead
+D) Memory usage reduction
+E) Power consumption reduction
+F) Optimization coverage
+
+Answer: A, B, C, D, E, F - All are optimization metrics. Speedup (performance), Code size (space), Compilation time (cost), Memory usage (footprint), Power consumption (energy), Coverage (% code optimized). Measure optimization effectiveness.
+
+#@@@@@@@@@@
+
+185. Complete this loop-aware redundancy elimination:
+```cpp
+void eliminateRedundancyInLoop(Loop *loop) {
+    // Eliminate redundant computations in loop
+
+    std::map<Expression, Instruction*> available;
+
+    for (Instruction *inst : loop->getInstructions()) {
+        Expression expr = createExpression(inst);
+
+        // Check if expression is available
+        if (available.count(expr)) {
+            Instruction *prev = available[expr];
+
+            // Check if previous computation dominates current
+            if (dominates(prev, inst)) {
+                // Check if no intervening modifications
+                if (!_______________( prev, inst, expr)) {
+                    inst->replaceAllUsesWith(prev);
+                }
+            }
+        } else {
+            available[expr] = inst;
+        }
+    }
+}
+```
+
+Answer: `hasModification` or `isModifiedBetween` - Check if expression operands modified. Loop-aware redundancy elimination considers loop structure.
+
+#@@@@@@@@@@
+
+186. What is the purpose of loop-aware scheduling?
+
+Answer: Loop-aware scheduling considers loop structure when scheduling instructions. Minimize register pressure in loops, schedule loop-invariant code early, respect loop-carried dependencies. Software pipelining for aggressive scheduling. Balance ILP with register pressure. Critical for loop performance.
+
+#@@@@@@@@@@
+
+187. How do you implement loop-aware partial redundancy elimination?
+
+Answer: Loop-aware PRE considers loop structure. Insert computations in loop preheader, eliminate redundant computations in loop. More aggressive than general PRE. Subsumes loop-invariant code motion. Powerful optimization for loops.
+
+#@@@@@@@@@@
+
+188. Which of the following are compiler optimization goals? (Multiple correct)
+A) Minimize execution time
+B) Minimize code size
+C) Minimize memory usage
+D) Minimize power consumption
+E) Maximize throughput
+F) Minimize compilation time
+
+Answer: A, B, C, D, E, F - All are optimization goals. Execution time (performance), Code size (embedded), Memory usage (footprint), Power consumption (mobile), Throughput (server), Compilation time (developer productivity). Different priorities for different applications.
+
+#@@@@@@@@@@
+
+189. Complete this loop-aware instruction selection:
+```cpp
+void selectInstructionsForLoop(Loop *loop) {
+    // Select instructions considering loop structure
+
+    for (Instruction *inst : loop->getInstructions()) {
+        // Check if instruction is loop-invariant
+        if (isLoopInvariant(inst, loop)) {
+            // Use more expensive but precise instruction
+            selectPreciseInstruction(inst);
+        } else {
+            // Check if instruction is in hot path
+            if (isHotPath(inst, loop)) {
+                // Use fast instruction
+                selectFastInstruction(inst);
+            } else {
+                // Use _______________
+                selectBalancedInstruction(inst);
+            }
+        }
+    }
+}
+```
+
+Answer: `balanced` or `default` - Balanced instruction selection. Loop-aware instruction selection considers loop structure, hotness.
+
+#@@@@@@@@@@
+
+190. What is the difference between loop-level and instruction-level parallelism?
+
+Answer: Loop-level parallelism (LLP) executes different loop iterations in parallel, coarse-grained, requires independent iterations. Instruction-level parallelism (ILP) executes different instructions in parallel, fine-grained, within single iteration. LLP for multi-core, ILP for pipelining. Both important for performance.
+
+#@@@@@@@@@@
+
+191. How do you implement loop-aware register pressure reduction?
+
+Answer: Loop-aware register pressure reduction prioritizes loop variables. Spill non-loop variables, keep loop-carried values in registers. Live range splitting at loop boundaries. Reduces spills in hot code. Significant performance improvement.
+
+#@@@@@@@@@@
+
+192. Which of the following are compiler loop analysis techniques? (Multiple correct)
+A) Induction variable analysis
+B) Loop-carried dependence analysis
+C) Trip count analysis
+D) Loop nesting analysis
+E) Loop invariant detection
+F) Reduction recognition
+
+Answer: A, B, C, D, E, F - All are loop analysis techniques. Induction variables (counters), Loop-carried dependence (dependencies), Trip count (iterations), Loop nesting (hierarchy), Loop invariants (hoisting), Reductions (sum, product). Foundation for loop optimization.
+
+#@@@@@@@@@@
+
+193. Complete this loop-aware memory optimization:
+```cpp
+void optimizeMemoryAccessesInLoop(Loop *loop) {
+    // Optimize memory accesses in loop
+
+    std::vector<LoadInst*> loads;
+    std::vector<StoreInst*> stores;
+
+    // Collect memory accesses
+    for (Instruction *inst : loop->getInstructions()) {
+        if (LoadInst *load = dyn_cast<LoadInst>(inst)) {
+            loads.push_back(load);
+        } else if (StoreInst *store = dyn_cast<StoreInst>(inst)) {
+            stores.push_back(store);
+        }
+    }
+
+    // Promote loop-invariant loads
+    for (LoadInst *load : loads) {
+        if (isLoopInvariant(load->getPointerOperand(), loop)) {
+            // Hoist load to preheader
+            load->moveBefore(loop->getPreheader()->getTerminator());
+        }
+    }
+
+    // Sink loop-invariant stores
+    for (StoreInst *store : stores) {
+        if (isLoopInvariant(store->getPointerOperand(), loop) &&
+            isLoopInvariant(store->getValueOperand(), loop)) {
+            // Sink store to _______________
+            store->moveAfter(loop->getExit()->getFirstNonPHI());
+        }
+    }
+}
+```
+
+Answer: `exit` or `latch` - Move store after loop. Loop-aware memory optimization hoists loads, sinks stores. Reduces memory traffic.
+
+#@@@@@@@@@@
+
+194. What is the purpose of loop-aware code motion?
+
+Answer: Loop-aware code motion moves code considering loop structure. Hoist loop-invariant code (LICM), sink loop-invariant stores, move code to less frequently executed paths. Reduces computation in loop body. Significant performance improvement.
+
+#@@@@@@@@@@
+
+195. How do you implement loop-aware optimization pipeline?
+
+Answer: Loop-aware optimization pipeline applies optimizations in loop-aware order. Loop analysis first, then loop transformations (interchange, tiling, unrolling), then loop-aware optimizations (LICM, strength reduction), finally general optimizations. Order matters for effectiveness.
+
+#@@@@@@@@@@
+
+196. Which of the following are compiler loop transformation legality checks? (Multiple correct)
+A) Dependence preservation
+B) Iteration space preservation
+C) Memory access preservation
+D) Control flow preservation
+E) Data type preservation
+F) Semantics preservation
+
+Answer: A, B, C, D, E, F - All are legality checks. Dependence (preserve dependencies), Iteration space (same iterations), Memory access (same accesses), Control flow (same control), Data type (same types), Semantics (same behavior). Transformations must preserve program semantics.
+
+#@@@@@@@@@@
+
+197. Complete this loop-aware optimization decision:
+```cpp
+bool shouldOptimizeLoop(Loop *loop) {
+    // Decide if loop should be optimized
+
+    // Check trip count
+    int tripCount = loop->getTripCount();
+    if (tripCount < MIN_TRIP_COUNT) return false;
+
+    // Check loop size
+    int loopSize = loop->getInstructionCount();
+    if (loopSize > MAX_LOOP_SIZE) return false;
+
+    // Check profitability
+    float benefit = estimateBenefit(loop);
+    float cost = estimateCost(loop);
+
+    return benefit > cost * _______________;
+}
+```
+
+Answer: `PROFITABILITY_THRESHOLD` or `1.5` - Profitability threshold. Loop optimization decisions based on cost-benefit analysis. Avoid unprofitable optimizations.
+
+#@@@@@@@@@@
+
+198. What is the difference between loop-aware and general optimization?
+
+Answer: Loop-aware optimization considers loop structure, properties (induction variables, trip count, nesting). General optimization applies to all code. Loop-aware more aggressive, exploits loop properties. Examples: LICM (loop-aware), CSE (general). Both important.
+
+#@@@@@@@@@@
+
+199. How do you implement loop-aware optimization profitability analysis?
+
+Answer: Profitability analysis estimates benefit vs cost. Benefit: reduced computation, better cache locality. Cost: code size increase, compilation time. Use heuristics, profiling data. Example: unroll if trip count small, benefit > cost. Avoid unprofitable optimizations.
+
+#@@@@@@@@@@
+
+200. Which principles lead to effective compiler optimization? (Multiple correct)
+A) Correctness first (preserve semantics)
+B) Measure performance (profile-guided)
+C) Iterative refinement (multiple passes)
+D) Cost-benefit analysis (profitability)
+E) Target-aware (architecture-specific)
+F) Composability (combine optimizations)
+
+Answer: A, B, C, D, E, F - All are principles for effective optimization. Correctness (must preserve semantics), Measurement (data-driven decisions), Iterative refinement (multiple passes improve results), Cost-benefit (avoid unprofitable optimizations), Target-aware (exploit hardware features), Composability (optimizations interact). Successful compilers balance these principles with deep understanding of program analysis, transformation techniques, and target architectures.
+
+#@@@@@@@@@@

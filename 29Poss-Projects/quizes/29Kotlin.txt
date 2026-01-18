@@ -1,0 +1,3131 @@
+Kotlin Quiz - 200 Questions
+Tech Stack: Android SDK, Jetpack Compose, Gradle, Retrofit, Coroutines, Room, Firebase, Ktor
+
+1. Which of the following are Kotlin features? (Multiple correct)
+A) Null safety
+B) Extension functions
+C) Data classes
+D) Coroutines
+E) Sealed classes
+F) Type inference
+
+Answer: A, B, C, D, E, F - All are Kotlin features. Null safety (nullable types), Extension functions (add methods), Data classes (POJOs), Coroutines (async), Sealed classes (restricted hierarchies), Type inference (automatic types). Kotlin is modern, concise, and safe.
+
+#@@@@@@@@@@
+
+2. Complete this Kotlin coroutine:
+```kotlin
+import kotlinx.coroutines.*
+
+suspend fun fetchData(): String {
+    delay(1000)
+    return "Data loaded"
+}
+
+fun main() = runBlocking {
+    val job = launch {
+        val data = fetchData()
+        println(data)
+    }
+
+    println("Loading...")
+    job._______________()
+    println("Done")
+}
+```
+
+Answer: `join` - Wait for coroutine completion. `join()` suspends until the job completes. Coroutines provide structured concurrency for asynchronous programming.
+
+#@@@@@@@@@@
+
+3. What is the difference between `val` and `var` in Kotlin?
+
+Answer: `val` is read-only (immutable reference), assigned once, cannot be reassigned, like Java final. `var` is mutable, can be reassigned. Both can hold mutable objects. Use `val` by default for immutability, `var` when reassignment needed.
+
+#@@@@@@@@@@
+
+4. Which of the following are Jetpack Compose components? (Multiple correct)
+A) @Composable
+B) remember
+C) State
+D) LaunchedEffect
+E) Modifier
+F) Column/Row
+
+Answer: A, B, C, D, E, F - All are Compose components. @Composable (composable functions), remember (state preservation), State (reactive state), LaunchedEffect (side effects), Modifier (styling), Column/Row (layouts). Compose is declarative UI toolkit for Android.
+
+#@@@@@@@@@@
+
+5. Find the issue in this Kotlin code:
+```kotlin
+data class User(val name: String, val age: Int)
+
+fun main() {
+    val users = listOf(
+        User("Alice", 25),
+        User("Bob", 30),
+        User("Charlie", 25)
+    )
+
+    // Issue: nullable type mismatch
+    val firstUser: User = users.firstOrNull { it.age > 40 }
+    println(firstUser.name)
+}
+```
+
+Answer: `firstOrNull()` returns `User?` (nullable), but assigned to non-nullable `User`. Fix: `val firstUser: User? = users.firstOrNull { it.age > 40 }` or use `first()` with default. Also need null check before accessing `name`.
+
+#@@@@@@@@@@
+
+6. How do you implement dependency injection with Hilt?
+
+Answer: Add Hilt Gradle plugin, annotate Application with @HiltAndroidApp, annotate activities with @AndroidEntryPoint, create modules with @Module and @InstallIn, provide dependencies with @Provides or @Binds, inject with @Inject constructor or field injection.
+
+#@@@@@@@@@@
+
+7. Which of the following are Room database components? (Multiple correct)
+A) @Entity
+B) @Dao
+C) @Database
+D) @PrimaryKey
+E) @Query
+F) @Insert
+
+Answer: A, B, C, D, E, F - All are Room components. @Entity (table), @Dao (data access object), @Database (database class), @PrimaryKey (primary key), @Query (SQL query), @Insert (insert operation). Room provides SQLite abstraction for Android.
+
+#@@@@@@@@@@
+
+8. Complete this Retrofit interface:
+```kotlin
+import retrofit2.http.*
+
+interface ApiService {
+    @GET("users/{id}")
+    suspend fun getUser(@Path("id") userId: Int): User
+
+    @POST("users")
+    suspend fun createUser(@Body user: User): User
+
+    @PUT("users/{id}")
+    suspend fun updateUser(
+        @Path("id") userId: Int,
+        @Body user: User
+    ): User
+
+    @_______________("users/{id}")
+    suspend fun deleteUser(@Path("id") userId: Int)
+}
+```
+
+Answer: `DELETE` - HTTP DELETE method annotation. Retrofit provides type-safe HTTP client for Android/Kotlin with coroutines support.
+
+#@@@@@@@@@@
+
+9. What is the difference between `launch` and `async` in coroutines?
+
+Answer: `launch` returns Job, fire-and-forget, no return value, used for side effects. `async` returns Deferred<T>, returns value with await(), used for concurrent computations. Both create coroutines, choose based on whether you need result.
+
+#@@@@@@@@@@
+
+10. Which of the following are Kotlin scope functions? (Multiple correct)
+A) let
+B) run
+C) with
+D) apply
+E) also
+F) takeIf
+
+Answer: A, B, C, D, E, F - All are scope functions. let (it, returns lambda result), run (this, returns lambda result), with (this, returns lambda result), apply (this, returns receiver), also (it, returns receiver), takeIf (conditional). Each has different context and return value.
+
+#@@@@@@@@@@
+
+11. Predict the output of this Kotlin code:
+```kotlin
+fun main() {
+    val numbers = listOf(1, 2, 3, 4, 5)
+
+    val result = numbers
+        .filter { it % 2 == 0 }
+        .map { it * 2 }
+        .sum()
+
+    println(result)
+}
+```
+
+Answer: 12. Filter evens: [2, 4], map to double: [4, 8], sum: 4 + 8 = 12. Kotlin collections provide functional programming operations with lambda expressions.
+
+#@@@@@@@@@@
+
+12. How do you implement Firebase Authentication in Android?
+
+Answer: Add Firebase SDK, configure google-services.json, initialize FirebaseAuth, implement sign-in methods (email/password, Google, Facebook), handle auth state changes with addAuthStateListener(), manage user sessions, implement sign-out, handle errors.
+
+#@@@@@@@@@@
+
+13. Which of the following are Gradle build script elements? (Multiple correct)
+A) plugins
+B) dependencies
+C) android
+D) buildTypes
+E) productFlavors
+F) repositories
+
+Answer: A, B, C, D, E, F - All are Gradle elements. plugins (apply plugins), dependencies (libraries), android (Android config), buildTypes (debug/release), productFlavors (variants), repositories (dependency sources). Gradle builds Android apps with Kotlin DSL.
+
+#@@@@@@@@@@
+
+14. Complete this Jetpack Compose state management:
+```kotlin
+@Composable
+fun Counter() {
+    var count by remember { mutableStateOf(0) }
+
+    Column {
+        Text("Count: $count")
+        Button(onClick = { count++ }) {
+            Text("Increment")
+        }
+        Button(onClick = { count = _______________ }) {
+            Text("Reset")
+        }
+    }
+}
+```
+
+Answer: `0` - Reset count to zero. Compose uses state hoisting and recomposition for reactive UI updates when state changes.
+
+#@@@@@@@@@@
+
+15. What is the difference between Ktor and Retrofit?
+
+Answer: Ktor is Kotlin-native HTTP client/server framework, multiplatform, coroutines-first, flexible, server-side support. Retrofit is Android HTTP client, annotation-based, type-safe, mature ecosystem, Android-focused. Use Ktor for multiplatform or server, Retrofit for Android REST APIs.
+
+#@@@@@@@@@@
+
+16. Which of the following are Android SDK components? (Multiple correct)
+A) Activity
+B) Service
+C) BroadcastReceiver
+D) ContentProvider
+E) Fragment
+F) Intent
+
+Answer: A, B, C, D, E, F - All are Android SDK components. Activity (UI screens), Service (background operations), BroadcastReceiver (system events), ContentProvider (data sharing), Fragment (UI subcomponents), Intent (component communication).
+
+#@@@@@@@@@@
+
+17. Complete this Room database setup:
+```kotlin
+@Database(entities = [User::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getDatabase(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "app_database"
+                )._______________()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+}
+```
+
+Answer: `build` - Builds the Room database instance. Room provides type-safe SQLite database with compile-time verification of SQL queries.
+
+#@@@@@@@@@@
+
+18. What is the purpose of `suspend` keyword in Kotlin?
+
+Answer: Marks function as suspending, can be called from coroutines or other suspending functions, can pause execution without blocking threads. Enables asynchronous programming with coroutines, allows structured concurrency, and provides sequential-looking code for async operations.
+
+#@@@@@@@@@@
+
+19. Which of the following are Jetpack Compose layout components? (Multiple correct)
+A) Column
+B) Row
+C) Box
+D) LazyColumn
+E) LazyRow
+F) ConstraintLayout
+
+Answer: A, B, C, D, E, F - All are Compose layout components. Column (vertical), Row (horizontal), Box (stacking), LazyColumn/LazyRow (lazy lists), ConstraintLayout (complex layouts). Compose provides declarative UI with composable functions.
+
+#@@@@@@@@@@
+
+20. Find the bug in this coroutine code:
+```kotlin
+import kotlinx.coroutines.*
+
+fun main() = runBlocking {
+    val deferred1 = async { fetchData1() }
+    val deferred2 = async { fetchData2() }
+    
+    println("Processing...")
+    val result1 = deferred1.await()
+    val result2 = deferred2.await()
+    
+    println("Results: $result1, $result2")
+}
+
+suspend fun fetchData1(): String {
+    delay(1000)
+    return "Data1"
+}
+
+suspend fun fetchData2(): String {
+    delay(2000)
+    throw RuntimeException("Error in data2")
+}
+```
+
+Answer: When fetchData2() throws exception, deferred1.await() will also fail even though it completed successfully. Need to handle exceptions with try-catch or use CoroutineExceptionHandler. Exception propagation in coroutines cancels parent and sibling coroutines.
+
+#@@@@@@@@@@
+
+21. How do you implement Ktor client in Android?
+
+Answer: Add Ktor client dependencies, create HttpClient instance, configure plugins (ContentNegotiation, Logging, Auth), define data classes for JSON, create suspend functions for API calls, use in coroutines with proper error handling and timeout configuration.
+
+#@@@@@@@@@@
+
+22. Which of the following are Firebase services? (Multiple correct)
+A) Firebase Authentication
+B) Cloud Firestore
+C) Firebase Storage
+D) Firebase Cloud Messaging
+E) Firebase Analytics
+F) Firebase Crashlytics
+
+Answer: A, B, C, D, E, F - All are Firebase services. Authentication (user management), Firestore (NoSQL database), Storage (file storage), Cloud Messaging (push notifications), Analytics (user behavior), Crashlytics (crash reporting).
+
+#@@@@@@@@@@
+
+23. Complete this Gradle build configuration:
+```kotlin
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+}
+
+android {
+    namespace = "com.example.app"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.app"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    buildFeatures {
+        _______________ = true
+    }
+}
+```
+
+Answer: `compose` - Enables Jetpack Compose build feature. Gradle configuration manages Android app build process, dependencies, and features like Compose.
+
+#@@@@@@@@@@
+
+24. What is the difference between `StateFlow` and `SharedFlow` in Kotlin coroutines?
+
+Answer: StateFlow holds current state, new subscribers receive latest value, has initial value, used for state management. SharedFlow emits events, no initial value, subscribers receive only future emissions, used for events. StateFlow is conflated, SharedFlow can buffer multiple values.
+
+#@@@@@@@@@@
+
+25. Which of the following are Android Architecture Components? (Multiple correct)
+A) ViewModel
+B) LiveData
+C) Room
+D) Navigation
+E) WorkManager
+F) Paging
+
+Answer: A, B, C, D, E, F - All are Architecture Components. ViewModel (UI state), LiveData (observable data), Room (database), Navigation (navigation), WorkManager (background work), Paging (pagination). These provide robust app architecture.
+
+#@@@@@@@@@@
+
+26. Complete this Retrofit with Moshi setup:
+```kotlin
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+
+object RetrofitClient {
+    private const val BASE_URL = "https://api.example.com/"
+
+    val instance: Retrofit by lazy {
+        val moshi = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            ._______________()
+
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
+}
+```
+
+Answer: `build()` - Builds the Moshi instance for JSON serialization/deserialization. Retrofit with Moshi provides type-safe JSON API client for Kotlin.
+
+#@@@@@@@@@@
+
+27. What is the purpose of `@Composable` annotation in Jetpack Compose?
+
+Answer: Marks function as composable, can be called from other composable functions, describes UI declaratively, enables recomposition when state changes. Composable functions are the building blocks of Compose UI, replacing traditional Android view system.
+
+#@@@@@@@@@@
+
+28. Which of the following are Kotlin collection types? (Multiple correct)
+A) List
+B) Set
+C) Map
+D) Array
+E) ArrayList
+F) HashMap
+
+Answer: A, B, C, D, E, F - All are collection types. List (ordered collection), Set (unique elements), Map (key-value pairs), Array (fixed size), ArrayList (mutable list), HashMap (mutable map). Kotlin provides rich collection APIs.
+
+#@@@@@@@@@@
+
+29. Find the issue in this Room entity:
+```kotlin
+@Entity(tableName = "users")
+data class User(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String,
+    val email: String,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis()
+)
+```
+
+Answer: No apparent issue - this is a correct Room entity. @Entity marks it as database table, @PrimaryKey with autoGenerate creates auto-incrementing ID, @ColumnInfo customizes column name. Entity is properly structured for Room database.
+
+#@@@@@@@@@@
+
+30. How do you implement Firebase Cloud Messaging (FCM) in Android?
+
+Answer: Add Firebase Messaging dependency, create service extending FirebaseMessagingService, override onMessageReceived() for foreground messages, override onNewToken() for token updates, handle notification permissions, create notification channels for Android 8+, implement token storage and server registration.
+
+#@@@@@@@@@@
+
+31. Which of the following are coroutine dispatchers? (Multiple correct)
+A) Dispatchers.Main
+B) Dispatchers.IO
+C) Dispatchers.Default
+D) Dispatchers.Unconfined
+E) Dispatchers.Single
+F) Dispatchers.LimitedParallelism
+
+Answer: A, B, C, D, F - Dispatchers.Single doesn't exist. Main (UI thread), IO (network/disk), Default (CPU-intensive), Unconfined (inherited), LimitedParallelism (custom parallelism). Dispatchers determine coroutine execution thread.
+
+#@@@@@@@@@@
+
+32. Complete this Jetpack Compose navigation:
+```kotlin
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        composable("home") {
+            HomeScreen(navController = navController)
+        }
+        composable("detail/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")
+            DetailScreen(id = id, navController = navController)
+        }
+        composable("profile") {
+            ProfileScreen(navController = navController)
+        }
+        _______________("settings") {
+            SettingsScreen(navController = navController)
+        }
+    }
+}
+```
+
+Answer: `composable` - Defines navigation route for settings screen. Compose Navigation provides type-safe navigation between composable screens.
+
+#@@@@@@@@@@
+
+33. What is the difference between `List` and `MutableList` in Kotlin?
+
+Answer: List is read-only (immutable), cannot modify after creation, provides thread safety. MutableList is mutable, can add/remove/modify elements, not thread-safe. Use List for immutable data, MutableList when modifications needed. List has methods like map, filter; MutableList adds add, remove, clear.
+
+#@@@@@@@@@@
+
+34. Which of the following are Android lifecycle components? (Multiple correct)
+A) Lifecycle
+B) LifecycleOwner
+C) LifecycleObserver
+D) ViewModel
+E) LiveData
+F) SavedStateHandle
+
+Answer: A, B, C, D, E, F - All are lifecycle components. Lifecycle (lifecycle state), LifecycleOwner (provides lifecycle), LifecycleObserver (observes lifecycle), ViewModel (survives config changes), LiveData (lifecycle-aware data), SavedStateHandle (saved state). Lifecycle-aware components prevent memory leaks.
+
+#@@@@@@@@@@
+
+35. Complete this Ktor server setup:
+```kotlin
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+
+fun main() {
+    embeddedServer(Netty, port = 8080) {
+        routing {
+            get("/") {
+                call.respondText("Hello, Ktor!")
+            }
+            get("/users") {
+                call.respond(userService.getAllUsers())
+            }
+            post("/users") {
+                val user = call.receive<User>()
+                val createdUser = userService.createUser(user)
+                call.respond(HttpStatusCode.Created, _______________)
+            }
+        }
+    }.start(wait = true)
+}
+```
+
+Answer: `createdUser` - Respond with created user object. Ktor server provides lightweight HTTP server with routing, content negotiation, and coroutine support.
+
+#@@@@@@@@@@
+
+36. What is the purpose of `@Inject` annotation in Hilt?
+
+Answer: Marks constructor, field, or method for dependency injection. Hilt automatically provides dependencies at compile time. Constructor injection is preferred for testability. @Inject works with @Module and @Provides to create dependency graph for Android applications.
+
+#@@@@@@@@@@
+
+37. Which of the following are Android data binding techniques? (Multiple correct)
+A) View Binding
+B) Data Binding Library
+C) Jetpack Compose
+D) findViewById
+E) ButterKnife
+F) Synthetic imports (deprecated)
+
+Answer: A, B, C - findViewById, ButterKnife, and synthetic imports are older/deprecated approaches. View Binding (type-safe view references), Data Binding (declarative UI binding), Compose (declarative UI) are modern approaches.
+
+#@@@@@@@@@@
+
+38. Complete this coroutine error handling:
+```kotlin
+import kotlinx.coroutines.*
+
+suspend fun riskyOperation(): String {
+    delay(1000)
+    throw RuntimeException("Operation failed")
+}
+
+fun main() = runBlocking {
+    val result = try {
+        riskyOperation()
+    } catch (e: Exception) {
+        println("Caught exception: ${e.message}")
+        _______________("Default value")
+    }
+    println("Result: $result")
+}
+```
+
+Answer: `"Default value"` - Return default value when exception occurs. Try-catch in coroutines handles exceptions from suspending functions, preventing coroutine cancellation.
+
+#@@@@@@@@@@
+
+39. What is the difference between `LazyColumn` and `Column` in Jetpack Compose?
+
+Answer: LazyColumn lazy-loads and recycles visible items, handles large lists efficiently, scrolls smoothly. Column renders all items at once, suitable for small collections. LazyColumn uses LazyListScope DSL, Column uses standard composable composition. Use LazyColumn for lists, Column for fixed layouts.
+
+#@@@@@@@@@@
+
+40. Which of the following are Android storage options? (Multiple correct)
+A) SharedPreferences
+B) Internal Storage
+C) External Storage
+D) SQLite Database
+E) Room Database
+F) Firebase Storage
+
+Answer: A, B, C, D, E, F - All are storage options. SharedPreferences (key-value pairs), Internal/External Storage (files), SQLite/Room (structured data), Firebase Storage (cloud storage). Choose based on data type, size, and access requirements.
+
+#@@@@@@@@@@
+
+41. Complete this Retrofit interceptor setup:
+```kotlin
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+
+object ApiClient {
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val authInterceptor = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            ._______________()
+        chain.proceed(request)
+    }
+
+    val client = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(authInterceptor)
+        .build()
+}
+```
+
+Answer: `build()` - Builds the modified request with authorization header. Interceptors allow request/response modification, logging, and authentication in Retrofit.
+
+#@@@@@@@@@@
+
+42. What is the purpose of `remember` in Jetpack Compose?
+
+Answer: Stores object in composition, survives recomposition, preserves state across UI updates. Used with mutableStateOf for state management, rememberSaveable for configuration changes. Prevents object recreation on each recomposition, improving performance and maintaining state.
+
+#@@@@@@@@@@
+
+43. Which of the following are Android permissions categories? (Multiple correct)
+A) Normal permissions
+B) Dangerous permissions
+C) Signature permissions
+D) System permissions
+E) Runtime permissions
+F) Install-time permissions
+
+Answer: A, B, C, E, F - System permissions isn't a standard category. Normal (auto-granted), Dangerous (runtime request), Signature (same signature), Runtime (user approval), Install-time (granted on install). Permissions protect user privacy and system resources.
+
+#@@@@@@@@@@
+
+44. Complete this Firebase Firestore query:
+```kotlin
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+
+val db = FirebaseFirestore.getInstance()
+
+fun getUsersByAge(minAge: Int): Query {
+    return db.collection("users")
+        .whereGreaterThanOrEqualTo("age", minAge)
+        .orderBy("age", Query.Direction.ASCENDING)
+        ._______________(10)
+}
+```
+
+Answer: `limit` - Limits query results to specified number of documents. Firestore provides NoSQL database with real-time synchronization, offline support, and powerful querying capabilities.
+
+#@@@@@@@@@@
+
+45. What is the difference between `Flow` and `Channel` in Kotlin coroutines?
+
+Answer: Flow is cold stream, starts collection when terminal operator called, supports multiple operators, designed for data streams. Channel is hot stream, sends data independently, supports multiple senders/receivers, designed for communication between coroutines. Use Flow for data streams, Channel for coroutine communication.
+
+#@@@@@@@@@@
+
+46. Which of the following are Android testing frameworks? (Multiple correct)
+A) JUnit
+B) Espresso
+C) Robolectric
+D) Mockito
+E) Turbine
+F) Compose Testing
+
+Answer: A, B, C, D, E, F - All are testing frameworks. JUnit (unit tests), Espresso (UI tests), Robolectric (local JVM tests), Mockito (mocking), Turbine (Flow testing), Compose Testing (Compose UI tests). Comprehensive testing ensures app quality.
+
+#@@@@@@@@@@
+
+47. Complete this Hilt module:
+```kotlin
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.example.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            ._______________()
+    }
+}
+```
+
+Answer: `build()` - Builds the Retrofit instance. Hilt modules provide dependencies with specific scopes and configurations for dependency injection.
+
+#@@@@@@@@@@
+
+48. What is the purpose of `@Entity` annotation in Room?
+
+Answer: Marks class as database table, defines table structure, maps to SQLite table. Can specify table name, indices, foreign keys, and inheritance. Room entities are data classes that represent database tables with compile-time verification.
+
+#@@@@@@@@@@
+
+49. Which of the following are Android build variants? (Multiple correct)
+A) Debug
+B) Release
+C) Profile
+D) Staging
+E) Production
+F) QA
+
+Answer: A, B - Debug and Release are standard build variants. Staging, QA, Production are custom product flavors. Build variants allow different configurations for development, testing, and production environments.
+
+#@@@@@@@@@@
+
+50. Complete this Ktor client configuration:
+```kotlin
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.serialization.kotlinx.json.*
+
+val httpClient = HttpClient(OkHttp) {
+    install(ContentNegotiation) {
+        json()
+    }
+    install(Logging) {
+        logger = Logger.DEFAULT
+        level = LogLevel._______________
+    }
+}
+```
+
+Answer: `BODY` - Logs full request/response body. Ktor client configuration includes engines, plugins, and serialization for HTTP communication.
+
+#@@@@@@@@@@
+
+51. What is the difference between `ViewModel` and `AndroidViewModel`?
+
+Answer: ViewModel survives configuration changes, no Android framework dependencies. AndroidViewModel extends ViewModel, includes Application context via getApplication(), useful for context-dependent operations. Use ViewModel for pure logic, AndroidViewModel when context is needed.
+
+#@@@@@@@@@@
+
+52. Which of the following are Kotlin null safety operators? (Multiple correct)
+A) ? (safe call)
+B) ?: (Elvis operator)
+C) !! (double-bang)
+D) ?. (safe call with method)
+E) as? (safe cast)
+F) let with it
+
+Answer: A, B, C, D, E - let with it is a scope function, not null safety operator. ? (nullable type), ?: (default value), !! (force unwrap), ?. (safe call), as? (safe cast). Kotlin's null safety prevents NullPointerException.
+
+#@@@@@@@@@@
+
+53. Complete this Room DAO with relationships:
+```kotlin
+@Dao
+interface UserDao {
+    @Query("SELECT * FROM users")
+    fun getAllUsers(): Flow<List<User>>
+
+    @Query("SELECT * FROM users WHERE id = :id")
+    suspend fun getUserById(id: Int): User?
+
+    @Transaction
+    @Query("SELECT * FROM users WHERE id = :userId")
+    suspend fun getUserWithOrders(userId: Int): _______________
+}
+```
+
+Answer: `UserWithOrders` - Returns data class with user and their orders. Room relationships use @Transaction, @Relation, and embedded data classes for complex queries.
+
+#@@@@@@@@@@
+
+54. How do you implement biometric authentication in Android?
+
+Answer: Add Biometric library, check biometric availability, create BiometricPrompt.PromptInfo, implement BiometricPrompt.AuthenticationCallback, handle authentication results, handle errors, provide fallback authentication methods. BiometricPrompt supports fingerprint, face, and device credentials.
+
+#@@@@@@@@@@
+
+55. Which of the following are Jetpack Compose state holders? (Multiple correct)
+A) mutableStateOf
+B) remember
+C) rememberSaveable
+D) derivedStateOf
+E) produceState
+F) mutableStateListOf
+
+Answer: A, B, C, D, E, F - All are state holders. mutableStateOf (observable state), remember (preserves state), rememberSaveable (survives config changes), derivedStateOf (computed state), produceState (asynchronous state), mutableStateListOf (observable list).
+
+#@@@@@@@@@@
+
+56. Complete this coroutine timeout handling:
+```kotlin
+import kotlinx.coroutines.*
+
+suspend fun fetchDataWithTimeout(): String {
+    return try {
+        withTimeout(5000) {
+            delay(6000) // Simulate slow operation
+            "Data loaded"
+        }
+    } catch (e: TimeoutCancellationException) {
+        println("Operation timed out")
+        _______________("Fallback data")
+    }
+}
+```
+
+Answer: `"Fallback data"` - Return fallback when timeout occurs. withTimeout cancels coroutine after specified duration, enabling timeout handling for long-running operations.
+
+#@@@@@@@@@@
+
+57. What is the purpose of `@Dao` annotation in Room?
+
+Answer: Marks interface or abstract class as Data Access Object, provides database operations, contains abstract methods for queries. Room generates implementation at compile-time. DAOs separate database logic from business logic, providing clean data access layer.
+
+#@@@@@@@@@@
+
+58. Which of the following are Android navigation components? (Multiple correct)
+A) NavController
+B) NavHost
+C) NavGraph
+D) NavDestination
+E) NavOptions
+F) DeepLink
+
+Answer: A, B, C, D, E, F - All are navigation components. NavController (manages navigation), NavHost (container), NavGraph (navigation map), NavDestination (target), NavOptions (transition config), DeepLink (direct navigation). Navigation Component provides structured app navigation.
+
+#@@@@@@@@@@
+
+59. Complete this Firebase Realtime Database operation:
+```kotlin
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.getValue
+
+val database = FirebaseDatabase.getInstance()
+val usersRef = database.getReference("users")
+
+fun saveUser(user: User) {
+    usersRef.child(user.id).setValue(user)
+        .addOnSuccessListener {
+            println("User saved successfully")
+        }
+        ._______________ { error ->
+            println("Error saving user: ${error.message}")
+        }
+}
+```
+
+Answer: `addOnFailureListener` - Handles database operation failures. Firebase Realtime Database provides real-time data synchronization with offline support.
+
+#@@@@@@@@@@
+
+60. What is the difference between `suspend` and `runBlocking`?
+
+Answer: suspend marks function that can be paused without blocking, called from coroutines. runBlocking blocks current thread until coroutine completes, bridges blocking and coroutine worlds. Use suspend for coroutine functions, runBlocking for main functions and tests.
+
+#@@@@@@@@@@
+
+61. Which of the following are Android memory management techniques? (Multiple correct)
+A) WeakReference
+B) SoftReference
+C) PhantomReference
+D) LRU Cache
+E) Memory profiling
+F) Garbage collection
+
+Answer: A, B, C, D, E, F - All are memory management techniques. Weak/Soft/Phantom references (object references), LRU Cache (caching strategy), Memory profiling (analysis), Garbage collection (automatic memory cleanup). Proper memory management prevents leaks and OOM.
+
+#@@@@@@@@@@
+
+62. Complete this Jetpack Compose animation:
+```kotlin
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+
+@Composable
+fun AnimatedBox() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val color by infiniteTransition.animateColor(
+        initialValue = Color.Red,
+        targetValue = Color.Blue,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode._______________
+        )
+    )
+
+    Box(
+        modifier = Modifier
+            .size(100.dp)
+            .background(color)
+    )
+}
+```
+
+Answer: `Reverse` - Reverses animation direction on repeat. Compose animations use transition APIs, animation specs, and state-driven animations for smooth UI transitions.
+
+#@@@@@@@@@@
+
+63. What is the purpose of `@Database` annotation in Room?
+
+Answer: Marks abstract class as database holder, defines database configuration, lists entities and version. Room generates database implementation. @Database provides central point for database configuration with entities, version, and migration management.
+
+#@@@@@@@@@@
+
+64. Which of the following are Android background processing options? (Multiple correct)
+A) WorkManager
+B) JobScheduler
+C) AlarmManager
+D) Foreground Service
+E) Coroutine Worker
+F) IntentService (deprecated)
+
+Answer: A, B, C, D, E, F - All are background processing options. WorkManager (deferrable work), JobScheduler (system-optimized), AlarmManager (timed operations), Foreground Service (long-running), Coroutine Worker (coroutine-based), IntentService (deprecated). Choose based on timing and persistence requirements.
+
+#@@@@@@@@@@
+
+65. Complete this Retrofit multipart request:
+```kotlin
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.http.*
+
+interface FileUploadService {
+    @Multipart
+    @POST("upload")
+    suspend fun uploadFile(
+        @Part file: MultipartBody.Part,
+        @Part("description") description: RequestBody
+    ): _______________
+}
+```
+
+Answer: `UploadResponse` - Returns response object for file upload. Retrofit supports multipart requests for file uploads with metadata, using MultipartBody.Part for files and RequestBody for text fields.
+
+#@@@@@@@@@@
+
+66. How do you implement Material Design 3 in Jetpack Compose?
+
+Answer: Use Material3 composables (MaterialTheme, Button, Card), define MaterialTheme with colorScheme, typography, shapes, use Material3 dependency, apply dynamic color, follow Material Design 3 guidelines for components and layouts.
+
+#@@@@@@@@@@
+
+67. Which of the following are Kotlin delegation patterns? (Multiple correct)
+A) Class delegation
+B) Property delegation
+C) Interface delegation
+D) Method delegation
+E) Lazy delegation
+F) Observable delegation
+
+Answer: A, B, E, F - Class delegation (by keyword), Property delegation (by keyword), Lazy delegation (lazy()), Observable delegation (Delegates.observable()). Interface and Method delegation aren't built-in patterns. Delegation provides code reuse and behavior composition.
+
+#@@@@@@@@@@
+
+68. Complete this Firebase Analytics implementation:
+```kotlin
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+
+class AnalyticsManager(private val context: Context) {
+    private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
+
+    fun logUserSignUp(method: String) {
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP) {
+            param(FirebaseAnalytics.Param.METHOD, _______________)
+        }
+    }
+}
+```
+
+Answer: `method` - Parameter value for sign-up method. Firebase Analytics tracks user behavior and app usage with predefined events and custom parameters.
+
+#@@@@@@@@@@
+
+69. What is the difference between `LiveData` and `StateFlow`?
+
+Answer: LiveData is lifecycle-aware, main thread observer, value-based, Android-specific. StateFlow is coroutine-based, any thread collector, hot stream, multiplatform. LiveData works with Android lifecycle, StateFlow works with coroutines. Use LiveData for Android UI, StateFlow for cross-platform or coroutine environments.
+
+#@@@@@@@@@@
+
+70. Which of the following are Android security best practices? (Multiple correct)
+A) Use HTTPS
+B) Encrypt sensitive data
+C) Validate input
+D) Use ProGuard/R8
+E) Secure storage
+F) Certificate pinning
+
+Answer: A, B, C, D, E, F - All are security practices. HTTPS (secure communication), Encryption (data protection), Input validation (prevent injection), ProGuard/R8 (code obfuscation), Secure storage (keystore), Certificate pinning (prevent MITM). Security protects user data and app integrity.
+
+#@@@@@@@@@@
+
+71. Complete this Room migration:
+```kotlin
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE users ADD COLUMN email _______________"
+        )
+    }
+}
+```
+
+Answer: `TEXT` - Adds email column with TEXT type. Room migrations handle database schema changes with SQL commands, ensuring data integrity during app updates.
+
+#@@@@@@@@@@
+
+72. How do you implement pagination with Room and Paging3?
+
+Answer: Use PagingSource with Room DAO query returning PagingSource<Int, Entity>, create Pager with PagingConfig, collect LazyPagingItems in Compose, handle loading/error states, implement RemoteMediator for network+database caching.
+
+#@@@@@@@@@@
+
+73. Which of the following are Kotlin visibility modifiers? (Multiple correct)
+A) public
+B) private
+C) protected
+D) internal
+E) package-private
+F) sealed
+
+Answer: A, B, C, D - package-private and sealed aren't visibility modifiers. public (everywhere), private (file/class), protected (subclasses), internal (module). Kotlin's visibility modifiers control access to declarations.
+
+#@@@@@@@@@@
+
+74. Complete this Jetpack Compose theme:
+```kotlin
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40
+)
+
+@Composable
+fun AppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        _______________ = content
+    )
+}
+```
+
+Answer: `content` - Applies theme to child composables. Compose theming provides consistent design system with colors, typography, and shapes.
+
+#@@@@@@@@@@
+
+75. What is the purpose of `@PrimaryKey` annotation in Room?
+
+Answer: Marks field as primary key, uniquely identifies each row, supports auto-generation, can be composite. Primary keys ensure data uniqueness and enable efficient querying. Room requires primary key for every entity.
+
+#@@@@@@@@@@
+
+76. Which of the following are Android performance optimization techniques? (Multiple correct)
+A) View recycling
+B) Image optimization
+C) Memory caching
+D) Network optimization
+E) Battery optimization
+F) APK size reduction
+
+Answer: A, B, C, D, E, F - All are optimization techniques. View recycling (RecyclerView), Image optimization (compression/caching), Memory caching (LRU), Network optimization (caching/compression), Battery optimization (background limits), APK size reduction (R8/resources). Performance optimization improves user experience.
+
+#@@@@@@@@@@
+
+77. Complete this coroutine supervisor scope:
+```kotlin
+import kotlinx.coroutines.*
+
+fun launchSupervisedTasks() = runBlocking {
+    val supervisor = SupervisorJob()
+    with(CoroutineScope(Dispatchers.Default + supervisor)) {
+        launch {
+            delay(1000)
+            println("Task 1 completed")
+        }
+        launch {
+            delay(500)
+            throw RuntimeException("Task 2 failed")
+        }
+        launch {
+            delay(1500)
+            println("Task 3 completed")
+        }
+    }
+    supervisor._______________()
+    println("All tasks finished")
+}
+```
+
+Answer: `join` - Waits for all children to complete. SupervisorScope prevents failure of one child from canceling siblings, useful for independent concurrent tasks.
+
+#@@@@@@@@@@
+
+78. How do you implement deep linking in Android?
+
+Answer: Add intent filters with specific data schemes/hosts, handle incoming intents in Activity, parse deep link data, navigate to appropriate content, use Nav Deep Link for Compose Navigation, test deep links with ADB or browser.
+
+#@@@@@@@@@@
+
+79. Which of the following are Kotlin inline classes? (Multiple correct)
+A) value class
+B) inline class
+C) data class
+D) sealed class
+E) enum class
+F) interface
+
+Answer: A, B - value class (new name) and inline class (old name) are inline classes. data, sealed, enum, and interface are different class types. Inline classes provide type safety without runtime overhead.
+
+#@@@@@@@@@@
+
+80. Complete this Firebase Cloud Functions call:
+```kotlin
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+
+class CloudFunctionsManager {
+    private val functions = Firebase.functions
+
+    suspend fun callAddNumbers(a: Int, b: Int): Int {
+        val data = mapOf(
+            "firstNumber" to a,
+            "secondNumber" to b
+        )
+        
+        val result = functions
+            .getHttpsCallable("addNumbers")
+            ._______________(data)
+        
+        return result.data.toString().toInt()
+    }
+}
+```
+
+Answer: `call` - Calls Firebase Cloud Function with data. Firebase Cloud Functions provide serverless backend logic with HTTPS triggers and Firebase SDK integration.
+
+#@@@@@@@@@@
+
+81. What is the difference between `Fragment` and `Composable`?
+
+Answer: Fragment is traditional Android UI component with lifecycle, view hierarchy, and back stack management. Composable is modern declarative UI function with recomposition, state management, and composition. Fragments use XML layouts, Composables use Kotlin code. Migrate gradually with Compose interoperability.
+
+#@@@@@@@@@@
+
+82. Which of the following are Android networking libraries? (Multiple correct)
+A) Retrofit
+B) OkHttp
+C) Ktor Client
+D) Volley
+E) Glide
+F) Picasso
+
+Answer: A, B, C, D - Glide and Picasso are image loading libraries. Retrofit (type-safe HTTP), OkHttp (HTTP client), Ktor Client (multiplatform), Volley (Google's HTTP library). Choose based on project requirements and ecosystem.
+
+#@@@@@@@@@@
+
+83. Complete this Room database with TypeConverter:
+```kotlin
+@TypeConverter
+class Converters {
+    @TypeConverter
+    fun fromTimestamp(value: Long?): Date? {
+        return value?.let { Date(it) }
+    }
+
+    @TypeConverter
+    fun dateToTimestamp(date: Date?): _______________ {
+        return date?.time
+    }
+}
+
+@Database(entities = [User::class], version = 1, typeConverters = [Converters::class])
+abstract class AppDatabase : RoomDatabase()
+```
+
+Answer: `Long?` - Converts Date to Long for database storage. TypeConverters handle custom data types that Room doesn't support natively.
+
+#@@@@@@@@@@
+
+84. How do you implement accessibility in Jetpack Compose?
+
+Answer: Use semantic properties (contentDescription, stateDescription), handle accessibility actions, support screen readers, ensure sufficient contrast, provide keyboard navigation, test with TalkBack and accessibility scanner, follow WCAG guidelines.
+
+#@@@@@@@@@@
+
+85. Which of the following are Kotlin concurrency primitives? (Multiple correct)
+A) Mutex
+B) Semaphore
+C) Channel
+D) Actor
+E) Flow
+F) Deferred
+
+Answer: A, B, C, D, E, F - All are concurrency primitives. Mutex (mutual exclusion), Semaphore (permit limiting), Channel (communication), Actor (message-based), Flow (data stream), Deferred (future result). Kotlin coroutines provide rich concurrency toolkit.
+
+#@@@@@@@@@@
+
+86. Complete this Jetpack Compose custom layout:
+```kotlin
+import androidx.compose.ui.layout.*
+
+@Composable
+fun StaggeredGrid(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        modifier = modifier,
+        content = content
+    ) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints)
+        }
+        
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            var xPosition = 0
+            var yPosition = 0
+            
+            placeables.forEach { placeable ->
+                placeable._______________(xPosition, yPosition)
+                yPosition += placeable.height
+            }
+        }
+    }
+}
+```
+
+Answer: `place` - Places measured component at specified coordinates. Custom layouts in Compose use Layout composable with measurement and placement logic.
+
+#@@@@@@@@@@
+
+87. What is the purpose of `@Insert` annotation in Room?
+
+Answer: Marks DAO method for inserting data, supports single entity or list, can return row ID or list of IDs, handles conflict resolution with OnConflictStrategy. Room generates SQL INSERT statements at compile-time for type-safe database operations.
+
+#@@@@@@@@@@
+
+88. Which of the following are Android testing strategies? (Multiple correct)
+A) Unit testing
+B) Integration testing
+C) UI testing
+D) Performance testing
+E) Accessibility testing
+F) Security testing
+
+Answer: A, B, C, D, E, F - All are testing strategies. Unit (logic), Integration (components), UI (user interaction), Performance (speed/memory), Accessibility (usability), Security (vulnerabilities). Comprehensive testing ensures app quality and reliability.
+
+#@@@@@@@@@@
+
+89. Complete this Ktor server with authentication:
+```kotlin
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+
+fun Application.configureAuthentication() {
+    install(Authentication) {
+        basic("auth-basic") {
+            realm = "Access to the 'admin' area"
+            validate { credentials ->
+                if (credentials.name == "admin" && credentials.password == "password") {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    _______________
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `null` - Returns null for invalid credentials. Ktor authentication provides multiple authentication methods (basic, JWT, OAuth) with configurable validation logic.
+
+#@@@@@@@@@@
+
+90. How do you implement app shortcuts in Android?
+
+Answer: Create shortcuts.xml resource, define static and dynamic shortcuts, use ShortcutManagerCompat for dynamic shortcuts, handle shortcut intents in Activity, customize shortcut icons and labels, update shortcuts based on user behavior.
+
+#@@@@@@@@@@
+
+91. Which of the following are Kotlin collection functions? (Multiple correct)
+A) map
+B) filter
+C) reduce
+D) fold
+E) flatMap
+F) groupBy
+
+Answer: A, B, C, D, E, F - All are collection functions. map (transform), filter (select), reduce (aggregate), fold (aggregate with initial), flatMap (transform+flatten), groupBy (group by key). Kotlin collections provide powerful functional programming capabilities.
+
+#@@@@@@@@@@
+
+92. Complete this Firebase Remote Config implementation:
+```kotlin
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+
+class RemoteConfigManager {
+    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+
+    fun fetchConfig() {
+        remoteConfig.fetchAndActivate()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val isFeatureEnabled = remoteConfig.getBoolean(_______________)
+                    updateFeatureState(isFeatureEnabled)
+                }
+            }
+        }
+    }
+}
+```
+
+Answer: `"feature_enabled"` - Remote Config parameter key. Firebase Remote Config provides dynamic app configuration without app updates, enabling feature flags and A/B testing.
+
+#@@@@@@@@@@
+
+93. What is the difference between `CoroutineScope` and `supervisorScope`?
+
+Answer: CoroutineScope cancels all children when any child fails. supervisorScope cancels only the failed child, others continue. Use CoroutineScope for related tasks, supervisorScope for independent tasks. supervisorScope provides structured concurrency with independent error handling.
+
+#@@@@@@@@@@
+
+94. Which of the following are Android app architecture patterns? (Multiple correct)
+A) MVP
+B) MVVM
+C) MVI
+D) MVI (Model-View-Intent)
+E) Clean Architecture
+F) Redux
+
+Answer: A, B, C, D, E, F - All are architecture patterns. MVP (Model-View-Presenter), MVVM (Model-View-ViewModel), MVI (Model-View-Intent), Clean Architecture (layered), Redux (unidirectional). Choose pattern based on app complexity and team preferences.
+
+#@@@@@@@@@@
+
+95. Complete this Jetpack Compose side effect:
+```kotlin
+import androidx.compose.runtime.*
+
+@Composable
+functionality LaunchedEffectExample(key: String) {
+    var data by remember { mutableStateOf<String?>(null) }
+    
+    LaunchedEffect(key) {
+        data = fetchDataFromNetwork(key)
+    }
+    
+    LaunchedEffect(Unit) {
+        // This runs only once when composable enters composition
+        _______________("Composable initialized")
+    }
+}
+```
+
+Answer: `println` - Logs message when composable initializes. LaunchedEffect executes suspend functions in response to key changes, managing side effects in Compose.
+
+#@@@@@@@@@@
+
+96. How do you implement in-app updates in Android?
+
+Answer: Use AppUpdateManager, check for update availability, show update flow (flexible/immediate), handle update states, implement update listener, provide user-friendly update experience, test update flow with internal testing tracks.
+
+#@@@@@@@@@@
+
+97. Which of the following are Kotlin extension function use cases? (Multiple correct)
+A) Adding utility functions
+B) DSL creation
+C) View binding
+D) String manipulation
+E) Collection operations
+F) Configuration builders
+
+Answer: A, B, C, D, E, F - All are extension function use cases. Extension functions add functionality to existing classes without inheritance, enabling clean APIs and DSL creation.
+
+#@@@@@@@@@@
+
+98. Complete this Room database with foreign key:
+```kotlin
+@Entity(foreignKeys = [
+    ForeignKey(
+        entity = User::class,
+        parentColumns = ["id"],
+        childColumns = ["user_id"],
+        onDelete = ForeignKey._______________
+    )
+])
+data class Order(
+    @PrimaryKey val id: Int,
+    val user_id: Int,
+    val product: String,
+    val amount: Double
+)
+```
+
+Answer: `CASCADE` - Deletes orders when user is deleted. Foreign keys enforce referential integrity between related tables in Room database.
+
+#@@@@@@@@@@
+
+99. What is the purpose of `@Query` annotation in Room?
+
+Answer: Marks DAO method for custom SQL queries, supports parameters, returns entities/primitives/Flow, enables complex database operations. Room validates queries at compile-time, preventing runtime SQL errors. @Query provides full SQL power with type safety.
+
+#@@@@@@@@@@
+
+100. Which of the following are Android performance monitoring tools? (Multiple correct)
+A) Android Profiler
+B) Systrace
+C) Perfetto
+D) Memory Profiler
+E) CPU Profiler
+F) Network Profiler
+
+Answer: A, B, C, D, E, F - All are performance tools. Android Profiler (CPU/memory/network), Systrace (system tracing), Perfetto (advanced tracing), Memory/CPU/Network Profilers (specific metrics). Performance monitoring identifies bottlenecks and optimization opportunities.
+
+#@@@@@@@@@@
+
+101. Complete this coroutine with multiple dispatchers:
+```kotlin
+import kotlinx.coroutines.*
+
+fun fetchAndProcessData() = runBlocking {
+    val deferred = async(Dispatchers.IO) {
+        // Network operation on IO thread
+        fetchDataFromNetwork()
+    }
+    
+    val result = deferred.await()
+    
+    withContext(Dispatchers.Default) {
+        // CPU-intensive processing on default thread
+        processData(result)
+    }
+    
+    withContext(Dispatchers.Main) {
+        // UI update on main thread
+        updateUI(result)
+        _______________("Processing completed")
+    }
+}
+```
+
+Answer: `println` - Logs completion message. Using appropriate dispatchers ensures optimal performance: IO for network, Default for CPU work, Main for UI updates.
+
+#@@@@@@@@@@
+
+102. How do you implement widget in Android?
+
+Answer: Create AppWidgetProvider, configure widget metadata in XML, implement RemoteViews for widget UI, use AppWidgetManager for updates, handle widget click events, update widget with PendingIntent, support multiple widget sizes.
+
+#@@@@@@@@@@
+
+103. Which of the following are Kotlin data class features? (Multiple correct)
+A) Auto-generated equals()
+B) Auto-generated hashCode()
+C) Auto-generated toString()
+D) Auto-generated copy()
+E) Auto-generated componentN() functions
+F) Auto-generated constructor
+
+Answer: A, B, C, D, E, F - All are data class features. Data classes provide boilerplate code for modeling data with immutability and equality support.
+
+#@@@@@@@@@@
+
+104. Complete this Firebase Storage upload:
+```kotlin
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+
+class StorageManager {
+    private val storage = Firebase.storage
+    
+    fun uploadImage(uri: Uri, fileName: String) {
+        val storageRef = storage.reference
+        val imagesRef = storageRef.child("images/$fileName")
+        
+        imagesRef.putFile(uri)
+            .addOnSuccessListener {
+                println("Image uploaded successfully")
+            }
+            ._______________ { exception ->
+                println("Upload failed: ${exception.message}")
+            }
+    }
+}
+```
+
+Answer: `addOnFailureListener` - Handles upload failures. Firebase Storage provides cloud file storage with upload/download progress tracking and metadata management.
+
+#@@@@@@@@@@
+
+105. What is the difference between `Flow` and `LiveData`?
+
+Answer: Flow is cold stream, coroutine-based, flexible operators, multiplatform. LiveData is hot stream, lifecycle-aware, main thread, Android-only. Flow requires coroutine scope, LiveData automatically observes lifecycle. Use Flow for complex streams, LiveData for simple UI observation.
+
+#@@@@@@@@@@
+
+106. Which of the following are Android UI components? (Multiple correct)
+A) TextView
+B) Button
+C) EditText
+D) RecyclerView
+E) ConstraintLayout
+F) Compose UI
+
+Answer: A, B, C, D, E, F - All are UI components. Traditional Views (TextView, Button, EditText), RecyclerView (lists), ConstraintLayout (layouts), and Compose UI (declarative). Choose based on project requirements and architecture.
+
+#@@@@@@@@@@
+
+107. Complete this Hilt dependency injection:
+```kotlin
+import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.lifecycle.ViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val analyticsManager: AnalyticsManager
+) : ViewModel() {
+    
+    fun createUser(user: User) {
+        viewModelScope.launch {
+            val createdUser = userRepository.createUser(user)
+            analyticsManager.logUserCreated(_______________)
+        }
+    }
+}
+```
+
+Answer: `createdUser` - Logs created user event. Hilt provides dependency injection for Android components with compile-time code generation and scoping support.
+
+#@@@@@@@@@@
+
+108. How do you implement app indexing in Android?
+
+Answer: Add App Indexing API, implement deep links, provide structured data with JSON-LD, use Firebase App Indexing, handle search intents, test indexing with Google Search Console, monitor indexing performance.
+
+#@@@@@@@@@@
+
+109. Which of the following are Kotlin sealed class use cases? (Multiple correct)
+A) State management
+B) Result types
+C) UI events
+D) Network responses
+E) Navigation destinations
+F) Configuration options
+
+Answer: A, B, C, D, E, F - All are sealed class use cases. Sealed classes represent restricted hierarchies, enabling exhaustive when expressions and type-safe state management.
+
+#@@@@@@@@@@
+
+110. Complete this Room database transaction:
+```kotlin
+@Dao
+abstract class UserDao {
+    @Transaction
+    open suspend fun insertUserWithOrders(user: User, orders: List<Order>) {
+        insertUser(user)
+        orders.forEach { order ->
+            insertOrder(order.copy(userId = user.id))
+        }
+        _______________("User and orders inserted successfully")
+    }
+    
+    @Insert
+    abstract suspend fun insertUser(user: User): Long
+    
+    @Insert
+    abstract suspend fun insertOrder(order: Order): Long
+}
+```
+
+Answer: `println` - Logs transaction completion. Room transactions ensure atomic operations, maintaining data consistency across multiple database operations.
+
+#@@@@@@@@@@
+
+111. What is the purpose of `@Update` annotation in Room?
+
+Answer: Marks DAO method for updating data, supports single entity or list, returns number of rows affected, handles conflict resolution. Room generates SQL UPDATE statements for type-safe database modifications.
+
+#@@@@@@@@@@
+
+112. Which of the following are Android debugging tools? (Multiple correct)
+A) Logcat
+B) Debugger
+C) Layout Inspector
+D) Network Inspector
+E) Database Inspector
+F) Energy Profiler
+
+Answer: A, B, C, D, E, F - All are debugging tools. Logcat (logs), Debugger (breakpoints), Layout Inspector (UI hierarchy), Network Inspector (HTTP traffic), Database Inspector (database content), Energy Profiler (battery usage). Debugging tools identify and fix issues efficiently.
+
+#@@@@@@@@@@
+
+113. Complete this Ktor client with retry:
+```kotlin
+import io.ktor.client.*
+import io.ktor.client.plugins.retry.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+
+val httpClient = HttpClient {
+    install(Retry) {
+        maxRetries = 3
+        retryOnServerErrors()
+        retryIf { request, response ->
+            response.status.value in 500..599
+        }
+        delayMillis { _______________ }
+    }
+}
+```
+
+Answer: `1000` - Sets 1-second delay between retries. Ktor retry plugin provides configurable retry logic for handling transient failures in HTTP requests.
+
+#@@@@@@@@@@
+
+114. How do you implement adaptive icons in Android?
+
+Answer: Create adaptive icon layers (foreground, background), define icon masks in XML, support legacy icons, test on different launchers, follow adaptive icon guidelines, provide monochrome icon for Android 13+.
+
+#@@@@@@@@@@
+
+115. Which of the following are Kotlin generic constraints? (Multiple correct)
+A) Upper bounds (T : SomeType)
+B) Lower bounds (T : SomeType?)
+C) Multiple bounds (T : SomeType, OtherType)
+D) Where clauses
+E) Reified generics
+F) Type projection
+
+Answer: A, B, C, D, E, F - All are generic concepts. Upper bounds (type restriction), Lower bounds (nullable), Multiple bounds (interface), Where clauses (complex constraints), Reified (runtime type), Type projection (variance). Generics provide type safety and code reuse.
+
+#@@@@@@@@@@
+
+116. Complete this Firebase Dynamic Links:
+```kotlin
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+
+class DynamicLinkManager {
+    fun createDynamicLink(deepLink: Uri): String {
+        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+            .setLink(Uri.parse("https://example.com/deeplink"))
+            .setDomainUriPrefix("https://example.page.link")
+            .setAndroidParameters(
+                DynamicLink.AndroidParameters.Builder("com.example.app")
+                    .setMinimumVersion(1)
+                    ._______________()
+            )
+            .buildDynamicLink()
+        
+        return dynamicLink.uri.toString()
+    }
+}
+```
+
+Answer: `build` - Builds the dynamic link. Firebase Dynamic Links provide deep linking across platforms with app install attribution and deferred deep linking.
+
+#@@@@@@@@@@
+
+117. What is the difference between `Channel` and `Flow` in coroutines?
+
+Answer: Channel is hot stream for communication between coroutines, supports multiple senders/receivers, buffers values. Flow is cold stream for data transformation, starts on collection, supports operators. Use Channel for communication, Flow for data streams.
+
+#@@@@@@@@@@
+
+118. Which of the following are Android app distribution methods? (Multiple correct)
+A) Google Play Store
+B) Amazon Appstore
+C) Galaxy Store
+D) Huawei AppGallery
+E) Direct APK
+F) Enterprise distribution
+
+Answer: A, B, C, D, E, F - All are distribution methods. Play Store (primary), Amazon (alternative), Galaxy (Samsung), AppGallery (Huawei), Direct APK (sideloading), Enterprise (internal). Choose based on target audience and requirements.
+
+#@@@@@@@@@@
+
+119. Complete this coroutine with structured concurrency:
+```kotlin
+import kotlinx.coroutines.*
+
+fun processDataConcurrently() = runBlocking {
+    val supervisorJob = SupervisorJob()
+    
+    with(CoroutineScope(Dispatchers.Default + supervisorJob)) {
+        val jobs = listOf(
+            launch { processData("data1") },
+            launch { processData("data2") },
+            launch { processData("data3") }
+        )
+        
+        jobs.forEach { job ->
+            job._______________()
+        }
+    }
+    
+    supervisorJob.cancel()
+}
+```
+
+Answer: `join` - Waits for each job to complete. Structured concurrency ensures proper coroutine lifecycle management and cancellation propagation.
+
+#@@@@@@@@@@
+
+120. How do you implement notification channels in Android?
+
+Answer: Create NotificationChannel for Android 8+, configure channel properties (name, importance, sound), register channel with NotificationManager, create notifications with channel ID, handle channel settings, provide user-friendly channel management.
+
+#@@@@@@@@@@
+
+121. Which of the following are Kotlin operator overloading functions? (Multiple correct)
+A) plus
+B) minus
+C) times
+D) div
+E) rem
+F) get
+
+Answer: A, B, C, D, E, F - All are operator functions. plus (+), minus (-), times (*), div (/), rem (%), get ([]). Operator overloading enables intuitive syntax for custom types.
+
+#@@@@@@@@@@
+
+122. Complete this Room database with indexes:
+```kotlin
+@Entity(
+    tableName = "users",
+    indices = [
+        Index(value = ["name"], unique = true),
+        Index(value = ["email"]),
+        Index(value = ["created_at"], name = "index_created_at")
+    ]
+)
+data class User(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String,
+    val email: String,
+    val created_at: Long = System.currentTimeMillis()
+)
+
+@Dao
+interface UserDao {
+    @Query("SELECT * FROM users WHERE name = :name LIMIT 1")
+    suspend fun findByName(name: String): User?
+    
+    @Query("SELECT * FROM users ORDER BY _______________ DESC LIMIT 10")
+    suspend fun getRecentUsers(): List<User>
+}
+```
+
+Answer: `created_at` - Orders by creation timestamp. Room indexes improve query performance for frequently accessed columns, with options for uniqueness and custom names.
+
+#@@@@@@@@@@
+
+123. What is the purpose of `@Delete` annotation in Room?
+
+Answer: Marks DAO method for deleting data, supports single entity or list, returns number of rows affected. Room generates SQL DELETE statements for type-safe database removal operations.
+
+#@@@@@@@@@@
+
+124. Which of the following are Android localization strategies? (Multiple correct)
+A) String resources
+B) Locale-specific layouts
+C) RTL support
+D) Plurals handling
+E) Date/time formatting
+F) Currency formatting
+
+Answer: A, B, C, D, E, F - All are localization strategies. String resources (translations), Locale layouts (region-specific), RTL (right-to-left), Plurals (quantity), Date/time (locale format), Currency (local currency). Localization enables global app adoption.
+
+#@@@@@@@@@@
+
+125. Complete this Jetpack Compose gesture handling:
+```kotlin
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+
+@Composable
+fun DraggableBox() {
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    
+    Box(
+        modifier = Modifier
+            .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { delta ->
+                    offsetX += delta
+                }
+            )
+            ._______________(
+                state = rememberDraggableState { delta ->
+                    offsetY += delta
+                },
+                orientation = Orientation.Vertical
+            )
+            .size(100.dp)
+            .background(Color.Blue)
+    )
+}
+```
+
+Answer: `draggable` - Adds vertical drag gesture. Compose gesture handling provides drag, swipe, tap, and multi-touch gestures with state management.
+
+#@@@@@@@@@@
+
+126. How do you implement app themes in Android?
+
+Answer: Define themes in styles.xml, use Theme.Material3 components, support day/night themes, implement dynamic color (Material You), handle theme switching, provide theme-aware resources, test across theme variations.
+
+#@@@@@@@@@@
+
+127. Which of the following are Kotlin reflection features? (Multiple correct)
+A) KClass
+B) KProperty
+C) KFunction
+D) KType
+E) KParameter
+F) KCallable
+
+Answer: A, B, C, D, E, F - All are reflection features. KClass (class info), KProperty (property info), KFunction (function info), KType (type info), KParameter (parameter info), KCallable (callable info). Reflection enables runtime introspection and dynamic programming.
+
+#@@@@@@@@@@
+
+128. Complete this Firebase A/B Testing:
+```kotlin
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+
+class ABTestManager {
+    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    
+    fun isNewFeatureEnabled(): Boolean {
+        return remoteConfig.getBoolean(_______________)
+    }
+    
+    fun getButtonText(): String {
+        return remoteConfig.getString("button_text")
+    }
+    
+    fun logABTestEvent(variant: String) {
+        // Log analytics event for A/B test
+    }
+}
+```
+
+Answer: `"new_feature_enabled"` - Remote Config parameter for A/B test. Firebase A/B Testing enables controlled experiments with different app variants to optimize user experience.
+
+#@@@@@@@@@@
+
+129. What is the difference between `Job` and `Deferred` in coroutines?
+
+Answer: Job represents coroutine without return value, used for fire-and-forget operations. Deferred represents coroutine with future result, extends Job, provides await() method. Use Job for side effects, Deferred for concurrent computations.
+
+#@@@@@@@@@@
+
+130. Which of the following are Android security measures? (Multiple correct)
+A) Network Security Configuration
+B) Certificate Transparency
+C) SafetyNet Attestation
+D) Play Integrity API
+E) App Signing
+F) Obfuscation
+
+Answer: A, B, C, D, E, F - All are security measures. Network Security Config (HTTPS), Certificate Transparency (certificate validation), SafetyNet (device integrity), Play Integrity (app authenticity), App Signing (developer identity), Obfuscation (code protection). Security protects app and user data.
+
+#@@@@@@@@@@
+
+131. Complete this coroutine with timeout:
+```kotlin
+import kotlinx.coroutines.*
+
+suspend fun fetchWithTimeout(): String {
+    return try {
+        withTimeoutOrNull(3000) {
+            delay(4000) // Simulate slow operation
+            "Data loaded"
+        } ?: _______________("Operation timed out")
+    } catch (e: Exception) {
+        "Error occurred: ${e.message}"
+    }
+}
+```
+
+Answer: `"Operation timed out"` - Returns timeout message. withTimeoutOrNull returns null on timeout, enabling graceful timeout handling without exceptions.
+
+#@@@@@@@@@@
+
+132. How do you implement custom views in Android?
+
+Answer: Extend View class, implement onDraw() for custom drawing, override onMeasure() for sizing, handle touch events in onTouchEvent(), define custom attributes in XML, use AttributeSet in constructor, invalidate() to trigger redraws.
+
+#@@@@@@@@@@
+
+133. Which of the following are Kotlin DSL building blocks? (Multiple correct)
+A) Lambda with receiver
+B) Extension functions
+C) Operator overloading
+D) Infix functions
+E) Type-safe builders
+F) Scoped functions
+
+Answer: A, B, C, D, E, F - All contribute to DSL creation. Lambda with receiver (context), Extension functions (API), Operator overloading (syntax), Infix functions (readability), Type-safe builders (structure), Scoped functions (context). DSLs enable expressive, readable APIs.
+
+#@@@@@@@@@@
+
+134. Complete this Room database with view:
+```kotlin
+@Database(
+    entities = [User::class, Order::class],
+    views = [UserOrderView::class],
+    version = 1
+)
+abstract class AppDatabase : RoomDatabase()
+
+@Dao
+interface UserDao {
+    @Query("SELECT * FROM user_order_view WHERE user_id = :userId")
+    suspend fun getUserWithOrders(userId: Int): List<_______________>
+}
+
+class UserOrderView {
+    @ColumnInfo(name = "user_id")
+    val userId: Int
+    
+    @ColumnInfo(name = "user_name")
+    val userName: String
+    
+    @ColumnInfo(name = "order_count")
+    val orderCount: Int
+}
+```
+
+Answer: `UserOrderView` - Returns view data class. Room views provide read-only access to derived data from multiple tables with SQL queries.
+
+#@@@@@@@@@@
+
+135. What is the purpose of `@Transaction` annotation in Room?
+
+Answer: Marks DAO method for database transaction, ensures atomicity of multiple operations, rolls back on failure, supports suspend functions. Transactions maintain data consistency across complex database operations.
+
+#@@@@@@@@@@
+
+136. Which of the following are Android performance patterns? (Multiple correct)
+A) Lazy loading
+B) Caching
+C) Pagination
+D) Image optimization
+E) Memory management
+F) Background processing
+
+Answer: A, B, C, D, E, F - All are performance patterns. Lazy loading (on-demand), Caching (avoid recomputation), Pagination (large datasets), Image optimization (compression), Memory management (leak prevention), Background processing (non-blocking). Performance patterns ensure smooth user experience.
+
+#@@@@@@@@@@
+
+137. Complete this Jetpack Compose animation:
+```kotlin
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+
+@Composable
+fun AnimatedColorBox() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val color by infiniteTransition.animateColor(
+        initialValue = Color.Red,
+        targetValue = Color.Blue,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    
+    val size by infiniteTransition.animateDp(
+        initialValue = 50.dp,
+        targetValue = 150.dp,
+        animationSpec = keyframes {
+            durationMillis = 2000
+            50.dp at 0
+            150.dp at 1000
+            100.dp at _______________
+        }
+    )
+    
+    Box(
+        modifier = Modifier
+            .size(size)
+            .background(color)
+    )
+}
+```
+
+Answer: `2000` - Sets intermediate size at 2 seconds. Keyframe animations enable complex, multi-stage animations with precise timing control.
+
+#@@@@@@@@@@
+
+138. How do you implement app permissions in Android?
+
+Answer: Declare permissions in AndroidManifest.xml, check permission availability at runtime, request permissions with ActivityCompat.requestPermissions(), handle permission results in onRequestPermissionsResult(), provide rationale for denied permissions, handle permission denial gracefully.
+
+#@@@@@@@@@@
+
+139. Which of the following are Kotlin interoperability features? (Multiple correct)
+A) Platform types
+B) Nullability annotations
+C) SAM conversions
+D) Extension functions on Java classes
+E) Default parameter values
+F) Named arguments
+
+Answer: A, B, C, D, E, F - All are interoperability features. Platform types (Java null), Nullability annotations (@Nullable), SAM conversions (interfaces), Extension functions (Java classes), Default parameters (overloading), Named arguments (clarity). Kotlin seamlessly integrates with Java code.
+
+#@@@@@@@@@@
+
+140. Complete this Firebase Crashlytics:
+```kotlin
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+
+class CrashlyticsManager {
+    private val crashlytics = Firebase.crashlytics
+    
+    fun logError(message: String, throwable: Throwable? = null) {
+        crashlytics.recordException(
+            RuntimeException(message, throwable)
+        )
+    }
+    
+    fun setUserId(userId: String) {
+        crashlytics.setUserId(_______________)
+    }
+    
+    fun setCustomKey(key: String, value: String) {
+        crashlytics.setCustomKey(key, value)
+    }
+}
+```
+
+Answer: `userId` - Sets user identifier for crash reports. Firebase Crashlytics provides real-time crash reporting with user context and custom metadata for debugging.
+
+#@@@@@@@@@@
+
+141. What is the difference between `CoroutineScope` and `GlobalScope`?
+
+Answer: CoroutineScope is bound to lifecycle, cancels when scope ends, structured concurrency. GlobalScope is application-wide, not bound to lifecycle, requires manual cancellation. Use CoroutineScope for structured concurrency, GlobalScope sparingly for application-wide operations.
+
+#@@@@@@@@@@
+
+142. Which of the following are Android testing libraries? (Multiple correct)
+A) JUnit
+B) Espresso
+C) Robolectric
+D) MockK
+E) Turbine
+F) Compose Testing
+
+Answer: A, B, C, D, E, F - All are testing libraries. JUnit (unit tests), Espresso (UI tests), Robolectric (JVM tests), MockK (mocking), Turbine (Flow testing), Compose Testing (Compose UI). Comprehensive testing ensures app reliability.
+
+#@@@@@@@@@@
+
+143. Complete this coroutine with exception handling:
+```kotlin
+import kotlinx.coroutines.*
+
+fun safeOperation() = runBlocking {
+    val result = try {
+        async { riskyOperation1() }.await() +
+        async { riskyOperation2() }.await()
+    } catch (e: ArithmeticException) {
+        println("Math error: ${e.message}")
+        0
+    } catch (e: Exception) {
+        println("General error: ${e.message}")
+        _______________
+    }
+    
+    println("Result: $result")
+}
+```
+
+Answer: `-1` - Returns default error value. Exception handling in coroutines requires proper try-catch blocks to handle failures in concurrent operations.
+
+#@@@@@@@@@@
+
+144. How do you implement app shortcuts in Jetpack Compose?
+
+Answer: Create shortcut manager, define shortcut information, use ShortcutManagerCompat, handle shortcut intents, integrate with Compose navigation, update shortcuts dynamically, provide shortcut customization options.
+
+#@@@@@@@@@@
+
+145. Which of the following are Kotlin concurrency patterns? (Multiple correct)
+A) Producer-Consumer
+B) Fan-out/Fan-in
+C) Pipeline
+D) Race condition avoidance
+E) Mutex usage
+F) Channel communication
+
+Answer: A, B, C, D, E, F - All are concurrency patterns. Producer-Consumer (Channel), Fan-out/Fan-in (multiple coroutines), Pipeline (data flow), Race avoidance (synchronization), Mutex (mutual exclusion), Channel (communication). Concurrency patterns ensure safe parallel execution.
+
+#@@@@@@@@@@
+
+146. Complete this Room database with embedded entity:
+```kotlin
+@Entity(tableName = "users")
+data class User(
+    @PrimaryKey val id: Int,
+    val name: String,
+    val address: _______________
+)
+
+data class Address(
+    val street: String,
+    val city: String,
+    val state: String,
+    val zipCode: String
+)
+
+@Dao
+interface UserDao {
+    @Query("SELECT * FROM users WHERE city = :city")
+    suspend fun getUsersByCity(city: String): List<User>
+}
+```
+
+Answer: `Address` - Embeds Address data class in User entity. Room embedded entities flatten related data into single table, simplifying queries and improving performance.
+
+#@@@@@@@@@@
+
+147. What is the purpose of `@ColumnInfo` annotation in Room?
+
+Answer: Customizes column properties like name, type, and constraints. Enables column renaming, default values, and index configuration. @ColumnInfo provides fine-grained control over database schema generation.
+
+#@@@@@@@@@@
+
+148. Which of the following are Android memory optimization techniques? (Multiple correct)
+A) Object pooling
+B) Bitmap recycling
+C) Weak references
+D) Memory cache
+E) Lazy initialization
+F) Resource cleanup
+
+Answer: A, B, C, D, E, F - All are optimization techniques. Object pooling (reuse), Bitmap recycling (pixel data), Weak references (GC), Memory cache (LRU), Lazy initialization (on-demand), Resource cleanup (close/destroy). Memory optimization prevents leaks and OOM crashes.
+
+#@@@@@@@@@@
+
+149. Complete this Jetpack Compose state management:
+```kotlin
+import androidx.compose.runtime.*
+import androidx.compose.ui.input.key.*
+
+@Composable
+fun CounterWithKeyboard() {
+    var count by remember { mutableStateOf(0) }
+    
+    Column {
+        Text("Count: $count")
+        Button(onClick = { count++ }) {
+            Text("Increment")
+        }
+        
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(Color.Gray)
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.key == Key.Spacebar) {
+                        count++
+                        true // Consume the event
+                    } else {
+                        _______________ // Don't consume
+                    }
+                }
+        )
+    }
+}
+```
+
+Answer: `false` - Doesn't consume the key event. Compose state management with keyboard events enables interactive UI with multiple input methods.
+
+#@@@@@@@@@@
+
+150. How do you implement app widgets in Jetpack Compose?
+
+Answer: Use Glance library for Compose widgets, create GlanceAppWidget, define GlanceComposable, handle widget updates, configure widget metadata, support multiple widget sizes, integrate with existing widget infrastructure.
+
+#@@@@@@@@@@
+
+151. Which of the following are Kotlin type system features? (Multiple correct)
+A) Null safety
+B) Smart casts
+C) Type inference
+D) Generics
+E) Sealed classes
+F) Inline classes
+
+Answer: A, B, C, D, E, F - All are type system features. Null safety (nullable types), Smart casts (automatic casting), Type inference (automatic types), Generics (parameterized types), Sealed classes (restricted hierarchies), Inline classes (type-safe wrappers). Kotlin's type system ensures compile-time safety.
+
+#@@@@@@@@@@
+
+152. Complete this Firebase Performance Monitoring:
+```kotlin
+import com.google.firebase.perf.FirebasePerformance
+import com.google.firebase.perf.metrics.Trace
+
+class PerformanceManager {
+    private val performance = FirebasePerformance.getInstance()
+    
+    fun startTrace(traceName: String): Trace {
+        val trace = performance.newTrace(traceName)
+        trace._______________()
+        return trace
+    }
+    
+    fun stopTrace(trace: Trace) {
+        trace.stop()
+    }
+    
+    fun recordMetric(trace: Trace, metricName: String, value: Long) {
+        trace.putMetric(metricName, value)
+    }
+}
+```
+
+Answer: `start` - Starts performance trace. Firebase Performance Monitoring provides insights into app performance with custom traces and automatic monitoring.
+
+#@@@@@@@@@@
+
+153. What is the difference between `Flow` and `Channel` in terms of backpressure?
+
+Answer: Flow handles backpressure through suspension, collector controls emission rate. Channel buffers values, producer can outpace consumer, may drop or buffer. Flow is pull-based, Channel is push-based. Use Flow for data streams, Channel for communication.
+
+#@@@@@@@@@@
+
+154. Which of the following are Android animation techniques? (Multiple correct)
+A) ViewPropertyAnimator
+B) ObjectAnimator
+C) ValueAnimator
+D) MotionLayout
+E) Lottie animations
+F) Compose animations
+
+Answer: A, B, C, D, E, F - All are animation techniques. ViewPropertyAnimator (simple), ObjectAnimator (property), ValueAnimator (values), MotionLayout (complex), Lottie (After Effects), Compose (declarative). Animations enhance user experience and visual feedback.
+
+#@@@@@@@@@@
+
+155. Complete this coroutine with cancellation:
+```kotlin
+import kotlinx.coroutines.*
+
+fun cancellableOperation() = runBlocking {
+    val job = launch {
+        repeat(1000) { i ->
+            if (!isActive) {
+                println("Coroutine is cancelling...")
+                return@launch
+            }
+            delay(100)
+            println("Step $i")
+        }
+    }
+    
+    delay(250)
+    println("Cancelling coroutine...")
+    job._______________()
+    println("Coroutine cancelled")
+}
+```
+
+Answer: `cancel` - Cancels the coroutine job. Cancellation in coroutines is cooperative, check isActive to respect cancellation requests and clean up resources.
+
+#@@@@@@@@@@
+
+156. How do you implement app backup in Android?
+
+Answer: Use Auto Backup for cloud backup, implement BackupAgentHelper for custom backup, exclude sensitive data with include/exclude rules, handle backup restoration, test backup/restore process, provide user control over backup settings.
+
+#@@@@@@@@@@
+
+157. Which of the following are Kotlin functional programming features? (Multiple correct)
+A) Lambda expressions
+B) Higher-order functions
+C) Extension functions
+D) Inline functions
+E) Tail recursion
+F) Function types
+
+Answer: A, B, C, D, E, F - All are functional features. Lambda (anonymous functions), Higher-order (function parameters), Extension (add functions), Inline (performance), Tail recursion (optimization), Function types (first-class). Kotlin supports functional programming paradigms.
+
+#@@@@@@@@@@
+
+158. Complete this Room database with FTS (Full-Text Search):
+```kotlin
+@Entity(tableName = "products")
+@Fts4(contentEntity = Product::class)
+data class ProductFts(
+    @PrimaryKey val rowid: Int,
+    val name: String,
+    val description: String
+)
+
+@Dao
+interface ProductDao {
+    @Query("SELECT * FROM products WHERE products MATCH :query")
+    suspend fun searchProducts(query: String): List<_______________>
+    
+    @Query("INSERT INTO productsFts(name, description) VALUES(:name, :description)")
+    suspend fun insertProductForSearch(name: String, description: String)
+}
+```
+
+Answer: `Product` - Returns Product entities from FTS search. Room FTS provides efficient full-text search capabilities with SQLite FTS extensions.
+
+#@@@@@@@@@@
+
+159. What is the purpose of `@Ignore` annotation in Room?
+
+Answer: Excludes field from database persistence, useful for computed properties or transient data. @Ignore allows fields in data classes that shouldn't be stored in database tables.
+
+#@@@@@@@@@@
+
+160. Which of the following are Android accessibility features? (Multiple correct)
+A) ContentDescription
+B) AccessibilityManager
+C) AccessibilityService
+D) TalkBack
+E) Switch Access
+F) Voice Access
+
+Answer: A, B, C, D, E, F - All are accessibility features. ContentDescription (image descriptions), AccessibilityManager (system service), AccessibilityService (custom services), TalkBack (screen reader), Switch Access (switch control), Voice Access (voice control). Accessibility ensures app usability for all users.
+
+#@@@@@@@@@@
+
+161. Complete this Jetpack Compose custom component:
+```kotlin
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+
+@Composable
+fun CustomButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    var isPressed by remember { mutableStateOf(false) }
+    
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (isPressed) Color.DarkGray else Color.Gray
+        )
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        awaitRelease()
+                        isPressed = _______________
+                    }
+                )
+            }
+        )
+    }
+}
+```
+
+Answer: `false` - Resets pressed state after release. Custom Compose components combine state management, event handling, and composition for reusable UI elements.
+
+#@@@@@@@@@@
+
+162. How do you implement app signing in Android?
+
+Answer: Generate signing key with keytool, configure signing config in build.gradle, sign release APK/AAB, verify signature, manage key security, use Play App Signing for distribution, implement signing key backup and recovery.
+
+#@@@@@@@@@@
+
+163. Which of the following are Kotlin delegation examples? (Multiple correct)
+A) Lazy initialization
+B) Observable properties
+C) Map delegation
+D) View binding
+E) Database delegation
+F) Network delegation
+
+Answer: A, B, C, D, E, F - All are delegation examples. Lazy (lazy()), Observable (Delegates.observable), Map (by map), View (binding delegates), Database (DAO), Network (repository). Delegation provides composition over inheritance.
+
+#@@@@@@@@@@
+
+164. Complete this Firebase In-App Messaging:
+```kotlin
+import com.google.firebase.inappmessaging.FirebaseInAppMessaging
+import com.google.firebase.inappmessaging.ktx.inAppMessaging
+
+class InAppMessagingManager {
+    private val inAppMessaging: FirebaseInAppMessaging = Firebase.inAppMessaging
+    
+    fun triggerEvent(eventName: String) {
+        inAppMessaging.triggerEvent(_______________)
+    }
+    
+    fun suppressMessages() {
+        inAppMessaging.suppressMessages = true
+    }
+    
+    fun enableMessages() {
+        inAppMessaging.suppressMessages = false
+    }
+}
+```
+
+Answer: `eventName` - Triggers in-app message based on event. Firebase In-App Messaging provides contextual messages to users based on behavior and events.
+
+#@@@@@@@@@@
+
+165. What is the difference between `StateFlow` and `SharedFlow` buffer strategies?
+
+Answer: StateFlow conflates (keeps latest value), SharedFlow supports various buffer strategies (BufferOverflow.SUSPEND, DROP_OLDEST, DROP_LATEST). StateFlow is state-oriented, SharedFlow is event-oriented. Choose based on whether you need state preservation or event delivery.
+
+#@@@@@@@@@@
+
+166. Which of the following are Android internationalization features? (Multiple correct)
+A) String resources with qualifiers
+B) Locale-specific resources
+C) RTL layout support
+D) Pluralization rules
+E) Date/time formatting
+F) Currency and number formatting
+
+Answer: A, B, C, D, E, F - All are i18n features. String resources (translations), Locale resources (region-specific), RTL (right-to-left), Plurals (quantity rules), Date/time (locale format), Currency/numbers (local formatting). Internationalization enables global app distribution.
+
+#@@@@@@@@@@
+
+167. Complete this coroutine with multiple producers:
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
+
+fun multipleProducers() = runBlocking {
+    val channel = Channel<Int>()
+    
+    // Producer 1
+    launch {
+        for (i in 1..5) {
+            channel.send(i * 10)
+            delay(100)
+        }
+    }
+    
+    // Producer 2
+    launch {
+        for (i in 1..5) {
+            channel.send(i * 100)
+            delay(150)
+        }
+    }
+    
+    // Consumer
+    launch {
+        repeat(10) {
+            val value = channel._______________()
+            println("Received: $value")
+        }
+        channel.close()
+    }
+}
+```
+
+Answer: `receive` - Receives value from channel. Multiple producers can send values to a single channel, enabling fan-in patterns for concurrent data processing.
+
+#@@@@@@@@@@
+
+168. How do you implement app ratings in Android?
+
+Answer: Use In-App Review API, request review at appropriate moments, handle review flow, respect user choice, implement custom review prompts, track review conversion, provide feedback channels.
+
+#@@@@@@@@@@
+
+169. Which of the following are Kotlin inline function benefits? (Multiple correct)
+A) Performance optimization
+B) Type reification
+C) Lambda overhead elimination
+D) Bytecode reduction
+E) Better debugging
+F) Memory efficiency
+
+Answer: A, B, C, F - Bytecode reduction and better debugging aren't primary benefits. Performance (no function call overhead), Reification (generic types), Lambda elimination (inline), Memory efficiency (no object allocation). Inline functions optimize high-order functions.
+
+#@@@@@@@@@@
+
+170. Complete this Firebase Predictions:
+```kotlin
+import com.google.firebase.predictions.FirebasePredictions
+import com.google.firebase.predictions.ktx.predictions
+
+class PredictionsManager {
+    private val predictions: FirebasePredictions = Firebase.predictions
+    
+    fun predictChurn(): String {
+        return predictions.getPrediction(_______________).value
+    }
+    
+    fun predictPurchase(): String {
+        return predictions.getPrediction("purchase_probability").value
+    }
+    
+    fun logEvent(eventName: String, parameters: Map<String, String>) {
+        // Log event for prediction model training
+    }
+}
+```
+
+Answer: `"churn_probability"` - Predicts user churn likelihood. Firebase Predictions uses machine learning to predict user behavior and enable proactive engagement.
+
+#@@@@@@@@@@
+
+171. What is the difference between `Mutex` and `Semaphore` in coroutines?
+
+Answer: Mutex allows exclusive access (one coroutine at a time), Semaphore allows limited concurrent access (specified permits). Mutex is for mutual exclusion, Semaphore is for resource limiting. Use Mutex for critical sections, Semaphore for rate limiting.
+
+#@@@@@@@@@@
+
+172. Which of the following are Android debugging techniques? (Multiple correct)
+A) Breakpoints
+B) Log statements
+C) Memory profiling
+D) CPU profiling
+E) Network inspection
+F) Layout debugging
+
+Answer: A, B, C, D, E, F - All are debugging techniques. Breakpoints (step execution), Logs (runtime info), Memory profiling (leaks), CPU profiling (performance), Network inspection (HTTP), Layout debugging (UI hierarchy). Debugging identifies and fixes issues efficiently.
+
+#@@@@@@@@@@
+
+173. Complete this Jetpack Compose navigation with arguments:
+```kotlin
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        composable("home") {
+            HomeScreen(navController)
+        }
+        composable(
+            "detail/{itemId}",
+            arguments = listOf(
+                navArgument("itemId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getInt("itemId")
+            DetailScreen(itemId, navController)
+        }
+        composable(
+            "profile/{userId}",
+            arguments = listOf(
+                navArgument("userId") { 
+                    type = NavType.StringType
+                    _______________ = false 
+                }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            ProfileScreen(userId, navController)
+        }
+    }
+}
+```
+
+Answer: `nullable` - Makes userId argument optional. Compose Navigation with arguments provides type-safe parameter passing between screens with validation and default values.
+
+#@@@@@@@@@@
+
+174. How do you implement app updates in Android?
+
+Answer: Use In-App Updates API, check for update availability, show update flow (flexible/immediate), handle update states, implement update listener, provide user-friendly update experience, test update flow with internal testing.
+
+#@@@@@@@@@@
+
+175. Which of the following are Kotlin reflection use cases? (Multiple correct)
+A) Dependency injection
+B) Serialization
+C) Code generation
+D) Runtime type checking
+E) Dynamic method invocation
+F) Annotation processing
+
+Answer: A, B, C, D, E, F - All are reflection use cases. Dependency injection (constructor analysis), Serialization (property access), Code generation (metadata), Type checking (runtime), Method invocation (dynamic), Annotation processing (metadata). Reflection enables powerful runtime programming.
+
+#@@@@@@@@@@
+
+176. Complete this coroutine with actor pattern:
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
+
+sealed class CounterMessage {
+    object Increment : CounterMessage()
+    object Decrement : CounterMessage()
+    class GetValue(val response: CompletableDeferred<Int>) : CounterMessage()
+}
+
+fun counterActor() = actor<CounterMessage> {
+    var counter = 0
+    
+    for (message in channel) {
+        when (message) {
+            is CounterMessage.Increment -> counter++
+            is CounterMessage.Decrement -> counter--
+            is CounterMessage.GetValue -> message.response._______________(counter)
+        }
+    }
+}
+
+suspend fun main() {
+    val actor = counterActor()
+    
+    actor.send(CounterMessage.Increment)
+    actor.send(CounterMessage.Increment)
+    
+    val response = CompletableDeferred<Int>()
+    actor.send(CounterMessage.GetValue(response))
+    println("Counter value: ${response.await()}")
+    
+    actor.close()
+}
+```
+
+Answer: `complete` - Completes the deferred response. Actor pattern provides thread-safe state management through message passing, eliminating race conditions.
+
+#@@@@@@@@@@
+
+177. What is the difference between `Flow` and `LiveData` in terms of threading?
+
+Answer: Flow is flexible with dispatchers, can collect on any thread, requires manual context switching. LiveData is main thread observer, posts values from background, automatic thread switching. Flow gives control, LiveData provides simplicity.
+
+#@@@@@@@@@@
+
+178. Which of the following are Android testing best practices? (Multiple correct)
+A) Test pyramid (unit/integration/UI)
+B) Test-driven development
+C) Continuous integration
+D) Test coverage metrics
+E) Mock external dependencies
+F) Test on real devices
+
+Answer: A, B, C, D, E, F - All are best practices. Test pyramid (balanced testing), TDD (test first), CI (automated testing), Coverage (quality metrics), Mocking (isolation), Real devices (realistic testing). Comprehensive testing ensures app quality.
+
+#@@@@@@@@@@
+
+179. Complete this Firebase App Distribution:
+```kotlin
+import com.google.firebase.appdistribution.FirebaseAppDistribution
+import com.google.firebase.appdistribution.ktx.appDistribution
+
+class AppDistributionManager {
+    private val appDistribution = Firebase.appDistribution
+    
+    fun checkForUpdate() {
+        appDistribution.checkForNewRelease()
+            .addOnSuccessListener { release ->
+                if (release != null) {
+                    println("New version available: ${release.displayVersion}")
+                    appDistribution._______________()
+                }
+            }
+            .addOnFailureListener { e ->
+                println("Update check failed: ${e.message}")
+            }
+    }
+}
+```
+
+Answer: `updateApp` - Starts app update flow. Firebase App Distribution provides streamlined app distribution to testers with version management and update notifications.
+
+#@@@@@@@@@@
+
+180. How do you implement app shortcuts with dynamic updates?
+
+Answer: Use ShortcutManagerCompat, create ShortcutInfoCompat objects, update shortcuts dynamically, handle shortcut intents, track shortcut usage, provide contextual shortcuts, update shortcuts based on user behavior.
+
+#@@@@@@@@@@
+
+181. Which of the following are Kotlin DSL examples? (Multiple correct)
+A) Gradle build scripts
+B) Anko layouts
+C) Compose UI
+D) HTML builders
+E) SQL builders
+F) Configuration builders
+
+Answer: A, B, C, D, E, F - All are DSL examples. Gradle (build configuration), Anko (Android layouts), Compose (UI), HTML (web pages), SQL (queries), Configuration (settings). DSLs provide expressive, readable domain-specific syntax.
+
+#@@@@@@@@@@
+
+182. Complete this coroutine with race condition prevention:
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.*
+
+class SafeCounter {
+    private val mutex = Mutex()
+    private var counter = 0
+    
+    suspend fun increment() {
+        mutex.withLock {
+            counter++
+        }
+    }
+    
+    suspend fun decrement() {
+        mutex._______________ {
+            counter--
+        }
+    }
+    
+    suspend fun getValue(): Int {
+        mutex.withLock {
+            return counter
+        }
+    }
+}
+
+suspend fun main() {
+    val counter = SafeCounter()
+    
+    coroutineScope {
+        repeat(1000) {
+            launch {
+                counter.increment()
+            }
+        }
+        repeat(1000) {
+            launch {
+                counter.decrement()
+            }
+        }
+    }
+    
+    println("Final counter value: ${counter.getValue()}")
+}
+```
+
+Answer: `withLock` - Provides mutual exclusion for counter access. Mutex prevents race conditions by ensuring only one coroutine can modify shared state at a time.
+
+#@@@@@@@@@@
+
+183. What is the purpose of `@Entity` inheritance in Room?
+
+Answer: Enables entity inheritance hierarchies, supports abstract superclasses, maps inheritance to database tables. Room inheritance allows shared fields and behavior across related entities while maintaining type safety.
+
+#@@@@@@@@@@
+
+184. Which of the following are Android performance monitoring tools? (Multiple correct)
+A) Android Profiler
+B) Firebase Performance
+C) Systrace
+D) Perfetto
+E) Custom metrics
+F) APM tools
+
+Answer: A, B, C, D, E, F - All are monitoring tools. Android Profiler (built-in), Firebase Performance (cloud), Systrace (system), Perfetto (advanced), Custom metrics (app-specific), APM (third-party). Performance monitoring identifies bottlenecks and optimization opportunities.
+
+#@@@@@@@@@@
+
+185. Complete this Jetpack Compose with side effects:
+```kotlin
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+
+@Composable
+functionality LifecycleAwareComposable() {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var count by remember { mutableStateOf(0) }
+    
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                println("Composable started")
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                println("Composable stopped")
+            }
+        }
+        
+        lifecycleOwner.lifecycle.addObserver(observer)
+        
+        onDispose {
+            lifecycleOwner.lifecycle._______________(observer)
+        }
+    }
+    
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000)
+            count++
+        }
+    }
+    
+    Text("Count: $count")
+}
+```
+
+Answer: `removeObserver` - Removes lifecycle observer on disposal. Side effects in Compose handle lifecycle events, coroutines, and external resource management safely.
+
+#@@@@@@@@@@
+
+186. How do you implement app theming with Material You in Android?
+
+Answer: Use Material3 components, implement dynamic color from wallpaper, support color schemes (light/dark), customize typography and shapes, handle color contrast, provide theme switching, test across devices.
+
+#@@@@@@@@@@
+
+187. Which of the following are Kotlin coroutines concepts? (Multiple correct)
+A) Structured concurrency
+B) Cancellation
+C) Exception handling
+D) Context switching
+E) Flow operators
+F) Channel communication
+
+Answer: A, B, C, D, E, F - All are coroutine concepts. Structured concurrency (lifecycle), Cancellation (cooperative), Exception handling (try-catch), Context switching (dispatchers), Flow operators (transformations), Channel (communication). Coroutines provide comprehensive concurrency framework.
+
+#@@@@@@@@@@
+
+188. Complete this Firebase A/B Testing with remote config:
+```kotlin
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+
+class ABTestManager {
+    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    
+    fun getButtonColor(): String {
+        return remoteConfig.getString(_______________)
+    }
+    
+    fun isFeatureEnabled(): Boolean {
+        return remoteConfig.getBoolean("new_feature_enabled")
+    }
+    
+    fun logABTestImpression(variant: String) {
+        // Log to analytics for A/B test analysis
+    }
+    
+    fun fetchAndActivate() {
+        remoteConfig.fetchAndActivate()
+    }
+}
+```
+
+Answer: `"button_color"` - Remote Config parameter for button color A/B test. Firebase A/B Testing with Remote Config enables controlled experiments for UI and feature variations.
+
+#@@@@@@@@@@
+
+189. What is the difference between `Job` and `SupervisorJob`?
+
+Answer: Job cancels all children when any child fails. SupervisorJob cancels only the failed child, others continue. Job is for related tasks, SupervisorJob for independent tasks. SupervisorJob provides fault tolerance in concurrent operations.
+
+#@@@@@@@@@@
+
+190. Which of the following are Android security best practices? (Multiple correct)
+A) Use HTTPS for network
+B) Encrypt sensitive data
+C) Validate user input
+D) Use ProGuard/R8
+E) Implement certificate pinning
+F) Secure keystore usage
+
+Answer: A, B, C, D, E, F - All are security practices. HTTPS (secure communication), Encryption (data protection), Input validation (prevent injection), ProGuard/R8 (code obfuscation), Certificate pinning (MITM prevention), Keystore (secure storage). Security protects app and user data.
+
+#@@@@@@@@@@
+
+191. Complete this coroutine with timeout and retry:
+```kotlin
+import kotlinx.coroutines.*
+import kotlinx.coroutines.retry.*
+
+suspend fun robustOperation(): String {
+    return retry(3) {
+        try {
+            withTimeout(2000) {
+                delay(1500) // Simulate operation
+                "Success"
+            }
+        } catch (e: TimeoutCancellationException) {
+            println("Timeout, retrying...")
+            throw e // Retry will handle this
+        }
+    }
+}
+
+suspend fun main() {
+    try {
+        val result = robustOperation()
+        println(_______________)
+    } catch (e: Exception) {
+        println("All retries failed: ${e.message}")
+    }
+}
+```
+
+Answer: `"Result: $result"` - Prints successful result. Retry with timeout provides robust error handling for transient failures and network operations.
+
+#@@@@@@@@@@
+
+192. How do you implement app onboarding in Android?
+
+Answer: Create onboarding screens with ViewPager2 or Compose, store onboarding completion state, show onboarding only for new users, provide skip option, track onboarding progress, customize onboarding based on user type.
+
+#@@@@@@@@@@
+
+193. Which of the following are Kotlin functional programming concepts? (Multiple correct)
+A) Pure functions
+B) Immutability
+C) Higher-order functions
+D) Lambda expressions
+E) Function composition
+F) Recursion
+
+Answer: A, B, C, D, E, F - All are functional concepts. Pure functions (no side effects), Immutability (unchangeable data), Higher-order (function parameters), Lambda (anonymous functions), Composition (combining functions), Recursion (self-reference). Functional programming enables predictable, testable code.
+
+#@@@@@@@@@@
+
+194. Complete this Room database with composite key:
+```kotlin
+@Entity(
+    tableName = "user_permissions",
+    primaryKeys = ["user_id", "permission_id"]
+)
+data class UserPermission(
+    val user_id: Int,
+    val permission_id: Int,
+    val granted: Boolean,
+    @ColumnInfo(name = "granted_at")
+    val grantedAt: Long = System.currentTimeMillis()
+)
+
+@Dao
+interface UserPermissionDao {
+    @Query("SELECT * FROM user_permissions WHERE user_id = :userId")
+    suspend fun getUserPermissions(userId: Int): List<_______________>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun grantPermission(permission: UserPermission)
+    
+    @Delete
+    suspend fun revokePermission(permission: UserPermission)
+}
+```
+
+Answer: `UserPermission` - Returns UserPermission entities. Room composite keys enable multi-column primary keys for many-to-many relationships and complex entity identification.
+
+#@@@@@@@@@@
+
+195. What is the purpose of `@Embedded` annotation in Room?
+
+Answer: Embeds object fields into parent table, flattens nested objects, enables custom object composition. @Embedded simplifies complex data structures while maintaining relational database integrity.
+
+#@@@@@@@@@@
+
+196. Which of the following are Android testing strategies? (Multiple correct)
+A) Unit testing
+B) Integration testing
+C) End-to-end testing
+D) Performance testing
+E) Accessibility testing
+F) Security testing
+
+Answer: A, B, C, D, E, F - All are testing strategies. Unit (isolated logic), Integration (component interaction), End-to-end (user flows), Performance (speed/memory), Accessibility (usability), Security (vulnerabilities). Comprehensive testing ensures app quality and reliability.
+
+#@@@@@@@@@@
+
+197. Complete this Jetpack Compose with animation:
+```kotlin
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+
+@Composable
+fun AnimatedTransition() {
+    var isVisible by remember { mutableStateOf(false) }
+    
+    val animatedVisibility = animatedVisibility(
+        visible = isVisible,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    )
+    
+    Column {
+        Button(onClick = { isVisible = !isVisible }) {
+            Text("Toggle")
+        }
+        
+        animatedVisibility {
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(Color.Green)
+                    ._______________ {
+                        // Animation complete callback
+                        println("Animation completed")
+                    }
+            ) {
+                Text("Animated Content")
+            }
+        }
+    }
+}
+```
+
+Answer: `onGloballyPositioned` - Called when layout is positioned. Compose animations provide smooth transitions with enter/exit animations and state-driven updates.
+
+#@@@@@@@@@@
+
+198. How do you implement app analytics in Android?
+
+Answer: Use Firebase Analytics or custom analytics, track user events and properties, implement user identification, set up conversion tracking, analyze user behavior, configure funnels and cohorts, respect privacy regulations.
+
+#@@@@@@@@@@
+
+199. Which of the following are Kotlin coroutines best practices? (Multiple correct)
+A) Use structured concurrency
+B) Handle cancellation properly
+C) Choose appropriate dispatchers
+D) Implement proper error handling
+E) Avoid GlobalScope
+F) Use Flow for data streams
+
+Answer: A, B, C, D, E, F - All are best practices. Structured concurrency (lifecycle), Cancellation (cooperative), Dispatchers (threading), Error handling (try-catch), Avoid GlobalScope (scoped), Flow (streams). Best practices ensure robust, maintainable coroutine code.
+
+#@@@@@@@@@@
+
+200. Complete this comprehensive Android app setup:
+```kotlin
+@HiltAndroidApp
+class MainApplication : Application() {
+    
+    override fun onCreate() {
+        super.onCreate()
+        
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this)
+        
+        // Initialize Timber for logging
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+        
+        // Initialize Crashlytics
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+        
+        // Set up default configurations
+        initializeDefaultConfigurations()
+    }
+    
+    private fun initializeDefaultConfigurations() {
+        // Configure default settings
+        Timber.d("Application initialized with all services")
+        println(_______________)
+    }
+}
+```
+
+Answer: `"All services initialized successfully"` - Logs successful initialization. Comprehensive Android app setup includes dependency injection, logging, crash reporting, and service initialization for production-ready applications.
+
+#@@@@@@@@@@

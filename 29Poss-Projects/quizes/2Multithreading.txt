@@ -1,0 +1,3053 @@
+MULTITHREADING COMPREHENSIVE QUIZ - 200 QUESTIONS
+Tech Stack: Threads (creation/management), Concurrency Primitives (locks, mutexes), Synchronization (critical sections), Race Conditions, Deadlocks, Semaphores, Atomic Operations, Thread Pools, Starvation, Producer-Consumer, Dining Philosophers, Sleeping Barber, GC tuning (G1/ZGC/Shenandoah)
+
+#@@@@@@@@@@
+
+1. What is the difference between `Thread.start()` and `Thread.run()` methods?
+
+Answer: Thread.start() creates a new thread and executes run() method in that thread. Thread.run() executes the method in the current thread, no new thread is created. Always use start() to create concurrent execution.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid ways to create threads in Java? (Multiple correct answers)
+A) Extending Thread class
+B) Implementing Runnable interface
+C) Using Callable interface with ExecutorService
+D) Using lambda expressions with Thread constructor
+
+Answer: A, B, C, D - All are valid. Extend Thread, implement Runnable, use Callable for return values, or pass lambda to Thread constructor.
+
+#@@@@@@@@@@
+
+3. Find the bug in this thread creation code:
+```java
+public class MyThread extends Thread {
+    private int counter = 0;
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            counter++;
+        }
+        System.out.println("Counter: " + counter);
+    }
+
+    public static void main(String[] args) {
+        MyThread t1 = new MyThread();
+        MyThread t2 = new MyThread();
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+Answer: No bug in thread creation, but each thread has its own counter instance. If shared counter is intended, make counter static and use synchronization to prevent race conditions.
+
+#@@@@@@@@@@
+
+4. Explain the difference between `synchronized` method and `synchronized` block.
+
+Answer: Synchronized method locks entire method using object's intrinsic lock. Synchronized block locks specific code section with specified lock object. Synchronized blocks provide finer granularity and can use different lock objects for better performance.
+
+#@@@@@@@@@@
+
+5. What will this code output?
+```java
+public class RaceCondition {
+    private static int counter = 0;
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter++;
+            }
+        });
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter++;
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("Counter: " + counter);
+    }
+}
+```
+
+Answer: Output is unpredictable, likely less than 2000 due to race condition. Multiple threads accessing shared variable without synchronization causes lost updates. Result varies between runs.
+
+#@@@@@@@@@@
+
+6. How do you prevent deadlock in multi-threaded applications?
+
+Answer: Use consistent lock ordering, timeout on lock acquisition, avoid nested locks, use tryLock() with timeout, implement deadlock detection, use higher-level concurrency utilities like java.util.concurrent classes.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid thread states in Java? (Multiple correct)
+A) NEW
+B) RUNNABLE
+C) BLOCKED
+D) WAITING
+E) TIMED_WAITING
+F) TERMINATED
+G) SLEEPING
+
+Answer: A, B, C, D, E, F - SLEEPING is not a valid thread state. TIMED_WAITING covers sleeping threads.
+
+#@@@@@@@@@@
+
+8. Complete this producer-consumer implementation:
+```java
+public class ProducerConsumer {
+    private final Queue<Integer> queue = new LinkedList<>();
+    private final int capacity = 10;
+
+    public void produce() throws InterruptedException {
+        synchronized (queue) {
+            while (queue.size() == capacity) {
+                queue._______________();
+            }
+            queue.offer(new Random().nextInt());
+            queue._______________();
+        }
+    }
+}
+```
+
+Answer: First blank: `wait()`, Second blank: `notifyAll()`. Producer waits when queue is full, notifies consumers when item is added.
+
+#@@@@@@@@@@
+
+9. What is the purpose of `volatile` keyword in Java multithreading?
+
+Answer: Ensures visibility of variable changes across threads by preventing CPU caching. Reads/writes go directly to main memory. Provides happens-before relationship but doesn't guarantee atomicity for compound operations.
+
+#@@@@@@@@@@
+
+10. Find the issue in this synchronization code:
+```java
+public class Counter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+
+    public int getCount() {
+        return count;
+    }
+}
+```
+
+Answer: getCount() method is not synchronized. Reading count without synchronization may return stale value due to visibility issues. Should synchronize getCount() or make count volatile.
+
+#@@@@@@@@@@
+
+11. Which atomic operations are available in java.util.concurrent.atomic package? (Multiple correct)
+A) AtomicInteger
+B) AtomicBoolean
+C) AtomicReference
+D) AtomicLong
+E) AtomicArray
+
+Answer: A, B, C, D - AtomicArray is not a class. Use AtomicIntegerArray, AtomicLongArray, AtomicReferenceArray for atomic array operations.
+
+#@@@@@@@@@@
+
+12. Predict the output of this code:
+```java
+public class ThreadJoin {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                System.out.println("Thread 1 finished");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        t1.start();
+        System.out.println("Main thread continues");
+        t1.join();
+        System.out.println("Main thread finished");
+    }
+}
+```
+
+Answer: "Main thread continues" prints immediately, then after 1 second "Thread 1 finished", then "Main thread finished". join() makes main thread wait for t1 completion.
+
+#@@@@@@@@@@
+
+13. What is the difference between `ReentrantLock` and `synchronized`?
+
+Answer: ReentrantLock provides explicit lock/unlock, tryLock() with timeout, interruptible locking, condition variables, and fair/unfair locking. Synchronized is simpler, automatic unlock, built into JVM. Use ReentrantLock for advanced features.
+
+#@@@@@@@@@@
+
+14. Complete this thread pool implementation:
+```java
+ExecutorService executor = Executors._______________();
+Future<String> future = executor.submit(() -> {
+    Thread.sleep(1000);
+    return "Task completed";
+});
+
+String result = future._______________();
+executor._______________();
+```
+
+Answer: First blank: `newFixedThreadPool(4)` or similar, Second blank: `get()`, Third blank: `shutdown()`. Creates thread pool, submits task, gets result, shuts down executor.
+
+#@@@@@@@@@@
+
+15. How do you implement the Dining Philosophers problem solution?
+
+Answer: Use semaphores or locks with consistent ordering to prevent deadlock. Each philosopher acquires forks in same order (e.g., lower-numbered first), or use timeout on lock acquisition, or limit concurrent philosophers to n-1.
+
+#@@@@@@@@@@
+
+16. Which of the following can cause thread starvation? (Multiple correct)
+A) High priority threads monopolizing CPU
+B) Unfair lock implementation
+C) Poor thread scheduling
+D) Infinite loops in high-priority threads
+E) Excessive context switching
+
+Answer: A, B, C, D - Excessive context switching causes performance issues but not starvation. Starvation occurs when threads can't get resources due to other threads monopolizing them.
+
+#@@@@@@@@@@
+
+17. Find the bug in this atomic operation:
+```java
+public class AtomicCounter {
+    private AtomicInteger count = new AtomicInteger(0);
+
+    public void increment() {
+        int current = count.get();
+        int next = current + 1;
+        count.set(next);
+    }
+}
+```
+
+Answer: Race condition between get() and set(). Multiple threads can read same value and overwrite each other's updates. Should use count.incrementAndGet() or compareAndSet() for atomic increment.
+
+#@@@@@@@@@@
+
+18. What is the purpose of `CountDownLatch` in Java concurrency?
+
+Answer: Allows threads to wait for set of operations to complete. Initialized with count, threads call await() to wait, other threads call countDown() to decrement. When count reaches zero, waiting threads proceed. Useful for coordinating thread startup/completion.
+
+#@@@@@@@@@@
+
+19. Predict the output:
+```java
+public class ThreadInterrupt {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                System.out.println("Thread completed");
+            } catch (InterruptedException e) {
+                System.out.println("Thread interrupted");
+            }
+        });
+
+        t.start();
+        Thread.sleep(1000);
+        t.interrupt();
+        t.join();
+        System.out.println("Main finished");
+    }
+}
+```
+
+Answer: "Thread interrupted" followed by "Main finished". Thread is interrupted during sleep, InterruptedException is caught and handled.
+
+#@@@@@@@@@@
+
+20. How do you implement a thread-safe singleton using double-checked locking?
+
+Answer: Use volatile instance variable, check null twice with synchronization only on first check:
+```java
+private static volatile Singleton instance;
+public static Singleton getInstance() {
+    if (instance == null) {
+        synchronized (Singleton.class) {
+            if (instance == null) {
+                instance = new Singleton();
+            }
+        }
+    }
+    return instance;
+}
+```
+
+#@@@@@@@@@@
+
+21. Which garbage collectors are available in modern JVM? (Multiple correct)
+A) G1GC
+B) ZGC
+C) Shenandoah
+D) Parallel GC
+E) CMS
+F) Serial GC
+
+Answer: A, B, C, D, E, F - All are valid garbage collectors. CMS is deprecated but still available. ZGC and Shenandoah are low-latency collectors.
+
+#@@@@@@@@@@
+
+22. Complete this semaphore implementation:
+```java
+public class ResourcePool {
+    private final Semaphore semaphore = new Semaphore(_______________);
+    private final List<Resource> resources = new ArrayList<>();
+
+    public Resource acquire() throws InterruptedException {
+        semaphore._______________();
+        return getResource();
+    }
+
+    public void release(Resource resource) {
+        returnResource(resource);
+        semaphore._______________();
+    }
+}
+```
+
+Answer: First blank: `3` (or desired pool size), Second blank: `acquire()`, Third blank: `release()`. Semaphore controls access to limited resources.
+
+#@@@@@@@@@@
+
+23. What is the difference between `CyclicBarrier` and `CountDownLatch`?
+
+Answer: CyclicBarrier waits for all threads to reach barrier point, then releases all simultaneously, can be reused. CountDownLatch waits for count to reach zero, one-time use. CyclicBarrier for synchronization points, CountDownLatch for completion waiting.
+
+#@@@@@@@@@@
+
+24. Find the issue in this thread pool usage:
+```java
+public class ThreadPoolExample {
+    private ExecutorService executor = Executors.newFixedThreadPool(10);
+
+    public void processData(List<Data> dataList) {
+        for (Data data : dataList) {
+            executor.submit(() -> {
+                processItem(data);
+            });
+        }
+    }
+}
+```
+
+Answer: Executor is never shut down, causing resource leak. Should call executor.shutdown() when done. Also, no error handling for submitted tasks. Consider using try-with-resources or proper lifecycle management.
+
+#@@@@@@@@@@
+
+25. What will this lock-free algorithm output?
+```java
+public class LockFreeCounter {
+    private AtomicInteger count = new AtomicInteger(0);
+
+    public int increment() {
+        int current, next;
+        do {
+            current = count.get();
+            next = current + 1;
+        } while (!count.compareAndSet(current, next));
+        return next;
+    }
+}
+```
+
+Answer: Thread-safe increment using compare-and-swap. Returns incremented value. If CAS fails due to concurrent modification, loop retries until successful. Lock-free but not wait-free due to potential spinning.
+
+#@@@@@@@@@@
+
+26. How do you tune G1 garbage collector for low latency?
+
+Answer: Set -XX:+UseG1GC, -XX:MaxGCPauseMillis=50 for pause target, -XX:G1HeapRegionSize for region size, -XX:+G1UseAdaptiveIHOP for adaptive heap occupancy, monitor with -XX:+PrintGC and adjust based on application needs.
+
+#@@@@@@@@@@
+
+27. Which of the following are valid concurrent collections in Java? (Multiple correct)
+A) ConcurrentHashMap
+B) CopyOnWriteArrayList
+C) BlockingQueue
+D) ConcurrentLinkedQueue
+E) SynchronizedList
+
+Answer: A, B, C, D - SynchronizedList is synchronized wrapper, not truly concurrent. Others are designed for concurrent access with better performance.
+
+#@@@@@@@@@@
+
+28. Complete this blocking queue producer-consumer:
+```java
+public class BlockingQueueExample {
+    private BlockingQueue<String> queue = new _______________<>();
+
+    public void producer() throws InterruptedException {
+        queue._______________("item");
+    }
+
+    public String consumer() throws InterruptedException {
+        return queue._______________();
+    }
+}
+```
+
+Answer: First blank: `ArrayBlockingQueue<>(10)` or `LinkedBlockingQueue`, Second blank: `put`, Third blank: `take`. BlockingQueue handles synchronization automatically.
+
+#@@@@@@@@@@
+
+29. What is the purpose of `ThreadLocal` in Java?
+
+Answer: Provides thread-local variables where each thread has its own copy. Useful for storing per-thread context like user sessions, database connections, or request data. Prevents sharing state between threads while maintaining easy access.
+
+#@@@@@@@@@@
+
+30. Find the deadlock in this code:
+```java
+public class DeadlockExample {
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
+
+    public void method1() {
+        synchronized (lock1) {
+            synchronized (lock2) {
+                // work
+            }
+        }
+    }
+
+    public void method2() {
+        synchronized (lock2) {
+            synchronized (lock1) {
+                // work
+            }
+        }
+    }
+}
+```
+
+Answer: Deadlock occurs when thread1 calls method1() (acquires lock1, waits for lock2) while thread2 calls method2() (acquires lock2, waits for lock1). Fix by consistent lock ordering in both methods.
+
+#@@@@@@@@@@
+
+31. How do you implement the Sleeping Barber problem?
+
+Answer: Use semaphores for customers (waiting room capacity), barber (0 or 1), and mutex for critical sections. Customers wait if barber busy and chairs available, leave if no chairs. Barber sleeps when no customers, wakes when customer arrives.
+
+#@@@@@@@@@@
+
+32. Which ZGC tuning parameters are important for performance? (Multiple correct)
+A) -XX:+UseZGC
+B) -XX:+UnlockExperimentalVMOptions
+C) -Xmx (heap size)
+D) -XX:ZCollectionInterval
+E) -XX:ZUncommitDelay
+
+Answer: A, B, C, E - ZCollectionInterval is not a valid ZGC parameter. ZGC is concurrent collector with very low pause times regardless of heap size.
+
+#@@@@@@@@@@
+
+33. Predict the output:
+```java
+public class ThreadLocalExample {
+    private static ThreadLocal<Integer> threadLocal = ThreadLocal.withInitial(() -> 0);
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            threadLocal.set(100);
+            System.out.println("T1: " + threadLocal.get());
+        });
+
+        Thread t2 = new Thread(() -> {
+            System.out.println("T2: " + threadLocal.get());
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+    }
+}
+```
+
+Answer: "T1: 100" and "T2: 0" (order may vary). Each thread has its own ThreadLocal copy. T1 sets value to 100, T2 uses initial value 0.
+
+#@@@@@@@@@@
+
+34. What is the difference between `submit()` and `execute()` in ExecutorService?
+
+Answer: submit() returns Future for result/exception handling, accepts Callable or Runnable. execute() returns void, only accepts Runnable, exceptions are handled by UncaughtExceptionHandler. Use submit() when you need result or exception handling.
+
+#@@@@@@@@@@
+
+35. Complete this read-write lock implementation:
+```java
+public class ReadWriteLockExample {
+    private final ReadWriteLock lock = new _______________();
+    private final Lock readLock = lock._______________();
+    private final Lock writeLock = lock._______________();
+    private String data = "";
+
+    public String read() {
+        readLock.lock();
+        try {
+            return data;
+        } finally {
+            readLock.unlock();
+        }
+    }
+}
+```
+
+Answer: First blank: `ReentrantReadWriteLock()`, Second blank: `readLock()`, Third blank: `writeLock()`. Allows multiple concurrent readers or single writer.
+
+#@@@@@@@@@@
+
+36. How do you handle exceptions in thread pools?
+
+Answer: Use Future.get() to retrieve exceptions from submitted tasks, implement UncaughtExceptionHandler for execute() tasks, wrap tasks in try-catch, use CompletableFuture.handle() for async exception handling.
+
+#@@@@@@@@@@
+
+37. Which of the following cause context switching overhead? (Multiple correct)
+A) Too many threads
+B) Frequent lock contention
+C) I/O operations
+D) Thread.yield() calls
+E) Interrupt handling
+
+Answer: A, B, C, D, E - All cause context switching. Too many threads increase switching frequency, lock contention blocks threads, I/O blocks threads, yield() explicitly switches, interrupts trigger context switches.
+
+#@@@@@@@@@@
+
+38. Find the race condition:
+```java
+public class LazyInitialization {
+    private volatile boolean initialized = false;
+    private String data;
+
+    public String getData() {
+        if (!initialized) {
+            data = expensiveComputation();
+            initialized = true;
+        }
+        return data;
+    }
+}
+```
+
+Answer: Race condition between checking initialized and setting data. Multiple threads can pass the check and execute expensiveComputation(). Use double-checked locking or synchronization to fix.
+
+#@@@@@@@@@@
+
+39. What is the purpose of `Phaser` in Java concurrency?
+
+Answer: Flexible synchronization barrier supporting dynamic number of parties. Threads register/deregister dynamically, supports multiple phases, can be tiered. More flexible than CyclicBarrier for complex synchronization scenarios with varying participant counts.
+
+#@@@@@@@@@@
+
+40. Predict the output:
+```java
+public class InterruptExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                System.out.println("Working...");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    System.out.println("Interrupted during sleep");
+                    break;
+                }
+            }
+            System.out.println("Thread finished");
+        });
+
+        t.start();
+        Thread.sleep(1200);
+        t.interrupt();
+        t.join();
+    }
+}
+```
+
+Answer: "Working..." prints 2-3 times, then "Interrupted during sleep", then "Thread finished". Thread checks interrupt status and handles InterruptedException properly.
+
+#@@@@@@@@@@
+
+41. How do you implement a thread-safe cache with expiration?
+
+Answer: Use ConcurrentHashMap with timestamps, ScheduledExecutorService for cleanup, or libraries like Caffeine/Guava Cache. Implement get() with expiration check, put() with timestamp, background cleanup thread to remove expired entries.
+
+#@@@@@@@@@@
+
+42. Which Shenandoah GC tuning options are available? (Multiple correct)
+A) -XX:+UseShenandoahGC
+B) -XX:+UnlockExperimentalVMOptions
+C) -XX:ShenandoahGCHeuristics
+D) -XX:ShenandoahUncommitDelay
+E) -XX:ShenandoahGuaranteedGCInterval
+
+Answer: A, B, C, D, E - All are valid Shenandoah tuning options. Shenandoah provides low-latency garbage collection with concurrent collection cycles.
+
+#@@@@@@@@@@
+
+43. Complete this fork-join framework example:
+```java
+public class ForkJoinExample extends _______________<Long> {
+    private final int[] array;
+    private final int start, end;
+
+    @Override
+    protected Long compute() {
+        if (end - start <= 1000) {
+            return computeDirectly();
+        } else {
+            int mid = (start + end) / 2;
+            ForkJoinExample left = new ForkJoinExample(array, start, mid);
+            ForkJoinExample right = new ForkJoinExample(array, mid, end);
+            left._______________();
+            return right.compute() + left._______________();
+        }
+    }
+}
+```
+
+Answer: First blank: `RecursiveTask`, Second blank: `fork()`, Third blank: `join()`. ForkJoinTask for divide-and-conquer algorithms with work stealing.
+
+#@@@@@@@@@@
+
+44. What is the difference between fair and unfair locks?
+
+Answer: Fair locks grant access in FIFO order, preventing starvation but with lower throughput. Unfair locks allow barging, higher throughput but possible starvation. ReentrantLock constructor accepts fairness parameter.
+
+#@@@@@@@@@@
+
+45. Find the memory visibility issue:
+```java
+public class VisibilityProblem {
+    private boolean flag = false;
+    private int value = 0;
+
+    public void writer() {
+        value = 42;
+        flag = true;
+    }
+
+    public void reader() {
+        if (flag) {
+            System.out.println("Value: " + value);
+        }
+    }
+}
+```
+
+Answer: Without synchronization or volatile, reader thread may see flag=true but value=0 due to CPU caching and instruction reordering. Make fields volatile or use synchronization to ensure visibility.
+
+#@@@@@@@@@@
+
+46. How do you implement a custom thread factory?
+
+Answer: Implement ThreadFactory interface with newThread() method. Customize thread names, daemon status, priority, exception handlers. Example:
+```java
+ThreadFactory factory = r -> {
+    Thread t = new Thread(r, "CustomThread-" + counter.incrementAndGet());
+    t.setDaemon(true);
+    return t;
+};
+```
+
+#@@@@@@@@@@
+
+47. Which of the following are lock-free data structures? (Multiple correct)
+A) ConcurrentLinkedQueue
+B) AtomicReference
+C) ConcurrentHashMap
+D) CopyOnWriteArrayList
+E) LinkedBlockingQueue
+
+Answer: A, B - ConcurrentLinkedQueue and AtomicReference use CAS operations without locks. ConcurrentHashMap uses segment locking, CopyOnWriteArrayList uses locks for writes, LinkedBlockingQueue uses locks.
+
+#@@@@@@@@@@
+
+48. Predict the output:
+```java
+public class CompletableFutureExample {
+    public static void main(String[] args) {
+        CompletableFuture<String> future = CompletableFuture
+            .supplyAsync(() -> "Hello")
+            .thenApply(s -> s + " World")
+            .thenApply(String::toUpperCase);
+
+        System.out.println(future.join());
+    }
+}
+```
+
+Answer: "HELLO WORLD" - CompletableFuture chains async operations. supplyAsync provides initial value, thenApply transforms it, join() waits for completion and returns result.
+
+#@@@@@@@@@@
+
+49. What is the purpose of `StampedLock` in Java 8+?
+
+Answer: Provides optimistic reading capability with read/write locks. Supports three modes: writing, reading, optimistic reading. Optimistic reads don't block writers, validate with stamp. Better performance than ReadWriteLock for read-heavy workloads.
+
+#@@@@@@@@@@
+
+50. Complete this thread-safe counter with CAS:
+```java
+public class CASCounter {
+    private final AtomicInteger count = new AtomicInteger(0);
+
+    public int increment() {
+        int current, next;
+        do {
+            current = count.get();
+            next = current + 1;
+        } while (!count._______________);
+        return next;
+    }
+}
+```
+
+Answer: `compareAndSet(current, next)` - Compare-and-swap operation atomically updates value if current value matches expected value. Retries until successful.
+
+#@@@@@@@@@@
+
+51. What is the difference between `wait()` and `sleep()` methods?
+
+Answer: wait() releases object lock and waits for notification, must be called in synchronized context. sleep() doesn't release locks, pauses thread for specified time. wait() for coordination, sleep() for delays.
+
+#@@@@@@@@@@
+
+52. Which of the following are valid ways to stop a thread? (Multiple correct)
+A) Using interrupt() and checking isInterrupted()
+B) Using volatile boolean flag
+C) Using stop() method
+D) Letting run() method complete naturally
+
+Answer: A, B, D - stop() method is deprecated and unsafe. Use interrupt mechanism, volatile flags, or natural completion for safe thread termination.
+
+#@@@@@@@@@@
+
+53. Find the bug in this thread-safe singleton:
+```java
+public class Singleton {
+    private static Singleton instance;
+
+    public static synchronized Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+```
+
+Answer: No bug - this is correct thread-safe singleton using synchronized method. However, performance can be improved with double-checked locking or enum singleton pattern.
+
+#@@@@@@@@@@
+
+54. What is the purpose of `Exchanger` in Java concurrency?
+
+Answer: Synchronization point where two threads can exchange objects. Each thread calls exchange() method, blocks until partner arrives, then swaps objects. Useful for producer-consumer scenarios where roles alternate.
+
+#@@@@@@@@@@
+
+55. Predict the output:
+```java
+public class VolatileExample {
+    private volatile boolean flag = false;
+    private int value = 0;
+
+    public void writer() {
+        value = 42;
+        flag = true;
+    }
+
+    public void reader() {
+        if (flag) {
+            System.out.println("Value: " + value);
+        }
+    }
+}
+```
+
+Answer: "Value: 42" - volatile flag ensures happens-before relationship. When reader sees flag=true, it's guaranteed to see value=42 due to memory ordering guarantees.
+
+#@@@@@@@@@@
+
+56. How do you implement a custom blocking queue?
+
+Answer: Use ReentrantLock with Condition variables for put/take operations. Implement capacity checking, blocking when full/empty, signaling on state changes. Example: ArrayBlockingQueue implementation with lock, notEmpty, notFull conditions.
+
+#@@@@@@@@@@
+
+57. Which of the following are characteristics of lock-free algorithms? (Multiple correct)
+A) Use atomic operations
+B) No thread blocking
+C) ABA problem susceptible
+D) Memory ordering important
+E) Always faster than locks
+
+Answer: A, B, C, D - Lock-free algorithms aren't always faster due to retry overhead and cache contention. They provide progress guarantees and avoid blocking.
+
+#@@@@@@@@@@
+
+58. Complete this work-stealing queue implementation:
+```java
+public class WorkStealingQueue<T> {
+    private final T[] array;
+    private volatile int top = 0;
+    private volatile int bottom = 0;
+
+    public void push(T item) {
+        int b = bottom;
+        array[b % array.length] = item;
+        bottom = b + 1;
+    }
+
+    public T pop() {
+        int b = --bottom;
+        T item = array[b % array.length];
+        if (b > top) {
+            return item;
+        }
+        bottom = b + 1;
+        if (b == top && _______________) {
+            top++;
+            return item;
+        }
+        return null;
+    }
+}
+```
+
+Answer: `compareAndSet(top, b, b + 1)` or similar CAS operation to atomically update top pointer when stealing last element.
+
+#@@@@@@@@@@
+
+59. What is the ABA problem in concurrent programming?
+
+Answer: Value changes from A to B and back to A between reads, making CAS think nothing changed. Can cause incorrect behavior in lock-free algorithms. Solutions: use version numbers, hazard pointers, or atomic stamped references.
+
+#@@@@@@@@@@
+
+60. Find the issue in this thread pool configuration:
+```java
+ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    1, 1, 0L, TimeUnit.MILLISECONDS,
+    new LinkedBlockingQueue<>()
+);
+
+for (int i = 0; i < 1000; i++) {
+    executor.submit(() -> {
+        // long running task
+        Thread.sleep(10000);
+    });
+}
+```
+
+Answer: Unbounded queue can cause OutOfMemoryError. With core=max=1, only one thread processes tasks while others queue indefinitely. Use bounded queue or increase thread pool size.
+
+#@@@@@@@@@@
+
+61. How do you implement priority-based thread scheduling?
+
+Answer: Use PriorityBlockingQueue with Comparable tasks, custom ThreadPoolExecutor with priority queue, or Thread.setPriority() (limited effectiveness). Consider using separate thread pools for different priority levels.
+
+#@@@@@@@@@@
+
+62. Which memory consistency models are relevant for Java? (Multiple correct)
+A) Sequential consistency
+B) Happens-before
+C) Causal consistency
+D) Release consistency
+E) Weak consistency
+
+Answer: A, B - Java Memory Model primarily uses happens-before relationships and provides sequential consistency for properly synchronized programs. Other models are theoretical concepts.
+
+#@@@@@@@@@@
+
+63. Predict the output:
+```java
+public class FinalFieldExample {
+    private final int value;
+    private boolean initialized = false;
+
+    public FinalFieldExample(int value) {
+        this.value = value;
+        initialized = true;
+    }
+
+    public void print() {
+        if (initialized) {
+            System.out.println("Value: " + value);
+        }
+    }
+}
+```
+
+Answer: May print "Value: 0" due to improper publication. Final fields are guaranteed visible after constructor completion, but initialized flag may be seen as true before constructor finishes. Use proper synchronization.
+
+#@@@@@@@@@@
+
+64. What is the difference between `park()` and `unpark()` in LockSupport?
+
+Answer: park() blocks current thread until unpark() is called or thread is interrupted. unpark() gives permission for thread to proceed. Unlike wait/notify, unpark can be called before park, and it's thread-specific.
+
+#@@@@@@@@@@
+
+65. Complete this custom lock implementation:
+```java
+public class CustomLock {
+    private final AtomicBoolean locked = new AtomicBoolean(false);
+    private final Queue<Thread> waiters = new ConcurrentLinkedQueue<>();
+
+    public void lock() {
+        Thread current = Thread.currentThread();
+        waiters.offer(current);
+
+        while (waiters.peek() != current || !locked._______________) {
+            LockSupport.park();
+        }
+        waiters.poll();
+    }
+
+    public void unlock() {
+        locked.set(false);
+        LockSupport._______________();
+    }
+}
+```
+
+Answer: First blank: `compareAndSet(false, true)`, Second blank: `unpark(waiters.peek())`. Custom fair lock using CAS and LockSupport.
+
+#@@@@@@@@@@
+
+66. How do you detect and resolve deadlocks programmatically?
+
+Answer: Use ThreadMXBean.findDeadlockedThreads(), implement timeout-based detection, use lock ordering, or deadlock detection algorithms. JConsole and VisualVM provide deadlock detection tools.
+
+#@@@@@@@@@@
+
+67. Which of the following are valid CompletableFuture combinators? (Multiple correct)
+A) thenApply
+B) thenCompose
+C) thenCombine
+D) allOf
+E) anyOf
+F) thenMerge
+
+Answer: A, B, C, D, E - thenMerge is not a valid CompletableFuture method. Others provide functional composition of async operations.
+
+#@@@@@@@@@@
+
+68. Find the race condition:
+```java
+public class DoubleCheckedLocking {
+    private volatile Helper helper;
+
+    public Helper getHelper() {
+        if (helper == null) {
+            synchronized (this) {
+                if (helper == null) {
+                    helper = new Helper();
+                }
+            }
+        }
+        return helper;
+    }
+}
+```
+
+Answer: No race condition - this is correct double-checked locking with volatile. The volatile keyword ensures proper memory ordering and prevents partial construction visibility.
+
+#@@@@@@@@@@
+
+69. What is the purpose of memory barriers in concurrent programming?
+
+Answer: Prevent CPU reordering of memory operations, ensure visibility of writes across threads. Types: load barrier (prevents reordering of loads), store barrier (prevents reordering of stores), full barrier (prevents all reordering).
+
+#@@@@@@@@@@
+
+70. Predict the output:
+```java
+public class ThreadGroupExample {
+    public static void main(String[] args) throws InterruptedException {
+        ThreadGroup group = new ThreadGroup("MyGroup");
+
+        Thread t1 = new Thread(group, () -> {
+            System.out.println("Thread 1 in group: " + Thread.currentThread().getThreadGroup().getName());
+        });
+
+        Thread t2 = new Thread(group, () -> {
+            System.out.println("Thread 2 in group: " + Thread.currentThread().getThreadGroup().getName());
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("Active threads in group: " + group.activeCount());
+    }
+}
+```
+
+Answer: "Thread 1 in group: MyGroup", "Thread 2 in group: MyGroup", "Active threads in group: 0". Threads finish before activeCount() is called.
+
+#@@@@@@@@@@
+
+71. How do you implement a thread-safe lazy initialization holder pattern?
+
+Answer: Use static nested class for lazy loading:
+```java
+public class Singleton {
+    private Singleton() {}
+
+    private static class Holder {
+        static final Singleton INSTANCE = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+```
+
+#@@@@@@@@@@
+
+72. Which garbage collection algorithms are concurrent? (Multiple correct)
+A) G1GC
+B) CMS
+C) ZGC
+D) Shenandoah
+E) Parallel GC
+F) Serial GC
+
+Answer: A, B, C, D - G1, CMS, ZGC, and Shenandoah perform concurrent collection. Parallel and Serial GC stop all application threads during collection.
+
+#@@@@@@@@@@
+
+73. Complete this thread-safe counter using synchronized blocks:
+```java
+public class SynchronizedCounter {
+    private int count = 0;
+    private final Object lock = new Object();
+
+    public void increment() {
+        synchronized (_______________) {
+            count++;
+        }
+    }
+
+    public int getCount() {
+        synchronized (_______________) {
+            return count;
+        }
+    }
+}
+```
+
+Answer: Both blanks: `lock`. Use same lock object for both operations to ensure mutual exclusion and visibility.
+
+#@@@@@@@@@@
+
+74. What is the difference between cooperative and preemptive multitasking?
+
+Answer: Cooperative: threads voluntarily yield control (Thread.yield(), blocking operations). Preemptive: OS forcibly switches threads using time slicing. Java uses preemptive multitasking with thread priorities as hints.
+
+#@@@@@@@@@@
+
+75. Find the bug in this producer-consumer implementation:
+```java
+public class ProducerConsumer {
+    private final Object lock = new Object();
+    private final Queue<String> queue = new LinkedList<>();
+    private final int capacity = 10;
+
+    public void produce(String item) throws InterruptedException {
+        synchronized (lock) {
+            if (queue.size() == capacity) {
+                lock.wait();
+            }
+            queue.offer(item);
+            lock.notify();
+        }
+    }
+}
+```
+
+Answer: Should use while loop instead of if for wait condition. Spurious wakeups can cause thread to proceed when condition is still false. Use while (queue.size() == capacity) lock.wait();
+
+#@@@@@@@@@@
+
+76. How do you implement a thread-safe event bus?
+
+Answer: Use ConcurrentHashMap for subscribers, CopyOnWriteArrayList for handlers per event type, synchronize subscription/unsubscription, use thread pool for async event delivery. Consider using libraries like Guava EventBus.
+
+#@@@@@@@@@@
+
+77. Which of the following are valid thread dump analysis tools? (Multiple correct)
+A) jstack
+B) VisualVM
+C) Eclipse MAT
+D) JConsole
+E) FastThread.io
+
+Answer: A, B, C, D, E - All are valid tools for thread dump analysis. jstack generates dumps, others analyze them for deadlocks, contention, and performance issues.
+
+#@@@@@@@@@@
+
+78. Predict the output:
+```java
+public class DaemonThreadExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread daemon = new Thread(() -> {
+            while (true) {
+                System.out.println("Daemon working...");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+
+        daemon.setDaemon(true);
+        daemon.start();
+
+        Thread.sleep(3000);
+        System.out.println("Main thread ending");
+    }
+}
+```
+
+Answer: "Daemon working..." prints ~3 times, then "Main thread ending". JVM exits when only daemon threads remain, so daemon thread stops when main thread ends.
+
+#@@@@@@@@@@
+
+79. What is the difference between `FutureTask` and `CompletableFuture`?
+
+Answer: FutureTask is simple wrapper for Callable/Runnable with Future interface. CompletableFuture provides rich functional composition, chaining, combining multiple futures, exception handling, and async execution.
+
+#@@@@@@@@@@
+
+80. Complete this thread-local random implementation:
+```java
+public class ThreadLocalRandom {
+    private static final ThreadLocal<Random> random = ThreadLocal.withInitial(() ->
+        new Random(System.nanoTime() + Thread.currentThread().getId())
+    );
+
+    public static int nextInt(int bound) {
+        return random._______________().nextInt(bound);
+    }
+
+    public static double nextDouble() {
+        return random._______________().nextDouble();
+    }
+}
+```
+
+Answer: Both blanks: `get()`. ThreadLocal.get() retrieves the thread-local Random instance for current thread.
+
+#@@@@@@@@@@
+
+81. How do you implement backpressure in producer-consumer scenarios?
+
+Answer: Use bounded queues, blocking operations (put/take), flow control mechanisms, reactive streams with request/response, circuit breakers, or adaptive rate limiting based on queue size.
+
+#@@@@@@@@@@
+
+82. Which of the following can cause false sharing? (Multiple correct)
+A) Array elements accessed by different threads
+B) Object fields in same cache line
+C) Static variables in same class
+D) Local variables in different threads
+E) Volatile fields close together
+
+Answer: A, B, C, E - Local variables are thread-local (stack), so no false sharing. False sharing occurs when different threads modify data in same cache line.
+
+#@@@@@@@@@@
+
+83. Find the issue in this lock-free stack:
+```java
+public class LockFreeStack<T> {
+    private volatile Node<T> head;
+
+    public void push(T item) {
+        Node<T> newNode = new Node<>(item);
+        Node<T> currentHead;
+        do {
+            currentHead = head;
+            newNode.next = currentHead;
+        } while (!compareAndSet(head, currentHead, newNode));
+    }
+
+    public T pop() {
+        Node<T> currentHead;
+        Node<T> newHead;
+        do {
+            currentHead = head;
+            if (currentHead == null) return null;
+            newHead = currentHead.next;
+        } while (!compareAndSet(head, currentHead, newHead));
+        return currentHead.item;
+    }
+}
+```
+
+Answer: Missing actual compareAndSet implementation. Should use AtomicReference<Node<T>> instead of volatile Node<T> to get atomic compareAndSet operation.
+
+#@@@@@@@@@@
+
+84. What is the purpose of `@Contended` annotation in Java?
+
+Answer: Prevents false sharing by adding padding around annotated fields/classes. JVM adds cache line padding to avoid different threads accessing same cache line. Requires -XX:-RestrictContended JVM flag.
+
+#@@@@@@@@@@
+
+85. Predict the output:
+```java
+public class ThreadPriorityExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread lowPriority = new Thread(() -> {
+            for (int i = 0; i < 5; i++) {
+                System.out.println("Low: " + i);
+                Thread.yield();
+            }
+        });
+
+        Thread highPriority = new Thread(() -> {
+            for (int i = 0; i < 5; i++) {
+                System.out.println("High: " + i);
+                Thread.yield();
+            }
+        });
+
+        lowPriority.setPriority(Thread.MIN_PRIORITY);
+        highPriority.setPriority(Thread.MAX_PRIORITY);
+
+        lowPriority.start();
+        highPriority.start();
+
+        lowPriority.join();
+        highPriority.join();
+    }
+}
+```
+
+Answer: Output order is unpredictable. Thread priorities are hints to OS scheduler, not guarantees. Both threads will complete, but order depends on OS scheduling and system load.
+
+#@@@@@@@@@@
+
+86. How do you implement a thread-safe object pool?
+
+Answer: Use ConcurrentLinkedQueue or BlockingQueue for available objects, AtomicInteger for size tracking, factory method for object creation, proper cleanup on return, and optional validation.
+
+#@@@@@@@@@@
+
+87. Which of the following are valid concurrent design patterns? (Multiple correct)
+A) Producer-Consumer
+B) Reader-Writer
+C) Thread Pool
+D) Actor Model
+E) Master-Worker
+F) Pipeline
+
+Answer: A, B, C, D, E, F - All are valid concurrent design patterns for different scenarios and requirements.
+
+#@@@@@@@@@@
+
+88. Complete this custom condition variable:
+```java
+public class CustomCondition {
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock._______________();
+    private boolean ready = false;
+
+    public void waitForCondition() throws InterruptedException {
+        lock.lock();
+        try {
+            while (!ready) {
+                condition._______________();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void signalCondition() {
+        lock.lock();
+        try {
+            ready = true;
+            condition._______________();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
+
+Answer: First blank: `newCondition()`, Second blank: `await()`, Third blank: `signalAll()`. Condition variables for thread coordination.
+
+#@@@@@@@@@@
+
+89. What is the difference between `invokeAll()` and `invokeAny()` in ExecutorService?
+
+Answer: invokeAll() executes all tasks and waits for completion, returns List<Future>. invokeAny() executes tasks concurrently, returns result of first successful completion, cancels remaining tasks.
+
+#@@@@@@@@@@
+
+90. Find the memory leak in this thread pool usage:
+```java
+public class ThreadPoolLeak {
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    public void processRequest(Request request) {
+        executor.submit(() -> {
+            ThreadLocal<String> context = new ThreadLocal<>();
+            context.set(request.getContext());
+            // process request
+            // Missing: context.remove();
+        });
+    }
+}
+```
+
+Answer: ThreadLocal not cleaned up. Long-lived threads in cached pool retain ThreadLocal values, causing memory leak. Always call ThreadLocal.remove() or use try-finally block.
+
+#@@@@@@@@@@
+
+91. How do you implement a non-blocking algorithm for queue operations?
+
+Answer: Use atomic references with CAS operations, handle ABA problem with version stamps, implement retry loops, use hazard pointers for memory management, consider Michael & Scott algorithm for lock-free queues.
+
+#@@@@@@@@@@
+
+92. Which JVM flags are useful for debugging concurrency issues? (Multiple correct)
+A) -XX:+PrintGCDetails
+B) -XX:+PrintConcurrentLocks
+C) -XX:+TraceClassLoading
+D) -XX:+UseBiasedLocking
+E) -XX:+PrintGCApplicationStoppedTime
+
+Answer: A, B, E - PrintGCDetails shows GC pauses affecting threads, PrintConcurrentLocks shows lock contention, PrintGCApplicationStoppedTime shows stop-the-world pauses. Others are less relevant for concurrency.
+
+#@@@@@@@@@@
+
+93. Predict the output:
+```java
+public class ThreadStateExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        System.out.println("Before start: " + t.getState());
+        t.start();
+        System.out.println("After start: " + t.getState());
+        Thread.sleep(100);
+        System.out.println("During sleep: " + t.getState());
+        t.join();
+        System.out.println("After join: " + t.getState());
+    }
+}
+```
+
+Answer: "Before start: NEW", "After start: RUNNABLE", "During sleep: TIMED_WAITING", "After join: TERMINATED". Shows thread state transitions.
+
+#@@@@@@@@@@
+
+94. What is the purpose of `LongAdder` vs `AtomicLong`?
+
+Answer: LongAdder provides better performance under high contention by using multiple variables and summing them. AtomicLong uses single variable with CAS. Use LongAdder for counters with high contention, AtomicLong for low contention or when exact value needed frequently.
+
+#@@@@@@@@@@
+
+95. Complete this thread-safe lazy initialization:
+```java
+public class LazyInitialization<T> {
+    private volatile T instance;
+    private final Supplier<T> supplier;
+
+    public LazyInitialization(Supplier<T> supplier) {
+        this.supplier = supplier;
+    }
+
+    public T get() {
+        T result = instance;
+        if (result == null) {
+            synchronized (this) {
+                result = instance;
+                if (result == null) {
+                    instance = result = supplier._______________();
+                }
+            }
+        }
+        return result;
+    }
+}
+```
+
+Answer: `get()` - Calls the supplier function to create the instance. This implements double-checked locking pattern with generic type.
+
+#@@@@@@@@@@
+
+96. How do you handle thread interruption properly?
+
+Answer: Check Thread.interrupted() regularly, handle InterruptedException by restoring interrupt status or propagating exception, use interruptible operations, avoid catching and ignoring InterruptedException.
+
+#@@@@@@@@@@
+
+97. Which of the following are characteristics of wait-free algorithms? (Multiple correct)
+A) Every thread makes progress in finite steps
+B) No thread can be blocked indefinitely
+C) Stronger guarantee than lock-free
+D) Always use atomic operations
+E) Immune to priority inversion
+
+Answer: A, B, C, E - Wait-free algorithms guarantee progress for all threads, stronger than lock-free. May use atomic operations but not exclusively. Immune to priority inversion since no blocking.
+
+#@@@@@@@@@@
+
+98. Find the bug in this thread-safe singleton:
+```java
+public enum Singleton {
+    INSTANCE;
+
+    private String value;
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+}
+```
+
+Answer: No thread-safety bug in singleton creation (enum is thread-safe), but setValue/getValue operations are not synchronized. Multiple threads can cause race conditions when accessing value field.
+
+#@@@@@@@@@@
+
+99. What is the difference between `parallelStream()` and manual thread management?
+
+Answer: parallelStream() uses common ForkJoinPool, automatic work distribution, limited control over threads. Manual management provides full control over thread pools, scheduling, error handling, but requires more code and expertise.
+
+#@@@@@@@@@@
+
+100. Predict the output:
+```java
+public class ForkJoinExample {
+    public static void main(String[] args) {
+        ForkJoinPool pool = new ForkJoinPool(2);
+
+        RecursiveTask<Integer> task = new RecursiveTask<Integer>() {
+            @Override
+            protected Integer compute() {
+                System.out.println("Task running in: " + Thread.currentThread().getName());
+                return 42;
+            }
+        };
+
+        Integer result = pool.invoke(task);
+        System.out.println("Result: " + result);
+        pool.shutdown();
+    }
+}
+```
+
+Answer: "Task running in: ForkJoinPool-1-worker-1" (or similar worker thread name), "Result: 42". ForkJoinPool executes task in worker thread.
+
+#@@@@@@@@@@
+
+101. How do you implement a thread-safe cache with TTL (Time To Live)?
+
+Answer: Use ConcurrentHashMap with wrapper objects containing value and expiration time, ScheduledExecutorService for cleanup, or libraries like Caffeine with expireAfterWrite(). Check expiration on access and remove expired entries.
+
+#@@@@@@@@@@
+
+102. Which of the following are valid memory ordering constraints? (Multiple correct)
+A) Acquire
+B) Release
+C) Sequential Consistency
+D) Relaxed
+E) Consume
+
+Answer: A, B, C, D, E - All are valid memory ordering constraints in concurrent programming. Java primarily uses acquire-release semantics with sequential consistency for synchronized operations.
+
+#@@@@@@@@@@
+
+103. Find the race condition:
+```java
+public class CounterWithCheck {
+    private volatile int count = 0;
+    private final int maxCount = 100;
+
+    public boolean incrementIfPossible() {
+        if (count < maxCount) {
+            count++;
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+Answer: Race condition between check (count < maxCount) and increment (count++). Multiple threads can pass the check simultaneously and exceed maxCount. Use AtomicInteger with compareAndSet loop.
+
+#@@@@@@@@@@
+
+104. What is the purpose of `ThreadLocalRandom` vs `Random`?
+
+Answer: ThreadLocalRandom provides better performance in multithreaded environments by avoiding contention. Each thread has its own Random instance. Random uses synchronized methods causing contention under high concurrency.
+
+#@@@@@@@@@@
+
+105. Predict the output:
+```java
+public class NestedLockExample {
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
+
+    public void method1() {
+        synchronized (lock1) {
+            System.out.println("Method1 acquired lock1");
+            method2();
+        }
+    }
+
+    public void method2() {
+        synchronized (lock2) {
+            System.out.println("Method2 acquired lock2");
+            synchronized (lock1) {
+                System.out.println("Method2 acquired lock1");
+            }
+        }
+    }
+}
+```
+
+Answer: "Method1 acquired lock1", "Method2 acquired lock2", "Method2 acquired lock1". No deadlock since method1 calls method2 in same thread, locks are reentrant within same thread.
+
+#@@@@@@@@@@
+
+106. How do you implement a thread-safe publish-subscribe pattern?
+
+Answer: Use ConcurrentHashMap for topic-subscriber mapping, CopyOnWriteArrayList for subscribers per topic, thread pool for async message delivery, proper synchronization for subscription management.
+
+#@@@@@@@@@@
+
+107. Which of the following are valid strategies for reducing lock contention? (Multiple correct)
+A) Lock splitting
+B) Lock striping
+C) Lock-free algorithms
+D) Reducing critical section size
+E) Using volatile instead of locks
+
+Answer: A, B, C, D, E - All are valid strategies. Lock splitting divides locks, striping uses multiple locks, lock-free avoids locks, smaller critical sections reduce contention time, volatile for simple cases.
+
+#@@@@@@@@@@
+
+108. Complete this thread-safe counter with overflow protection:
+```java
+public class SafeCounter {
+    private final AtomicLong count = new AtomicLong(0);
+
+    public boolean increment() {
+        long current, next;
+        do {
+            current = count.get();
+            if (current == Long.MAX_VALUE) {
+                return false; // overflow protection
+            }
+            next = current + 1;
+        } while (!count._______________);
+        return true;
+    }
+}
+```
+
+Answer: `compareAndSet(current, next)` - Atomically updates count if current value matches expected value, providing thread-safe increment with overflow check.
+
+#@@@@@@@@@@
+
+109. What is the difference between `synchronized` and `ReentrantLock` performance?
+
+Answer: Synchronized has lower overhead for uncontended access, built into JVM. ReentrantLock has higher overhead but better performance under high contention due to advanced features like fairness, tryLock, and condition variables.
+
+#@@@@@@@@@@
+
+110. Find the issue in this thread pool shutdown:
+```java
+public class ThreadPoolShutdown {
+    private ExecutorService executor = Executors.newFixedThreadPool(10);
+
+    public void shutdown() {
+        executor.shutdown();
+        System.out.println("Shutdown initiated");
+    }
+
+    public void processTask(Runnable task) {
+        executor.submit(task);
+    }
+}
+```
+
+Answer: No waiting for termination. Should call awaitTermination() to wait for running tasks to complete, or shutdownNow() for immediate termination. Current code initiates shutdown but doesn't wait for completion.
+
+#@@@@@@@@@@
+
+111. How do you implement a thread-safe rate limiter?
+
+Answer: Use token bucket algorithm with AtomicLong for tokens, ScheduledExecutorService for refill, or sliding window with ConcurrentHashMap. Libraries like Guava RateLimiter provide production-ready implementations.
+
+#@@@@@@@@@@
+
+112. Which of the following can cause thread pool starvation? (Multiple correct)
+A) All threads blocked on I/O
+B) Deadlock between tasks
+C) Tasks submitting subtasks to same pool
+D) Insufficient pool size
+E) Long-running tasks
+
+Answer: A, B, C, D, E - All can cause starvation. Blocked threads can't process new tasks, deadlocks prevent progress, recursive task submission can exhaust pool, small pools limit throughput, long tasks block others.
+
+#@@@@@@@@@@
+
+113. Predict the output:
+```java
+public class WeakReferenceExample {
+    public static void main(String[] args) throws InterruptedException {
+        Object obj = new Object();
+        WeakReference<Object> weakRef = new WeakReference<>(obj);
+
+        System.out.println("Before nulling: " + (weakRef.get() != null));
+        obj = null;
+        System.gc();
+        Thread.sleep(100);
+        System.out.println("After GC: " + (weakRef.get() != null));
+    }
+}
+```
+
+Answer: "Before nulling: true", "After GC: false" (usually). WeakReference allows garbage collection of referenced object. After obj=null and GC, weakRef.get() typically returns null.
+
+#@@@@@@@@@@
+
+114. What is the purpose of `StampedLock.tryOptimisticRead()`?
+
+Answer: Returns stamp for optimistic read without acquiring lock. Read data, then validate stamp with validate(). If validation fails, upgrade to read lock. Provides better performance for read-heavy workloads with occasional writes.
+
+#@@@@@@@@@@
+
+115. Complete this lock-free linked list insertion:
+```java
+public class LockFreeList<T> {
+    private volatile Node<T> head;
+
+    public void insert(T item) {
+        Node<T> newNode = new Node<>(item);
+        Node<T> currentHead;
+        do {
+            currentHead = head;
+            newNode.next = currentHead;
+        } while (!_______________);
+    }
+
+    private boolean compareAndSet(Node<T> expected, Node<T> update) {
+        // Assume this method exists
+        return true;
+    }
+}
+```
+
+Answer: `compareAndSet(currentHead, newNode)` - Atomically updates head pointer if it still points to currentHead, ensuring thread-safe insertion.
+
+#@@@@@@@@@@
+
+116. How do you handle spurious wakeups in wait/notify?
+
+Answer: Always use while loop instead of if when checking condition before wait(). Spurious wakeups can occur without notify() being called, so condition must be rechecked after wakeup.
+
+#@@@@@@@@@@
+
+117. Which of the following are valid thread-safe collection types? (Multiple correct)
+A) Vector
+B) Hashtable
+C) Collections.synchronizedList()
+D) ConcurrentHashMap
+E) CopyOnWriteArrayList
+
+Answer: A, B, C, D, E - All provide thread safety. Vector and Hashtable use synchronized methods, synchronizedList wraps collections, ConcurrentHashMap and CopyOnWriteArrayList are designed for concurrency.
+
+#@@@@@@@@@@
+
+118. Find the bug in this double-checked locking:
+```java
+public class BrokenSingleton {
+    private static BrokenSingleton instance;
+
+    public static BrokenSingleton getInstance() {
+        if (instance == null) {
+            synchronized (BrokenSingleton.class) {
+                if (instance == null) {
+                    instance = new BrokenSingleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+Answer: Missing volatile keyword on instance field. Without volatile, other threads may see partially constructed object due to instruction reordering. Make instance volatile for proper double-checked locking.
+
+#@@@@@@@@@@
+
+119. What is the difference between `Semaphore` and `CountDownLatch`?
+
+Answer: Semaphore controls access to limited resources, can be acquired/released multiple times, reusable. CountDownLatch waits for events to complete, one-time use, counts down to zero. Different use cases and lifecycle.
+
+#@@@@@@@@@@
+
+120. Predict the output:
+```java
+public class AtomicReferenceExample {
+    private static AtomicReference<String> atomicRef = new AtomicReference<>("initial");
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            atomicRef.compareAndSet("initial", "updated by t1");
+            System.out.println("T1: " + atomicRef.get());
+        });
+
+        Thread t2 = new Thread(() -> {
+            atomicRef.compareAndSet("initial", "updated by t2");
+            System.out.println("T2: " + atomicRef.get());
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+    }
+}
+```
+
+Answer: One thread succeeds with CAS, other fails. Output could be "T1: updated by t1", "T2: updated by t1" or vice versa. Only first CAS succeeds, second sees changed value and fails.
+
+#@@@@@@@@@@
+
+121. How do you implement a thread-safe circular buffer?
+
+Answer: Use AtomicInteger for read/write pointers, array for data storage, proper modulo arithmetic for wrapping, CAS operations for pointer updates, or use libraries like Disruptor for high-performance implementations.
+
+#@@@@@@@@@@
+
+122. Which garbage collection tuning parameters affect thread performance? (Multiple correct)
+A) -XX:MaxGCPauseMillis
+B) -XX:ParallelGCThreads
+C) -XX:ConcGCThreads
+D) -XX:G1HeapRegionSize
+E) -Xmx
+
+Answer: A, B, C, D, E - All affect thread performance. Pause times affect application threads, GC thread counts affect CPU usage, region size affects GC efficiency, heap size affects GC frequency.
+
+#@@@@@@@@@@
+
+123. Complete this thread-safe lazy initialization with exception handling:
+```java
+public class LazyInitWithException<T> {
+    private volatile T instance;
+    private volatile Exception exception;
+
+    public T get() throws Exception {
+        T result = instance;
+        if (result == null && exception == null) {
+            synchronized (this) {
+                result = instance;
+                if (result == null && exception == null) {
+                    try {
+                        instance = result = createInstance();
+                    } catch (Exception e) {
+                        exception = e;
+                        throw e;
+                    }
+                }
+            }
+        }
+        if (exception != null) {
+            throw new Exception(exception);
+        }
+        return result;
+    }
+
+    protected T createInstance() throws Exception {
+        // Implementation specific
+        return null;
+    }
+}
+```
+
+Answer: This implementation correctly handles exceptions in lazy initialization by caching the exception and rethrowing it on subsequent calls, preventing repeated failed initialization attempts.
+
+#@@@@@@@@@@
+
+124. What is the purpose of `LockSupport.parkNanos()` vs `Thread.sleep()`?
+
+Answer: parkNanos() can be unparked by another thread using unpark(), interruptible, more precise timing. sleep() cannot be "unwoken" except by interrupt, less precise timing. parkNanos() is building block for higher-level synchronizers.
+
+#@@@@@@@@@@
+
+125. Find the race condition:
+```java
+public class LazyList<T> {
+    private volatile List<T> list;
+
+    public List<T> getList() {
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
+
+    public void add(T item) {
+        getList().add(item);
+    }
+}
+```
+
+Answer: Race condition in getList() - multiple threads can create different ArrayList instances. Also, ArrayList is not thread-safe for concurrent modifications. Use double-checked locking for initialization and thread-safe list implementation.
+
+#@@@@@@@@@@
+
+126. How do you implement a thread-safe state machine?
+
+Answer: Use enum for states, AtomicReference for current state, CAS operations for state transitions, validate transitions in compareAndSet loop, consider using state pattern with immutable state objects.
+
+#@@@@@@@@@@
+
+127. Which of the following are valid approaches for thread coordination? (Multiple correct)
+A) CountDownLatch
+B) CyclicBarrier
+C) Phaser
+D) Semaphore
+E) CompletableFuture
+F) BlockingQueue
+
+Answer: A, B, C, D, E, F - All provide thread coordination mechanisms for different scenarios: startup/completion, synchronization points, resource control, async composition, producer-consumer.
+
+#@@@@@@@@@@
+
+128. Predict the output:
+```java
+public class ThreadInterruptionExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                System.out.println("Working...");
+                if (Math.random() > 0.7) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("Self-interrupted");
+                }
+            }
+            System.out.println("Thread finished");
+        });
+
+        t.start();
+        t.join();
+    }
+}
+```
+
+Answer: "Working..." prints variable number of times until random condition triggers self-interrupt, then "Self-interrupted", then "Thread finished". Thread terminates when interrupt flag is set.
+
+#@@@@@@@@@@
+
+129. What is the difference between `ConcurrentHashMap.compute()` and `putIfAbsent()`?
+
+Answer: compute() atomically computes new value based on key and current value, can remove entries by returning null. putIfAbsent() only adds if key doesn't exist, cannot modify existing values. compute() is more flexible for atomic updates.
+
+#@@@@@@@@@@
+
+130. Complete this thread-safe singleton with initialization parameter:
+```java
+public class ParameterizedSingleton {
+    private static volatile ParameterizedSingleton instance;
+    private final String parameter;
+
+    private ParameterizedSingleton(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public static ParameterizedSingleton getInstance(String parameter) {
+        ParameterizedSingleton result = instance;
+        if (result == null) {
+            synchronized (ParameterizedSingleton.class) {
+                result = instance;
+                if (result == null) {
+                    instance = result = new ParameterizedSingleton(parameter);
+                }
+            }
+        }
+        return result;
+    }
+}
+```
+
+Answer: This implementation is correct but has limitation - parameter is only used for first initialization. Subsequent calls with different parameters are ignored. Consider throwing exception or returning different instances based on parameters.
+
+#@@@@@@@@@@
+
+131. How do you implement a thread-safe observer pattern?
+
+Answer: Use CopyOnWriteArrayList for observers (read-heavy), synchronize add/remove operations, consider WeakReference for observers to prevent memory leaks, use thread pool for async notifications.
+
+#@@@@@@@@@@
+
+132. Which of the following are valid techniques for avoiding deadlock? (Multiple correct)
+A) Lock ordering
+B) Lock timeout
+C) Deadlock detection
+D) Lock-free algorithms
+E) Single-threaded execution
+
+Answer: A, B, C, D, E - All are valid techniques. Lock ordering prevents circular wait, timeout breaks deadlock, detection allows recovery, lock-free avoids locks entirely, single-threaded eliminates concurrency issues.
+
+#@@@@@@@@@@
+
+133. Find the issue in this thread pool task submission:
+```java
+public class TaskSubmission {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public Future<String> processData(String data) {
+        return executor.submit(() -> {
+            // Process data
+            String result = heavyComputation(data);
+
+            // Submit follow-up task to same executor
+            Future<String> followUp = executor.submit(() -> {
+                return postProcess(result);
+            });
+
+            return followUp.get(); // Potential deadlock
+        });
+    }
+}
+```
+
+Answer: Deadlock potential with single-thread executor. Main task waits for follow-up task, but follow-up task can't execute because single thread is blocked waiting. Use separate executor for follow-up tasks or increase pool size.
+
+#@@@@@@@@@@
+
+134. What is the purpose of `ThreadMXBean` in monitoring?
+
+Answer: Provides thread monitoring capabilities: thread count, CPU time, contention monitoring, deadlock detection, thread states. Useful for performance monitoring, debugging concurrency issues, and application health checks.
+
+#@@@@@@@@@@
+
+135. Predict the output:
+```java
+public class FinalFieldVisibility {
+    private final int value;
+    private boolean ready = false;
+
+    public FinalFieldVisibility(int value) {
+        this.value = value;
+        ready = true;
+    }
+
+    public void print() {
+        if (ready) {
+            System.out.println("Value: " + value);
+        }
+    }
+}
+
+// Thread 1: creates object and passes to Thread 2
+// Thread 2: calls print()
+```
+
+Answer: May print "Value: 0" due to improper publication. Final fields are guaranteed visible after constructor completion, but ready flag may be seen as true before constructor finishes due to reordering. Use proper synchronization for publication.
+
+#@@@@@@@@@@
+
+136. How do you implement a thread-safe cache with size limit?
+
+Answer: Use ConcurrentHashMap with LRU eviction policy, AtomicInteger for size tracking, or libraries like Caffeine with maximumSize(). Implement custom eviction logic or use LinkedHashMap with access-order for LRU behavior.
+
+#@@@@@@@@@@
+
+137. Which of the following are valid memory consistency effects? (Multiple correct)
+A) Happens-before
+B) Synchronizes-with
+C) Program order
+D) Transitivity
+E) Causality
+
+Answer: A, B, C, D, E - All are memory consistency concepts in Java Memory Model. They define ordering relationships between operations in concurrent programs.
+
+#@@@@@@@@@@
+
+138. Complete this lock-free queue implementation:
+```java
+public class LockFreeQueue<T> {
+    private volatile Node<T> head;
+    private volatile Node<T> tail;
+
+    public LockFreeQueue() {
+        Node<T> dummy = new Node<>(null);
+        head = tail = dummy;
+    }
+
+    public void enqueue(T item) {
+        Node<T> newNode = new Node<>(item);
+        while (true) {
+            Node<T> last = tail;
+            Node<T> next = last.next;
+            if (last == tail) {
+                if (next == null) {
+                    if (_______________) {
+                        break;
+                    }
+                } else {
+                    compareAndSet(tail, last, next);
+                }
+            }
+        }
+        compareAndSet(tail, tail, newNode);
+    }
+}
+```
+
+Answer: `compareAndSet(last.next, null, newNode)` - Atomically sets the next pointer of last node to new node, implementing Michael & Scott lock-free queue algorithm.
+
+#@@@@@@@@@@
+
+139. What is the difference between `ReentrantLock.lock()` and `tryLock()`?
+
+Answer: lock() blocks until lock is acquired, can be interrupted. tryLock() returns immediately with boolean result, non-blocking. tryLock(timeout) waits for specified time. Use tryLock() to avoid blocking or implement timeout logic.
+
+#@@@@@@@@@@
+
+140. Find the bug in this thread-safe counter:
+```java
+public class ThreadSafeCounter {
+    private final AtomicInteger count = new AtomicInteger(0);
+    private final AtomicInteger maxSeen = new AtomicInteger(0);
+
+    public int increment() {
+        int newValue = count.incrementAndGet();
+
+        // Update max seen value
+        int currentMax = maxSeen.get();
+        while (newValue > currentMax) {
+            if (maxSeen.compareAndSet(currentMax, newValue)) {
+                break;
+            }
+            currentMax = maxSeen.get();
+        }
+
+        return newValue;
+    }
+}
+```
+
+Answer: No bug - this is correct implementation of thread-safe counter with maximum value tracking using CAS loop to update maxSeen atomically.
+
+#@@@@@@@@@@
+
+141. How do you implement a thread-safe command queue?
+
+Answer: Use BlockingQueue for commands, worker threads polling queue, proper shutdown handling, exception handling for command execution, optional priority support with PriorityBlockingQueue.
+
+#@@@@@@@@@@
+
+142. Which of the following are valid thread dump triggers? (Multiple correct)
+A) kill -3 <pid> (Linux/Unix)
+B) Ctrl+Break (Windows)
+C) jstack <pid>
+D) JConsole
+E) OutOfMemoryError
+
+Answer: A, B, C, D, E - All can trigger thread dumps. kill -3 and Ctrl+Break send signals, jstack generates dumps, JConsole provides GUI, OOM can trigger automatic dumps with -XX:+PrintGCDetails.
+
+#@@@@@@@@@@
+
+143. Predict the output:
+```java
+public class VolatileArrayExample {
+    private volatile int[] array = new int[10];
+
+    public void writer() {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = i;
+        }
+    }
+
+    public void reader() {
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i] + " ");
+        }
+    }
+}
+```
+
+Answer: Output is unpredictable. volatile only applies to array reference, not array elements. Individual array element updates are not atomic or visible across threads. Use AtomicIntegerArray or synchronization for thread-safe array access.
+
+#@@@@@@@@@@
+
+144. What is the purpose of `CompletableFuture.allOf()` vs `anyOf()`?
+
+Answer: allOf() waits for all futures to complete, returns CompletableFuture<Void>. anyOf() waits for any future to complete, returns CompletableFuture<Object> with first result. Use allOf() for parallel execution, anyOf() for racing alternatives.
+
+#@@@@@@@@@@
+
+145. Complete this thread-safe resource pool:
+```java
+public class ResourcePool<T> {
+    private final BlockingQueue<T> available;
+    private final Set<T> inUse = ConcurrentHashMap.newKeySet();
+
+    public ResourcePool(Collection<T> resources) {
+        this.available = new LinkedBlockingQueue<>(resources);
+    }
+
+    public T acquire() throws InterruptedException {
+        T resource = available._______________();
+        inUse.add(resource);
+        return resource;
+    }
+
+    public void release(T resource) {
+        if (inUse.remove(resource)) {
+            available._______________();
+        }
+    }
+}
+```
+
+Answer: First blank: `take()`, Second blank: `offer(resource)`. BlockingQueue handles thread-safe resource management with blocking acquisition.
+
+#@@@@@@@@@@
+
+146. How do you implement graceful shutdown of thread pools?
+
+Answer: Call shutdown() to stop accepting new tasks, use awaitTermination() with timeout to wait for completion, call shutdownNow() if timeout exceeded, handle InterruptedException in tasks, use shutdown hooks for cleanup.
+
+#@@@@@@@@@@
+
+147. Which of the following are valid concurrent programming principles? (Multiple correct)
+A) Minimize shared mutable state
+B) Use immutable objects when possible
+C) Prefer higher-level concurrency utilities
+D) Avoid blocking operations in critical sections
+E) Design for composability
+
+Answer: A, B, C, D, E - All are fundamental principles for writing correct and efficient concurrent programs.
+
+#@@@@@@@@@@
+
+148. Find the race condition:
+```java
+public class StatefulService {
+    private final Map<String, String> cache = new ConcurrentHashMap<>();
+    private volatile boolean initialized = false;
+
+    public String getValue(String key) {
+        if (!initialized) {
+            initializeCache();
+            initialized = true;
+        }
+        return cache.get(key);
+    }
+
+    private void initializeCache() {
+        // Expensive initialization
+        cache.put("key1", "value1");
+        cache.put("key2", "value2");
+    }
+}
+```
+
+Answer: Race condition in initialization check. Multiple threads can pass the !initialized check and call initializeCache() multiple times. Use double-checked locking or AtomicBoolean.compareAndSet() for thread-safe initialization.
+
+#@@@@@@@@@@
+
+149. What is the difference between `ConcurrentLinkedQueue` and `LinkedBlockingQueue`?
+
+Answer: ConcurrentLinkedQueue is unbounded, non-blocking, lock-free implementation. LinkedBlockingQueue can be bounded, blocking operations (put/take), uses locks. Use ConcurrentLinkedQueue for high throughput, LinkedBlockingQueue for flow control.
+
+#@@@@@@@@@@
+
+150. Predict the output:
+```java
+public class ThreadGroupUncaughtException {
+    public static void main(String[] args) throws InterruptedException {
+        ThreadGroup group = new ThreadGroup("TestGroup");
+        group.setUncaughtExceptionHandler((t, e) -> {
+            System.out.println("Uncaught exception in " + t.getName() + ": " + e.getMessage());
+        });
+
+        Thread t = new Thread(group, () -> {
+            throw new RuntimeException("Test exception");
+        }, "TestThread");
+
+        t.start();
+        t.join();
+        System.out.println("Main thread finished");
+    }
+}
+```
+
+Answer: "Uncaught exception in TestThread: Test exception", "Main thread finished". ThreadGroup's uncaught exception handler catches and handles the RuntimeException.
+
+#@@@@@@@@@@
+
+151. How do you implement a thread-safe metrics collector?
+
+Answer: Use AtomicLong for counters, ConcurrentHashMap for metric storage, LongAdder for high-contention counters, ScheduledExecutorService for periodic reporting, consider libraries like Micrometer for production use.
+
+#@@@@@@@@@@
+
+152. Which of the following are valid lock-free data structure implementations? (Multiple correct)
+A) Treiber stack
+B) Michael & Scott queue
+C) Harris linked list
+D) Cliff Click hash table
+E) Lock-free binary search tree
+
+Answer: A, B, C, D, E - All are well-known lock-free data structure algorithms used in concurrent programming and available in various libraries.
+
+#@@@@@@@@@@
+
+153. Complete this thread-safe event dispatcher:
+```java
+public class EventDispatcher<T> {
+    private final Map<Class<T>, List<Consumer<T>>> listeners = new ConcurrentHashMap<>();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    public void register(Class<T> eventType, Consumer<T> listener) {
+        listeners.computeIfAbsent(eventType, k -> new _______________<>()).add(listener);
+    }
+
+    public void dispatch(T event) {
+        List<Consumer<T>> eventListeners = listeners.get(event.getClass());
+        if (eventListeners != null) {
+            for (Consumer<T> listener : eventListeners) {
+                executor.submit(() -> listener._______________());
+            }
+        }
+    }
+}
+```
+
+Answer: First blank: `CopyOnWriteArrayList`, Second blank: `accept(event)`. CopyOnWriteArrayList for thread-safe listener management, accept() to invoke consumer.
+
+#@@@@@@@@@@
+
+154. What is the purpose of `@sun.misc.Contended` annotation?
+
+Answer: Prevents false sharing by adding padding around annotated fields/classes. JVM adds cache line padding to ensure different threads don't access same cache line. Requires -XX:-RestrictContended flag to enable.
+
+#@@@@@@@@@@
+
+155. Find the bug in this thread-safe lazy initialization:
+```java
+public class LazyInitialization {
+    private static class Holder {
+        static final ExpensiveObject INSTANCE = new ExpensiveObject();
+    }
+
+    public static ExpensiveObject getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+
+class ExpensiveObject {
+    private final String data;
+
+    public ExpensiveObject() {
+        // Expensive initialization that might throw exception
+        this.data = performExpensiveOperation();
+    }
+
+    private String performExpensiveOperation() {
+        if (Math.random() > 0.5) {
+            throw new RuntimeException("Initialization failed");
+        }
+        return "initialized";
+    }
+}
+```
+
+Answer: If ExpensiveObject constructor throws exception, class loading fails and subsequent getInstance() calls will throw NoClassDefFoundError or ExceptionInInitializerError. No retry mechanism for failed initialization.
+
+#@@@@@@@@@@
+
+156. How do you implement a thread-safe circuit breaker pattern?
+
+Answer: Use AtomicInteger for failure count, AtomicReference for state (CLOSED/OPEN/HALF_OPEN), timeout for state transitions, thread-safe state machine with CAS operations, consider libraries like Resilience4j.
+
+#@@@@@@@@@@
+
+157. Which of the following are valid approaches for thread-safe initialization? (Multiple correct)
+A) Double-checked locking with volatile
+B) Initialization-on-demand holder pattern
+C) Enum singleton
+D) Synchronized method
+E) AtomicReference with CAS
+
+Answer: A, B, C, D, E - All are valid approaches with different trade-offs in performance, complexity, and use cases.
+
+#@@@@@@@@@@
+
+158. Predict the output:
+```java
+public class ThreadLocalInheritance {
+    private static final InheritableThreadLocal<String> inheritableThreadLocal =
+        new InheritableThreadLocal<String>() {
+            @Override
+            protected String initialValue() {
+                return "default";
+            }
+        };
+
+    public static void main(String[] args) throws InterruptedException {
+        inheritableThreadLocal.set("parent-value");
+
+        Thread child = new Thread(() -> {
+            System.out.println("Child: " + inheritableThreadLocal.get());
+            inheritableThreadLocal.set("child-value");
+            System.out.println("Child modified: " + inheritableThreadLocal.get());
+        });
+
+        child.start();
+        child.join();
+
+        System.out.println("Parent: " + inheritableThreadLocal.get());
+    }
+}
+```
+
+Answer: "Child: parent-value", "Child modified: child-value", "Parent: parent-value". InheritableThreadLocal copies parent value to child thread, but modifications in child don't affect parent.
+
+#@@@@@@@@@@
+
+159. What is the difference between `ConcurrentSkipListMap` and `ConcurrentHashMap`?
+
+Answer: ConcurrentSkipListMap maintains sorted order, implements NavigableMap, O(log n) operations. ConcurrentHashMap doesn't maintain order, O(1) average operations, better performance for unsorted access. Choose based on ordering requirements.
+
+#@@@@@@@@@@
+
+160. Complete this thread-safe bounded buffer:
+```java
+public class BoundedBuffer<T> {
+    private final T[] buffer;
+    private final int capacity;
+    private final AtomicInteger count = new AtomicInteger(0);
+    private final AtomicInteger putIndex = new AtomicInteger(0);
+    private final AtomicInteger takeIndex = new AtomicInteger(0);
+    private final Semaphore putSemaphore;
+    private final Semaphore takeSemaphore;
+
+    @SuppressWarnings("unchecked")
+    public BoundedBuffer(int capacity) {
+        this.capacity = capacity;
+        this.buffer = (T[]) new Object[capacity];
+        this.putSemaphore = new Semaphore(capacity);
+        this.takeSemaphore = new Semaphore(0);
+    }
+
+    public void put(T item) throws InterruptedException {
+        putSemaphore.acquire();
+        int index = putIndex.getAndIncrement() % capacity;
+        buffer[index] = item;
+        takeSemaphore._______________();
+    }
+
+    public T take() throws InterruptedException {
+        takeSemaphore.acquire();
+        int index = takeIndex.getAndIncrement() % capacity;
+        T item = buffer[index];
+        buffer[index] = null; // Help GC
+        putSemaphore._______________();
+        return item;
+    }
+}
+```
+
+Answer: Both blanks: `release()`. Semaphores coordinate producer-consumer access to bounded buffer.
+
+#@@@@@@@@@@
+
+161. How do you implement a thread-safe reference counting mechanism?
+
+Answer: Use AtomicInteger for count, CAS operations for increment/decrement, callback for zero count reached, WeakReference for automatic cleanup, or use libraries like Netty's ReferenceCounted.
+
+#@@@@@@@@@@
+
+162. Which of the following are valid thread safety levels? (Multiple correct)
+A) Thread-safe
+B) Conditionally thread-safe
+C) Thread-compatible
+D) Thread-hostile
+E) Immutable
+
+Answer: A, B, C, D, E - All are valid thread safety classifications from weakest (thread-hostile) to strongest (immutable), as defined in Java Concurrency in Practice.
+
+#@@@@@@@@@@
+
+163. Find the issue in this lock-free algorithm:
+```java
+public class LockFreeCounter {
+    private volatile long count = 0;
+
+    public long increment() {
+        long current, next;
+        do {
+            current = count;
+            next = current + 1;
+        } while (!compareAndSet(current, next));
+        return next;
+    }
+
+    private boolean compareAndSet(long expected, long update) {
+        // Simplified - assume this works atomically
+        if (count == expected) {
+            count = update;
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+Answer: compareAndSet implementation is not atomic. The check and update are separate operations, creating race condition. Should use AtomicLong.compareAndSet() or proper atomic CAS instruction.
+
+#@@@@@@@@@@
+
+164. What is the purpose of `ThreadFactory` in thread pools?
+
+Answer: Customizes thread creation: names, daemon status, priority, exception handlers, thread groups. Provides control over thread characteristics in ExecutorService implementations. Useful for debugging and monitoring.
+
+#@@@@@@@@@@
+
+165. Predict the output:
+```java
+public class MemoryConsistencyExample {
+    private int x = 0;
+    private volatile boolean ready = false;
+
+    public void writer() {
+        x = 42;
+        ready = true; // volatile write
+    }
+
+    public void reader() {
+        if (ready) { // volatile read
+            System.out.println("x = " + x);
+        }
+    }
+}
+```
+
+Answer: "x = 42" - volatile write of ready happens-before volatile read of ready, which happens-before reading x. Memory consistency guarantees x will be visible as 42.
+
+#@@@@@@@@@@
+
+166. How do you implement a thread-safe object factory?
+
+Answer: Use ConcurrentHashMap for object caching, factory methods with proper synchronization, consider object pooling for expensive objects, use weak references for automatic cleanup, implement proper lifecycle management.
+
+#@@@@@@@@@@
+
+167. Which of the following are valid concurrent design patterns? (Multiple correct)
+A) Active Object
+B) Monitor Object
+C) Half-Sync/Half-Async
+D) Leader/Followers
+E) Producer-Consumer
+F) Reactor
+
+Answer: A, B, C, D, E, F - All are established concurrent design patterns for different scenarios and architectural requirements.
+
+#@@@@@@@@@@
+
+168. Complete this thread-safe memoization:
+```java
+public class Memoizer<A, V> {
+    private final ConcurrentMap<A, Future<V>> cache = new ConcurrentHashMap<>();
+    private final Function<A, V> function;
+
+    public Memoizer(Function<A, V> function) {
+        this.function = function;
+    }
+
+    public V compute(A arg) throws InterruptedException, ExecutionException {
+        Future<V> future = cache.get(arg);
+        if (future == null) {
+            FutureTask<V> task = new FutureTask<>(() -> function.apply(arg));
+            future = cache._______________);
+            if (future == null) {
+                future = task;
+                task.run();
+            }
+        }
+        return future.get();
+    }
+}
+```
+
+Answer: `putIfAbsent(arg, task)` - Atomically puts task if absent, returns existing value if present. Prevents duplicate computation while ensuring thread safety.
+
+#@@@@@@@@@@
+
+169. What is the difference between `notify()` and `notifyAll()`?
+
+Answer: notify() wakes up one waiting thread (arbitrary choice), notifyAll() wakes up all waiting threads. Use notifyAll() when multiple threads might be waiting for different conditions, notify() when only one thread should proceed.
+
+#@@@@@@@@@@
+
+170. Find the bug in this thread pool configuration:
+```java
+public class CustomThreadPool {
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+        0, Integer.MAX_VALUE,
+        60L, TimeUnit.SECONDS,
+        new SynchronousQueue<>(),
+        Executors.defaultThreadFactory(),
+        new ThreadPoolExecutor.AbortPolicy()
+    );
+
+    public void submitTask(Runnable task) {
+        executor.submit(task);
+    }
+}
+```
+
+Answer: This is essentially Executors.newCachedThreadPool() configuration. Potential issues: unbounded thread creation can cause OutOfMemoryError under high load, SynchronousQueue with AbortPolicy can reject tasks immediately if no threads available.
+
+#@@@@@@@@@@
+
+171. How do you implement a thread-safe priority queue?
+
+Answer: Use PriorityBlockingQueue for thread-safe operations, custom Comparator for priority logic, or implement using ReentrantLock with Condition variables and heap data structure.
+
+#@@@@@@@@@@
+
+172. Which of the following are valid memory leak sources in multithreaded applications? (Multiple correct)
+A) ThreadLocal not cleaned up
+B) Thread pools not shut down
+C) Event listeners not removed
+D) Static collections growing unbounded
+E) Circular references with strong references
+
+Answer: A, B, C, D, E - All can cause memory leaks in multithreaded applications. Proper cleanup, lifecycle management, and weak references help prevent leaks.
+
+#@@@@@@@@@@
+
+173. Predict the output:
+```java
+public class AtomicFieldUpdaterExample {
+    private volatile int value = 0;
+    private static final AtomicIntegerFieldUpdater<AtomicFieldUpdaterExample> updater =
+        AtomicIntegerFieldUpdater.newUpdater(AtomicFieldUpdaterExample.class, "value");
+
+    public void increment() {
+        updater.incrementAndGet(this);
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        AtomicFieldUpdaterExample example = new AtomicFieldUpdaterExample();
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                example.increment();
+            }
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                example.increment();
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("Final value: " + example.getValue());
+    }
+}
+```
+
+Answer: "Final value: 2000" - AtomicIntegerFieldUpdater provides atomic operations on volatile fields, ensuring thread-safe increments without race conditions.
+
+#@@@@@@@@@@
+
+174. What is the purpose of `Unsafe` class in Java concurrency?
+
+Answer: Provides low-level memory operations, CAS instructions, memory barriers. Used internally by java.util.concurrent classes. Not recommended for application use due to safety concerns and potential removal in future Java versions.
+
+#@@@@@@@@@@
+
+175. Complete this thread-safe sliding window rate limiter:
+```java
+public class SlidingWindowRateLimiter {
+    private final int maxRequests;
+    private final long windowSizeMs;
+    private final ConcurrentLinkedQueue<Long> timestamps = new ConcurrentLinkedQueue<>();
+
+    public SlidingWindowRateLimiter(int maxRequests, long windowSizeMs) {
+        this.maxRequests = maxRequests;
+        this.windowSizeMs = windowSizeMs;
+    }
+
+    public boolean allowRequest() {
+        long now = System.currentTimeMillis();
+
+        // Remove old timestamps
+        while (!timestamps.isEmpty() && now - timestamps.peek() > windowSizeMs) {
+            timestamps._______________();
+        }
+
+        if (timestamps.size() < maxRequests) {
+            timestamps._______________();
+            return true;
+        }
+
+        return false;
+    }
+}
+```
+
+Answer: First blank: `poll()`, Second blank: `offer(now)`. Removes expired timestamps and adds current timestamp if within rate limit.
+
+#@@@@@@@@@@
+
+176. How do you implement a thread-safe cache with write-through policy?
+
+Answer: Use ConcurrentHashMap for cache storage, synchronize write operations to ensure cache and backing store consistency, implement cache loader for misses, consider using libraries like Caffeine with writer configuration.
+
+#@@@@@@@@@@
+
+177. Which of the following are valid thread interruption handling strategies? (Multiple correct)
+A) Restore interrupt status and continue
+B) Propagate InterruptedException
+C) Log and ignore (rarely appropriate)
+D) Clean up and exit thread
+E) Convert to unchecked exception
+
+Answer: A, B, D, E - Logging and ignoring interruption is rarely appropriate as it breaks cancellation mechanism. Other strategies are valid depending on context.
+
+#@@@@@@@@@@
+
+178. Find the race condition:
+```java
+public class CacheWithStats {
+    private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
+    private final AtomicLong hits = new AtomicLong(0);
+    private final AtomicLong misses = new AtomicLong(0);
+
+    public String get(String key) {
+        String value = cache.get(key);
+        if (value != null) {
+            hits.incrementAndGet();
+            return value;
+        } else {
+            misses.incrementAndGet();
+            return loadFromDatabase(key);
+        }
+    }
+}
+```
+
+Answer: Race condition between cache miss and loading from database. Multiple threads can miss same key and load from database simultaneously. Use computeIfAbsent() or double-checked locking to ensure single load per key.
+
+#@@@@@@@@@@
+
+179. What is the difference between `RecursiveAction` and `RecursiveTask` in ForkJoin?
+
+Answer: RecursiveAction for tasks that don't return results (void), RecursiveTask for tasks that return values. Both support divide-and-conquer algorithms with work stealing in ForkJoinPool.
+
+#@@@@@@@@@@
+
+180. Predict the output:
+```java
+public class CompletableFutureChaining {
+    public static void main(String[] args) {
+        CompletableFuture<String> future = CompletableFuture
+            .supplyAsync(() -> {
+                System.out.println("Supply: " + Thread.currentThread().getName());
+                return "Hello";
+            })
+            .thenApply(s -> {
+                System.out.println("Apply: " + Thread.currentThread().getName());
+                return s + " World";
+            })
+            .thenAccept(s -> {
+                System.out.println("Accept: " + Thread.currentThread().getName());
+                System.out.println("Result: " + s);
+            });
+
+        future.join();
+    }
+}
+```
+
+Answer: Shows thread names for each stage. supplyAsync runs in ForkJoinPool thread, thenApply and thenAccept may run in same thread or different threads depending on timing and thread availability.
+
+#@@@@@@@@@@
+
+181. How do you implement a thread-safe connection pool?
+
+Answer: Use BlockingQueue for available connections, Set for active connections, proper connection validation, timeout handling, connection lifecycle management, consider libraries like HikariCP for production use.
+
+#@@@@@@@@@@
+
+182. Which of the following are valid approaches for handling shared mutable state? (Multiple correct)
+A) Synchronization
+B) Immutable objects
+C) Thread-local storage
+D) Actor model
+E) Lock-free algorithms
+F) Message passing
+
+Answer: A, B, C, D, E, F - All are valid approaches for managing shared mutable state in concurrent applications, each with different trade-offs.
+
+#@@@@@@@@@@
+
+183. Complete this thread-safe lazy initialization with double-checked locking:
+```java
+public class LazyInitialization<T> {
+    private volatile T instance;
+    private final Supplier<T> supplier;
+    private final Object lock = new Object();
+
+    public LazyInitialization(Supplier<T> supplier) {
+        this.supplier = supplier;
+    }
+
+    public T get() {
+        T result = instance;
+        if (result == null) {
+            synchronized (lock) {
+                result = instance;
+                if (result == null) {
+                    instance = result = supplier._______________();
+                }
+            }
+        }
+        return result;
+    }
+}
+```
+
+Answer: `get()` - Calls the supplier function to create the instance. This is a generic implementation of double-checked locking pattern.
+
+#@@@@@@@@@@
+
+184. What is the purpose of `ConcurrentModificationException`?
+
+Answer: Thrown when collection is modified while being iterated by fail-fast iterator. Indicates concurrent modification detected. Use concurrent collections or proper synchronization to avoid this exception.
+
+#@@@@@@@@@@
+
+185. Find the issue in this thread-safe singleton:
+```java
+public class Singleton {
+    private static Singleton instance;
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private Singleton() {
+        // Constructor might throw exception
+        if (System.currentTimeMillis() % 2 == 0) {
+            throw new RuntimeException("Initialization failed");
+        }
+    }
+}
+```
+
+Answer: If constructor throws exception, instance remains null but synchronization block exits. Subsequent calls will retry initialization. Consider caching exception or using different initialization strategy for failed cases.
+
+#@@@@@@@@@@
+
+186. How do you implement a thread-safe event sourcing mechanism?
+
+Answer: Use append-only log with atomic writes, sequence numbers for ordering, concurrent readers with proper synchronization, event replay mechanism, consider using libraries like Axon Framework.
+
+#@@@@@@@@@@
+
+187. Which of the following are valid concurrent collection characteristics? (Multiple correct)
+A) Thread-safe operations
+B) Fail-fast iterators
+C) Weakly consistent iterators
+D) Lock-free implementations
+E) Bounded capacity options
+
+Answer: A, C, D, E - Concurrent collections typically have weakly consistent (not fail-fast) iterators that don't throw ConcurrentModificationException.
+
+#@@@@@@@@@@
+
+188. Predict the output:
+```java
+public class ThreadLocalCleanup {
+    private static final ThreadLocal<String> threadLocal = new ThreadLocal<>();
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            threadLocal.set("thread-value");
+            System.out.println("Set: " + threadLocal.get());
+            // Missing: threadLocal.remove();
+        });
+
+        t.start();
+        t.join();
+
+        // Thread t is now terminated
+        System.out.println("Main: " + threadLocal.get());
+    }
+}
+```
+
+Answer: "Set: thread-value", "Main: null". Each thread has its own ThreadLocal copy. Main thread's ThreadLocal is null since it was never set. Thread t's value is cleaned up when thread terminates.
+
+#@@@@@@@@@@
+
+189. What is the difference between `ConcurrentHashMap.size()` and `mappingCount()`?
+
+Answer: size() returns int, may not reflect exact count during concurrent modifications. mappingCount() returns long, provides better accuracy for large maps. Use mappingCount() for more precise count in concurrent scenarios.
+
+#@@@@@@@@@@
+
+190. Complete this thread-safe work queue with priority:
+```java
+public class PriorityWorkQueue<T extends Comparable<T>> {
+    private final PriorityBlockingQueue<T> queue = new PriorityBlockingQueue<>();
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+
+    public void submit(T task) {
+        if (!shutdown.get()) {
+            queue._______________();
+        }
+    }
+
+    public T take() throws InterruptedException {
+        while (!shutdown.get() || !queue.isEmpty()) {
+            T task = queue.poll(100, TimeUnit.MILLISECONDS);
+            if (task != null) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    public void shutdown() {
+        shutdown.set(true);
+    }
+}
+```
+
+Answer: `offer(task)` - Adds task to priority queue. PriorityBlockingQueue maintains ordering based on Comparable implementation.
+
+#@@@@@@@@@@
+
+191. How do you implement a thread-safe reference cache with weak references?
+
+Answer: Use ConcurrentHashMap with WeakReference values, ReferenceQueue for cleanup notification, background thread for removing cleared references, proper synchronization for cache operations.
+
+#@@@@@@@@@@
+
+192. Which of the following are valid thread pool rejection policies? (Multiple correct)
+A) AbortPolicy
+B) CallerRunsPolicy
+C) DiscardPolicy
+D) DiscardOldestPolicy
+E) CustomRejectionHandler
+
+Answer: A, B, C, D, E - All are valid. AbortPolicy throws exception, CallerRunsPolicy runs in caller thread, DiscardPolicy silently discards, DiscardOldestPolicy removes oldest task, custom handlers implement RejectedExecutionHandler.
+
+#@@@@@@@@@@
+
+193. Find the bug in this lock-free linked list:
+```java
+public class LockFreeLinkedList<T> {
+    private volatile Node<T> head;
+
+    public void add(T item) {
+        Node<T> newNode = new Node<>(item);
+        Node<T> currentHead;
+        do {
+            currentHead = head;
+            newNode.next = currentHead;
+        } while (!compareAndSet(head, currentHead, newNode));
+    }
+
+    public boolean remove(T item) {
+        Node<T> current = head;
+        Node<T> previous = null;
+
+        while (current != null) {
+            if (current.data.equals(item)) {
+                if (previous == null) {
+                    return compareAndSet(head, current, current.next);
+                } else {
+                    return compareAndSet(previous.next, current, current.next);
+                }
+            }
+            previous = current;
+            current = current.next;
+        }
+        return false;
+    }
+}
+```
+
+Answer: Race condition in remove() method. Between finding node and attempting CAS, list structure can change. Need to use marked references or hazard pointers to handle concurrent modifications safely.
+
+#@@@@@@@@@@
+
+194. What is the purpose of `ThreadLocalRandom.current()`?
+
+Answer: Returns ThreadLocalRandom instance for current thread, avoiding contention of shared Random instance. Each thread gets its own random number generator, improving performance in multithreaded applications.
+
+#@@@@@@@@@@
+
+195. Predict the output:
+```java
+public class FinalizeExample {
+    private static volatile boolean finalized = false;
+
+    @Override
+    protected void finalize() throws Throwable {
+        finalized = true;
+        System.out.println("Object finalized");
+        super.finalize();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        new FinalizeExample();
+        System.gc();
+        Thread.sleep(1000);
+        System.out.println("Finalized: " + finalized);
+    }
+}
+```
+
+Answer: Output is unpredictable. finalize() may or may not be called - GC and finalization are not guaranteed. May print "Object finalized" and "Finalized: true", or just "Finalized: false". Don't rely on finalize() for cleanup.
+
+#@@@@@@@@@@
+
+196. How do you implement a thread-safe batch processor?
+
+Answer: Use BlockingQueue for items, batch size threshold, timeout for partial batches, worker threads for processing, proper shutdown handling, consider using libraries like Spring Batch for complex scenarios.
+
+#@@@@@@@@@@
+
+197. Which of the following are valid approaches for thread-safe lazy initialization? (Multiple correct)
+A) Synchronized method
+B) Double-checked locking with volatile
+C) Initialization-on-demand holder
+D) AtomicReference with CAS
+E) Enum singleton
+
+Answer: A, B, C, D, E - All are valid approaches with different performance characteristics and complexity levels.
+
+#@@@@@@@@@@
+
+198. Complete this thread-safe counter with overflow detection:
+```java
+public class OverflowSafeCounter {
+    private final AtomicLong counter = new AtomicLong(0);
+
+    public boolean increment() {
+        long current, next;
+        do {
+            current = counter.get();
+            if (current == Long.MAX_VALUE) {
+                return false; // Overflow would occur
+            }
+            next = current + 1;
+        } while (!counter._______________);
+        return true;
+    }
+
+    public boolean decrement() {
+        long current, next;
+        do {
+            current = counter.get();
+            if (current == Long.MIN_VALUE) {
+                return false; // Underflow would occur
+            }
+            next = current - 1;
+        } while (!counter._______________);
+        return true;
+    }
+}
+```
+
+Answer: Both blanks: `compareAndSet(current, next)` - Atomically updates counter if current value matches expected value, providing overflow/underflow protection.
+
+#@@@@@@@@@@
+
+199. What is the difference between `ExecutorService.submit()` and `CompletableFuture.supplyAsync()`?
+
+Answer: submit() uses provided ExecutorService, returns Future. supplyAsync() uses common ForkJoinPool by default (or provided executor), returns CompletableFuture with rich composition API. CompletableFuture provides better functional programming support.
+
+#@@@@@@@@@@
+
+200. Find the final race condition:
+```java
+public class FinalRaceCondition {
+    private final Map<String, AtomicInteger> counters = new ConcurrentHashMap<>();
+
+    public int incrementCounter(String key) {
+        AtomicInteger counter = counters.get(key);
+        if (counter == null) {
+            counter = new AtomicInteger(0);
+            counters.put(key, counter);
+        }
+        return counter.incrementAndGet();
+    }
+}
+```
+
+Answer: Race condition between get() and put(). Multiple threads can create different AtomicInteger instances for same key. Use computeIfAbsent() for atomic get-or-create: `counters.computeIfAbsent(key, k -> new AtomicInteger(0)).incrementAndGet()`.
+
+#@@@@@@@@@@

@@ -1,0 +1,335 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: maven:3.9-eclipse-temurin-21
+    command: ['sleep']
+    args: ['infinity']
+    volumeMounts:
+    - name: maven-cache
+      mountPath: /root/.m2
+  - name: node
+    image: node:20-alpine
+    command: ['sleep']
+    args: ['infinity']
+  - name: docker
+    image: docker:24-dind
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: maven-cache
+    persistentVolumeClaim:
+      claimName: maven-cache
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+'''
+        }
+    }
+
+    environment {
+        DOCKER_REGISTRY = credentials('docker-registry')
+        AWS_CREDENTIALS = credentials('aws-credentials')
+        SONAR_TOKEN = credentials('sonar-token')
+        ECR_REGISTRY = 'your-account.dkr.ecr.us-east-1.amazonaws.com'
+        IMAGE_TAG = "${env.GIT_COMMIT?.take(8) ?: 'latest'}"
+    }
+
+    options {
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
+
+        stage('Build') {
+            parallel {
+                stage('Build Backend') {
+                    steps {
+                        container('maven') {
+                            sh '''
+                                mvn clean compile -DskipTests -B
+                            '''
+                        }
+                    }
+                }
+
+                stage('Build Frontend') {
+                    steps {
+                        container('node') {
+                            dir('frontend') {
+                                sh '''
+                                    npm ci
+                                    npm run build
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        container('maven') {
+                            sh '''
+                                mvn test -B
+                            '''
+                        }
+                    }
+                    post {
+                        always {
+                            junit '**/target/surefire-reports/*.xml'
+                            jacoco(
+                                execPattern: '**/target/jacoco.exec',
+                                classPattern: '**/target/classes',
+                                sourcePattern: '**/src/main/java'
+                            )
+                        }
+                    }
+                }
+
+                stage('Frontend Tests') {
+                    steps {
+                        container('node') {
+                            dir('frontend') {
+                                sh '''
+                                    npm run test:coverage
+                                '''
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            publishHTML(target: [
+                                reportDir: 'frontend/coverage',
+                                reportFiles: 'index.html',
+                                reportName: 'Frontend Coverage'
+                            ])
+                        }
+                    }
+                }
+
+                stage('Integration Tests') {
+                    steps {
+                        container('maven') {
+                            sh '''
+                                mvn verify -DskipUnitTests -B
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            parallel {
+                stage('SonarQube Analysis') {
+                    steps {
+                        container('maven') {
+                            withSonarQubeEnv('SonarQube') {
+                                sh '''
+                                    mvn sonar:sonar \
+                                        -Dsonar.projectKey=enterprise-banking-platform \
+                                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                                        -Dsonar.login=${SONAR_TOKEN}
+                                '''
+                            }
+                        }
+                    }
+                }
+
+                stage('Security Scan') {
+                    steps {
+                        container('maven') {
+                            sh '''
+                                mvn org.owasp:dependency-check-maven:check -B
+                            '''
+                        }
+                    }
+                    post {
+                        always {
+                            dependencyCheckPublisher(
+                                pattern: '**/dependency-check-report.xml'
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate Check') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                    branch pattern: 'release/*'
+                }
+            }
+            steps {
+                container('docker') {
+                    script {
+                        def services = [
+                            'account-service',
+                            'transaction-service',
+                            'loan-service',
+                            'fraud-detection-service',
+                            'api-gateway'
+                        ]
+
+                        services.each { service ->
+                            sh """
+                                docker build \
+                                    -t ${ECR_REGISTRY}/${service}:${IMAGE_TAG} \
+                                    -t ${ECR_REGISTRY}/${service}:latest \
+                                    -f services/${service}/Dockerfile \
+                                    services/${service}
+                            """
+                        }
+
+                        // Build frontend
+                        sh """
+                            docker build \
+                                -t ${ECR_REGISTRY}/frontend:${IMAGE_TAG} \
+                                -t ${ECR_REGISTRY}/frontend:latest \
+                                -f frontend/Dockerfile \
+                                frontend
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Push to Registry') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                    branch pattern: 'release/*'
+                }
+            }
+            steps {
+                container('docker') {
+                    sh '''
+                        aws ecr get-login-password --region us-east-1 | \
+                            docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                    '''
+                    script {
+                        def images = [
+                            'account-service',
+                            'transaction-service',
+                            'loan-service',
+                            'fraud-detection-service',
+                            'api-gateway',
+                            'frontend'
+                        ]
+
+                        images.each { image ->
+                            sh """
+                                docker push ${ECR_REGISTRY}/${image}:${IMAGE_TAG}
+                                docker push ${ECR_REGISTRY}/${image}:latest
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Dev') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                container('docker') {
+                    sh '''
+                        kubectl config use-context dev-cluster
+                        kubectl set image deployment/account-service \
+                            account-service=${ECR_REGISTRY}/account-service:${IMAGE_TAG} \
+                            -n banking-dev
+                        kubectl rollout status deployment/account-service -n banking-dev
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            when {
+                branch pattern: 'release/*'
+            }
+            steps {
+                input message: 'Deploy to Staging?', ok: 'Deploy'
+                container('docker') {
+                    sh '''
+                        kubectl config use-context staging-cluster
+                        kubectl apply -k infrastructure/kubernetes/overlays/staging
+                        kubectl rollout status deployment --all -n banking-staging
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: 'Deploy to Production?', ok: 'Deploy'
+                container('docker') {
+                    sh '''
+                        kubectl config use-context prod-cluster
+                        kubectl apply -k infrastructure/kubernetes/overlays/prod
+                        kubectl rollout status deployment --all -n banking-prod
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            slackSend(
+                color: 'good',
+                message: "Build succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+        }
+        failure {
+            slackSend(
+                color: 'danger',
+                message: "Build failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+        }
+    }
+}

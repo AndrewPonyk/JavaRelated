@@ -1,0 +1,2391 @@
+Ruby Quiz - 200 Questions
+Tech Stack: Rails, Sinatra, Hanami, Bundler, RSpec, RuboCop, Sidekiq, Capistrano
+
+1. Which of the following are Ruby on Rails conventions? (Multiple correct)
+A) Convention over Configuration
+B) DRY (Don't Repeat Yourself)
+C) RESTful routing
+D) ActiveRecord pattern
+E) MVC architecture
+F) Fat models, skinny controllers
+
+Answer: A, B, C, D, E, F - All are Rails conventions. Convention over Configuration (sensible defaults), DRY (avoid repetition), RESTful routing (resource-based), ActiveRecord pattern (ORM), MVC architecture (separation of concerns), Fat models, skinny controllers (business logic in models).
+
+#@@@@@@@@@@
+
+2. Complete this Rails controller:
+```ruby
+class UsersController < ApplicationController
+  before_action :set_user, only: [:show, :edit, :update, :destroy]
+
+  def index
+    @users = User.all
+  end
+
+  def show
+  end
+
+  def create
+    @user = User.new(user_params)
+
+    if @user.save
+      redirect_to @user, notice: 'User was successfully created.'
+    else
+      render :_______________
+    end
+  end
+
+  private
+
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  def user_params
+    params.require(:user).permit(:name, :email)
+  end
+end
+```
+
+Answer: `new` - Render the new template to show validation errors when user creation fails. This follows Rails conventions for handling form submission errors.
+
+#@@@@@@@@@@
+
+3. What is the difference between Sinatra and Rails?
+
+Answer: Sinatra is lightweight, minimal web framework for simple applications. Rails is full-stack framework with conventions, generators, ORM, extensive features. Sinatra gives more control and flexibility, Rails provides rapid development with conventions. Choose Sinatra for APIs/microservices, Rails for full applications.
+
+#@@@@@@@@@@
+
+4. Which of the following are Bundler commands? (Multiple correct)
+A) bundle install
+B) bundle update
+C) bundle exec
+D) bundle add
+E) bundle remove
+F) bundle show
+
+Answer: A, B, C, D, E, F - All are Bundler commands. install (install gems), update (update gems), exec (run with bundle context), add (add gem to Gemfile), remove (remove gem), show (show gem info).
+
+#@@@@@@@@@@
+
+5. Find the N+1 query problem in this Rails code:
+```ruby
+class PostsController < ApplicationController
+  def index
+    @posts = Post.all
+  end
+end
+
+# In the view:
+<% @posts.each do |post| %>
+  <h3><%= post.title %></h3>
+  <p>By: <%= post.user.name %></p> <!-- N+1 problem here -->
+  <p><%= post.content %></p>
+<% end %>
+```
+
+Answer: Each post.user.name triggers a separate database query. Fix with eager loading: `@posts = Post.includes(:user)` or `@posts = Post.joins(:user).select('posts.*, users.name as user_name')` to load users in single query.
+
+#@@@@@@@@@@
+
+6. How do you implement background jobs in Rails with Sidekiq?
+
+Answer: Add sidekiq gem, create worker class inheriting from `Sidekiq::Worker`, implement perform method, enqueue with `MyWorker.perform_async(args)`. Configure Redis, start sidekiq process, use sidekiq-web for monitoring. Handle retries, failures, and job scheduling.
+
+#@@@@@@@@@@
+
+7. Which of the following are RSpec matchers? (Multiple correct)
+A) expect().to eq()
+B) expect().to be_nil
+C) expect().to include()
+D) expect().to raise_error()
+E) expect().to change()
+F) expect().to have_attributes()
+
+Answer: A, B, C, D, E, F - All are RSpec matchers. eq (equality), be_nil (nil check), include (collection membership), raise_error (exception testing), change (state change), have_attributes (object attributes).
+
+#@@@@@@@@@@
+
+8. Complete this Hanami action:
+```ruby
+module Web
+  module Controllers
+    module Users
+      class Show
+        include Web::Action
+
+        def call(params)
+          @user = UserRepository.new.find(params[:id])
+
+          halt 404 unless @user
+        end
+
+        private
+
+        def _______________
+          %i[id name email]
+        end
+      end
+    end
+  end
+end
+```
+
+Answer: `expose` - Define which instance variables are exposed to the view. Hanami uses explicit exposure rather than automatic instance variable sharing like Rails.
+
+#@@@@@@@@@@
+
+9. What is the difference between symbols and strings in Ruby?
+
+Answer: Symbols are immutable, stored once in memory, faster for comparisons, used as identifiers. Strings are mutable, new object each time, slower comparisons, used for text data. Use symbols for keys, constants, method names. Use strings for user data, text manipulation.
+
+#@@@@@@@@@@
+
+10. Which of the following are Ruby metaprogramming techniques? (Multiple correct)
+A) define_method
+B) method_missing
+C) eval
+D) class_eval
+E) instance_eval
+F) const_missing
+
+Answer: A, B, C, D, E, F - All are Ruby metaprogramming techniques. define_method (dynamic method creation), method_missing (handle undefined methods), eval (execute string as code), class_eval (evaluate in class context), instance_eval (evaluate in instance context), const_missing (handle undefined constants).
+
+#@@@@@@@@@@
+
+11. Predict the output of this Ruby code:
+```ruby
+class Person
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def greet
+    "Hello, I'm #{@name}"
+  end
+end
+
+person = Person.new("Alice")
+puts person.greet
+
+person.name = "Bob"
+puts person.greet
+```
+
+Answer: Hello, I'm Alice, Hello, I'm Bob - attr_accessor creates getter and setter methods. The setter changes @name instance variable, affecting subsequent method calls.
+
+#@@@@@@@@@@
+
+12. How do you implement caching in Rails?
+
+Answer: Use Rails.cache with backends (memory, file, Redis, Memcached). Methods: cache.fetch(), cache.write(), cache.read(). Fragment caching with cache helper, Russian Doll caching with cache_key. Configure in environments, use cache_store setting.
+
+#@@@@@@@@@@
+
+13. Which of the following are RuboCop features? (Multiple correct)
+A) Code style checking
+B) Auto-correction
+C) Custom cops
+D) Configuration files
+E) IDE integration
+F) Performance analysis
+
+Answer: A, B, C, D, E, F - All are RuboCop features. Code style checking (style enforcement), Auto-correction (automatic fixes), Custom cops (custom rules), Configuration files (.rubocop.yml), IDE integration (editor support), Performance analysis (performance cops).
+
+#@@@@@@@@@@
+
+14. Complete this Capistrano deployment configuration:
+```ruby
+# config/deploy.rb
+set :application, 'my_app'
+set :repo_url, 'git@github.com:user/my_app.git'
+set :branch, 'main'
+set :deploy_to, '/var/www/my_app'
+
+set :linked_files, %w{config/database.yml config/master.key}
+set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+
+namespace :deploy do
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
+      within release_path do
+        execute :rake, '_______________'
+      end
+    end
+  end
+end
+```
+
+Answer: `tmp:clear` or `assets:precompile` - Common rake tasks for deployment. tmp:clear cleans temporary files, assets:precompile compiles assets for production.
+
+#@@@@@@@@@@
+
+15. What is the difference between blocks, procs, and lambdas in Ruby?
+
+Answer: Blocks are not objects, passed to methods with {} or do/end. Procs are objects, created with Proc.new, flexible return behavior. Lambdas are strict procs, check argument count, return from lambda only. Use blocks for iteration, procs for callbacks, lambdas for strict functions.
+
+#@@@@@@@@@@
+
+16. Which of the following are Ruby metaprogramming techniques? (Multiple correct)
+A) define_method
+B) method_missing
+C) class_eval
+D) instance_eval
+E) send
+F) All of the above
+
+Answer: F - All are metaprogramming techniques. define_method (dynamic method creation), method_missing (catch undefined methods), class_eval (evaluate in class context), instance_eval (evaluate in instance context), send (call methods dynamically). Powerful Ruby feature.
+
+#@@@@@@@@@@
+
+17. Find the bug in this Ruby code:
+```ruby
+class User
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def greet
+    puts "Hello, #{name}"
+  end
+end
+
+user = User.new("John")
+user.greet
+puts user.name # Bug: no bug, works correctly
+```
+
+Answer: No bug - attr_accessor creates getter and setter methods. Can access @name via name method or directly. Output: "Hello, John" then "John". Proper use of attr_accessor.
+
+#@@@@@@@@@@
+
+18. What is the output of this code?
+```ruby
+arr = [1, 2, 3, 4, 5]
+result = arr.select { |n| n.even? }.map { |n| n * 2 }
+puts result.inspect
+```
+
+Answer: [4, 8] - select filters even numbers [2, 4], map doubles them [4, 8]. Method chaining with blocks. Functional programming style.
+
+#@@@@@@@@@@
+
+19. Which of the following are Rails ActiveRecord associations? (Multiple correct)
+A) belongs_to
+B) has_one
+C) has_many
+D) has_many :through
+E) has_and_belongs_to_many
+F) All of the above
+
+Answer: F - All are ActiveRecord associations. belongs_to (foreign key), has_one (one-to-one), has_many (one-to-many), has_many :through (many-to-many with join model), has_and_belongs_to_many (many-to-many direct). Powerful ORM relationships.
+
+#@@@@@@@@@@
+
+20. Complete this RSpec test:
+```ruby
+require 'rails_helper'
+
+RSpec.describe User, type: :model do
+  describe 'validations' do
+    it 'validates presence of name' do
+      user = User.new(name: nil)
+      expect(user).to_not be_______________
+      expect(user.errors[:name]).to include("can't be blank")
+    end
+  end
+end
+```
+
+Answer: `valid` or `be_valid` - Test validation. RSpec matchers for testing. BDD testing framework for Ruby.
+
+#@@@@@@@@@@
+
+21. How do you implement modules in Ruby?
+
+Answer: Define with `module ModuleName; end`. Include for instance methods, extend for class methods. Example: `module Loggable; def log(msg); end; end` then `include Loggable`. Mixins for code reuse. Multiple modules allowed.
+
+#@@@@@@@@@@
+
+22. Which of the following are Bundler commands? (Multiple correct)
+A) bundle install
+B) bundle update
+C) bundle exec
+D) bundle show
+E) bundle outdated
+F) All of the above
+
+Answer: F - All are Bundler commands. install (install gems), update (update gems), exec (run with bundle context), show (show gem location), outdated (check for updates). Ruby dependency management.
+
+#@@@@@@@@@@
+
+23. Find the bug:
+```ruby
+class Calculator
+  def add(a, b)
+    a + b
+  end
+end
+
+calc = Calculator.new
+result = calc.add(5) # Bug: missing argument
+puts result
+```
+
+Answer: Missing second argument. Ruby raises ArgumentError (wrong number of arguments). Fix: provide both arguments `calc.add(5, 3)`. Argument count validation.
+
+#@@@@@@@@@@
+
+24. What is the difference between symbols and strings in Ruby?
+
+Answer: Symbols are immutable, unique, stored once in memory. Strings are mutable, each instance separate. Symbols faster for comparisons, used as hash keys, identifiers. Strings for text data. Example: :name vs "name".
+
+#@@@@@@@@@@
+
+25. Which of the following are Rails validations? (Multiple correct)
+A) validates_presence_of
+B) validates_uniqueness_of
+C) validates_format_of
+D) validates_length_of
+E) validates_numericality_of
+F) All of the above
+
+Answer: F - All are Rails validations. presence (not blank), uniqueness (unique in DB), format (regex match), length (min/max), numericality (numeric). Data validation in models.
+
+#@@@@@@@@@@
+
+26. Complete this Sinatra route:
+```ruby
+require 'sinatra'
+
+get '/users/:id' do
+  user = User.find(params[:_______________])
+  user.to_json
+end
+```
+
+Answer: `id` - Access route parameter. Sinatra lightweight web framework. RESTful routing with parameters.
+
+#@@@@@@@@@@
+
+27. How do you implement class methods in Ruby?
+
+Answer: Use `self.method_name` or `class << self`. Example: `def self.create; new; end` or `class << self; def create; new; end; end`. Class methods called on class, not instance. Use for factory methods, utilities.
+
+#@@@@@@@@@@
+
+28. Which of the following are Ruby enumerable methods? (Multiple correct)
+A) each
+B) map
+C) select
+D) reduce
+E) find
+F) All of the above
+
+Answer: F - All are Enumerable methods. each (iterate), map (transform), select (filter), reduce (accumulate), find (first match). Powerful collection operations.
+
+#@@@@@@@@@@
+
+29. Find the bug:
+```ruby
+def factorial(n)
+  return 1 if n == 0
+  n * factorial(n - 1)
+end
+
+puts factorial(-5) # Bug: infinite recursion
+```
+
+Answer: Negative input causes infinite recursion. Fix: add validation `raise ArgumentError if n < 0`. Always validate recursive function inputs.
+
+#@@@@@@@@@@
+
+30. What is the difference between include and extend?
+
+Answer: include adds module methods as instance methods. extend adds module methods as class methods. Example: `include Loggable` gives instance.log, `extend Loggable` gives Class.log. Different method visibility.
+
+#@@@@@@@@@@
+
+31. Which of the following are Sidekiq features? (Multiple correct)
+A) Background job processing
+B) Redis-based
+C) Concurrency
+D) Retries
+E) Scheduled jobs
+F) All of the above
+
+Answer: F - All are Sidekiq features. Background jobs (async), Redis (storage), Concurrency (multi-threaded), Retries (automatic), Scheduled (delayed execution). Popular Ruby job processor.
+
+#@@@@@@@@@@
+
+32. Complete this Rails migration:
+```ruby
+class CreateUsers < ActiveRecord::Migration[7.0]
+  def change
+    create_table :users do |t|
+      t.string :name
+      t.string :email, null: false
+      t._______________
+    end
+
+    add_index :users, :email, unique: true
+  end
+end
+```
+
+Answer: `timestamps` - Adds created_at and updated_at columns. Rails convention for tracking record changes. Automatic timestamp management.
+
+#@@@@@@@@@@
+
+33. How do you implement attr_reader, attr_writer, and attr_accessor?
+
+Answer: attr_reader creates getter method. attr_writer creates setter method. attr_accessor creates both. Example: `attr_accessor :name` equivalent to `def name; @name; end; def name=(val); @name = val; end`. Shorthand for accessors.
+
+#@@@@@@@@@@
+
+34. Which of the following are RuboCop features? (Multiple correct)
+A) Code style checking
+B) Auto-correction
+C) Custom cops
+D) Configuration
+E) Multiple formatters
+F) All of the above
+
+Answer: F - All are RuboCop features. Style checking (linting), Auto-correction (fix issues), Custom cops (extensible), Configuration (.rubocop.yml), Formatters (output styles). Ruby code quality tool.
+
+#@@@@@@@@@@
+
+35. Find the bug:
+```ruby
+class Product
+  attr_reader :price
+
+  def initialize(price)
+    @price = price
+  end
+
+  def discount(percent)
+    @price = @price * (1 - percent / 100.0)
+  end
+end
+
+product = Product.new(100)
+product.discount(10)
+puts product.price # No bug
+```
+
+Answer: No bug - correctly applies discount. Output: 90.0. attr_reader allows reading @price. Proper instance variable modification.
+
+#@@@@@@@@@@
+
+36. What is the difference between nil?, empty?, and blank?
+
+Answer: nil? checks if object is nil. empty? checks if collection/string has no elements (raises on nil). blank? (Rails) checks if nil, empty, or whitespace only. Use nil? for nil check, empty? for collections, blank? for Rails presence check.
+
+#@@@@@@@@@@
+
+37. Which of the following are Rails callbacks? (Multiple correct)
+A) before_validation
+B) after_create
+C) before_save
+D) after_destroy
+E) around_update
+F) All of the above
+
+Answer: F - All are Rails callbacks. before_validation (before validation), after_create (after creation), before_save (before save), after_destroy (after deletion), around_update (wrap update). Lifecycle hooks.
+
+#@@@@@@@@@@
+
+38. Complete this Rails route:
+```ruby
+Rails.application.routes.draw do
+  resources :posts do
+    resources :comments, only: [:_______________, :create, :destroy]
+  end
+
+  root 'posts#index'
+end
+```
+
+Answer: `index` or `new` - RESTful actions for nested resources. Rails routing DSL. Resource-based routing.
+
+#@@@@@@@@@@
+
+39. How do you implement singleton methods in Ruby?
+
+Answer: Define method on specific object instance. Example: `obj = Object.new; def obj.special_method; end`. Or use `class << obj; def method; end; end`. Method exists only on that instance. Eigenclass methods.
+
+#@@@@@@@@@@
+
+40. Which of the following are Ruby string methods? (Multiple correct)
+A) upcase
+B) downcase
+C) strip
+D) split
+E) gsub
+F) All of the above
+
+Answer: F - All are string methods. upcase (uppercase), downcase (lowercase), strip (trim whitespace), split (to array), gsub (global substitution). String manipulation.
+
+#@@@@@@@@@@
+
+41. Find the bug:
+```ruby
+hash = { name: 'John', age: 30 }
+puts hash[:email] # Bug: returns nil, not error
+```
+
+Answer: No bug - accessing non-existent hash key returns nil. Not an error in Ruby. Use fetch for error: `hash.fetch(:email)`. Hash default behavior.
+
+#@@@@@@@@@@
+
+42. What is the difference between == and eql? and equal?
+
+Answer: == checks value equality (type coercion). eql? checks value and type equality. equal? checks object identity (same object). Example: 1 == 1.0 (true), 1.eql?(1.0) (false), a.equal?(a) (true). Different equality levels.
+
+#@@@@@@@@@@
+
+43. Which of the following are Rails helpers? (Multiple correct)
+A) link_to
+B) form_with
+C) image_tag
+D) content_tag
+E) number_to_currency
+F) All of the above
+
+Answer: F - All are Rails helpers. link_to (links), form_with (forms), image_tag (images), content_tag (HTML tags), number_to_currency (formatting). View helpers for templates.
+
+#@@@@@@@@@@
+
+44. Complete this ActiveRecord query:
+```ruby
+# Find users created in last 7 days
+users = User.where('created_at > ?', 7.days._______________)
+           .order(created_at: :desc)
+```
+
+Answer: `ago` - ActiveSupport time helper. Rails provides convenient time methods. Readable date/time calculations.
+
+#@@@@@@@@@@
+
+45. How do you implement method aliasing in Ruby?
+
+Answer: Use `alias` or `alias_method`. Example: `alias new_name old_name` or `alias_method :new_name, :old_name`. Creates copy of method with new name. Use for method wrapping, backwards compatibility.
+
+#@@@@@@@@@@
+
+46. Which of the following are Rack features? (Multiple correct)
+A) Middleware
+B) Request/Response objects
+C) Web server interface
+D) Framework foundation
+E) All of the above
+
+Answer: E - All are Rack features. Middleware (request pipeline), Request/Response (objects), Web server interface (standard), Foundation (Rails, Sinatra use Rack). Ruby web server interface.
+
+#@@@@@@@@@@
+
+47. Find the bug:
+```ruby
+class User
+  def initialize(name)
+    @name = name
+  end
+
+  def name
+    @name
+  end
+end
+
+user = User.new("John")
+user.name = "Jane" # Bug: no setter method
+```
+
+Answer: No setter method defined. Fix: add `attr_writer :name` or `def name=(val); @name = val; end`. Only getter exists.
+
+#@@@@@@@@@@
+
+48. What is the difference between require and load?
+
+Answer: require loads file once, tracks loaded files. load loads file every time, no tracking. require for libraries, load for reloading during development. require is standard, load for special cases.
+
+#@@@@@@@@@@
+
+49. Which of the following are Rails scopes? (Multiple correct)
+A) default_scope
+B) scope :active
+C) where clauses
+D) Chainable queries
+E) All of the above
+
+Answer: E - All relate to scopes. default_scope (default query), scope (named query), where (conditions), Chainable (combine scopes). Reusable query logic.
+
+#@@@@@@@@@@
+
+50. Complete this Capistrano task:
+```ruby
+namespace :deploy do
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      execute :touch, release_path.join('tmp/restart._______________')
+    end
+  end
+end
+```
+
+Answer: `txt` - Passenger restart file. Capistrano deployment automation. Remote server task execution.
+
+#@@@@@@@@@@
+
+51. How do you implement duck typing in Ruby?
+
+Answer: Focus on object behavior, not type. If object responds to method, use it. Example: `obj.quack if obj.respond_to?(:quack)`. No explicit type checking. "If it walks like a duck and quacks like a duck, it's a duck." Dynamic typing philosophy.
+
+#@@@@@@@@@@
+
+52. Which of the following are Rails concerns? (Multiple correct)
+A) Shared model logic
+B) Shared controller logic
+C) Module organization
+D) DRY principle
+E) All of the above
+
+Answer: E - All relate to concerns. Concerns are modules for shared logic. app/models/concerns and app/controllers/concerns. Organize reusable code. Include with `include ConcernName`.
+
+#@@@@@@@@@@
+
+53. Find the bug:
+```ruby
+numbers = [1, 2, 3, 4, 5]
+numbers.each do |n|
+  numbers.delete(n) if n.even? # Bug: modifying during iteration
+end
+puts numbers.inspect
+```
+
+Answer: Modifying collection during iteration causes unexpected behavior. Fix: use `numbers.delete_if { |n| n.even? }` or iterate over copy. Don't modify collection while iterating.
+
+#@@@@@@@@@@
+
+54. What is the output of this code?
+```ruby
+class Animal
+  def speak
+    "Some sound"
+  end
+end
+
+class Dog < Animal
+  def speak
+    "Woof"
+  end
+end
+
+dog = Dog.new
+puts dog.speak
+```
+
+Answer: "Woof" - Method overriding in inheritance. Subclass method overrides parent method. Polymorphism in Ruby.
+
+#@@@@@@@@@@
+
+55. Which of the following are Gem features? (Multiple correct)
+A) Package management
+B) Versioning
+C) Dependencies
+D) RubyGems.org repository
+E) Gemfile specification
+F) All of the above
+
+Answer: F - All are Gem features. Packages (libraries), Versioning (semantic), Dependencies (automatic), Repository (central), Gemfile (Bundler). Ruby package ecosystem.
+
+#@@@@@@@@@@
+
+56. Complete this Rails model validation:
+```ruby
+class User < ApplicationRecord
+  validates :email, presence: true,
+                    uniqueness: true,
+                    format: { with: URI::MailTo::EMAIL_REGEXP }
+
+  validates :age, numericality: { greater_than_or_equal_to: _______________ }
+end
+```
+
+Answer: `0` or `18` - Minimum age validation. ActiveRecord validations for data integrity. Declarative validation rules.
+
+#@@@@@@@@@@
+
+57. How do you implement exception handling in Ruby?
+
+Answer: Use begin/rescue/ensure/end. Example: `begin; risky_code; rescue StandardError => e; handle_error; ensure; cleanup; end`. Raise exceptions with `raise`. Custom exceptions inherit from StandardError. Use for error handling.
+
+#@@@@@@@@@@
+
+58. Which of the following are Ruby array methods? (Multiple correct)
+A) push/pop
+B) shift/unshift
+C) first/last
+D) flatten
+E) compact
+F) All of the above
+
+Answer: F - All are array methods. push/pop (end), shift/unshift (beginning), first/last (access), flatten (nested to flat), compact (remove nils). Array manipulation.
+
+#@@@@@@@@@@
+
+59. Find the bug:
+```ruby
+def greet(name = "World")
+  puts "Hello, #{name}!"
+end
+
+greet() # No bug
+greet("Ruby")
+```
+
+Answer: No bug - default parameter works correctly. Output: "Hello, World!" then "Hello, Ruby!". Proper default parameter usage.
+
+#@@@@@@@@@@
+
+60. What is the difference between public, private, and protected methods?
+
+Answer: public accessible everywhere. private accessible only within class, no explicit receiver. protected accessible within class and subclasses. Use public for API, private for internal, protected for inheritance.
+
+#@@@@@@@@@@
+
+61. Which of the following are Rails Action Cable features? (Multiple correct)
+A) WebSocket support
+B) Real-time features
+C) Channels
+D) Broadcasting
+E) Client-side JavaScript
+F) All of the above
+
+Answer: F - All are Action Cable features. WebSockets (persistent connection), Real-time (live updates), Channels (communication), Broadcasting (pub/sub), JavaScript (client integration). Real-time Rails.
+
+#@@@@@@@@@@
+
+62. Complete this RSpec matcher:
+```ruby
+RSpec.describe Calculator do
+  it 'adds two numbers' do
+    calc = Calculator.new
+    result = calc.add(2, 3)
+    expect(result).to _______________(5)
+  end
+end
+```
+
+Answer: `eq` or `equal` - RSpec equality matcher. eq for value equality, equal for object identity. BDD testing syntax.
+
+#@@@@@@@@@@
+
+63. How do you implement string interpolation in Ruby?
+
+Answer: Use #{} inside double quotes. Example: `"Hello, #{name}!"`. Evaluates expression, converts to string. Single quotes don't interpolate. Use for dynamic strings.
+
+#@@@@@@@@@@
+
+64. Which of the following are Rails Active Job adapters? (Multiple correct)
+A) Sidekiq
+B) Resque
+C) Delayed Job
+D) Inline (synchronous)
+E) All of the above
+
+Answer: E - All are Active Job adapters. Sidekiq (Redis), Resque (Redis), Delayed Job (database), Inline (testing). Unified interface for background jobs.
+
+#@@@@@@@@@@
+
+65. Find the bug:
+```ruby
+class Counter
+  @@count = 0
+
+  def initialize
+    @@count += 1
+  end
+
+  def self.count
+    @@count
+  end
+end
+
+c1 = Counter.new
+c2 = Counter.new
+puts Counter.count # No bug
+```
+
+Answer: No bug - class variable shared across instances. Output: 2. Class variables (@@) shared by all instances. Use for class-level state.
+
+#@@@@@@@@@@
+
+66. What is the difference between Hash and OpenStruct?
+
+Answer: Hash is key-value store, access with []. OpenStruct allows dot notation access, dynamic attributes. Hash faster, OpenStruct more convenient. Example: `hash[:name]` vs `struct.name`. Use Hash for performance, OpenStruct for convenience.
+
+#@@@@@@@@@@
+
+67. Which of the following are Rails generators? (Multiple correct)
+A) rails generate model
+B) rails generate controller
+C) rails generate migration
+D) rails generate scaffold
+E) All of the above
+
+Answer: E - All are Rails generators. model (model + migration), controller (controller + views), migration (database migration), scaffold (full CRUD). Code generation tools.
+
+#@@@@@@@@@@
+
+68. Complete this Rails association:
+```ruby
+class Post < ApplicationRecord
+  belongs_to :user
+  has_many :comments, dependent: _______________
+end
+```
+
+Answer: `:destroy` or `:delete_all` - Cascade deletion. destroy runs callbacks, delete_all is faster. Manage associated records on deletion.
+
+#@@@@@@@@@@
+
+69. How do you implement regular expressions in Ruby?
+
+Answer: Use /pattern/ or Regexp.new. Match with =~, match, scan. Example: `"hello" =~ /ell/` returns 1 (position). Capture groups with (). Use for pattern matching, validation.
+
+#@@@@@@@@@@
+
+70. Which of the following are Ruby hash methods? (Multiple correct)
+A) keys
+B) values
+C) merge
+D) select
+E) transform_keys
+F) All of the above
+
+Answer: F - All are hash methods. keys (array of keys), values (array of values), merge (combine hashes), select (filter), transform_keys (modify keys). Hash manipulation.
+
+#@@@@@@@@@@
+
+71. Find the bug:
+```ruby
+def divide(a, b)
+  a / b
+end
+
+result = divide(10, 0) # Bug: division by zero
+puts result
+```
+
+Answer: Division by zero raises ZeroDivisionError. Fix: add validation `raise ArgumentError, "Cannot divide by zero" if b.zero?`. Handle edge cases.
+
+#@@@@@@@@@@
+
+72. What is the difference between instance variables and class variables?
+
+Answer: Instance variables (@var) unique per instance. Class variables (@@var) shared across all instances and subclasses. Use instance variables for object state, class variables for shared state (rarely, prefer class instance variables).
+
+#@@@@@@@@@@
+
+73. Which of the following are Hanami features? (Multiple correct)
+A) Lightweight framework
+B) Multiple apps in one project
+C) Dependency injection
+D) Immutable objects
+E) All of the above
+
+Answer: E - All are Hanami features. Lightweight (minimal), Multiple apps (modular), DI (container), Immutable (functional style). Modern Ruby web framework.
+
+#@@@@@@@@@@
+
+74. Complete this Rails query:
+```ruby
+# Find users with posts
+users = User.joins(:posts)
+            ._______________(:posts)
+            .where('posts.published = ?', true)
+```
+
+Answer: `distinct` or `group` - Remove duplicates or group results. joins can create duplicates. Ensure unique users.
+
+#@@@@@@@@@@
+
+75. How do you implement method chaining in Ruby?
+
+Answer: Return self from methods. Example: `def set_name(name); @name = name; self; end`. Enables `obj.set_name("John").set_age(30)`. Fluent interface pattern.
+
+#@@@@@@@@@@
+
+76. Which of the following are Ruby file I/O methods? (Multiple correct)
+A) File.read
+B) File.write
+C) File.open
+D) IO.readlines
+E) All of the above
+
+Answer: E - All are file I/O methods. read (read file), write (write file), open (open file with block), readlines (array of lines). File operations.
+
+#@@@@@@@@@@
+
+77. Find the bug:
+```ruby
+class Person
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+
+  def ==(other)
+    name == other.name
+  end
+end
+
+p1 = Person.new("John")
+p2 = Person.new("John")
+puts p1 == p2 # No bug
+```
+
+Answer: No bug - custom equality method works. Output: true. Overriding == for value equality. Proper equality implementation.
+
+#@@@@@@@@@@
+
+78. What is the difference between Time, Date, and DateTime?
+
+Answer: Time for timestamps with time zone. Date for dates only, no time. DateTime for date and time (legacy, use Time). Use Time for most cases, Date for date-only. ActiveSupport enhances all.
+
+#@@@@@@@@@@
+
+79. Which of the following are Rails Active Storage features? (Multiple correct)
+A) File uploads
+B) Cloud storage (S3, GCS)
+C) Image processing
+D) Direct uploads
+E) All of the above
+
+Answer: E - All are Active Storage features. Uploads (attachments), Cloud (multiple backends), Processing (variants), Direct (client to cloud). Modern file handling for Rails.
+
+#@@@@@@@@@@
+
+80. Complete this Sidekiq worker:
+```ruby
+class EmailWorker
+  include Sidekiq::Worker
+
+  def perform(user_id)
+    user = User.find(user_id)
+    UserMailer.welcome_email(user)._______________
+  end
+end
+```
+
+Answer: `deliver_now` or `deliver_later` - Send email. deliver_now sends immediately, deliver_later queues. Mailer delivery methods.
+
+#@@@@@@@@@@
+
+81. How do you implement constants in Ruby?
+
+Answer: Use UPPERCASE names. Example: `MAX_SIZE = 100`. Constants can be reassigned (warning). Use for configuration, fixed values. Freeze for immutability: `ARRAY = [1,2,3].freeze`.
+
+#@@@@@@@@@@
+
+82. Which of the following are Ruby range operations? (Multiple correct)
+A) (1..10)
+B) (1...10)
+C) .to_a
+D) .cover?
+E) .include?
+F) All of the above
+
+Answer: F - All are range operations. (1..10) inclusive, (1...10) exclusive, to_a (to array), cover? (fast check), include? (iterate check). Range manipulation.
+
+#@@@@@@@@@@
+
+83. Find the bug:
+```ruby
+arr = [1, 2, 3]
+arr.map { |n| n * 2 }
+puts arr.inspect # Bug: map doesn't modify original
+```
+
+Answer: map returns new array, doesn't modify original. arr still [1, 2, 3]. Use map! for in-place modification. Understand mutating vs non-mutating methods.
+
+#@@@@@@@@@@
+
+84. What is the difference between puts and p?
+
+Answer: puts calls to_s, adds newline, returns nil. p calls inspect, shows quotes/escapes, returns object. Use puts for output, p for debugging. Example: puts "hi" vs p "hi" (shows quotes).
+
+#@@@@@@@@@@
+
+85. Which of the following are Rails routing constraints? (Multiple correct)
+A) Subdomain constraints
+B) Request method constraints
+C) Format constraints
+D) Custom constraints
+E) All of the above
+
+Answer: E - All are routing constraints. Subdomain (subdomain: 'api'), Method (via: :get), Format (format: :json), Custom (lambda). Advanced routing control.
+
+#@@@@@@@@@@
+
+86. Complete this Rails mailer:
+```ruby
+class UserMailer < ApplicationMailer
+  def welcome_email(user)
+    @user = user
+    mail(to: @user.email,
+         subject: 'Welcome!',
+         from: '_______________')
+  end
+end
+```
+
+Answer: `'noreply@example.com'` or similar - Sender email address. Rails Action Mailer for emails. Email configuration.
+
+#@@@@@@@@@@
+
+87. How do you implement splat operator in Ruby?
+
+Answer: Use * for array expansion. Example: `def method(*args)` accepts variable arguments. `method(*array)` expands array to arguments. ** for hash expansion. Use for flexible parameters.
+
+#@@@@@@@@@@
+
+88. Which of the following are Ruby conditional operators? (Multiple correct)
+A) if/elsif/else
+B) unless
+C) case/when
+D) Ternary (?:)
+E) All of the above
+
+Answer: E - All are conditional operators. if/elsif/else (standard), unless (negative if), case/when (switch), Ternary (inline). Control flow.
+
+#@@@@@@@@@@
+
+89. Find the bug:
+```ruby
+class Book
+  attr_reader :title, :author
+
+  def initialize(title, author)
+    @title = title
+    @author = author
+  end
+end
+
+book = Book.new("1984", "Orwell")
+book.title = "Animal Farm" # Bug: no setter
+```
+
+Answer: attr_reader only creates getter. Fix: use attr_accessor or attr_writer. Only reading allowed with attr_reader.
+
+#@@@@@@@@@@
+
+90. What is the difference between && and and?
+
+Answer: && has higher precedence than and. && for boolean logic, and for control flow. Example: `result = true && false` vs `result = true and false` (different). Prefer && for consistency.
+
+#@@@@@@@@@@
+
+91. Which of the following are Rails security features? (Multiple correct)
+A) CSRF protection
+B) SQL injection prevention
+C) XSS protection
+D) Strong parameters
+E) All of the above
+
+Answer: E - All are security features. CSRF (token), SQL injection (parameterized queries), XSS (escaping), Strong parameters (mass assignment protection). Security by default.
+
+#@@@@@@@@@@
+
+92. Complete this Rails concern:
+```ruby
+module Timestampable
+  extend ActiveSupport::_______________
+
+  included do
+    before_create :set_timestamps
+  end
+
+  def set_timestamps
+    self.created_at = Time.current
+  end
+end
+```
+
+Answer: `Concern` - Rails concern module. Organize shared logic. Include callbacks and class methods.
+
+#@@@@@@@@@@
+
+93. How do you implement yield in Ruby?
+
+Answer: yield calls block passed to method. Example: `def method; yield if block_given?; end`. Pass arguments: `yield(value)`. Use for callbacks, iteration. Block execution control.
+
+#@@@@@@@@@@
+
+94. Which of the following are Ruby loop constructs? (Multiple correct)
+A) loop
+B) while
+C) until
+D) for
+E) .times
+F) All of the above
+
+Answer: F - All are loop constructs. loop (infinite), while (condition true), until (condition false), for (iteration), .times (n times). Iteration control.
+
+#@@@@@@@@@@
+
+95. Find the bug:
+```ruby
+def process_data(data)
+  data.map do |item|
+    item.upcase
+  end
+end
+
+result = process_data([1, 2, 3]) # Bug: integers don't have upcase
+puts result
+```
+
+Answer: Calling upcase on integers raises NoMethodError. Fix: ensure data is strings or add type checking. Type validation needed.
+
+#@@@@@@@@@@
+
+96. What is the difference between to_s and to_str?
+
+Answer: to_s explicit conversion, defined on most objects. to_str implicit conversion, only on string-like objects. Ruby calls to_str for implicit conversion. Define to_str for string-like classes.
+
+#@@@@@@@@@@
+
+97. Which of the following are Rails caching strategies? (Multiple correct)
+A) Page caching
+B) Action caching
+C) Fragment caching
+D) Russian doll caching
+E) All of the above
+
+Answer: E - All are caching strategies. Page (full page), Action (controller action), Fragment (view partial), Russian doll (nested fragments). Performance optimization.
+
+#@@@@@@@@@@
+
+98. Complete this Rails serializer:
+```ruby
+class UserSerializer < ActiveModel::Serializer
+  attributes :id, :name, :email
+
+  has_many :posts
+
+  def email
+    object.email if scope&._______________?
+  end
+end
+```
+
+Answer: `admin` - Conditional attribute based on scope. Serializers for API responses. Authorization in serialization.
+
+#@@@@@@@@@@
+
+99. How do you implement frozen strings in Ruby?
+
+Answer: Use `# frozen_string_literal: true` at top of file. Or `.freeze` on string. Frozen strings immutable, better performance. Example: `"hello".freeze`. Use for constants, optimization.
+
+#@@@@@@@@@@
+
+100. Which of the following represent Ruby best practices? (Multiple correct)
+A) Follow Ruby style guide
+B) Use RuboCop
+C) Write tests (RSpec/Minitest)
+D) Use meaningful names
+E) Keep methods small
+F) All of the above
+
+Answer: F - All are best practices. Style guide (community standards), RuboCop (linting), Tests (quality), Names (readability), Small methods (SRP). Professional Ruby development.
+
+#@@@@@@@@@@
+
+101. How do you implement refinements in Ruby?
+
+Answer: Use `refine` to modify classes locally. Example: `module StringExtensions; refine String do; def shout; upcase + "!"; end; end; end`. Activate with `using StringExtensions`. Scoped monkey patching. Use for safe extensions.
+
+#@@@@@@@@@@
+
+102. Which of the following are Rails Active Model features? (Multiple correct)
+A) Validations
+B) Callbacks
+C) Serialization
+D) Dirty tracking
+E) All of the above
+
+Answer: E - All are Active Model features. Validations (without DB), Callbacks (lifecycle), Serialization (to_json), Dirty tracking (changes). Model behavior without ActiveRecord.
+
+#@@@@@@@@@@
+
+103. Find the bug:
+```ruby
+class ShoppingCart
+  def initialize
+    @items = []
+  end
+
+  def add_item(item)
+    @items << item
+    self
+  end
+
+  def total
+    @items.sum(&:price)
+  end
+end
+
+cart = ShoppingCart.new
+cart.add_item({name: "Book", price: 10})
+puts cart.total # No bug
+```
+
+Answer: No bug - correctly sums prices. Output: 10. Method chaining returns self. Symbol to_proc (&:price) for sum.
+
+#@@@@@@@@@@
+
+104. What is the output of this code?
+```ruby
+def method(a, b = 2, *c, d)
+  puts "a=#{a}, b=#{b}, c=#{c}, d=#{d}"
+end
+
+method(1, 2, 3, 4, 5)
+```
+
+Answer: a=1, b=2, c=[3, 4], d=5 - Complex parameter handling. Required, default, splat, required. Ruby assigns parameters left to right, splat gets middle.
+
+#@@@@@@@@@@
+
+105. Which of the following are Puma features? (Multiple correct)
+A) Multi-threaded
+B) Clustered mode
+C) Hot restart
+D) Rails default server
+E) All of the above
+
+Answer: E - All are Puma features. Multi-threaded (concurrent requests), Clustered (multiple workers), Hot restart (zero downtime), Default (Rails 5+). Modern Ruby web server.
+
+#@@@@@@@@@@
+
+106. Complete this Rails polymorphic association:
+```ruby
+class Comment < ApplicationRecord
+  belongs_to :commentable, polymorphic: _______________
+end
+
+class Post < ApplicationRecord
+  has_many :comments, as: :commentable
+end
+
+class Photo < ApplicationRecord
+  has_many :comments, as: :commentable
+end
+```
+
+Answer: `true` - Enable polymorphic association. Comments belong to multiple types. Flexible associations.
+
+#@@@@@@@@@@
+
+107. How do you implement lazy enumerators in Ruby?
+
+Answer: Use `.lazy` on enumerable. Example: `(1..Float::INFINITY).lazy.select(&:even?).first(10)`. Lazy evaluation, doesn't compute all. Use for infinite sequences, performance.
+
+#@@@@@@@@@@
+
+108. Which of the following are Ruby module functions? (Multiple correct)
+A) module_function
+B) extend self
+C) Class methods in module
+D) All of the above
+
+Answer: D - All create module functions. module_function (private instance, public module), extend self (all methods), Class methods (def self.method). Different approaches.
+
+#@@@@@@@@@@
+
+109. Find the bug:
+```ruby
+class User
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    "User: #{@name}"
+  end
+end
+
+users = [User.new("Alice"), User.new("Bob")]
+puts users.sort # Bug: no comparison method
+```
+
+Answer: sort requires <=> method. Fix: implement `def <=>(other); @name <=> other.name; end` or use `sort_by`. Comparison operator needed.
+
+#@@@@@@@@@@
+
+110. What is the difference between Struct and Class?
+
+Answer: Struct creates simple classes with attributes. Class is full-featured. Struct: `User = Struct.new(:name, :email)`. Auto-generates initialize, accessors, ==, etc. Use Struct for data containers, Class for behavior.
+
+#@@@@@@@@@@
+
+111. Which of the following are Rails Action Mailer features? (Multiple correct)
+A) Email templates
+B) Attachments
+C) Inline images
+D) Multipart emails
+E) Interceptors
+F) All of the above
+
+Answer: F - All are Action Mailer features. Templates (views), Attachments (files), Inline (embedded images), Multipart (HTML/text), Interceptors (modify before send). Complete email solution.
+
+#@@@@@@@@@@
+
+112. Complete this Rails counter cache:
+```ruby
+class Post < ApplicationRecord
+  belongs_to :user, counter_cache: _______________
+  has_many :comments
+end
+
+class User < ApplicationRecord
+  has_many :posts
+end
+
+# Migration adds posts_count to users table
+```
+
+Answer: `true` or `:posts_count` - Enable counter cache. Denormalize count for performance. Automatic count updates.
+
+#@@@@@@@@@@
+
+113. How do you implement method visibility in Ruby?
+
+Answer: Use public, private, protected keywords. Example: `private; def helper_method; end`. Or `private :method_name`. Methods after keyword have that visibility. Control access to methods.
+
+#@@@@@@@@@@
+
+114. Which of the following are Ruby debugging tools? (Multiple correct)
+A) byebug
+B) pry
+C) debug (Ruby 3.1+)
+D) puts debugging
+E) All of the above
+
+Answer: E - All are debugging tools. byebug (debugger), pry (REPL), debug (built-in), puts (simple). Use for troubleshooting.
+
+#@@@@@@@@@@
+
+115. Find the bug:
+```ruby
+def calculate
+  result = 10 / 2
+  result
+end
+
+value = calculate
+puts value + 5 # No bug
+```
+
+Answer: No bug - correctly returns and uses result. Output: 10. Implicit return of last expression.
+
+#@@@@@@@@@@
+
+116. What is the difference between send and public_send?
+
+Answer: send calls any method (public, private, protected). public_send only calls public methods. send bypasses visibility, public_send respects it. Use public_send for safety.
+
+#@@@@@@@@@@
+
+117. Which of the following are Rails Active Record query methods? (Multiple correct)
+A) find
+B) find_by
+C) where
+D) includes
+E) joins
+F) All of the above
+
+Answer: F - All are query methods. find (by ID), find_by (by attributes), where (conditions), includes (eager load), joins (SQL join). Flexible querying.
+
+#@@@@@@@@@@
+
+118. Complete this Rails concern with class methods:
+```ruby
+module Searchable
+  extend ActiveSupport::Concern
+
+  class_methods do
+    def search(query)
+      where("name LIKE ?", "%#{_______________}%")
+    end
+  end
+end
+```
+
+Answer: `query` or `sanitize_sql_like(query)` - Use query parameter. sanitize_sql_like prevents SQL injection. Secure search implementation.
+
+#@@@@@@@@@@
+
+119. How do you implement keyword arguments in Ruby?
+
+Answer: Use name: syntax. Example: `def greet(name:, title: "Mr."); end`. Required: `name:`, optional: `title: default`. Call: `greet(name: "John")`. Named parameters for clarity.
+
+#@@@@@@@@@@
+
+120. Which of the following are Minitest features? (Multiple correct)
+A) Unit tests
+B) Spec-style syntax
+C) Mocking
+D) Benchmarking
+E) All of the above
+
+Answer: E - All are Minitest features. Unit tests (assertions), Spec (RSpec-like), Mocking (built-in), Benchmarking (performance). Ruby standard test framework.
+
+#@@@@@@@@@@
+
+121. Find the bug:
+```ruby
+class Product
+  attr_accessor :price
+
+  def initialize(price)
+    @price = price
+  end
+
+  def discounted_price(percent)
+    @price * (1 - percent)
+  end
+end
+
+product = Product.new(100)
+puts product.discounted_price(0.1) # No bug
+```
+
+Answer: No bug - correctly calculates discount. Output: 90.0. Proper percentage calculation.
+
+#@@@@@@@@@@
+
+122. What is the difference between Array#each and Array#map?
+
+Answer: each iterates, returns original array, used for side effects. map transforms, returns new array with results. each for iteration, map for transformation. Example: `arr.each { |n| puts n }` vs `arr.map { |n| n * 2 }`.
+
+#@@@@@@@@@@
+
+123. Which of the following are Rails view helpers? (Multiple correct)
+A) render
+B) partial
+C) content_for
+D) yield
+E) All of the above
+
+Answer: E - All are view helpers. render (templates/partials), partial (render partial), content_for (store content), yield (output content). Template composition.
+
+#@@@@@@@@@@
+
+124. Complete this Rails scope with lambda:
+```ruby
+class Post < ApplicationRecord
+  scope :published, -> { where(published: true) }
+  scope :recent, -> { where('created_at > ?', 1.week._______________) }
+  scope :by_author, ->(author_id) { where(author_id: author_id) }
+end
+```
+
+Answer: `ago` - ActiveSupport time helper. Lambda scopes for dynamic queries. Chainable query methods.
+
+#@@@@@@@@@@
+
+125. How do you implement double splat operator in Ruby?
+
+Answer: Use ** for hash expansion. Example: `def method(**options)` accepts keyword arguments as hash. `method(**hash)` expands hash to keywords. Use for flexible options.
+
+#@@@@@@@@@@
+
+126. Which of the following are Ruby comparison operators? (Multiple correct)
+A) <, >, <=, >=
+B) ==, !=
+C) <=>
+D) ===
+E) All of the above
+
+Answer: E - All are comparison operators. <, >, <=, >= (magnitude), ==, != (equality), <=> (spaceship), === (case equality). Different comparison types.
+
+#@@@@@@@@@@
+
+127. Find the bug:
+```ruby
+def process_items(items)
+  items.each do |item|
+    return item if item > 10
+  end
+  nil
+end
+
+result = process_items([1, 2, 15, 20])
+puts result # No bug
+```
+
+Answer: No bug - returns first item > 10. Output: 15. Early return from method, not just block.
+
+#@@@@@@@@@@
+
+128. What is the difference between require_relative and require?
+
+Answer: require_relative loads file relative to current file. require loads from $LOAD_PATH. require_relative for local files, require for gems. Example: `require_relative 'lib/helper'` vs `require 'rails'`.
+
+#@@@@@@@@@@
+
+129. Which of the following are Rails Active Job features? (Multiple correct)
+A) Unified interface
+B) Multiple backends
+C) Retries
+D) Scheduling
+E) All of the above
+
+Answer: E - All are Active Job features. Unified (consistent API), Backends (Sidekiq, Resque, etc.), Retries (automatic), Scheduling (perform_later). Background job abstraction.
+
+#@@@@@@@@@@
+
+130. Complete this Rails migration with index:
+```ruby
+class AddIndexToUsers < ActiveRecord::Migration[7.0]
+  def change
+    add_index :users, :email, _______________: true
+    add_index :users, [:last_name, :first_name]
+  end
+end
+```
+
+Answer: `unique` - Create unique index. Composite index on multiple columns. Database performance and constraints.
+
+#@@@@@@@@@@
+
+131. How do you implement safe navigation operator in Ruby?
+
+Answer: Use &. operator (Ruby 2.3+). Example: `user&.address&.city`. Returns nil if any part is nil. Prevents NoMethodError. Cleaner than nested conditionals.
+
+#@@@@@@@@@@
+
+132. Which of the following are Ruby numeric methods? (Multiple correct)
+A) abs
+B) round
+C) ceil
+D) floor
+E) to_i/to_f
+F) All of the above
+
+Answer: F - All are numeric methods. abs (absolute), round (nearest), ceil (up), floor (down), to_i/to_f (convert). Number manipulation.
+
+#@@@@@@@@@@
+
+133. Find the bug:
+```ruby
+class BankAccount
+  attr_reader :balance
+
+  def initialize(balance = 0)
+    @balance = balance
+  end
+
+  def deposit(amount)
+    @balance += amount
+  end
+
+  def withdraw(amount)
+    @balance -= amount if @balance >= amount
+  end
+end
+
+account = BankAccount.new(100)
+account.withdraw(50)
+puts account.balance # No bug
+```
+
+Answer: No bug - correctly manages balance. Output: 50. Proper encapsulation with attr_reader and methods.
+
+#@@@@@@@@@@
+
+134. What is the difference between next and break in loops?
+
+Answer: next skips to next iteration. break exits loop entirely. Example: `next if condition` vs `break if condition`. Use next to skip, break to exit.
+
+#@@@@@@@@@@
+
+135. Which of the following are Rails internationalization features? (Multiple correct)
+A) I18n.t (translate)
+B) Locale files (YAML)
+C) Pluralization
+D) Interpolation
+E) All of the above
+
+Answer: E - All are I18n features. t (translation lookup), Locale files (translations), Pluralization (count-based), Interpolation (variables). Multi-language support.
+
+#@@@@@@@@@@
+
+136. Complete this Rails callback:
+```ruby
+class User < ApplicationRecord
+  before_save :normalize_email
+
+  private
+
+  def normalize_email
+    self.email = email._______________
+  end
+end
+```
+
+Answer: `downcase` or `strip.downcase` - Normalize email before saving. Callbacks for data processing. Ensure data consistency.
+
+#@@@@@@@@@@
+
+137. How do you implement singleton pattern in Ruby?
+
+Answer: Use Singleton module. Example: `require 'singleton'; class Config; include Singleton; end`. Access with `Config.instance`. Or use class variables/methods. Ensure single instance.
+
+#@@@@@@@@@@
+
+138. Which of the following are Ruby object methods? (Multiple correct)
+A) class
+B) is_a?
+C) respond_to?
+D) methods
+E) instance_variables
+F) All of the above
+
+Answer: F - All are object methods. class (object's class), is_a? (type check), respond_to? (method check), methods (list methods), instance_variables (list ivars). Object introspection.
+
+#@@@@@@@@@@
+
+139. Find the bug:
+```ruby
+def fibonacci(n)
+  return n if n <= 1
+  fibonacci(n - 1) + fibonacci(n - 2)
+end
+
+puts fibonacci(40) # Bug: very slow, exponential time
+```
+
+Answer: Inefficient recursive implementation. Fix: use memoization or iterative approach. Exponential time complexity. Optimize with caching.
+
+#@@@@@@@@@@
+
+140. What is the difference between redo and retry?
+
+Answer: redo repeats current iteration without re-evaluating condition. retry restarts entire begin/rescue block. redo in loops, retry in exception handling. Different restart points.
+
+#@@@@@@@@@@
+
+141. Which of the following are Rails asset pipeline features? (Multiple correct)
+A) Asset concatenation
+B) Minification
+C) Fingerprinting
+D) Preprocessing (Sass, CoffeeScript)
+E) All of the above
+
+Answer: E - All are asset pipeline features. Concatenation (combine files), Minification (compress), Fingerprinting (cache busting), Preprocessing (compile). Asset management (legacy, now Webpacker/Propshaft).
+
+#@@@@@@@@@@
+
+142. Complete this Rails form helper:
+```ruby
+<%= form_with model: @user do |f| %>
+  <%= f.label :name %>
+  <%= f.text_field :name %>
+
+  <%= f.label :email %>
+  <%= f._______________field :email %>
+
+  <%= f.submit %>
+<% end %>
+```
+
+Answer: `email` or `text` - Form field type. Rails form helpers generate HTML. Type-specific helpers available.
+
+#@@@@@@@@@@
+
+143. How do you implement tap method in Ruby?
+
+Answer: tap yields self to block, returns self. Example: `user.tap { |u| u.save }`. Use for side effects in chain. Built-in method for debugging, chaining.
+
+#@@@@@@@@@@
+
+144. Which of the following are Ruby set operations? (Multiple correct)
+A) Union (|)
+B) Intersection (&)
+C) Difference (-)
+D) Subset (<=)
+E) All of the above
+
+Answer: E - All are set operations. Union (combine), Intersection (common), Difference (remove), Subset (contained). Array set operations.
+
+#@@@@@@@@@@
+
+145. Find the bug:
+```ruby
+class Temperature
+  def initialize(celsius)
+    @celsius = celsius
+  end
+
+  def fahrenheit
+    @celsius * 9 / 5 + 32
+  end
+end
+
+temp = Temperature.new(0)
+puts temp.fahrenheit # Bug: integer division
+```
+
+Answer: Integer division loses precision. 9 / 5 = 1 (not 1.8). Fix: use 9.0 / 5 or 9 / 5.0. Type matters in division.
+
+#@@@@@@@@@@
+
+146. What is the difference between super and super()?
+
+Answer: super passes all arguments to parent method. super() passes no arguments. super with args passes specific arguments. Use super for default, super() for none.
+
+#@@@@@@@@@@
+
+147. Which of the following are Rails testing tools? (Multiple correct)
+A) Fixtures
+B) Factories (FactoryBot)
+C) System tests
+D) Request tests
+E) All of the above
+
+Answer: E - All are testing tools. Fixtures (YAML data), Factories (dynamic data), System tests (browser), Request tests (integration). Comprehensive testing.
+
+#@@@@@@@@@@
+
+148. Complete this Rails validation with custom method:
+```ruby
+class Event < ApplicationRecord
+  validate :end_date_after_start_date
+
+  private
+
+  def end_date_after_start_date
+    return if end_date.blank? || start_date.blank?
+
+    if end_date < start_date
+      errors.add(:end_date, "must be after start date")
+    end
+  end
+end
+```
+
+Answer: Custom validation method complete. validate (not validates) for custom methods. Add errors to errors object. Complex validation logic.
+
+#@@@@@@@@@@
+
+149. How do you implement method delegation in Ruby?
+
+Answer: Use delegate or Forwardable. Example: `delegate :name, to: :user` (Rails) or `extend Forwardable; def_delegator :@user, :name` (Ruby). Forward method calls to another object.
+
+#@@@@@@@@@@
+
+150. Which of the following represent Ruby's philosophy? (Multiple correct)
+A) Principle of Least Surprise
+B) Developer happiness
+C) Flexibility
+D) Expressiveness
+E) All of the above
+
+Answer: E - All represent Ruby philosophy. Least Surprise (intuitive), Happiness (enjoyable), Flexibility (multiple ways), Expressiveness (readable). Matz's design principles. Ruby optimizes for programmer productivity and joy, making it one of the most developer-friendly languages.
+
+#@@@@@@@@@@
+
+151. How do you implement prepend in Ruby?
+
+Answer: prepend adds module methods before class methods in lookup chain. Example: `prepend Loggable`. Allows wrapping class methods. Use for aspect-oriented programming, method wrapping.
+
+#@@@@@@@@@@
+
+152. Which of the following are Rails Active Record callbacks order? (Multiple correct)
+A) before_validation
+B) after_validation
+C) before_save
+D) before_create/update
+E) after_create/update
+F) All in order
+
+Answer: F - Callback execution order. Validation callbacks first, then save, then create/update. Understanding order crucial for data flow.
+
+#@@@@@@@@@@
+
+153. Find the bug:
+```ruby
+class Stack
+  def initialize
+    @items = []
+  end
+
+  def push(item)
+    @items.push(item)
+  end
+
+  def pop
+    @items.pop
+  end
+
+  def peek
+    @items.last
+  end
+end
+
+stack = Stack.new
+stack.push(1)
+stack.push(2)
+puts stack.peek # No bug
+```
+
+Answer: No bug - correctly implements stack. Output: 2. Proper stack data structure with LIFO.
+
+#@@@@@@@@@@
+
+154. What is the output of this code?
+```ruby
+a = [1, 2, 3]
+b = a
+b << 4
+puts a.inspect
+```
+
+Answer: [1, 2, 3, 4] - Arrays assigned by reference. b and a point to same array. Modifying b affects a. Use dup or clone for copy.
+
+#@@@@@@@@@@
+
+155. Which of the following are Rake features? (Multiple correct)
+A) Task definition
+B) Dependencies
+C) Namespaces
+D) File tasks
+E) All of the above
+
+Answer: E - All are Rake features. Tasks (define work), Dependencies (task order), Namespaces (organization), File tasks (file generation). Ruby build tool.
+
+#@@@@@@@@@@
+
+156. Complete this Rails STI (Single Table Inheritance):
+```ruby
+class Vehicle < ApplicationRecord
+end
+
+class Car < _______________
+end
+
+class Motorcycle < Vehicle
+end
+
+# Migration has type column for discriminator
+```
+
+Answer: `Vehicle` - Inherit from base class. STI stores multiple types in one table. type column determines class. Use for similar models.
+
+#@@@@@@@@@@
+
+157. How do you implement method composition in Ruby?
+
+Answer: Use >> and << operators (Ruby 2.6+). Example: `add_one = ->(x) { x + 1 }; double = ->(x) { x * 2 }; composed = add_one >> double`. Chain procs/lambdas. Functional composition.
+
+#@@@@@@@@@@
+
+158. Which of the following are Ruby exception classes? (Multiple correct)
+A) StandardError
+B) ArgumentError
+C) NoMethodError
+D) RuntimeError
+E) All of the above
+
+Answer: E - All are exception classes. StandardError (base for rescue), ArgumentError (wrong args), NoMethodError (undefined method), RuntimeError (generic). Exception hierarchy.
+
+#@@@@@@@@@@
+
+159. Find the bug:
+```ruby
+def greet(name)
+  puts "Hello, #{name}!"
+end
+
+greet("Alice")
+greet() # Bug: missing required argument
+```
+
+Answer: Missing required argument. Fix: add default parameter `def greet(name = "World")` or provide argument. Required parameters must be supplied.
+
+#@@@@@@@@@@
+
+160. What is the difference between Array#flatten and Array#compact?
+
+Answer: flatten converts nested arrays to flat array. compact removes nil values. Different purposes. Example: `[[1, 2], [3]].flatten` => [1, 2, 3], `[1, nil, 2].compact` => [1, 2].
+
+#@@@@@@@@@@
+
+161. Which of the following are Rails Action View features? (Multiple correct)
+A) Templates (ERB, Haml)
+B) Partials
+C) Layouts
+D) Helpers
+E) All of the above
+
+Answer: E - All are Action View features. Templates (rendering), Partials (reusable views), Layouts (page structure), Helpers (view logic). View layer of MVC.
+
+#@@@@@@@@@@
+
+162. Complete this Rails enum:
+```ruby
+class Order < ApplicationRecord
+  enum status: {
+    pending: 0,
+    processing: 1,
+    shipped: 2,
+    delivered: _______________
+  }
+end
+```
+
+Answer: `3` - Enum value for delivered status. Rails enums map symbols to integers. Provides query methods and scopes.
+
+#@@@@@@@@@@
+
+163. How do you implement pattern matching in Ruby?
+
+Answer: Use case/in syntax (Ruby 2.7+). Example: `case value; in {name:, age:}; puts name; end`. Destructuring and matching. Powerful pattern matching.
+
+#@@@@@@@@@@
+
+164. Which of the following are Ruby metaprogramming hooks? (Multiple correct)
+A) included
+B) extended
+C) inherited
+D) method_added
+E) All of the above
+
+Answer: E - All are metaprogramming hooks. included (module included), extended (module extended), inherited (class inherited), method_added (method defined). Lifecycle callbacks.
+
+#@@@@@@@@@@
+
+165. Find the bug:
+```ruby
+class Person
+  attr_accessor :age
+
+  def initialize(age)
+    @age = age
+  end
+
+  def adult?
+    age >= 18
+  end
+end
+
+person = Person.new(20)
+puts person.adult? # No bug
+```
+
+Answer: No bug - correctly checks adult status. Output: true. Proper predicate method with ? suffix.
+
+#@@@@@@@@@@
+
+166. What is the difference between Hash#fetch and Hash#[]?
+
+Answer: fetch raises KeyError if key missing, [] returns nil. fetch accepts default or block. fetch safer for required keys. Example: `hash.fetch(:key, 'default')`.
+
+#@@@@@@@@@@
+
+167. Which of the following are Rails Active Support core extensions? (Multiple correct)
+A) Time extensions (1.day.ago)
+B) String extensions (pluralize)
+C) Numeric extensions (2.megabytes)
+D) Array extensions (in_groups_of)
+E) All of the above
+
+Answer: E - All are Active Support extensions. Time (calculations), String (inflections), Numeric (bytes), Array (grouping). Convenient Ruby extensions.
+
+#@@@@@@@@@@
+
+168. Complete this Rails has_many through association:
+```ruby
+class Doctor < ApplicationRecord
+  has_many :appointments
+  has_many :patients, through: _______________
+end
+
+class Appointment < ApplicationRecord
+  belongs_to :doctor
+  belongs_to :patient
+end
+
+class Patient < ApplicationRecord
+  has_many :appointments
+  has_many :doctors, through: :appointments
+end
+```
+
+Answer: `:appointments` - Join model for many-to-many. has_many :through for complex associations. Access related records through join.
+
+#@@@@@@@@@@
+
+169. How do you implement endless ranges in Ruby?
+
+Answer: Use (1..) or (1...) syntax (Ruby 2.6+). Example: `(1..).take(5)` => [1, 2, 3, 4, 5]. Infinite ranges. Use with lazy evaluation.
+
+#@@@@@@@@@@
+
+170. Which of the following are RSpec matchers? (Multiple correct)
+A) expect().to eq()
+B) expect().to be()
+C) expect().to include()
+D) expect().to raise_error()
+E) All of the above
+
+Answer: E - All are RSpec matchers. eq (equality), be (identity), include (membership), raise_error (exceptions). Expressive testing.
+
+#@@@@@@@@@@
+
+171. Find the bug:
+```ruby
+def process(data)
+  data.map! { |item| item * 2 }
+end
+
+numbers = [1, 2, 3].freeze
+process(numbers) # Bug: can't modify frozen array
+```
+
+Answer: Frozen array can't be modified. map! raises FrozenError. Fix: use map (non-mutating) or don't freeze. Immutability enforcement.
+
+#@@@@@@@@@@
+
+172. What is the difference between String#chars and String#bytes?
+
+Answer: chars returns array of characters. bytes returns array of byte values. chars for Unicode characters, bytes for raw data. Example: "hello".chars vs "hello".bytes.
+
+#@@@@@@@@@@
+
+173. Which of the following are Rails routing helpers? (Multiple correct)
+A) resources
+B) resource
+C) namespace
+D) scope
+E) All of the above
+
+Answer: E - All are routing helpers. resources (RESTful routes), resource (singular), namespace (module), scope (group routes). Routing DSL.
+
+#@@@@@@@@@@
+
+174. Complete this Rails before_action filter:
+```ruby
+class PostsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_post, only: [:show, :edit, :update, :_______________]
+
+  private
+
+  def set_post
+    @post = Post.find(params[:id])
+  end
+end
+```
+
+Answer: `destroy` - Add destroy to actions needing post. before_action runs before controller actions. Filter pattern.
+
+#@@@@@@@@@@
+
+175. How do you implement numbered parameters in Ruby?
+
+Answer: Use _1, _2, etc. in blocks (Ruby 2.7+). Example: `[1, 2, 3].map { _1 * 2 }`. Implicit block parameters. Shorthand for simple blocks.
+
+#@@@@@@@@@@
+
+176. Which of the following are Bundler groups? (Multiple correct)
+A) :development
+B) :test
+C) :production
+D) Custom groups
+E) All of the above
+
+Answer: E - All are Bundler groups. development (dev tools), test (testing), production (runtime), Custom (any name). Organize dependencies by environment.
+
+#@@@@@@@@@@
+
+177. Find the bug:
+```ruby
+class Calculator
+  def self.add(a, b)
+    a + b
+  end
+end
+
+calc = Calculator.new
+result = calc.add(5, 3) # Bug: calling class method on instance
+```
+
+Answer: add is class method, called on instance. Fix: `Calculator.add(5, 3)`. Class methods called on class, not instance.
+
+#@@@@@@@@@@
+
+178. What is the difference between Array#join and Array#*?
+
+Answer: join converts to string with separator. * with string does same, with integer repeats array. Example: `[1,2].join(',')` => "1,2", `[1,2] * 2` => [1,2,1,2]. Different operations.
+
+#@@@@@@@@@@
+
+179. Which of the following are Rails credential features? (Multiple correct)
+A) Encrypted storage
+B) Master key
+C) Environment-specific
+D) EDITOR integration
+E) All of the above
+
+Answer: E - All are credential features. Encrypted (secure), Master key (decryption), Environment-specific (production.yml.enc), EDITOR (edit command). Secure configuration management.
+
+#@@@@@@@@@@
+
+180. Complete this Rails transaction:
+```ruby
+ActiveRecord::Base.transaction do
+  user = User.create!(name: "John")
+  account = Account.create!(user: user)
+
+  raise ActiveRecord::_______________ if some_condition
+end
+```
+
+Answer: `Rollback` - Rollback transaction without raising error. Transactions ensure atomicity. All or nothing database operations.
+
+#@@@@@@@@@@
+
+181. How do you implement rightward assignment in Ruby?
+
+Answer: Use => operator (Ruby 3.0+). Example: `{name: "John"} => {name:}`. Pattern matching with assignment. Experimental feature.
+
+#@@@@@@@@@@
+
+182. Which of the following are Ruby file test methods? (Multiple correct)
+A) File.exist?
+B) File.directory?
+C) File.file?
+D) File.readable?
+E) All of the above
+
+Answer: E - All are file test methods. exist? (exists), directory? (is directory), file? (is file), readable? (can read). File system checks.
+
+#@@@@@@@@@@
+
+183. Find the bug:
+```ruby
+def calculate_average(numbers)
+  total = numbers.sum
+  total / numbers.size
+end
+
+puts calculate_average([1, 2, 3, 4, 5]) # Bug: integer division
+```
+
+Answer: Integer division loses precision. Fix: `total.to_f / numbers.size` or use `numbers.sum.fdiv(numbers.size)`. Type conversion needed.
+
+#@@@@@@@@@@
+
+184. What is the difference between Kernel#p and Kernel#puts?
+
+Answer: p calls inspect, shows object representation, returns object. puts calls to_s, shows string, returns nil. p for debugging, puts for output. Example: p [1,2] shows [1, 2], puts shows 1\n2.
+
+#@@@@@@@@@@
+
+185. Which of the following are Rails Active Record scopes features? (Multiple correct)
+A) Chainable
+B) Reusable
+C) Default scope
+D) Merge scopes
+E) All of the above
+
+Answer: E - All are scope features. Chainable (combine), Reusable (DRY), Default (always applied), Merge (combine scopes). Query composition.
+
+#@@@@@@@@@@
+
+186. Complete this Rails polymorphic route:
+```ruby
+# Routes
+resources :posts do
+  resources :comments
+end
+
+resources :photos do
+  resources :comments
+end
+
+# View helper
+<%= link_to "Comment", [@commentable, Comment._______________] %>
+```
+
+Answer: `new` - Polymorphic route helper. Rails infers route from object type. Flexible routing.
+
+#@@@@@@@@@@
+
+187. How do you implement endless methods in Ruby?
+
+Answer: Use = syntax (Ruby 3.0+). Example: `def double(x) = x * 2`. Single expression methods. Concise syntax for simple methods.
+
+#@@@@@@@@@@
+
+188. Which of the following are Ruby CSV features? (Multiple correct)
+A) Reading CSV
+B) Writing CSV
+C) Headers
+D) Converters
+E) All of the above
+
+Answer: E - All are CSV features. Reading (parse), Writing (generate), Headers (column names), Converters (type conversion). CSV processing.
+
+#@@@@@@@@@@
+
+189. Find the bug:
+```ruby
+class User
+  def initialize(name)
+    @name = name
+  end
+
+  def greet
+    "Hello, #{@name}!"
+  end
+end
+
+user = User.new("Alice")
+puts user.greet # No bug
+```
+
+Answer: No bug - correctly returns greeting. Output: "Hello, Alice!". Proper instance variable usage and string interpolation.
+
+#@@@@@@@@@@
+
+190. What is the difference between Module#include and Module#prepend?
+
+Answer: include adds module after class in lookup. prepend adds module before class. prepend allows wrapping class methods. Use include for mixins, prepend for method wrapping.
+
+#@@@@@@@@@@
+
+191. Which of the following are Rails Action Controller features? (Multiple correct)
+A) Request/response handling
+B) Filters (before_action)
+C) Strong parameters
+D) Rendering
+E) All of the above
+
+Answer: E - All are Action Controller features. Request/response (HTTP), Filters (callbacks), Strong parameters (security), Rendering (views). Controller layer of MVC.
+
+#@@@@@@@@@@
+
+192. Complete this Rails custom validator:
+```ruby
+class EmailValidator < ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    unless value =~ /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+      record.errors.add(attribute, options[:message] || "is not a valid email")
+    end
+  end
+end
+
+class User < ApplicationRecord
+  validates :email, _______________: true
+end
+```
+
+Answer: `email` - Use custom validator. Custom validation classes for reusable logic. Extend ActiveModel::EachValidator.
+
+#@@@@@@@@@@
+
+193. How do you implement one-line pattern matching in Ruby?
+
+Answer: Use in operator (Ruby 3.0+). Example: `{name: "John", age: 30} in {name:, age:}`. Returns true/false. Concise pattern matching.
+
+#@@@@@@@@@@
+
+194. Which of the following are Ruby JSON features? (Multiple correct)
+A) JSON.parse
+B) JSON.generate
+C) to_json
+D) as_json
+E) All of the above
+
+Answer: E - All are JSON features. parse (string to object), generate (object to string), to_json (serialize), as_json (prepare for serialization). JSON processing.
+
+#@@@@@@@@@@
+
+195. Find the bug:
+```ruby
+def factorial(n, acc = 1)
+  return acc if n <= 1
+  factorial(n - 1, n * acc)
+end
+
+puts factorial(5) # No bug
+```
+
+Answer: No bug - tail-recursive factorial with accumulator. Output: 120. Efficient recursion pattern.
+
+#@@@@@@@@@@
+
+196. What is the difference between Array#sample and Array#shuffle?
+
+Answer: sample returns random element(s). shuffle returns randomized array. sample for selection, shuffle for reordering. Example: `[1,2,3].sample` vs `[1,2,3].shuffle`.
+
+#@@@@@@@@@@
+
+197. Which of the following are Rails deployment tools? (Multiple correct)
+A) Capistrano
+B) Heroku
+C) Docker
+D) Kubernetes
+E) All of the above
+
+Answer: E - All are deployment tools. Capistrano (automated deployment), Heroku (PaaS), Docker (containers), Kubernetes (orchestration). Various deployment strategies.
+
+#@@@@@@@@@@
+
+198. Complete this comprehensive Rails application structure:
+```ruby
+# app/ - Application code (MVC)
+# config/ - Configuration
+# db/ - Database (migrations, schema)
+# lib/ - Library code
+# public/ - Static files
+# test/ or spec/ - Tests
+# vendor/ - Third-party code
+# Gemfile - Dependencies
+# config.ru - Rack configuration
+```
+
+Answer: Standard Rails structure. Convention over configuration. Organized by function. Best practices for maintainability.
+
+#@@@@@@@@@@
+
+199. How do you implement hash default values in Ruby?
+
+Answer: Use Hash.new with default or block. Example: `Hash.new(0)` or `Hash.new { |h, k| h[k] = [] }`. Default for missing keys. Use for counters, accumulators.
+
+#@@@@@@@@@@
+
+200. Which of the following represent Ruby on Rails principles? (Multiple correct)
+A) Convention over Configuration
+B) DRY (Don't Repeat Yourself)
+C) RESTful design
+D) Rapid development
+E) Full-stack framework
+F) All of the above
+
+Answer: F - All are Rails principles. Convention (sensible defaults), DRY (avoid repetition), RESTful (resource-based), Rapid (productivity), Full-stack (complete solution). Rails revolutionized web development with its opinionated, productive approach. The framework emphasizes developer happiness, convention over configuration, and rapid application development. With a rich ecosystem of gems, comprehensive documentation, and strong community, Rails remains a powerful choice for building modern web applications. Ruby and Rails together create an environment where developers can focus on business logic rather than boilerplate, making web development enjoyable and efficient.
+
+#@@@@@@@@@@

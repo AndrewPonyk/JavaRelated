@@ -1,0 +1,2287 @@
+Game Development Quiz - 200 Questions
+Tech Stack: Unity, Unreal Engine, Godot, CryEngine, GameMaker Studio, Cocos2d-x, Blender, Substance Painter, Photon Networking
+
+1. Which of the following are Unity components? (Multiple correct)
+A) Transform
+B) Rigidbody
+C) Collider
+D) Renderer
+E) AudioSource
+F) Camera
+
+Answer: A, B, C, D, E, F - All are Unity components. Transform (position/rotation/scale), Rigidbody (physics), Collider (collision detection), Renderer (visual rendering), AudioSource (sound), Camera (viewport). Components define GameObject behavior.
+
+#@@@@@@@@@@
+
+2. Complete this Unity C# script:
+```csharp
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float speed = 5.0f;
+    private Rigidbody rb;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void Update()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        Vector3 movement = new Vector3(horizontal, 0, vertical);
+        rb._______________= movement * speed;
+    }
+}
+```
+
+Answer: `velocity` - Set the Rigidbody velocity to move the object. This applies physics-based movement using the Rigidbody component.
+
+#@@@@@@@@@@
+
+3. What is the difference between Unity and Unreal Engine?
+
+Answer: Unity uses C#, component-based architecture, easier for beginners, strong 2D/3D support, asset store. Unreal uses C++/Blueprints, powerful visual scripting, AAA graphics, advanced rendering, free until $1M revenue. Choose Unity for indie/mobile, Unreal for AAA/high-end graphics.
+
+#@@@@@@@@@@
+
+4. Which of the following are Unreal Engine Blueprint nodes? (Multiple correct)
+A) Event BeginPlay
+B) Set Actor Location
+C) Get Player Controller
+D) Branch
+E) For Each Loop
+F) Cast To
+
+Answer: A, B, C, D, E, F - All are Blueprint nodes. Event BeginPlay (initialization), Set Actor Location (positioning), Get Player Controller (input handling), Branch (conditional logic), For Each Loop (iteration), Cast To (type conversion).
+
+#@@@@@@@@@@
+
+5. Find the performance issue in this Unity code:
+```csharp
+public class EnemySpawner : MonoBehaviour
+{
+    public GameObject enemyPrefab;
+
+    void Update()
+    {
+        // Performance issue: expensive operation in Update
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        if (enemies.Length < 10)
+        {
+            Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        }
+    }
+}
+```
+
+Answer: FindGameObjectsWithTag() in Update() is expensive, called every frame. Cache enemy count, use events/coroutines, or check less frequently. Move expensive operations out of Update() or use object pooling for better performance.
+
+#@@@@@@@@@@
+
+6. How do you implement object pooling in Unity?
+
+Answer: Pre-instantiate objects, store in queue/list, reuse instead of Instantiate/Destroy. Activate/deactivate objects with SetActive(), reset object state when returning to pool. Improves performance by avoiding garbage collection and instantiation overhead.
+
+#@@@@@@@@@@
+
+7. Which of the following are Godot node types? (Multiple correct)
+A) Node2D
+B) RigidBody2D
+C) Area2D
+D) Control
+E) Spatial
+F) KinematicBody
+
+Answer: A, B, C, D, E, F - All are Godot nodes. Node2D (2D base), RigidBody2D (2D physics), Area2D (2D detection), Control (UI), Spatial (3D base), KinematicBody (character controller). Godot uses scene tree with nodes.
+
+#@@@@@@@@@@
+
+8. Complete this Godot GDScript:
+```gdscript
+extends KinematicBody2D
+
+export var speed = 200
+var velocity = Vector2()
+
+func _ready():
+    pass
+
+func _physics_process(delta):
+    velocity = Vector2()
+
+    if Input.is_action_pressed("ui_right"):
+        velocity.x += speed
+    if Input.is_action_pressed("ui_left"):
+        velocity.x -= speed
+    if Input.is_action_pressed("ui_down"):
+        velocity.y += speed
+    if Input.is_action_pressed("ui_up"):
+        velocity.y -= speed
+
+    velocity = _______________(velocity)
+```
+
+Answer: `move_and_slide` - Use move_and_slide() for smooth character movement with collision detection. This handles physics and collision automatically in Godot.
+
+#@@@@@@@@@@
+
+9. What is the difference between GameMaker Studio and Unity?
+
+Answer: GameMaker Studio specializes in 2D games, uses GML scripting, visual scripting, easier for 2D development, built-in sprite editor. Unity is general-purpose, 2D/3D, C# scripting, component system, larger community. Choose GameMaker for 2D focus, Unity for versatility.
+
+#@@@@@@@@@@
+
+10. Which of the following are Blender features for game development? (Multiple correct)
+A) Modeling
+B) Texturing
+C) Animation
+D) Rigging
+E) Baking
+F) Export to game engines
+
+Answer: A, B, C, D, E, F - All are Blender game dev features. Modeling (3D geometry), Texturing (materials/UV mapping), Animation (keyframes), Rigging (skeletal animation), Baking (lighting/textures), Export (FBX/glTF for engines).
+
+#@@@@@@@@@@
+
+11. Predict the output of this Unity coroutine:
+```csharp
+using System.Collections;
+using UnityEngine;
+
+public class CoroutineExample : MonoBehaviour
+{
+    void Start()
+    {
+        StartCoroutine(CountDown());
+    }
+
+    IEnumerator CountDown()
+    {
+        for (int i = 3; i >= 1; i--)
+        {
+            Debug.Log(i);
+            yield return new WaitForSeconds(1.0f);
+        }
+        Debug.Log("Go!");
+    }
+}
+```
+
+Answer: 3 (wait 1 sec), 2 (wait 1 sec), 1 (wait 1 sec), Go! - Coroutine prints countdown with 1-second delays between each number, then prints "Go!" at the end.
+
+#@@@@@@@@@@
+
+12. How do you implement multiplayer networking with Photon?
+
+Answer: Import Photon PUN2, set up Photon account, configure App ID, use PhotonNetwork.ConnectUsingSettings(), join/create rooms with PhotonNetwork.JoinOrCreateRoom(), sync objects with PhotonView, use RPCs for communication, handle player events.
+
+#@@@@@@@@@@
+
+13. Which of the following are CryEngine features? (Multiple correct)
+A) Flowgraph visual scripting
+B) Advanced lighting
+C) Terrain editor
+D) Physics simulation
+E) Audio system
+F) VR support
+
+Answer: A, B, C, D, E, F - All are CryEngine features. Flowgraph (visual scripting), Advanced lighting (real-time GI), Terrain editor (landscape tools), Physics simulation (realistic physics), Audio system (3D audio), VR support (virtual reality).
+
+#@@@@@@@@@@
+
+14. Complete this Substance Painter workflow:
+```
+1. Import 3D model
+2. Auto-unwrap UVs (if needed)
+3. Bake mesh maps (Normal, AO, Curvature)
+4. Create material layers
+5. Paint textures and details
+6. _______________
+7. Import to game engine
+```
+
+Answer: `Export texture maps` - Export diffuse, normal, roughness, metallic maps for the game engine. Substance Painter generates PBR textures that can be used in Unity, Unreal, etc.
+
+#@@@@@@@@@@
+
+15. What is the difference between forward and deferred rendering?
+
+Answer: Forward rendering processes each light for each object, simpler, better for transparent objects, limited lights. Deferred rendering renders geometry first, then lighting, supports many lights, requires more memory, issues with transparency. Choose based on lighting complexity and target platform.
+
+#@@@@@@@@@@
+
+16. Which of the following are Unity rendering pipelines? (Multiple correct)
+A) Built-in Render Pipeline
+B) Universal Render Pipeline (URP)
+C) High Definition Render Pipeline (HDRP)
+D) Scriptable Render Pipeline (SRP)
+E) Forward+ Pipeline
+F) Ray Tracing Pipeline
+
+Answer: A, B, C, D - Built-in (legacy), URP (mobile/cross-platform), HDRP (high-end), SRP (custom pipelines) are Unity pipelines. Forward+, Ray Tracing are rendering techniques, not separate pipelines.
+
+#@@@@@@@@@@
+
+17. Complete this Unity C# script for player movement:
+```csharp
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour {
+    public float speed = 5f;
+    private Rigidbody rb;
+
+    void Start() {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void FixedUpdate() {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        rb._______________(movement * speed);
+    }
+}
+```
+
+Answer: `AddForce` - Apply force for physics-based movement. Use MovePosition for kinematic, AddForce for dynamic Rigidbody.
+
+#@@@@@@@@@@
+
+18. What is the purpose of LOD (Level of Detail) in game development?
+
+Answer: LOD reduces polygon count for distant objects, improves performance. Multiple mesh versions at different detail levels. Automatically switches based on distance. Essential for open-world games, large scenes.
+
+#@@@@@@@@@@
+
+19. How do you implement object pooling in Unity?
+
+Answer: Pre-instantiate objects, reuse instead of destroy/instantiate. Queue or List of inactive objects. Activate when needed, deactivate when done. Reduces garbage collection, improves performance. Essential for bullets, particles, enemies.
+
+#@@@@@@@@@@
+
+20. Which of the following are Unreal Engine Blueprint node types? (Multiple correct)
+A) Event nodes
+B) Function nodes
+C) Variable nodes
+D) Flow control nodes
+E) Math nodes
+F) Cast nodes
+
+Answer: A, B, C, D, E, F - All are Blueprint node types. Event (triggers), Function (reusable logic), Variable (data), Flow control (branches/loops), Math (calculations), Cast (type conversion).
+
+#@@@@@@@@@@
+
+21. Complete this Godot GDScript for enemy AI:
+```gdscript
+extends KinematicBody2D
+
+var speed = 100
+var player = null
+
+func _ready():
+    player = get_node("/root/Main/Player")
+
+func _physics_process(delta):
+    if player:
+        var direction = (player.position - position).normalized()
+        var velocity = direction * speed
+        move_and_slide(_______________)
+```
+
+Answer: `velocity` - move_and_slide takes velocity vector. KinematicBody2D for character movement. normalized() for consistent speed.
+
+#@@@@@@@@@@
+
+22. What is the difference between Rigidbody and CharacterController in Unity?
+
+Answer: Rigidbody uses physics simulation, affected by forces/collisions, realistic movement. CharacterController is kinematic, manual control, no physics forces, better for player characters. Use Rigidbody for physics objects, CharacterController for player.
+
+#@@@@@@@@@@
+
+23. How do you implement save/load system in games?
+
+Answer: Serialize game state to JSON/binary. Use PlayerPrefs for simple data, file I/O for complex. Save: collect data, serialize, write to file. Load: read file, deserialize, apply to game. Handle versioning, encryption for security.
+
+#@@@@@@@@@@
+
+24. Which of the following are game design patterns? (Multiple correct)
+A) Singleton
+B) Object Pool
+C) Observer
+D) State Machine
+E) Command
+F) Component
+
+Answer: A, B, C, D, E, F - All are game design patterns. Singleton (global access), Object Pool (reuse), Observer (events), State Machine (AI/animation), Command (input), Component (ECS).
+
+#@@@@@@@@@@
+
+25. Complete this Unity Coroutine:
+```csharp
+IEnumerator SpawnEnemies() {
+    while (true) {
+        Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+        yield return new WaitForSeconds(_______________);
+    }
+}
+
+void Start() {
+    StartCoroutine(SpawnEnemies());
+}
+```
+
+Answer: `spawnDelay` or a number like `2.0f` - Wait between spawns. Coroutines for time-based logic. yield return for delays, WaitForSeconds for time.
+
+#@@@@@@@@@@
+
+26. What is the purpose of navmesh in game AI?
+
+Answer: Navmesh defines walkable areas for pathfinding. Bake navigation mesh from scene geometry. AI agents use A* or similar for pathfinding. Handles obstacles, dynamic updates. Essential for NPC navigation.
+
+#@@@@@@@@@@
+
+27. How do you implement multiplayer networking in Unity?
+
+Answer: Use Netcode for GameObjects, Mirror, or Photon. Client-server or peer-to-peer architecture. Synchronize transforms, RPCs for events, NetworkVariables for state. Handle latency, prediction, reconciliation.
+
+#@@@@@@@@@@
+
+28. Which of the following are shader types? (Multiple correct)
+A) Vertex shader
+B) Fragment/Pixel shader
+C) Geometry shader
+D) Compute shader
+E) Tessellation shader
+F) Ray tracing shader
+
+Answer: A, B, C, D, E, F - All are shader types. Vertex (vertex processing), Fragment (pixel color), Geometry (generate geometry), Compute (general computation), Tessellation (subdivide), Ray tracing (ray tracing).
+
+#@@@@@@@@@@
+
+29. Complete this Unreal C++ Actor class:
+```cpp
+UCLASS()
+class MYGAME_API AMyActor : public AActor {
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+    float Health = 100.0f;
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void TakeDamage(float Damage) {
+        Health -= Damage;
+        if (Health <= 0) {
+            _______________;
+        }
+    }
+};
+```
+
+Answer: `Destroy()` - Destroy actor when health depletes. UPROPERTY for exposed variables, UFUNCTION for exposed functions.
+
+#@@@@@@@@@@
+
+30. What is the difference between Update and FixedUpdate in Unity?
+
+Answer: Update called every frame, variable time, use for input/camera. FixedUpdate called at fixed intervals, consistent time, use for physics. Time.deltaTime vs Time.fixedDeltaTime. FixedUpdate for Rigidbody operations.
+
+#@@@@@@@@@@
+
+31. How do you implement particle systems in games?
+
+Answer: Use built-in particle systems (Unity ParticleSystem, Unreal Niagara/Cascade). Configure emitters, lifetime, velocity, color, size over time. GPU particles for large counts. Use for effects: fire, smoke, explosions, magic.
+
+#@@@@@@@@@@
+
+32. Which of the following are collision detection methods? (Multiple correct)
+A) AABB (Axis-Aligned Bounding Box)
+B) OBB (Oriented Bounding Box)
+C) Sphere collision
+D) Mesh collision
+E) Raycasting
+F) Spatial partitioning
+
+Answer: A, B, C, D, E, F - All are collision methods. AABB (simple, fast), OBB (rotated boxes), Sphere (distance check), Mesh (precise, slow), Raycasting (line intersection), Spatial partitioning (optimization).
+
+#@@@@@@@@@@
+
+33. Complete this Unity animation state machine transition:
+```csharp
+Animator animator;
+
+void Update() {
+    float speed = Input.GetAxis("Vertical");
+    animator.SetFloat("Speed", Mathf.Abs(speed));
+
+    if (Input.GetButtonDown("Jump")) {
+        animator._______________("Jump");
+    }
+}
+```
+
+Answer: `SetTrigger` - Trigger one-shot transitions. SetFloat/SetInt/SetBool for continuous parameters. Animator Controller manages states and transitions.
+
+#@@@@@@@@@@
+
+34. What is the purpose of occlusion culling in game engines?
+
+Answer: Occlusion culling skips rendering objects blocked by other objects. Reduces draw calls, improves performance. Bake occlusion data or use dynamic culling. Essential for complex scenes, indoor environments.
+
+#@@@@@@@@@@
+
+35. How do you implement procedural generation in games?
+
+Answer: Use algorithms (Perlin noise, cellular automata, L-systems) to generate content. Seed-based for reproducibility. Generate terrain, dungeons, levels, items. Balance randomness with design constraints. Examples: Minecraft, No Man's Sky.
+
+#@@@@@@@@@@
+
+36. Which of the following are audio middleware tools? (Multiple correct)
+A) FMOD
+B) Wwise
+C) Unity Audio
+D) Unreal Audio
+E) OpenAL
+F) XAudio2
+
+Answer: A, B - FMOD and Wwise are audio middleware. Unity Audio, Unreal Audio are built-in engines. OpenAL, XAudio2 are low-level APIs.
+
+#@@@@@@@@@@
+
+37. Complete this Godot signal connection:
+```gdscript
+extends Node2D
+
+signal health_changed(new_health)
+
+var health = 100
+
+func _ready():
+    connect("health_changed", self, "_on_health_changed")
+
+func take_damage(amount):
+    health -= amount
+    emit_signal(_______________, health)
+
+func _on_health_changed(new_health):
+    print("Health: ", new_health)
+```
+
+Answer: `"health_changed"` - Emit signal with name and parameters. Signals are Godot's event system. Connect in _ready or editor.
+
+#@@@@@@@@@@
+
+38. What is the difference between sprite and mesh rendering?
+
+Answer: Sprite rendering for 2D images, billboards, UI. Mesh rendering for 3D models, polygons. Sprites use quads, meshes use triangles. Sprites simpler, meshes more flexible. Choose based on game dimension.
+
+#@@@@@@@@@@
+
+39. How do you implement camera follow in games?
+
+Answer: Lerp camera position to target: `Vector3.Lerp(camera.position, target.position + offset, smoothSpeed * Time.deltaTime)`. Use Cinemachine (Unity) or Camera component (Unreal) for advanced features. Handle boundaries, smoothing, look-ahead.
+
+#@@@@@@@@@@
+
+40. Which of the following are game optimization techniques? (Multiple correct)
+A) Object pooling
+B) LOD (Level of Detail)
+C) Occlusion culling
+D) Texture atlasing
+E) Draw call batching
+F) Async loading
+
+Answer: A, B, C, D, E, F - All optimize performance. Object pooling (reduce GC), LOD (reduce polygons), Occlusion culling (skip hidden), Texture atlasing (reduce draw calls), Batching (combine meshes), Async loading (smooth loading).
+
+#@@@@@@@@@@
+
+41. Complete this Unity raycast for shooting:
+```csharp
+void Shoot() {
+    RaycastHit hit;
+    if (Physics.Raycast(transform.position, transform.forward, out hit, range)) {
+        Enemy enemy = hit.collider.GetComponent<Enemy>();
+        if (enemy != null) {
+            enemy._______________( damage);
+        }
+    }
+}
+```
+
+Answer: `TakeDamage` - Call damage method on hit enemy. Raycast for hitscan weapons. Use layer masks for filtering.
+
+#@@@@@@@@@@
+
+42. What is the purpose of post-processing in games?
+
+Answer: Post-processing applies effects after rendering: bloom, color grading, depth of field, motion blur, ambient occlusion. Enhances visual quality. Use Post-Processing Stack (Unity) or Post Process Volume (Unreal). Balance quality vs performance.
+
+#@@@@@@@@@@
+
+43. How do you implement inventory systems in games?
+
+Answer: Data structure (List/Dictionary) for items. UI for display/interaction. Drag-drop, stacking, sorting. Save/load inventory state. Item properties (ID, name, icon, quantity). Scriptable Objects (Unity) or Data Tables (Unreal) for item definitions.
+
+#@@@@@@@@@@
+
+44. Which of the following are lighting techniques? (Multiple correct)
+A) Baked lighting
+B) Real-time lighting
+C) Light probes
+D) Reflection probes
+E) Global illumination
+F) Volumetric lighting
+
+Answer: A, B, C, D, E, F - All are lighting techniques. Baked (pre-calculated), Real-time (dynamic), Light probes (dynamic objects), Reflection probes (reflections), Global illumination (indirect light), Volumetric (light shafts).
+
+#@@@@@@@@@@
+
+45. Complete this Unity UI button click handler:
+```csharp
+using UnityEngine.UI;
+
+public class UIManager : MonoBehaviour {
+    public Button startButton;
+
+    void Start() {
+        startButton.onClick.AddListener(_______________);
+    }
+
+    void OnStartButtonClicked() {
+        SceneManager.LoadScene("GameScene");
+    }
+}
+```
+
+Answer: `OnStartButtonClicked` - Add listener to button onClick event. Use UnityEvents for UI callbacks. Remove listeners in OnDestroy.
+
+#@@@@@@@@@@
+
+46. What is the difference between kinematic and dynamic rigidbodies?
+
+Answer: Dynamic rigidbodies affected by physics forces, gravity, collisions. Kinematic rigidbodies moved by script, not affected by forces, can affect dynamic bodies. Use dynamic for physics objects, kinematic for platforms, player characters.
+
+#@@@@@@@@@@
+
+47. How do you implement dialogue systems in games?
+
+Answer: Data structure for dialogue trees (nodes, choices, conditions). UI for text display, character portraits. Scriptable Objects or JSON for dialogue data. State machine for flow control. Ink, Yarn Spinner, or custom system.
+
+#@@@@@@@@@@
+
+48. Which of the following are texture types in game engines? (Multiple correct)
+A) Diffuse/Albedo
+B) Normal map
+C) Roughness/Smoothness
+D) Metallic
+E) Ambient Occlusion
+F) Emissive
+
+Answer: A, B, C, D, E, F - All are PBR texture types. Diffuse (base color), Normal (surface detail), Roughness (surface smoothness), Metallic (metal/non-metal), AO (shadows), Emissive (glow).
+
+#@@@@@@@@@@
+
+49. Complete this Unreal Blueprint for health pickup:
+```
+Event BeginOverlap
+    -> Cast to PlayerCharacter
+        -> Get Health
+        -> Add (Health + HealAmount)
+        -> Set Health
+        -> _______________
+```
+
+Answer: `Destroy Actor` or `Play Sound` - Complete pickup logic. Blueprints are visual scripting. Use for rapid prototyping, designers.
+
+#@@@@@@@@@@
+
+50. What is the purpose of animation blending in games?
+
+Answer: Animation blending smoothly transitions between animations. Blend trees for directional movement. Layer blending for upper/lower body. Weight-based blending. Prevents jarring transitions. Essential for realistic character animation.
+
+#@@@@@@@@@@
+
+51. How do you implement AI behavior trees?
+
+Answer: Hierarchical structure: root, composite nodes (sequence, selector), decorator nodes (conditions), leaf nodes (actions). Tick from root, execute based on node type. Modular, reusable AI logic. Better than FSM for complex AI.
+
+#@@@@@@@@@@
+
+52. Which of the following are game engine scripting languages? (Multiple correct)
+A) C# (Unity)
+B) C++ (Unreal)
+C) GDScript (Godot)
+D) Lua (various engines)
+E) Python (Blender Game Engine)
+F) JavaScript (web games)
+
+Answer: A, B, C, D, E, F - All are game scripting languages. C# (Unity), C++ (Unreal), GDScript (Godot), Lua (modding), Python (Blender), JavaScript (web/Phaser).
+
+#@@@@@@@@@@
+
+53. Complete this Unity ScriptableObject for game data:
+```csharp
+[CreateAssetMenu(fileName = "New Weapon", menuName = "Weapons/Weapon")]
+public class WeaponData : ScriptableObject {
+    public string weaponName;
+    public int damage;
+    public float fireRate;
+    public GameObject _______________;
+    public AudioClip fireSound;
+}
+```
+
+Answer: `projectilePrefab` or `bulletPrefab` - Store weapon configuration. ScriptableObjects for data-driven design. Reusable, inspector-editable.
+
+#@@@@@@@@@@
+
+54. What is the difference between orthographic and perspective cameras?
+
+Answer: Perspective camera simulates human vision, objects smaller with distance, 3D depth. Orthographic camera parallel projection, no size change with distance, 2D games/UI. Use perspective for 3D, orthographic for 2D.
+
+#@@@@@@@@@@
+
+55. How do you implement quest systems in games?
+
+Answer: Quest data structure (ID, title, description, objectives, rewards). Track progress, conditions. UI for quest log, markers. State machine for quest states (inactive, active, completed). Event system for objective updates.
+
+#@@@@@@@@@@
+
+56. Which of the following are game physics engines? (Multiple correct)
+A) PhysX (Unity, Unreal)
+B) Bullet Physics
+C) Box2D (2D)
+D) Havok
+E) Chipmunk2D
+F) ODE (Open Dynamics Engine)
+
+Answer: A, B, C, D, E, F - All are physics engines. PhysX (NVIDIA, 3D), Bullet (open-source, 3D), Box2D (2D), Havok (commercial), Chipmunk2D (2D), ODE (open-source, 3D).
+
+#@@@@@@@@@@
+
+57. Complete this Unity input system (new):
+```csharp
+using UnityEngine.InputSystem;
+
+public class PlayerInput : MonoBehaviour {
+    private PlayerControls controls;
+
+    void Awake() {
+        controls = new PlayerControls();
+    }
+
+    void OnEnable() {
+        controls.Player.Jump.performed += ctx => Jump();
+        controls.Player._______________();
+    }
+
+    void OnDisable() {
+        controls.Player.Disable();
+    }
+}
+```
+
+Answer: `Enable` - Enable input actions. New Input System for cross-platform input. Define actions in Input Actions asset.
+
+#@@@@@@@@@@
+
+58. What is the purpose of mipmaps in game textures?
+
+Answer: Mipmaps are pre-calculated lower resolution versions of textures. Reduce aliasing, improve performance for distant objects. Automatically generated by engine. Use more memory but better quality/performance. Essential for 3D games.
+
+#@@@@@@@@@@
+
+59. How do you implement damage numbers in games?
+
+Answer: Instantiate UI text at hit position. Animate upward with fade. Use object pooling for performance. WorldToScreenPoint for 3D to UI conversion. Customize color, size based on damage type/amount.
+
+#@@@@@@@@@@
+
+60. Which of the following are game monetization strategies? (Multiple correct)
+A) Premium (paid upfront)
+B) Free-to-play with IAP
+C) Ads (banner, interstitial, rewarded)
+D) Subscription
+E) DLC/Expansions
+F) Cosmetic microtransactions
+
+Answer: A, B, C, D, E, F - All are monetization strategies. Premium (one-time purchase), F2P+IAP (in-app purchases), Ads (ad revenue), Subscription (recurring), DLC (additional content), Cosmetics (skins, no gameplay advantage).
+
+#@@@@@@@@@@
+
+61. Complete this Unity tilemap for 2D games:
+```csharp
+using UnityEngine.Tilemaps;
+
+public class TilemapManager : MonoBehaviour {
+    public Tilemap tilemap;
+    public Tile grassTile;
+
+    void PlaceTile(Vector3Int position) {
+        tilemap._______________(position, grassTile);
+    }
+}
+```
+
+Answer: `SetTile` - Set tile at grid position. Tilemap for 2D level design. Use Tile Palette for painting. Rule Tiles for auto-tiling.
+
+#@@@@@@@@@@
+
+62. What is the purpose of skybox in 3D games?
+
+Answer: Skybox creates background environment (sky, horizon). Cube map or procedural sky. Provides ambient lighting reference. Enhances immersion. Use HDR skybox for realistic lighting with image-based lighting.
+
+#@@@@@@@@@@
+
+63. How do you implement minimap in games?
+
+Answer: Second camera rendering to RenderTexture. Orthographic top-down view. UI RawImage displays texture. Layer masks for what to show. Icons for players, enemies, objectives. Update camera position to follow player.
+
+#@@@@@@@@@@
+
+64. Which of the following are game testing types? (Multiple correct)
+A) Unit testing
+B) Integration testing
+C) Playtesting
+D) Performance testing
+E) Compatibility testing
+F) Localization testing
+
+Answer: A, B, C, D, E, F - All are game testing types. Unit (code), Integration (systems), Playtesting (gameplay), Performance (FPS, memory), Compatibility (platforms), Localization (languages).
+
+#@@@@@@@@@@
+
+65. Complete this Godot KinematicBody2D platformer movement:
+```gdscript
+extends KinematicBody2D
+
+var velocity = Vector2()
+var speed = 200
+var jump_force = 400
+var gravity = 800
+
+func _physics_process(delta):
+    velocity.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
+    velocity.x *= speed
+
+    velocity.y += gravity * delta
+
+    if is_on_floor() and Input.is_action_just_pressed("ui_up"):
+        velocity.y = _______________
+
+    velocity = move_and_slide(velocity, Vector2.UP)
+```
+
+Answer: `-jump_force` - Negative for upward jump. move_and_slide handles collisions. is_on_floor() detects ground.
+
+#@@@@@@@@@@
+
+66. What is the difference between additive and multiplicative game balance?
+
+Answer: Additive balance adds fixed values (damage +10), linear scaling, easier to balance. Multiplicative balance uses percentages (damage *1.5), exponential scaling, harder to balance. Combine both for depth. Avoid power creep.
+
+#@@@@@@@@@@
+
+67. How do you implement screen shake effect?
+
+Answer: Temporarily offset camera position with random values. Decay over time. Trigger on impacts, explosions. `camera.position += Random.insideUnitSphere * intensity * (1 - elapsed/duration)`. Use Cinemachine Impulse for advanced shake.
+
+#@@@@@@@@@@
+
+68. Which of the following are game audio concepts? (Multiple correct)
+A) 3D spatial audio
+B) Audio occlusion
+C) Reverb zones
+D) Audio mixing
+E) Dynamic music
+F) Adaptive audio
+
+Answer: A, B, C, D, E, F - All are audio concepts. 3D spatial (positional), Occlusion (blocked sound), Reverb (environment), Mixing (balance), Dynamic music (changes with gameplay), Adaptive (responds to events).
+
+#@@@@@@@@@@
+
+69. Complete this Unity addressables loading:
+```csharp
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+
+public class AssetLoader : MonoBehaviour {
+    public AssetReference assetReference;
+
+    async void LoadAsset() {
+        AsyncOperationHandle<GameObject> handle = assetReference._______________();
+        await handle.Task;
+        GameObject obj = handle.Result;
+        Instantiate(obj);
+    }
+}
+```
+
+Answer: `InstantiateAsync` or `LoadAssetAsync` - Addressables for asset management. Async loading, memory management, remote content. Better than Resources.
+
+#@@@@@@@@@@
+
+70. What is the purpose of frustum culling?
+
+Answer: Frustum culling skips rendering objects outside camera view frustum. Automatic in engines. Reduces draw calls significantly. Combined with occlusion culling for maximum performance. Essential optimization technique.
+
+#@@@@@@@@@@
+
+71. How do you implement achievements in games?
+
+Answer: Track player actions, check conditions. Unlock achievements when met. Save unlock state. Integrate with platform APIs (Steam, Google Play, Game Center). UI for achievement list. Notifications for unlocks.
+
+#@@@@@@@@@@
+
+72. Which of the following are shader graph nodes in Unity? (Multiple correct)
+A) Sample Texture 2D
+B) Lerp
+C) Normal From Height
+D) Fresnel Effect
+E) Voronoi
+F) Gradient Noise
+
+Answer: A, B, C, D, E, F - All are Shader Graph nodes. Sample Texture (textures), Lerp (blend), Normal From Height (normal maps), Fresnel (rim lighting), Voronoi (patterns), Gradient Noise (procedural).
+
+#@@@@@@@@@@
+
+73. Complete this Unity timeline for cutscenes:
+```csharp
+using UnityEngine.Playables;
+
+public class CutsceneManager : MonoBehaviour {
+    public PlayableDirector timeline;
+
+    void PlayCutscene() {
+        timeline.Play();
+    }
+
+    void OnEnable() {
+        timeline.stopped += _______________;
+    }
+
+    void OnCutsceneFinished(PlayableDirector director) {
+        // Resume gameplay
+    }
+}
+```
+
+Answer: `OnCutsceneFinished` - Subscribe to stopped event. Timeline for cinematic sequences. Control animations, audio, cameras, events.
+
+#@@@@@@@@@@
+
+74. What is the difference between static and dynamic batching?
+
+Answer: Static batching combines static meshes at build time, no runtime cost, more memory. Dynamic batching combines small meshes at runtime, CPU cost, less memory. Static for environment, dynamic for small objects. Reduces draw calls.
+
+#@@@@@@@@@@
+
+75. How do you implement fog of war in strategy games?
+
+Answer: Grid-based visibility system. Track explored/visible tiles. Render texture or mesh for fog. Update based on unit vision. Shader for smooth edges. Save explored state. Essential for RTS, tactical games.
+
+#@@@@@@@@@@
+
+76. Which of the following are game engine components in Unity? (Multiple correct)
+A) Transform
+B) Rigidbody
+C) Collider
+D) Renderer
+E) AudioSource
+F) Camera
+
+Answer: A, B, C, D, E, F - All are Unity components. Transform (position/rotation/scale), Rigidbody (physics), Collider (collision), Renderer (rendering), AudioSource (audio), Camera (view).
+
+#@@@@@@@@@@
+
+77. Complete this Unreal material blueprint for water:
+```
+Base Color: Lerp (Deep Color, Shallow Color, Depth Fade)
+Normal: Normal From Height (Panner + Noise)
+Roughness: 0.1
+Metallic: 0.0
+Opacity: _______________
+Refraction: 1.33
+```
+
+Answer: `0.9` or `Fresnel` - Water opacity/transparency. Materials define surface properties. Use refraction for underwater distortion.
+
+#@@@@@@@@@@
+
+78. What is the purpose of delta time in game loops?
+
+Answer: Delta time is time since last frame. Multiply movement by deltaTime for frame-rate independent movement. `position += velocity * Time.deltaTime`. Essential for consistent gameplay across different frame rates.
+
+#@@@@@@@@@@
+
+79. How do you implement leaderboards in games?
+
+Answer: Backend service (PlayFab, Firebase, custom API). Submit scores with player ID. Query top scores, player rank. Handle cheating (server validation). UI for display. Real-time or periodic updates.
+
+#@@@@@@@@@@
+
+80. Which of the following are game genres? (Multiple correct)
+A) FPS (First-Person Shooter)
+B) RPG (Role-Playing Game)
+C) RTS (Real-Time Strategy)
+D) MOBA (Multiplayer Online Battle Arena)
+E) Roguelike
+F) Metroidvania
+
+Answer: A, B, C, D, E, F - All are game genres. FPS (shooting), RPG (character progression), RTS (strategy), MOBA (team battles), Roguelike (permadeath, procedural), Metroidvania (exploration, abilities).
+
+#@@@@@@@@@@
+
+81. Complete this Unity JSON serialization:
+```csharp
+[System.Serializable]
+public class SaveData {
+    public int level;
+    public float health;
+    public Vector3 position;
+}
+
+void SaveGame() {
+    SaveData data = new SaveData();
+    data.level = currentLevel;
+    string json = JsonUtility._______________( data);
+    File.WriteAllText(savePath, json);
+}
+```
+
+Answer: `ToJson` - Serialize to JSON. JsonUtility for simple serialization. Use Newtonsoft.Json for complex data. Save to persistent data path.
+
+#@@@@@@@@@@
+
+82. What is the difference between prefabs and instances in Unity?
+
+Answer: Prefab is template/blueprint stored as asset. Instance is object in scene created from prefab. Changes to prefab affect all instances. Override instance properties. Nested prefabs for complex objects.
+
+#@@@@@@@@@@
+
+83. How do you implement day/night cycle in games?
+
+Answer: Rotate directional light over time. Lerp light color/intensity. Skybox rotation or procedural sky. Ambient lighting changes. Trigger events (spawn enemies at night). Time scale for speed control.
+
+#@@@@@@@@@@
+
+84. Which of the following are game AI techniques? (Multiple correct)
+A) Finite State Machines (FSM)
+B) Behavior Trees
+C) Utility AI
+D) GOAP (Goal-Oriented Action Planning)
+E) Neural Networks
+F) Pathfinding (A*)
+
+Answer: A, B, C, D, E, F - All are AI techniques. FSM (states), Behavior Trees (hierarchical), Utility AI (scoring), GOAP (planning), Neural Networks (learning), Pathfinding (navigation).
+
+#@@@@@@@@@@
+
+85. Complete this Godot Area2D for trigger zones:
+```gdscript
+extends Area2D
+
+signal player_entered
+
+func _ready():
+    connect("body_entered", self, "_on_body_entered")
+
+func _on_body_entered(body):
+    if body.is_in_group("Player"):
+        emit_signal(_______________)
+```
+
+Answer: `"player_entered"` - Emit signal when player enters. Area2D for triggers, not solid collisions. Use groups for identification.
+
+#@@@@@@@@@@
+
+86. What is the purpose of anti-aliasing in games?
+
+Answer: Anti-aliasing reduces jagged edges on geometry. Techniques: MSAA (multi-sample), FXAA (fast approximate), TAA (temporal), SMAA (subpixel morphological). Trade-off between quality and performance. Essential for visual quality.
+
+#@@@@@@@@@@
+
+87. How do you implement combo systems in fighting games?
+
+Answer: Track input sequence and timing. State machine for combo states. Buffer inputs for leniency. Cancel windows between moves. Damage scaling for long combos. Visual feedback for successful inputs.
+
+#@@@@@@@@@@
+
+88. Which of the following are Unity profiler categories? (Multiple correct)
+A) CPU Usage
+B) GPU Usage
+C) Memory
+D) Rendering
+E) Physics
+F) Audio
+
+Answer: A, B, C, D, E, F - All are profiler categories. CPU (scripts, rendering), GPU (shaders, draw calls), Memory (allocations), Rendering (batches), Physics (collisions), Audio (sources).
+
+#@@@@@@@@@@
+
+89. Complete this Unity event system:
+```csharp
+using UnityEngine.Events;
+
+public class GameEvents : MonoBehaviour {
+    public static UnityEvent<int> OnScoreChanged = new UnityEvent<int>();
+
+    public void AddScore(int points) {
+        score += points;
+        OnScoreChanged._______________( score);
+    }
+}
+```
+
+Answer: `Invoke` - Invoke event with parameter. UnityEvents for decoupled communication. Subscribe with AddListener, unsubscribe with RemoveListener.
+
+#@@@@@@@@@@
+
+90. What is the difference between scene and level in game development?
+
+Answer: Scene is technical term (Unity scene, Unreal level). Level is design term (game level, stage). Scene contains all objects, settings. Multiple scenes for menu, gameplay, loading. Load/unload scenes for memory management.
+
+#@@@@@@@@@@
+
+91. How do you implement weapon switching in FPS games?
+
+Answer: Array/List of weapon objects. Track current weapon index. Deactivate current, activate next on input. Smooth transition animation. Save ammo state per weapon. UI for weapon display.
+
+#@@@@@@@@@@
+
+92. Which of the following are game design principles? (Multiple correct)
+A) Player agency
+B) Feedback loops
+C) Risk vs reward
+D) Difficulty curve
+E) Flow state
+F) Emergent gameplay
+
+Answer: A, B, C, D, E, F - All are design principles. Player agency (meaningful choices), Feedback loops (cause/effect), Risk vs reward (decision-making), Difficulty curve (progression), Flow state (engagement), Emergent gameplay (unplanned interactions).
+
+#@@@@@@@@@@
+
+93. Complete this Unity object spawner:
+```csharp
+public class Spawner : MonoBehaviour {
+    public GameObject prefab;
+    public float spawnRadius = 5f;
+
+    void SpawnObject() {
+        Vector3 randomPos = transform.position + Random.insideUnitSphere * spawnRadius;
+        randomPos.y = transform.position.y;
+        Instantiate(prefab, randomPos, _______________);
+    }
+}
+```
+
+Answer: `Quaternion.identity` - No rotation. Random.insideUnitSphere for random position. Instantiate creates object from prefab.
+
+#@@@@@@@@@@
+
+94. What is the purpose of bloom effect in games?
+
+Answer: Bloom creates glow around bright areas. Simulates camera/eye light scattering. Enhances bright objects (lights, fire, magic). Post-processing effect. Threshold and intensity controls. Overuse can look unrealistic.
+
+#@@@@@@@@@@
+
+95. How do you implement crafting systems in games?
+
+Answer: Recipe data (ingredients, result). Inventory check for materials. Consume ingredients, create result. UI for recipe list, crafting interface. Unlock recipes through progression. Scriptable Objects for recipe definitions.
+
+#@@@@@@@@@@
+
+96. Which of the following are game performance metrics? (Multiple correct)
+A) FPS (Frames Per Second)
+B) Draw calls
+C) Triangles/vertices
+D) Memory usage
+E) Load time
+F) Network latency
+
+Answer: A, B, C, D, E, F - All are performance metrics. FPS (smoothness), Draw calls (rendering efficiency), Triangles (geometry complexity), Memory (RAM usage), Load time (user experience), Network latency (multiplayer).
+
+#@@@@@@@@@@
+
+97. Complete this Unreal damage system:
+```cpp
+void AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) {
+    Health -= DamageAmount;
+    if (Health <= 0) {
+        Die();
+    }
+    OnHealthChanged._______________( Health);
+}
+```
+
+Answer: `Broadcast` - Broadcast delegate event. Unreal delegates for events. Bind functions with AddDynamic or BindUFunction.
+
+#@@@@@@@@@@
+
+98. What is the difference between linear and gamma color space?
+
+Answer: Linear color space for physically accurate lighting, better blending. Gamma color space matches monitor output, legacy. Modern games use linear. Affects lighting calculations, post-processing. Set in project settings.
+
+#@@@@@@@@@@
+
+99. How do you implement checkpoints in games?
+
+Answer: Save player state (position, health, inventory) at checkpoint. Trigger zone or manual save. Respawn at last checkpoint on death. Visual feedback (particle, sound). Persistent save or session-based.
+
+#@@@@@@@@@@
+
+100. Which of the following are game monetization metrics? (Multiple correct)
+A) DAU (Daily Active Users)
+B) ARPU (Average Revenue Per User)
+C) Retention rate
+D) Conversion rate
+E) LTV (Lifetime Value)
+F) Churn rate
+
+Answer: A, B, C, D, E, F - All are monetization metrics. DAU (engagement), ARPU (revenue), Retention (returning players), Conversion (paying players), LTV (total revenue per player), Churn (leaving players).
+
+#@@@@@@@@@@
+
+101. Complete this Unity terrain painting:
+```csharp
+using UnityEngine;
+
+public class TerrainPainter : MonoBehaviour {
+    public Terrain terrain;
+    public int textureIndex = 0;
+
+    void PaintTexture(Vector3 worldPos) {
+        TerrainData terrainData = terrain.terrainData;
+        Vector3 terrainPos = worldPos - terrain.transform.position;
+        Vector3 normalizedPos = new Vector3(
+            terrainPos.x / terrainData.size.x,
+            0,
+            terrainPos.z / terrainData.size.z
+        );
+
+        int x = (int)(normalizedPos.x * terrainData.alphamapWidth);
+        int z = (int)(normalizedPos.z * terrainData.alphamapHeight);
+
+        float[,,] alphamap = terrainData.GetAlphamaps(x, z, 1, 1);
+        alphamap[0, 0, textureIndex] = 1.0f;
+        terrainData._______________( x, z, alphamap);
+    }
+}
+```
+
+Answer: `SetAlphamaps` - Paint terrain textures. Alphamap controls texture blending. Use terrain tools for level design.
+
+#@@@@@@@@@@
+
+102. What is the purpose of normal mapping in games?
+
+Answer: Normal maps add surface detail without geometry. Store surface normals in RGB texture. Simulate bumps, crevices. Much cheaper than high-poly models. Essential for modern game graphics. Bake from high-poly to low-poly.
+
+#@@@@@@@@@@
+
+103. How do you implement stealth mechanics in games?
+
+Answer: Vision cones for enemy sight. Noise system for sound detection. Light/shadow detection. Crouch for reduced visibility. Cover system. AI alert states (unaware, suspicious, alert). Feedback for player visibility level.
+
+#@@@@@@@@@@
+
+104. Which of the following are Unity asset store categories? (Multiple correct)
+A) 3D Models
+B) Audio
+C) Scripts/Tools
+D) VFX/Particles
+E) Templates/Projects
+F) Textures/Materials
+
+Answer: A, B, C, D, E, F - All are Asset Store categories. 3D Models (characters, props), Audio (music, SFX), Scripts (tools, systems), VFX (effects), Templates (complete projects), Textures (materials, shaders).
+
+#@@@@@@@@@@
+
+105. Complete this Godot autoload singleton:
+```gdscript
+# GameManager.gd (AutoLoad)
+extends Node
+
+var score = 0
+var level = 1
+
+signal score_changed(new_score)
+
+func add_score(points):
+    score += points
+    emit_signal(_______________, score)
+
+func reset_game():
+    score = 0
+    level = 1
+```
+
+Answer: `"score_changed"` - Emit signal with name. AutoLoad for global singletons. Access from any scene with GameManager.add_score().
+
+#@@@@@@@@@@
+
+106. What is the difference between forward kinematics and inverse kinematics?
+
+Answer: Forward kinematics (FK) calculates end position from joint rotations, animator controls joints. Inverse kinematics (IK) calculates joint rotations from end position, procedural animation. Use FK for authored animations, IK for foot placement, hand reaching.
+
+#@@@@@@@@@@
+
+107. How do you implement grappling hook mechanics?
+
+Answer: Raycast to find grapple point. Apply force toward point or move with lerp. Swing physics with pendulum motion. Line renderer for rope visual. Release on input. Handle obstacles, max distance.
+
+#@@@@@@@@@@
+
+108. Which of the following are game engine lighting models? (Multiple correct)
+A) Phong
+B) Blinn-Phong
+C) PBR (Physically Based Rendering)
+D) Lambert
+E) Toon/Cel shading
+F) Unlit
+
+Answer: A, B, C, D, E, F - All are lighting models. Phong (specular), Blinn-Phong (improved specular), PBR (physically accurate), Lambert (diffuse), Toon (stylized), Unlit (no lighting).
+
+#@@@@@@@@@@
+
+109. Complete this Unity animation event:
+```csharp
+public class PlayerAnimator : MonoBehaviour {
+    public AudioSource audioSource;
+    public AudioClip footstepSound;
+
+    // Called from animation event
+    public void PlayFootstep() {
+        audioSource.PlayOneShot(_______________);
+    }
+
+    // Add event in Animation window at specific frame
+}
+```
+
+Answer: `footstepSound` - Animation events trigger functions at keyframes. Sync audio, VFX, gameplay with animations. Add in Animation window.
+
+#@@@@@@@@@@
+
+110. What is the purpose of texture compression in games?
+
+Answer: Texture compression reduces memory usage, faster loading. Formats: DXT/BC (PC), PVRTC (iOS), ETC (Android), ASTC (modern). Quality vs size trade-off. Automatic in build process. Essential for mobile, console memory limits.
+
+#@@@@@@@@@@
+
+111. How do you implement boss fight patterns?
+
+Answer: Phase system based on health thresholds. Attack patterns with timers/state machines. Telegraph attacks with visual cues. Vulnerable periods for player damage. Escalating difficulty. Cinematic transitions between phases.
+
+#@@@@@@@@@@
+
+112. Which of the following are game camera types? (Multiple correct)
+A) First-person
+B) Third-person
+C) Top-down/Isometric
+D) Side-scrolling
+E) Fixed camera
+F) Cinematic camera
+
+Answer: A, B, C, D, E, F - All are camera types. First-person (FPS), Third-person (over shoulder), Top-down (RTS, RPG), Side-scrolling (platformers), Fixed (Resident Evil), Cinematic (cutscenes).
+
+#@@@@@@@@@@
+
+113. Complete this Unity NavMesh agent:
+```csharp
+using UnityEngine.AI;
+
+public class EnemyAI : MonoBehaviour {
+    public Transform target;
+    private NavMeshAgent agent;
+
+    void Start() {
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    void Update() {
+        if (target != null) {
+            agent._______________( target.position);
+        }
+    }
+}
+```
+
+Answer: `SetDestination` - Set navigation target. NavMeshAgent handles pathfinding, obstacle avoidance. Bake NavMesh from scene geometry.
+
+#@@@@@@@@@@
+
+114. What is the difference between sprite atlas and texture atlas?
+
+Answer: Both combine multiple images into one texture. Sprite atlas for 2D sprites (Unity Sprite Atlas). Texture atlas for 3D UVs. Reduces draw calls, improves performance. Automatic packing or manual layout.
+
+#@@@@@@@@@@
+
+115. How do you implement loot drop systems?
+
+Answer: Loot table with items and drop chances. Random selection weighted by rarity. Roll on enemy death or chest open. Instantiate loot prefab at position. Rarity tiers (common, rare, epic, legendary). Balance drop rates for economy.
+
+#@@@@@@@@@@
+
+116. Which of the following are game UI patterns? (Multiple correct)
+A) HUD (Heads-Up Display)
+B) Radial menu
+C) Context menu
+D) Inventory grid
+E) Skill tree
+F) Dialogue wheel
+
+Answer: A, B, C, D, E, F - All are UI patterns. HUD (health, ammo), Radial menu (quick select), Context menu (interactions), Inventory grid (items), Skill tree (progression), Dialogue wheel (conversation).
+
+#@@@@@@@@@@
+
+117. Complete this Unreal widget blueprint binding:
+```
+Text Block
+    -> Text
+        -> Bind
+            -> Create Binding
+                -> Get Health
+                -> To Text
+                -> _______________
+```
+
+Answer: `Return Value` or `Set Text` - Bind UI to game data. Widget blueprints for UI. Update automatically when data changes.
+
+#@@@@@@@@@@
+
+118. What is the purpose of ambient occlusion in games?
+
+Answer: Ambient occlusion darkens crevices and contact points. Simulates indirect lighting occlusion. SSAO (screen-space), HBAO (horizon-based), ray-traced AO. Adds depth, realism. Post-processing effect or baked into textures.
+
+#@@@@@@@@@@
+
+119. How do you implement double jump mechanics?
+
+Answer: Track jump count, max jumps (2 for double jump). Reset count on ground. Allow jump if count < max. Decrement air control for second jump. Different jump force for each jump. Visual/audio feedback.
+
+#@@@@@@@@@@
+
+120. Which of the following are game analytics events? (Multiple correct)
+A) Level start/complete
+B) Player death
+C) Item purchase
+D) Tutorial completion
+E) Session length
+F) Feature usage
+
+Answer: A, B, C, D, E, F - All are analytics events. Track player behavior, progression, monetization. Use Unity Analytics, GameAnalytics, or custom backend. Data-driven design decisions.
+
+#@@@@@@@@@@
+
+121. Complete this Unity shader property:
+```
+Shader "Custom/MyShader" {
+    Properties {
+        _MainTex ("Texture", 2D) = "white" {}
+        _Color ("Color", Color) = (1,1,1,1)
+        _Glossiness ("Smoothness", Range(0,1)) = 0.5
+        _Metallic ("Metallic", Range(0,1)) = _______________
+    }
+}
+```
+
+Answer: `0.0` or `0.5` - Default metallic value. Properties exposed in inspector. Range for sliders. Shaders define material appearance.
+
+#@@@@@@@@@@
+
+122. What is the difference between mesh collider and primitive colliders?
+
+Answer: Primitive colliders (box, sphere, capsule) are simple, fast, approximate. Mesh colliders use actual mesh geometry, precise, slower. Use primitives for performance, mesh for complex static objects. Convex mesh colliders for dynamic objects.
+
+#@@@@@@@@@@
+
+123. How do you implement wall running mechanics?
+
+Answer: Raycast to detect wall. Check player velocity and angle. Apply gravity reduction or upward force. Rotate player to wall normal. Timer for max wall run duration. Jump off wall with boost. Camera tilt for feedback.
+
+#@@@@@@@@@@
+
+124. Which of the following are game sound design elements? (Multiple correct)
+A) SFX (Sound Effects)
+B) Music/Soundtrack
+C) Ambient sounds
+D) Voice acting/Dialogue
+E) UI sounds
+F) Foley
+
+Answer: A, B, C, D, E, F - All are sound design elements. SFX (actions), Music (atmosphere), Ambient (environment), Voice (narrative), UI (feedback), Foley (footsteps, cloth).
+
+#@@@@@@@@@@
+
+125. Complete this Unity character controller:
+```csharp
+using UnityEngine;
+
+public class CharacterMovement : MonoBehaviour {
+    public CharacterController controller;
+    public float speed = 5f;
+    public float gravity = -9.81f;
+    private Vector3 velocity;
+
+    void Update() {
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+        controller.Move(move * speed * Time.deltaTime);
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * _______________);
+    }
+}
+```
+
+Answer: `Time.deltaTime` - Apply gravity over time. CharacterController for kinematic character movement. Handles collisions, slopes.
+
+#@@@@@@@@@@
+
+126. What is the purpose of render textures in games?
+
+Answer: Render textures capture camera output to texture. Use for mirrors, security cameras, minimaps, portals, UI displays. Dynamic textures updated each frame. Can apply post-processing. Performance cost of additional camera.
+
+#@@@@@@@@@@
+
+127. How do you implement skill cooldown systems?
+
+Answer: Track last use time per skill. Check if Time.time - lastUseTime >= cooldown. UI timer display. Disable skill button during cooldown. Visual feedback (greyed out, circular fill). Reset on death optional.
+
+#@@@@@@@@@@
+
+128. Which of the following are game optimization tools? (Multiple correct)
+A) Unity Profiler
+B) Unreal Insights
+C) RenderDoc
+D) PIX (Performance Investigator for Xbox)
+E) Xcode Instruments
+F) Android Profiler
+
+Answer: A, B, C, D, E, F - All are optimization tools. Unity Profiler (Unity), Unreal Insights (Unreal), RenderDoc (graphics debugging), PIX (Xbox), Xcode Instruments (iOS), Android Profiler (Android).
+
+#@@@@@@@@@@
+
+129. Complete this Godot tween animation:
+```gdscript
+extends Sprite
+
+func _ready():
+    var tween = create_tween()
+    tween.tween_property(self, "position", Vector2(500, 300), 2.0)
+    tween.tween_property(self, "modulate:a", 0.0, 1.0)
+    tween.set_trans(_______________)
+```
+
+Answer: `Tween.TRANS_BOUNCE` or `Tween.TRANS_ELASTIC` - Set transition type. Tweens for smooth animations. Chain multiple properties. Easing functions for natural motion.
+
+#@@@@@@@@@@
+
+130. What is the difference between baked and real-time global illumination?
+
+Answer: Baked GI pre-calculates indirect lighting, static only, no runtime cost, long bake times. Real-time GI calculates dynamically, supports moving lights/objects, performance cost. Use baked for static scenes, real-time for dynamic lighting.
+
+#@@@@@@@@@@
+
+131. How do you implement ragdoll physics?
+
+Answer: Replace animated skeleton with rigidbodies and joints on death. Configure joint limits, masses. Disable character controller, enable ragdoll. Apply force at hit point. Blend from animation to ragdoll. Get up animation or respawn.
+
+#@@@@@@@@@@
+
+132. Which of the following are game monetization models? (Multiple correct)
+A) Pay-to-win
+B) Pay-for-convenience
+C) Cosmetic-only
+D) Battle pass
+E) Loot boxes/Gacha
+F) Ad-supported
+
+Answer: A, B, C, D, E, F - All are monetization models. Pay-to-win (power), Pay-for-convenience (time-savers), Cosmetic (skins), Battle pass (seasonal rewards), Loot boxes (random rewards), Ad-supported (free with ads).
+
+#@@@@@@@@@@
+
+133. Complete this Unity build pipeline:
+```csharp
+using UnityEditor;
+
+public class BuildScript {
+    [MenuItem("Build/Build All Platforms")]
+    static void BuildAll() {
+        BuildPlayerOptions options = new BuildPlayerOptions();
+        options.scenes = new[] { "Assets/Scenes/Main.unity" };
+        options.locationPathName = "Builds/Game.exe";
+        options.target = BuildTarget.StandaloneWindows64;
+        options.options = BuildOptions._______________;
+
+        BuildPipeline.BuildPlayer(options);
+    }
+}
+```
+
+Answer: `None` or `Development` - Build options flags. Automate builds with scripts. CI/CD for automated builds. Multiple platforms from one codebase.
+
+#@@@@@@@@@@
+
+134. What is the purpose of vertex colors in 3D models?
+
+Answer: Vertex colors store color data per vertex. Use for variation without textures, blend masks, damage effects. Cheaper than textures. Painted in 3D software. Access in shaders. Limited resolution (vertex density).
+
+#@@@@@@@@@@
+
+135. How do you implement climbing mechanics?
+
+Answer: Detect climbable surfaces (tag, layer). Disable gravity, enable climbing movement. IK for hand/foot placement. Stamina system optional. Ledge detection for climb up. Camera adjustment. Smooth transitions.
+
+#@@@@@@@@@@
+
+136. Which of the following are game engine asset types? (Multiple correct)
+A) Prefabs/Blueprints
+B) Materials
+C) Animations
+D) Audio clips
+E) Scripts
+F) Scenes/Levels
+
+Answer: A, B, C, D, E, F - All are asset types. Prefabs (reusable objects), Materials (surface properties), Animations (motion data), Audio (sounds), Scripts (logic), Scenes (levels).
+
+#@@@@@@@@@@
+
+137. Complete this Unity custom editor:
+```csharp
+using UnityEditor;
+
+[CustomEditor(typeof(EnemySpawner))]
+public class EnemySpawnerEditor : Editor {
+    public override void OnInspectorGUI() {
+        DrawDefaultInspector();
+
+        EnemySpawner spawner = (EnemySpawner)target;
+        if (GUILayout.Button("Spawn Enemy")) {
+            spawner._______________();
+        }
+    }
+}
+```
+
+Answer: `SpawnEnemy` - Custom inspector buttons. Extend editor for tools. DrawDefaultInspector for default fields. EditorGUILayout for custom UI.
+
+#@@@@@@@@@@
+
+138. What is the difference between alpha blending and alpha testing?
+
+Answer: Alpha blending smoothly blends transparent pixels, supports partial transparency, render order matters, more expensive. Alpha testing discards pixels below threshold, binary transparency, no sorting needed, cheaper. Use blending for glass, testing for foliage.
+
+#@@@@@@@@@@
+
+139. How do you implement enemy spawning waves?
+
+Answer: Wave system with enemy counts, types. Spawn timer between enemies. Wave complete when all defeated. Difficulty scaling (more enemies, stronger types). Break between waves. UI for wave number. Endless mode optional.
+
+#@@@@@@@@@@
+
+140. Which of the following are game accessibility features? (Multiple correct)
+A) Colorblind modes
+B) Subtitles/Captions
+C) Remappable controls
+D) Difficulty options
+E) Text size adjustment
+F) Audio cues for visual events
+
+Answer: A, B, C, D, E, F - All are accessibility features. Colorblind (color adjustments), Subtitles (hearing), Remappable controls (motor), Difficulty (skill levels), Text size (vision), Audio cues (visual impairment). Inclusive design.
+
+#@@@@@@@@@@
+
+141. Complete this Unity VR controller input:
+```csharp
+using UnityEngine.XR;
+
+public class VRController : MonoBehaviour {
+    private InputDevice rightController;
+
+    void Start() {
+        rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+    }
+
+    void Update() {
+        bool triggerPressed;
+        if (rightController.TryGetFeatureValue(CommonUsages._______________, out triggerPressed) && triggerPressed) {
+            Shoot();
+        }
+    }
+}
+```
+
+Answer: `triggerButton` - VR input with XR Interaction Toolkit. Get controller features. Support multiple VR platforms.
+
+#@@@@@@@@@@
+
+142. What is the purpose of z-fighting in 3D graphics?
+
+Answer: Z-fighting is flickering when two surfaces occupy same depth. Caused by insufficient depth buffer precision. Fix: offset surfaces slightly, increase near/far plane ratio, use depth bias. Avoid overlapping geometry.
+
+#@@@@@@@@@@
+
+143. How do you implement destructible environments?
+
+Answer: Pre-fractured meshes or runtime fracturing. Replace intact with broken pieces on damage. Rigidbody physics for debris. Particle effects for dust. Performance considerations for many pieces. Voronoi fracturing algorithms.
+
+#@@@@@@@@@@
+
+144. Which of the following are game engine scripting concepts? (Multiple correct)
+A) MonoBehaviour (Unity)
+B) Actor Component (Unreal)
+C) Coroutines
+D) Delegates/Events
+E) Serialization
+F) Reflection
+
+Answer: A, B, C, D, E, F - All are scripting concepts. MonoBehaviour (Unity base class), Actor Component (Unreal), Coroutines (async), Delegates (callbacks), Serialization (save data), Reflection (runtime type info).
+
+#@@@@@@@@@@
+
+145. Complete this Godot physics material:
+```gdscript
+extends RigidBody2D
+
+func _ready():
+    var physics_material = PhysicsMaterial.new()
+    physics_material.friction = 0.5
+    physics_material.bounce = _______________
+    physics_material_override = physics_material
+```
+
+Answer: `0.8` or any value 0-1 - Set bounce/restitution. Physics materials control friction, bounce. Apply to rigidbodies for different surface properties.
+
+#@@@@@@@@@@
+
+146. What is the difference between forward and inverse rendering?
+
+Answer: Forward rendering renders objects front-to-back or back-to-front, processes each light per object. Inverse/deferred rendering renders geometry to G-buffer first, then lighting pass. Forward simpler, deferred better for many lights.
+
+#@@@@@@@@@@
+
+147. How do you implement cover systems in shooters?
+
+Answer: Detect cover objects (raycast, tags). Snap player to cover position. Crouch/lean animations. Peek/blind fire mechanics. Cover-to-cover movement. AI cover usage. Break cover on damage/flanking.
+
+#@@@@@@@@@@
+
+148. Which of the following are game balancing techniques? (Multiple correct)
+A) Playtesting
+B) Data analytics
+C) Mathematical modeling
+D) A/B testing
+E) Community feedback
+F) Iterative design
+
+Answer: A, B, C, D, E, F - All are balancing techniques. Playtesting (observation), Analytics (metrics), Mathematical modeling (simulation), A/B testing (variants), Community feedback (players), Iterative design (refinement).
+
+#@@@@@@@@@@
+
+149. Complete this Unity addressable asset loading:
+```csharp
+using UnityEngine.AddressableAssets;
+
+public class AssetManager : MonoBehaviour {
+    async void LoadLevel(string levelKey) {
+        var handle = Addressables.LoadSceneAsync(levelKey);
+        await handle.Task;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded) {
+            Debug.Log("Level loaded");
+        }
+
+        // Don't forget to release
+        Addressables._______________( handle);
+    }
+}
+```
+
+Answer: `Release` - Release addressable handles to free memory. Addressables for asset management, DLC, remote content. Async loading for smooth experience.
+
+#@@@@@@@@@@
+
+150. What is the purpose of GPU instancing?
+
+Answer: GPU instancing renders many copies of same mesh in one draw call. Reduces CPU overhead. Use for grass, trees, crowds. Requires same material, different transforms. Enable in material settings. Massive performance improvement.
+
+#@@@@@@@@@@
+
+151. How do you implement respawn systems?
+
+Answer: Save spawn point (checkpoint, last safe position). Reset player state (health, position, inventory). Delay or fade transition. Respawn enemies/items optional. Penalty (lose items, XP). Spectator mode for multiplayer.
+
+#@@@@@@@@@@
+
+152. Which of the following are game engine rendering features? (Multiple correct)
+A) Dynamic shadows
+B) Reflection probes
+C) Light baking
+D) Screen-space reflections
+E) Volumetric fog
+F) Particle systems
+
+Answer: A, B, C, D, E, F - All are rendering features. Dynamic shadows (real-time), Reflection probes (reflections), Light baking (pre-calculated), SSR (screen-space reflections), Volumetric fog (atmospheric), Particles (effects).
+
+#@@@@@@@@@@
+
+153. Complete this Unreal animation blueprint:
+```
+Event Graph:
+    Event Blueprint Update Animation
+        -> Get Owner
+        -> Cast to Character
+        -> Get Velocity
+        -> Vector Length
+        -> Set Speed
+        -> Get Is In Air
+        -> Set _______________
+```
+
+Answer: `IsJumping` or `IsFalling` - Update animation variables. Animation Blueprint for character animation logic. State machines for animation states.
+
+#@@@@@@@@@@
+
+154. What is the difference between static and dynamic lighting?
+
+Answer: Static lighting baked at build time, no runtime cost, can't change, supports GI. Dynamic lighting calculated at runtime, can move/change, performance cost, limited GI. Mix both for best results.
+
+#@@@@@@@@@@
+
+155. How do you implement turn-based combat?
+
+Answer: Turn queue/initiative system. State machine for combat phases (player turn, enemy turn, resolution). Action selection UI. Animate actions sequentially. Calculate damage/effects. Check win/lose conditions. Save combat state.
+
+#@@@@@@@@@@
+
+156. Which of the following are game engine physics features? (Multiple correct)
+A) Rigidbody dynamics
+B) Collision detection
+C) Joints/Constraints
+D) Cloth simulation
+E) Soft body physics
+F) Fluid simulation
+
+Answer: A, B, C, D, E, F - All are physics features. Rigidbody (rigid objects), Collision (detection/response), Joints (connections), Cloth (fabric), Soft body (deformable), Fluid (liquids). PhysX, Bullet, Havok engines.
+
+#@@@@@@@@@@
+
+157. Complete this Unity DOTween animation:
+```csharp
+using DG.Tweening;
+
+public class UIAnimator : MonoBehaviour {
+    public RectTransform panel;
+
+    void ShowPanel() {
+        panel.DOAnchorPos(Vector2.zero, 0.5f)
+            .SetEase(_______________)
+            .OnComplete(() => Debug.Log("Panel shown"));
+    }
+}
+```
+
+Answer: `Ease.OutBack` or `Ease.InOutQuad` - DOTween for smooth animations. Easing functions for natural motion. Chain tweens, callbacks. Popular Unity animation library.
+
+#@@@@@@@@@@
+
+158. What is the purpose of culling in game engines?
+
+Answer: Culling skips rendering invisible objects. Types: frustum (outside view), occlusion (blocked), distance (too far), layer (selective). Reduces draw calls, improves performance. Automatic in engines. Configure culling distances.
+
+#@@@@@@@@@@
+
+159. How do you implement experience/leveling systems?
+
+Answer: Track XP points, level thresholds. Award XP for actions (kills, quests, exploration). Level up when threshold reached. Increase stats, unlock abilities. Exponential or linear XP curves. Save progression. UI for level/XP display.
+
+#@@@@@@@@@@
+
+160. Which of the following are game design documents? (Multiple correct)
+A) Game Design Document (GDD)
+B) Technical Design Document (TDD)
+C) Art Bible
+D) Level Design Document
+E) Audio Design Document
+F) Monetization Design Document
+
+Answer: A, B, C, D, E, F - All are design documents. GDD (overall design), TDD (technical specs), Art Bible (visual style), Level Design (level layouts), Audio Design (sound direction), Monetization (business model).
+
+#@@@@@@@@@@
+
+161. Complete this Unity custom attribute:
+```csharp
+using UnityEngine;
+
+public class EnemyStats : MonoBehaviour {
+    [Range(1, 100)]
+    public int health = 50;
+
+    [_______________]
+    public float attackDamage = 10f;
+
+    [TextArea(3, 10)]
+    public string description;
+}
+```
+
+Answer: `Min(0)` or `Header("Combat")` or `Tooltip("Damage per attack")` - Attributes customize inspector. Range (slider), Min/Max (limits), Header (section), Tooltip (help), TextArea (multiline).
+
+#@@@@@@@@@@
+
+162. What is the difference between mesh and skinned mesh renderer?
+
+Answer: Mesh Renderer for static meshes, no deformation. Skinned Mesh Renderer for animated characters, bone deformation, blend shapes. Skinned mesh more expensive. Use mesh for props, skinned for characters.
+
+#@@@@@@@@@@
+
+163. How do you implement weather systems?
+
+Answer: Particle systems for rain/snow. Skybox changes for clouds. Lighting adjustments. Audio ambience. Puddle/snow decals. Gameplay effects (reduced visibility, slippery surfaces). Transition smoothly between weather states.
+
+#@@@@@@@@@@
+
+164. Which of the following are game engine animation systems? (Multiple correct)
+A) Mecanim (Unity)
+B) Animation Blueprint (Unreal)
+C) Blend trees
+D) State machines
+E) IK (Inverse Kinematics)
+F) Root motion
+
+Answer: A, B, C, D, E, F - All are animation systems. Mecanim (Unity animator), Animation Blueprint (Unreal), Blend trees (blending), State machines (states), IK (procedural), Root motion (animation-driven movement).
+
+#@@@@@@@@@@
+
+165. Complete this Godot shader:
+```glsl
+shader_type canvas_item;
+
+uniform sampler2D texture_albedo;
+uniform vec4 tint_color : hint_color = vec4(1.0);
+
+void fragment() {
+    vec4 tex = texture(texture_albedo, UV);
+    COLOR = tex * _______________;
+}
+```
+
+Answer: `tint_color` - Multiply texture by tint. Shaders for custom rendering. GLSL-like syntax in Godot. canvas_item for 2D, spatial for 3D.
+
+#@@@@@@@@@@
+
+166. What is the purpose of asset bundles in Unity?
+
+Answer: Asset Bundles package assets for runtime loading. DLC, modding, reduce build size. Load from local or remote. Platform-specific bundles. Dependency management. Replaced by Addressables in modern Unity.
+
+#@@@@@@@@@@
+
+167. How do you implement faction/reputation systems?
+
+Answer: Track reputation value per faction. Modify based on player actions. Thresholds for reputation levels (hostile, neutral, friendly, allied). Affect NPC behavior, prices, quests. UI for faction status. Consequences for choices.
+
+#@@@@@@@@@@
+
+168. Which of the following are game engine profiling metrics? (Multiple correct)
+A) Frame time
+B) Draw calls
+C) SetPass calls
+D) Garbage collection
+E) Physics time
+F) Script time
+
+Answer: A, B, C, D, E, F - All are profiling metrics. Frame time (total), Draw calls (rendering), SetPass (material changes), GC (memory), Physics (simulation), Script (code execution). Optimize bottlenecks.
+
+#@@@@@@@@@@
+
+169. Complete this Unity object pool:
+```csharp
+using System.Collections.Generic;
+
+public class ObjectPool : MonoBehaviour {
+    public GameObject prefab;
+    private Queue<GameObject> pool = new Queue<GameObject>();
+
+    public GameObject Get() {
+        if (pool.Count > 0) {
+            GameObject obj = pool.Dequeue();
+            obj.SetActive(true);
+            return obj;
+        }
+        return Instantiate(prefab);
+    }
+
+    public void Return(GameObject obj) {
+        obj.SetActive(false);
+        pool._______________( obj);
+    }
+}
+```
+
+Answer: `Enqueue` - Return object to pool. Object pooling reduces instantiation cost. Essential for bullets, particles, enemies. Reuse instead of destroy.
+
+#@@@@@@@@@@
+
+170. What is the difference between additive and single scene loading?
+
+Answer: Single scene loading unloads current scene, loads new one, clean slate. Additive scene loading keeps current scenes, adds new one, multiple scenes active. Use single for level transitions, additive for streaming, persistent managers.
+
+#@@@@@@@@@@
+
+171. How do you implement hitbox/hurtbox systems?
+
+Answer: Hitbox (attack area) and hurtbox (vulnerable area) colliders. Trigger collisions between hitbox and enemy hurtbox. Calculate damage, knockback. Frame-based activation for attacks. Separate layers for player/enemy. Visual debug gizmos.
+
+#@@@@@@@@@@
+
+172. Which of the following are game engine build platforms? (Multiple correct)
+A) Windows/Mac/Linux
+B) iOS/Android
+C) PlayStation/Xbox/Nintendo Switch
+D) WebGL
+E) VR (Oculus, SteamVR)
+F) AR (ARKit, ARCore)
+
+Answer: A, B, C, D, E, F - All are build platforms. Desktop (PC), Mobile (phones), Console (dedicated), WebGL (browser), VR (headsets), AR (augmented reality). Cross-platform development.
+
+#@@@@@@@@@@
+
+173. Complete this Unreal damage type:
+```cpp
+UCLASS()
+class MYGAME_API UFireDamageType : public UDamageType {
+    GENERATED_BODY()
+
+public:
+    UFireDamageType() {
+        DamageImpulse = 1000.0f;
+        DestructibleImpulse = 500.0f;
+        bCausedByWorld = _______________;
+    }
+};
+```
+
+Answer: `false` - Damage type classification. Different damage types for different effects. Apply damage with UGameplayStatics::ApplyDamage.
+
+#@@@@@@@@@@
+
+174. What is the purpose of blend shapes/morph targets?
+
+Answer: Blend shapes deform mesh for facial expressions, lip sync. Store vertex offsets. Blend between base and target. Cheaper than bones for facial animation. Export from 3D software. Animate blend shape weights.
+
+#@@@@@@@@@@
+
+175. How do you implement auto-save systems?
+
+Answer: Periodic timer or event-based triggers (checkpoint, level complete). Save game state to file/PlayerPrefs. Background thread to avoid hitches. Save indicator UI. Multiple save slots. Cloud save integration optional.
+
+#@@@@@@@@@@
+
+176. Which of the following are game engine shader types? (Multiple correct)
+A) Surface shader
+B) Vertex/Fragment shader
+C) Compute shader
+D) Geometry shader
+E) Tessellation shader
+F) Unlit shader
+
+Answer: A, B, C, D, E, F - All are shader types. Surface (Unity high-level), Vertex/Fragment (low-level), Compute (GPGPU), Geometry (generate geometry), Tessellation (subdivide), Unlit (no lighting).
+
+#@@@@@@@@@@
+
+177. Complete this Unity coroutine for fading:
+```csharp
+using System.Collections;
+
+public class FadeController : MonoBehaviour {
+    public CanvasGroup canvasGroup;
+
+    public IEnumerator FadeOut(float duration) {
+        float elapsed = 0f;
+        while (elapsed < duration) {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return _______________;
+        }
+        canvasGroup.alpha = 0f;
+    }
+}
+```
+
+Answer: `null` or `new WaitForEndOfFrame()` - Yield null waits one frame. Coroutines for time-based logic. Lerp for smooth transitions.
+
+#@@@@@@@@@@
+
+178. What is the difference between emissive and albedo textures?
+
+Answer: Albedo is base color, affected by lighting. Emissive is self-illumination, not affected by lighting, glows. Use emissive for lights, screens, magic. HDR emissive for bloom effect. Combine both in PBR materials.
+
+#@@@@@@@@@@
+
+179. How do you implement knockback mechanics?
+
+Answer: Apply force away from damage source. Calculate direction from attacker to victim. AddForce or set velocity. Stun duration during knockback. Disable player control temporarily. Scale force by damage. Visual feedback (camera shake).
+
+#@@@@@@@@@@
+
+180. Which of the following are game engine input systems? (Multiple correct)
+A) Unity Input System (new)
+B) Unity Input Manager (old)
+C) Unreal Enhanced Input
+D) Rewired (asset)
+E) InControl (asset)
+F) Custom input handling
+
+Answer: A, B, C, D, E, F - All are input systems. Unity Input System (modern, flexible), Input Manager (legacy), Unreal Enhanced Input (context-aware), Rewired (advanced), InControl (controller support), Custom (manual).
+
+#@@@@@@@@@@
+
+181. Complete this Godot state machine:
+```gdscript
+extends Node
+
+enum State { IDLE, WALK, RUN, JUMP }
+var current_state = State.IDLE
+
+func change_state(new_state):
+    exit_state(current_state)
+    current_state = new_state
+    enter_state(_______________)
+
+func enter_state(state):
+    match state:
+        State.IDLE:
+            print("Entering idle")
+        State.WALK:
+            print("Entering walk")
+```
+
+Answer: `current_state` or `new_state` - Enter new state. State machines for AI, animation, game flow. Enum for state types. Enter/exit/update methods per state.
+
+#@@@@@@@@@@
+
+182. What is the purpose of texture streaming?
+
+Answer: Texture streaming loads high-res textures on demand based on distance. Reduces memory usage. Mipmap streaming. Automatic in modern engines. Configure streaming pool size. Essential for large open worlds.
+
+#@@@@@@@@@@
+
+183. How do you implement stamina systems?
+
+Answer: Track current/max stamina. Consume on actions (sprint, dodge, attack). Regenerate over time when not in use. Delay before regen starts. UI bar display. Disable actions when depleted. Balance consumption/regen rates.
+
+#@@@@@@@@@@
+
+184. Which of the following are game engine particle system modules? (Multiple correct)
+A) Emission
+B) Shape
+C) Velocity over lifetime
+D) Color over lifetime
+E) Size over lifetime
+F) Collision
+
+Answer: A, B, C, D, E, F - All are particle modules. Emission (spawn rate), Shape (spawn area), Velocity (movement), Color (color changes), Size (size changes), Collision (world interaction). Combine for complex effects.
+
+#@@@@@@@@@@
+
+185. Complete this Unity singleton pattern:
+```csharp
+public class GameManager : MonoBehaviour {
+    private static GameManager _instance;
+
+    public static GameManager Instance {
+        get {
+            if (_instance == null) {
+                _instance = FindObjectOfType<GameManager>();
+                if (_instance == null) {
+                    GameObject go = new GameObject("GameManager");
+                    _instance = go.AddComponent<GameManager>();
+                }
+            }
+            return _______________;
+        }
+    }
+
+    void Awake() {
+        if (_instance != null && _instance != this) {
+            Destroy(gameObject);
+        } else {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+}
+```
+
+Answer: `_instance` - Singleton pattern for global access. DontDestroyOnLoad for persistence. Check for duplicates in Awake.
+
+#@@@@@@@@@@
+
+186. What is the difference between orthogonal and isometric tilemaps?
+
+Answer: Orthogonal tilemaps use square grid, top-down view, simple. Isometric tilemaps use diamond grid, 3/4 view, pseudo-3D. Isometric requires sorting, depth calculation. Use orthogonal for simple 2D, isometric for strategy/RPG.
+
+#@@@@@@@@@@
+
+187. How do you implement critical hit systems?
+
+Answer: Random chance check (Random.value < critChance). Multiply damage by crit multiplier. Visual/audio feedback (different effect, sound). UI indicator (damage number color). Balance crit chance and multiplier. Stats/items modify crit chance.
+
+#@@@@@@@@@@
+
+188. Which of the following are game engine lighting types? (Multiple correct)
+A) Directional light
+B) Point light
+C) Spot light
+D) Area light
+E) Emissive materials
+F) Light probes
+
+Answer: A, B, C, D, E, F - All are lighting types. Directional (sun), Point (bulb), Spot (flashlight), Area (soft light), Emissive (glowing surfaces), Light probes (dynamic object lighting).
+
+#@@@@@@@@@@
+
+189. Complete this Unreal game mode:
+```cpp
+UCLASS()
+class MYGAME_API AMyGameMode : public AGameModeBase {
+    GENERATED_BODY()
+
+public:
+    virtual void BeginPlay() override {
+        Super::BeginPlay();
+        SpawnEnemies();
+    }
+
+    UFUNCTION(BlueprintCallable)
+    void OnPlayerDeath() {
+        RestartPlayer(_______________);
+    }
+};
+```
+
+Answer: `GetWorld()->GetFirstPlayerController()` - Get player controller. Game Mode manages game rules, spawning, win/lose conditions. Server-only in multiplayer.
+
+#@@@@@@@@@@
+
+190. What is the purpose of UV mapping in 3D models?
+
+Answer: UV mapping unwraps 3D surface to 2D texture space. U and V are texture coordinates (like X, Y). Defines how textures wrap around model. Created in 3D software. Multiple UV channels for different textures. Proper UVs essential for texturing.
+
+#@@@@@@@@@@
+
+191. How do you implement dash mechanics?
+
+Answer: Apply instant velocity in movement direction. Cooldown timer between dashes. Invincibility frames optional. Dash distance/duration limits. Disable gravity during dash. Trail effect for feedback. Cancel other actions during dash.
+
+#@@@@@@@@@@
+
+192. Which of the following are game engine collision layers? (Multiple correct)
+A) Player
+B) Enemy
+C) Environment
+D) Projectile
+E) Trigger
+F) UI
+
+Answer: A, B, C, D, E - Player, Enemy, Environment, Projectile, Trigger are gameplay layers. UI doesn't use physics layers. Layer matrix controls which layers collide. Optimize by disabling unnecessary collisions.
+
+#@@@@@@@@@@
+
+193. Complete this Unity scriptable object event system:
+```csharp
+[CreateAssetMenu(menuName = "Events/Game Event")]
+public class GameEvent : ScriptableObject {
+    private List<GameEventListener> listeners = new List<GameEventListener>();
+
+    public void Raise() {
+        for (int i = listeners.Count - 1; i >= 0; i--) {
+            listeners[i]._______________();
+        }
+    }
+
+    public void RegisterListener(GameEventListener listener) {
+        listeners.Add(listener);
+    }
+}
+```
+
+Answer: `OnEventRaised` - Invoke listener callback. ScriptableObject events for decoupled architecture. Listeners subscribe/unsubscribe. Designer-friendly.
+
+#@@@@@@@@@@
+
+194. What is the difference between hard and soft shadows?
+
+Answer: Hard shadows have sharp edges, single light source, cheaper. Soft shadows have blurred edges, area light or multiple samples, more expensive. Soft shadows more realistic. Use shadow cascades for quality. PCF (Percentage Closer Filtering) for soft shadows.
+
+#@@@@@@@@@@
+
+195. How do you implement combo counters in games?
+
+Answer: Track consecutive hits without being hit. Timer resets combo if no hit within duration. Multiply score/damage by combo multiplier. UI display for combo count. Visual effects for high combos. Reset on player damage or timeout.
+
+#@@@@@@@@@@
+
+196. Which of the following are game engine audio features? (Multiple correct)
+A) 3D spatialization
+B) Reverb zones
+C) Audio mixers
+D) Ducking
+E) Audio occlusion
+F) Dynamic music layers
+
+Answer: A, B, C, D, E, F - All are audio features. 3D spatialization (positional), Reverb (environment), Mixers (volume control), Ducking (lower music for SFX), Occlusion (blocked sound), Dynamic layers (adaptive music).
+
+#@@@@@@@@@@
+
+197. Complete this Godot export variable:
+```gdscript
+extends Node2D
+
+export var speed: float = 100.0
+export(int, 1, 100) var health = 50
+export(PackedScene) var enemy_scene
+export(Color) var tint_color = Color.white
+export(NodePath) var target_path
+
+func _ready():
+    var target = get_node(_______________)
+```
+
+Answer: `target_path` - Get node from exported path. Export variables editable in inspector. Type hints for validation. PackedScene for prefab references.
+
+#@@@@@@@@@@
+
+198. What is the purpose of draw call batching?
+
+Answer: Draw call batching combines multiple objects into single draw call. Reduces CPU overhead. Static batching (build time) or dynamic batching (runtime). Requires same material, similar properties. GPU instancing alternative. Essential optimization.
+
+#@@@@@@@@@@
+
+199. How do you implement boss health bars?
+
+Answer: UI canvas with slider/image fill. Update based on boss health percentage. Show on boss encounter start. Segmented bars for phases. Damage flash effect. Hide on boss defeat. Position above boss or screen top.
+
+#@@@@@@@@@@
+
+200. Which game development principles lead to successful games? (Multiple correct)
+A) Clear game loop and core mechanics
+B) Balanced difficulty and progression
+C) Responsive controls and feedback
+D) Engaging narrative or gameplay
+E) Performance optimization
+F) Iterative playtesting and polish
+
+Answer: A, B, C, D, E, F - All are essential principles. Clear loop (addictive gameplay), Balanced difficulty (flow state), Responsive controls (feel), Engaging content (retention), Performance (accessibility), Playtesting (quality). Combine technical skill with design thinking for successful games.
+
+#@@@@@@@@@@

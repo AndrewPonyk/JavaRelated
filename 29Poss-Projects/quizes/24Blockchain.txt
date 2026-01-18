@@ -1,0 +1,222 @@
+Blockchain Quiz - 200 Questions
+Tech Stack: Solidity, Python, Rust, Web3.js, SHA-256, Truffle, IPFS, Hardhat, OpenZeppelin, Ganache, Ethers.js, Ethereum, Hyperledger Fabric, PoW, PoS, PBFT, Merkle Trees, Trezor, MythX
+
+1. Which of the following are blockchain consensus mechanisms? (Multiple correct)
+A) Proof of Work (PoW)
+B) Proof of Stake (PoS)
+C) Practical Byzantine Fault Tolerance (PBFT)
+D) Delegated Proof of Stake (DPoS)
+E) Proof of Authority (PoA)
+F) Raft
+
+Answer: A, B, C, D, E, F - All are consensus mechanisms. PoW (mining), PoS (staking), PBFT (Byzantine fault tolerance), DPoS (delegated staking), PoA (authority nodes), Raft (leader-based). Each has different security, performance, and decentralization tradeoffs.
+
+#@@@@@@@@@@
+
+2. Complete this Solidity smart contract:
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SimpleToken {
+    mapping(address => uint256) public balances;
+    uint256 public totalSupply;
+
+    constructor(uint256 _initialSupply) {
+        totalSupply = _initialSupply;
+        balances[msg.sender] = _initialSupply;
+    }
+
+    function transfer(address _to, uint256 _amount) public returns (bool) {
+        require(balances[msg.sender] >= _amount, "Insufficient balance");
+        require(_to != address(0), "Invalid address");
+
+        balances[msg.sender] -= _amount;
+        balances[_to] += _amount;
+
+        emit _______________(msg.sender, _to, _amount);
+        return true;
+    }
+
+    event _______________(address indexed from, address indexed to, uint256 amount);
+}
+```
+
+Answer: `Transfer` - Emit Transfer event for token transfers. Events are crucial for tracking blockchain state changes and enabling off-chain applications to monitor contract activity.
+
+#@@@@@@@@@@
+
+3. What is the difference between Ethereum and Hyperledger Fabric?
+
+Answer: Ethereum is public blockchain, permissionless, PoW/PoS consensus, smart contracts (Solidity), cryptocurrency (ETH), global state. Hyperledger Fabric is private/permissioned, modular architecture, pluggable consensus, chaincode (Go/Java/Node.js), no cryptocurrency, channels for privacy. Choose Ethereum for public dApps, Fabric for enterprise.
+
+#@@@@@@@@@@
+
+4. Which of the following are Web3.js methods? (Multiple correct)
+A) web3.eth.getBalance()
+B) web3.eth.sendTransaction()
+C) web3.eth.getBlock()
+D) web3.eth.call()
+E) web3.eth.Contract()
+F) web3.utils.toWei()
+
+Answer: A, B, C, D, E, F - All are Web3.js methods. getBalance (account balance), sendTransaction (send ETH), getBlock (block data), call (read contract), Contract (contract instance), toWei (unit conversion). Web3.js enables JavaScript interaction with Ethereum.
+
+#@@@@@@@@@@
+
+5. Find the security vulnerability in this smart contract:
+```solidity
+pragma solidity ^0.8.0;
+
+contract Auction {
+    address public highestBidder;
+    uint256 public highestBid;
+
+    function bid() public payable {
+        require(msg.value > highestBid, "Bid too low");
+
+        // Vulnerability: reentrancy attack possible
+        payable(highestBidder).transfer(highestBid);
+
+        highestBidder = msg.sender;
+        highestBid = msg.value;
+    }
+}
+```
+
+Answer: Reentrancy vulnerability - external call before state update. Fix by updating state first (Checks-Effects-Interactions pattern) or use ReentrancyGuard from OpenZeppelin. Attacker could recursively call bid() to drain contract funds.
+
+#@@@@@@@@@@
+
+6. How do you implement IPFS for decentralized storage?
+
+Answer: Install IPFS node, add files with `ipfs add`, get content-addressed hash (CID), retrieve with `ipfs cat <CID>`, pin important files, use IPFS gateways for HTTP access, integrate with smart contracts to store CIDs on-chain, use Pinata/Infura for managed IPFS.
+
+#@@@@@@@@@@
+
+7. Which of the following are Merkle Tree properties? (Multiple correct)
+A) Efficient verification
+B) Tamper-evident
+C) Binary tree structure
+D) Hash-based
+E) Used in blockchain
+F) Allows proof of inclusion
+
+Answer: A, B, C, D, E, F - All are Merkle Tree properties. Efficient verification (O(log n)), Tamper-evident (any change affects root), Binary tree (parent = hash(left + right)), Hash-based (cryptographic), Used in blockchain (transaction verification), Proof of inclusion (Merkle proofs).
+
+#@@@@@@@@@@
+
+8. Complete this Hardhat deployment script:
+```javascript
+const hre = require("hardhat");
+
+async function main() {
+    const [deployer] = await hre.ethers.getSigners();
+
+    console.log("Deploying contracts with account:", deployer.address);
+    console.log("Account balance:", (await deployer.getBalance()).toString());
+
+    const Token = await hre.ethers.getContractFactory("MyToken");
+    const token = await Token.deploy(1000000);
+
+    await token._______________();
+
+    console.log("Token deployed to:", token.address);
+}
+
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
+```
+
+Answer: `deployed` or `waitForDeployment` - Wait for contract deployment to complete. Hardhat provides development environment for Ethereum with testing, deployment, and debugging tools.
+
+#@@@@@@@@@@
+
+9. What is the difference between SHA-256 and Keccak-256?
+
+Answer: SHA-256 is NIST standard, used in Bitcoin, 256-bit output, standardized algorithm. Keccak-256 is Ethereum's hash function, SHA-3 finalist (pre-standardization version), 256-bit output, used for addresses and state. Both are cryptographically secure but incompatible.
+
+#@@@@@@@@@@
+
+10. Which of the following are OpenZeppelin contract libraries? (Multiple correct)
+A) ERC20
+B) ERC721
+C) Ownable
+D) ReentrancyGuard
+E) Pausable
+F) AccessControl
+
+Answer: A, B, C, D, E, F - All are OpenZeppelin libraries. ERC20 (fungible tokens), ERC721 (NFTs), Ownable (ownership), ReentrancyGuard (reentrancy protection), Pausable (emergency stop), AccessControl (role-based access). OpenZeppelin provides secure, audited smart contract components.
+
+#@@@@@@@@@@
+
+11. Predict the output of this Solidity code:
+```solidity
+pragma solidity ^0.8.0;
+
+contract Test {
+    uint256 public value;
+
+    function setValue(uint256 _value) public {
+        value = _value;
+    }
+
+    function getValue() public view returns (uint256) {
+        return value;
+    }
+}
+
+// Deployment and calls:
+// 1. Deploy contract
+// 2. Call setValue(42)
+// 3. Call getValue()
+```
+
+Answer: getValue() returns 42. The contract stores a state variable that persists on the blockchain. setValue() modifies state (costs gas), getValue() is view function (no gas for external calls).
+
+#@@@@@@@@@@
+
+12. How do you implement multi-signature wallet?
+
+Answer: Create smart contract requiring M-of-N signatures, store owner addresses, implement propose/approve/execute pattern, track approvals per transaction, require threshold signatures before execution, emit events for transparency. Use Gnosis Safe or custom implementation with OpenZeppelin.
+
+#@@@@@@@@@@
+
+13. Which of the following are Ethereum transaction properties? (Multiple correct)
+A) Nonce
+B) Gas price
+C) Gas limit
+D) To address
+E) Value
+F) Data
+
+Answer: A, B, C, D, E, F - All are transaction properties. Nonce (transaction count), Gas price (fee per gas), Gas limit (max gas), To address (recipient), Value (ETH amount), Data (contract call data). These fields define transaction execution and cost.
+
+#@@@@@@@@@@
+
+14. Complete this Truffle migration:
+```javascript
+const MyContract = artifacts.require("MyContract");
+
+module.exports = function(deployer, network, accounts) {
+    deployer.deploy(MyContract, {
+        from: accounts[0],
+        gas: 5000000,
+        gasPrice: _______________
+    });
+};
+```
+
+Answer: `web3.utils.toWei('10', 'gwei')` or similar gas price - Set gas price for deployment. Truffle provides development framework for Ethereum with migrations, testing, and deployment automation.
+
+#@@@@@@@@@@
+
+15. What is the difference between Layer 1 and Layer 2 blockchain solutions?
+
+Answer: Layer 1 is base blockchain (Ethereum, Bitcoin), on-chain execution, higher security, lower throughput, higher fees. Layer 2 is scaling solution (Optimistic Rollups, ZK-Rollups, State Channels), off-chain execution, inherits L1 security, higher throughput, lower fees. L2 settles to L1 for finality.
+
+#@@@@@@@@@@

@@ -1,0 +1,2302 @@
+Rust Quiz - 200 Questions
+Tech Stack: Cargo, Rustup, Crates.io, Tokio, WebAssembly, Actix, Rocket, Diesel, Serde
+
+1. Which of the following are Rust ownership concepts? (Multiple correct)
+A) Ownership
+B) Borrowing
+C) Lifetimes
+D) Move semantics
+E) References
+F) Smart pointers
+
+Answer: A, B, C, D, E, F - All are Rust ownership concepts. Ownership (unique ownership), Borrowing (temporary access), Lifetimes (reference validity), Move semantics (transfer ownership), References (&T, &mut T), Smart pointers (Box, Rc, Arc).
+
+#@@@@@@@@@@
+
+2. Complete this Cargo.toml file:
+```toml
+[package]
+name = "my-rust-app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+actix-web = "4.0"
+_______________
+
+[dev-dependencies]
+tokio-test = "0.4"
+```
+
+Answer: `diesel = { version = "2.0", features = ["postgres"] }` or similar dependency - Add additional dependencies like diesel for database ORM, reqwest for HTTP client, or other crates needed for the application.
+
+#@@@@@@@@@@
+
+3. What is the difference between `String` and `&str` in Rust?
+
+Answer: String is owned, heap-allocated, mutable, growable string type. &str is borrowed string slice, immutable reference to string data, can point to stack or heap. String owns data, &str borrows data. Use &str for function parameters, String for owned data.
+
+#@@@@@@@@@@
+
+4. Which of the following are Tokio runtime features? (Multiple correct)
+A) Async/await support
+B) Task scheduling
+C) I/O multiplexing
+D) Timer functionality
+E) Thread pool management
+F) Cooperative multitasking
+
+Answer: A, B, C, D, E, F - All are Tokio features. Async/await support (async runtime), Task scheduling (green threads), I/O multiplexing (epoll/kqueue), Timer functionality (delays/intervals), Thread pool management (work stealing), Cooperative multitasking (yield points).
+
+#@@@@@@@@@@
+
+5. Find the borrowing issue in this Rust code:
+```rust
+fn main() {
+    let mut vec = vec![1, 2, 3, 4, 5];
+
+    let first = &vec[0];
+    vec.push(6); // Borrowing issue here
+
+    println!("First element: {}", first);
+}
+```
+
+Answer: Cannot borrow `vec` as mutable while immutable reference `first` exists. The push operation might reallocate the vector, invalidating the reference. Fix by limiting scope of `first` or cloning the value: `let first = vec[0];`
+
+#@@@@@@@@@@
+
+6. How do you implement async functions in Tokio?
+
+Answer: Use `async fn` syntax, return `impl Future` or specific Future types, use `.await` for async operations, spawn tasks with `tokio::spawn()`, use async runtime with `#[tokio::main]` or `Runtime::new()`. Handle errors with `Result<T, E>` in async context.
+
+#@@@@@@@@@@
+
+7. Which of the following are Serde features? (Multiple correct)
+A) Serialization
+B) Deserialization
+C) Custom serializers
+D) Field renaming
+E) Skip serialization
+F) Derive macros
+
+Answer: A, B, C, D, E, F - All are Serde features. Serialization (to JSON/etc), Deserialization (from JSON/etc), Custom serializers (custom formats), Field renaming (#[serde(rename)]), Skip serialization (#[serde(skip)]), Derive macros (#[derive(Serialize, Deserialize)]).
+
+#@@@@@@@@@@
+
+8. Complete this Actix Web handler:
+```rust
+use actix_web::{web, App, HttpResponse, HttpServer, Result};
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct User {
+    id: u32,
+    name: String,
+}
+
+async fn get_user(path: web::Path<u32>) -> Result<HttpResponse> {
+    let user_id = path.into_inner();
+
+    // Simulate database lookup
+    let user = User {
+        id: user_id,
+        name: format!("User {}", user_id),
+    };
+
+    Ok(HttpResponse::Ok()._______________(&user))
+}
+```
+
+Answer: `json` - Use the json method to serialize the user struct to JSON response. This automatically sets the Content-Type header and serializes using Serde.
+
+#@@@@@@@@@@
+
+9. What is the difference between Actix Web and Rocket?
+
+Answer: Actix Web is async-first, uses actor model, high performance, stable. Rocket is more ergonomic, type-safe routing, easier to use, was nightly-only (now stable). Actix Web better for high-performance APIs, Rocket better for rapid development and type safety.
+
+#@@@@@@@@@@
+
+10. Which of the following are Diesel ORM features? (Multiple correct)
+A) Query builder
+B) Schema migrations
+C) Connection pooling
+D) Type-safe queries
+E) Custom SQL support
+F) Multiple database backends
+
+Answer: A, B, C, D, E, F - All are Diesel features. Query builder (fluent API), Schema migrations (database versioning), Connection pooling (r2d2), Type-safe queries (compile-time safety), Custom SQL support (raw queries), Multiple database backends (PostgreSQL, MySQL, SQLite).
+
+#@@@@@@@@@@
+
+11. Predict the output of this Rust code:
+```rust
+fn main() {
+    let x = 5;
+    let y = &x;
+    let z = &x;
+
+    println!("x: {}, y: {}, z: {}", x, y, z);
+
+    let mut a = 10;
+    let b = &mut a;
+    *b += 5;
+
+    println!("a: {}, b: {}", a, b);
+}
+```
+
+Answer: x: 5, y: 5, z: 5, a: 15, b: 15 - Multiple immutable references are allowed. Mutable reference allows modification through dereferencing. Both a and b show the modified value 15.
+
+#@@@@@@@@@@
+
+12. How do you compile Rust to WebAssembly?
+
+Answer: Install wasm-pack, add wasm-bindgen dependency, use `#[wasm_bindgen]` annotations, compile with `wasm-pack build --target web`. Generate JavaScript bindings, optimize with wee_alloc, use in web browsers or Node.js. Supports interaction between Rust and JavaScript.
+
+#@@@@@@@@@@
+
+13. Which of the following are Rust error handling patterns? (Multiple correct)
+A) Result<T, E>
+B) Option<T>
+C) ? operator
+D) panic!
+E) unwrap()
+F) expect()
+
+Answer: A, B, C, D, E, F - All are Rust error handling patterns. Result<T, E> (recoverable errors), Option<T> (nullable values), ? operator (error propagation), panic! (unrecoverable errors), unwrap() (extract value or panic), expect() (unwrap with message).
+
+#@@@@@@@@@@
+
+14. Complete this Rocket route:
+```rust
+#[macro_use] extern crate rocket;
+
+use rocket::serde::{Deserialize, Serialize, json::Json};
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct Task {
+    id: u32,
+    description: String,
+    completed: bool,
+}
+
+#[post("/tasks", data = "<task>")]
+fn create_task(task: Json<Task>) -> _______________<Task> {
+    // Process task creation
+    let new_task = Task {
+        id: 1,
+        description: task.description.clone(),
+        completed: false,
+    };
+
+    Json(new_task)
+}
+```
+
+Answer: `Json` - Return Json<Task> to serialize the response as JSON. Rocket's Json type handles both request parsing and response serialization automatically.
+
+#@@@@@@@@@@
+
+15. What is the difference between `Box<T>` and `Rc<T>` in Rust?
+
+Answer: Box<T> provides unique ownership, single owner, heap allocation, implements Drop for cleanup. Rc<T> provides shared ownership, reference counting, multiple owners, clone increments count. Use Box for unique ownership, Rc for shared ownership in single-threaded contexts, Arc for multi-threaded.
+
+#@@@@@@@@@@
+
+16. Which of the following are Rust macro types? (Multiple correct)
+A) Declarative macros (macro_rules!)
+B) Procedural macros
+C) Derive macros
+D) Attribute macros
+E) Function-like macros
+F) All of the above
+
+Answer: F - All are Rust macro types. Declarative (macro_rules!, pattern matching), Procedural (custom code generation), Derive (#[derive]), Attribute (#[attribute]), Function-like (looks like function call). Powerful metaprogramming.
+
+#@@@@@@@@@@
+
+17. Find the bug in this Rust code:
+```rust
+fn main() {
+    let s = String::from("hello");
+    let r1 = &s;
+    let r2 = &s;
+    let r3 = &mut s; // Bug: cannot borrow as mutable
+
+    println!("{}, {}, {}", r1, r2, r3);
+}
+```
+
+Answer: Cannot have mutable reference while immutable references exist. Rust's borrowing rules: either one mutable reference OR any number of immutable references. Fix: drop r1, r2 before creating r3, or don't use them after r3.
+
+#@@@@@@@@@@
+
+18. What is the output of this code?
+```rust
+fn main() {
+    let x = vec![1, 2, 3];
+    let y = x;
+    // println!("{:?}", x); // Would not compile
+    println!("{:?}", y);
+}
+```
+
+Answer: [1, 2, 3] - Ownership of vector moved from x to y. x is no longer valid after move. Attempting to use x would cause compile error. Move semantics prevent use-after-move bugs.
+
+#@@@@@@@@@@
+
+19. Which of the following are Actix-web features? (Multiple correct)
+A) High performance
+B) Actor-based
+C) Middleware support
+D) WebSocket support
+E) HTTP/2 support
+F) All of the above
+
+Answer: F - All are Actix-web features. Performance (fast), Actor-based (actor model), Middleware (extensible), WebSocket (real-time), HTTP/2 (modern protocol). Popular Rust web framework.
+
+#@@@@@@@@@@
+
+20. Complete this async function:
+```rust
+use tokio::time::{sleep, Duration};
+
+async fn fetch_data(url: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let response = reqwest::get(url)._______________?;
+    let body = response.text().await?;
+    Ok(body)
+}
+```
+
+Answer: `await` - Await the future returned by reqwest::get. Async functions return futures that must be awaited. Tokio runtime executes async tasks.
+
+#@@@@@@@@@@
+
+21. How do you implement error handling with Result in Rust?
+
+Answer: Use Result<T, E> enum with Ok(T) and Err(E) variants. Propagate errors with ? operator. Match on Result for handling. Use thiserror or anyhow for custom errors. Pattern: `fn operation() -> Result<T, Error> { let value = fallible_op()?; Ok(value) }`.
+
+#@@@@@@@@@@
+
+22. Which of the following are Rust trait features? (Multiple correct)
+A) Define shared behavior
+B) Generic constraints
+C) Default implementations
+D) Associated types
+E) Trait objects
+F) All of the above
+
+Answer: F - All are trait features. Shared behavior (interface), Generic constraints (T: Trait), Default implementations (default methods), Associated types (type Item), Trait objects (dyn Trait). Powerful abstraction mechanism.
+
+#@@@@@@@@@@
+
+23. Find the bug:
+```rust
+fn longest(x: &str, y: &str) -> &str {
+    // Bug: missing lifetime annotation
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+Answer: Missing lifetime annotation. Compiler can't determine return reference lifetime. Fix: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`. Lifetime 'a indicates return lives as long as both inputs.
+
+#@@@@@@@@@@
+
+24. What is the difference between Vec<T> and [T; N]?
+
+Answer: Vec<T> is heap-allocated, dynamic size, growable. [T; N] is stack-allocated (if small), fixed size N, compile-time known. Vec has runtime overhead, array is zero-cost. Use Vec for dynamic collections, arrays for fixed-size data.
+
+#@@@@@@@@@@
+
+25. Which of the following are Diesel ORM features? (Multiple correct)
+A) Type-safe queries
+B) Compile-time query validation
+C) Migrations
+D) Connection pooling
+E) Multiple database support
+F) All of the above
+
+Answer: F - All are Diesel features. Type-safe (compile-time checks), Query validation (SQL errors at compile time), Migrations (schema management), Pooling (r2d2), Databases (PostgreSQL, MySQL, SQLite). Safe, efficient ORM.
+
+#@@@@@@@@@@
+
+26. Complete this pattern matching:
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+fn process(msg: Message) {
+    match msg {
+        Message::Quit => println!("Quit"),
+        Message::Move { x, y } => println!("Move to {}, {}", x, y),
+        Message::Write(text) => println!("Text: {}", text),
+        Message::ChangeColor(r, g, b) => println!("Color: {}, {}, {}", r, g, b),
+    }
+}
+```
+
+Answer: Pattern matching is complete. Match must be exhaustive, covering all enum variants. Use _ for catch-all. Destructure enum variants to access data. Compiler ensures all cases handled.
+
+#@@@@@@@@@@
+
+27. How do you implement concurrency with threads in Rust?
+
+Answer: Use std::thread::spawn for creating threads. Move closures transfer ownership. Use channels (mpsc) for communication. Join handles wait for completion. Example: `let handle = thread::spawn(move || { /* work */ }); handle.join().unwrap();`. Thread safety enforced at compile time.
+
+#@@@@@@@@@@
+
+28. Which of the following are Serde features? (Multiple correct)
+A) Serialization
+B) Deserialization
+C) Multiple formats (JSON, YAML, TOML)
+D) Derive macros
+E) Custom serializers
+F) All of the above
+
+Answer: F - All are Serde features. Serialization (to format), Deserialization (from format), Formats (via format crates), Derive (#[derive(Serialize, Deserialize)]), Custom (implement traits). De facto serialization framework.
+
+#@@@@@@@@@@
+
+29. Find the bug:
+```rust
+fn main() {
+    let mut v = vec![1, 2, 3];
+    let first = &v[0];
+    v.push(4); // Bug: cannot mutate while borrowed
+    println!("{}", first);
+}
+```
+
+Answer: Cannot mutate vector while immutable reference exists. push may reallocate, invalidating reference. Fix: drop first before push, or clone value. Rust prevents use-after-free bugs.
+
+#@@@@@@@@@@
+
+30. What is the difference between Copy and Clone traits?
+
+Answer: Copy is implicit, bitwise copy, for simple types (integers, bool). Clone is explicit, can be expensive, for complex types. Copy types don't move, Clone requires .clone() call. Implement Copy only for cheap-to-copy types.
+
+#@@@@@@@@@@
+
+31. Which of the following are Cargo commands? (Multiple correct)
+A) cargo build
+B) cargo run
+C) cargo test
+D) cargo doc
+E) cargo publish
+F) All of the above
+
+Answer: F - All are Cargo commands. build (compile), run (build and execute), test (run tests), doc (generate documentation), publish (publish to crates.io). Comprehensive build tool and package manager.
+
+#@@@@@@@@@@
+
+32. Complete this trait implementation:
+```rust
+trait Summary {
+    fn summarize(&self) -> String;
+}
+
+struct Article {
+    title: String,
+    content: String,
+}
+
+impl Summary for Article {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self._______________, &self.content[..50])
+    }
+}
+```
+
+Answer: `title` - Access struct field. Implement trait methods for type. Traits define shared behavior. Can have default implementations.
+
+#@@@@@@@@@@
+
+33. How do you implement WebAssembly compilation in Rust?
+
+Answer: Use wasm-pack for building. Add wasm-bindgen for JS interop. Target wasm32-unknown-unknown. Command: `wasm-pack build --target web`. Generate JS bindings automatically. Deploy to web with npm package.
+
+#@@@@@@@@@@
+
+34. Which of the following are Rust smart pointer types? (Multiple correct)
+A) Box<T>
+B) Rc<T>
+C) Arc<T>
+D) RefCell<T>
+E) Mutex<T>
+F) All of the above
+
+Answer: F - All are smart pointers. Box (heap allocation), Rc (reference counting), Arc (atomic reference counting), RefCell (interior mutability), Mutex (thread-safe interior mutability). Enable flexible ownership patterns.
+
+#@@@@@@@@@@
+
+35. Find the bug:
+```rust
+use std::rc::Rc;
+use std::thread;
+
+fn main() {
+    let data = Rc::new(vec![1, 2, 3]);
+    let data_clone = Rc::clone(&data);
+
+    thread::spawn(move || {
+        // Bug: Rc is not Send
+        println!("{:?}", data_clone);
+    });
+}
+```
+
+Answer: Rc is not thread-safe (not Send). Use Arc (atomic reference counting) for multi-threaded contexts. Fix: `let data = Arc::new(vec![1, 2, 3])`. Compiler prevents data races.
+
+#@@@@@@@@@@
+
+36. What is the difference between &T and &mut T?
+
+Answer: &T is immutable reference, allows multiple readers, no modification. &mut T is mutable reference, exclusive access, allows modification. Borrowing rules: many &T OR one &mut T. Prevents data races at compile time.
+
+#@@@@@@@@@@
+
+37. Which of the following are Rocket framework features? (Multiple correct)
+A) Type-safe routing
+B) Request guards
+C) Fairings (middleware)
+D) Template support
+E) Form handling
+F) All of the above
+
+Answer: F - All are Rocket features. Type-safe routing (compile-time checks), Request guards (validation), Fairings (middleware), Templates (Tera, Handlebars), Forms (automatic parsing). Ergonomic web framework.
+
+#@@@@@@@@@@
+
+38. Complete this lifetime annotation:
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn announce_and_return_part(&self, announcement: &str) -> &_______________ str {
+        println!("Attention: {}", announcement);
+        self.part
+    }
+}
+```
+
+Answer: `'a` or `self` - Return reference with same lifetime as struct field. Lifetime elision rules apply. Explicit: `&'a str`, or rely on elision.
+
+#@@@@@@@@@@
+
+39. How do you implement async streams in Rust?
+
+Answer: Use async-stream crate or implement Stream trait. Tokio provides StreamExt. Example: `stream! { for i in 0..10 { yield i; } }`. Consume with `while let Some(item) = stream.next().await`. Async iteration over sequences.
+
+#@@@@@@@@@@
+
+40. Which of the following are Rust testing features? (Multiple correct)
+A) Unit tests (#[test])
+B) Integration tests
+C) Doc tests
+D) Benchmarks
+E) Test organization
+F) All of the above
+
+Answer: F - All are testing features. Unit tests (in module), Integration tests (tests/ directory), Doc tests (in documentation), Benchmarks (criterion crate), Organization (mod tests). Comprehensive testing support.
+
+#@@@@@@@@@@
+
+41. Find the bug:
+```rust
+fn main() {
+    let s = String::from("hello");
+    takes_ownership(s);
+    println!("{}", s); // Bug: value moved
+}
+
+fn takes_ownership(some_string: String) {
+    println!("{}", some_string);
+}
+```
+
+Answer: s moved into function, no longer valid. Fix: pass reference `&s` and change parameter to `&String`, or clone. Ownership rules prevent use-after-move.
+
+#@@@@@@@@@@
+
+42. What is the difference between String::from and to_string()?
+
+Answer: String::from creates String from &str. to_string() is trait method (ToString), works on many types. Both create owned String. Performance similar. Use String::from for clarity with string literals.
+
+#@@@@@@@@@@
+
+43. Which of the following are async runtime options in Rust? (Multiple correct)
+A) Tokio
+B) async-std
+C) smol
+D) actix-rt
+E) All of the above
+
+Answer: E - All are async runtimes. Tokio (most popular, feature-rich), async-std (std-like API), smol (minimal), actix-rt (for Actix). Choose based on needs and ecosystem.
+
+#@@@@@@@@@@
+
+44. Complete this error handling:
+```rust
+use std::fs::File;
+use std::io::Read;
+
+fn read_file(path: &str) -> Result<String, std::io::Error> {
+    let mut file = File::open(path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut _______________)?;
+    Ok(contents)
+}
+```
+
+Answer: `contents` - Read file into string. ? operator propagates errors. Result type for error handling. Idiomatic Rust error handling.
+
+#@@@@@@@@@@
+
+45. How do you implement custom derive macros in Rust?
+
+Answer: Create proc-macro crate. Use syn for parsing, quote for code generation. Annotate with #[proc_macro_derive(TraitName)]. Parse TokenStream, generate implementation. Example: derive macros for Serialize, Deserialize. Powerful metaprogramming.
+
+#@@@@@@@@@@
+
+46. Which of the following are Rust module features? (Multiple correct)
+A) Privacy (pub)
+B) Nested modules
+C) File-based modules
+D) Re-exports (pub use)
+E) Module paths
+F) All of the above
+
+Answer: F - All are module features. Privacy (pub keyword), Nested (mod inside mod), File-based (mod.rs, file.rs), Re-exports (flatten hierarchy), Paths (crate::, super::, self::). Organize code effectively.
+
+#@@@@@@@@@@
+
+47. Find the bug:
+```rust
+fn main() {
+    let mut s = String::from("hello");
+    let r1 = &mut s;
+    let r2 = &mut s; // Bug: two mutable references
+
+    println!("{}, {}", r1, r2);
+}
+```
+
+Answer: Cannot have two mutable references simultaneously. Violates borrowing rules. Fix: use r1, drop it, then create r2. Or use one mutable reference. Prevents data races.
+
+#@@@@@@@@@@
+
+48. What is the difference between Option<T> and Result<T, E>?
+
+Answer: Option represents optional value (Some(T) or None), for absence. Result represents success/failure (Ok(T) or Err(E)), for errors. Use Option for nullable values, Result for operations that can fail.
+
+#@@@@@@@@@@
+
+49. Which of the following are Rust iterator methods? (Multiple correct)
+A) map
+B) filter
+C) fold
+D) collect
+E) for_each
+F) All of the above
+
+Answer: F - All are iterator methods. map (transform), filter (select), fold (reduce), collect (to collection), for_each (side effects). Lazy evaluation, zero-cost abstractions. Functional programming style.
+
+#@@@@@@@@@@
+
+50. Complete this closure:
+```rust
+fn main() {
+    let numbers = vec![1, 2, 3, 4, 5];
+
+    let sum: i32 = numbers.iter()
+        .filter(|&x| x % 2 == 0)
+        .map(|x| x * 2)
+        ._______________();
+
+    println!("Sum: {}", sum);
+}
+```
+
+Answer: `sum` - Sum iterator elements. Iterator methods chain. Lazy evaluation until terminal operation. Efficient, expressive code.
+
+#@@@@@@@@@@
+
+51. How do you implement FFI (Foreign Function Interface) in Rust?
+
+Answer: Use extern "C" for C ABI compatibility. Mark functions with #[no_mangle]. Use unsafe for calling foreign functions. cbindgen generates C headers. Example: `extern "C" fn rust_function() { }`. Interop with C/C++ libraries.
+
+#@@@@@@@@@@
+
+52. Which of the following are Rust unsafe capabilities? (Multiple correct)
+A) Dereference raw pointers
+B) Call unsafe functions
+C) Access mutable static variables
+D) Implement unsafe traits
+E) Access union fields
+F) All of the above
+
+Answer: F - All are unsafe capabilities. Raw pointers (*const T, *mut T), Unsafe functions (unsafe fn), Mutable statics (static mut), Unsafe traits (unsafe trait), Unions (union). Use sparingly, encapsulate in safe APIs.
+
+#@@@@@@@@@@
+
+53. Find the bug:
+```rust
+fn main() {
+    let v = vec![1, 2, 3, 4, 5];
+
+    for i in &v {
+        v.push(6); // Bug: cannot mutate while iterating
+    }
+}
+```
+
+Answer: Cannot mutate vector while iterating with immutable reference. Fix: collect indices first, then modify. Or use different approach. Rust prevents iterator invalidation.
+
+#@@@@@@@@@@
+
+54. What is the difference between impl Trait and dyn Trait?
+
+Answer: impl Trait is static dispatch, compile-time polymorphism, zero-cost, monomorphization. dyn Trait is dynamic dispatch, runtime polymorphism, vtable overhead, trait objects. Use impl for performance, dyn for heterogeneous collections.
+
+#@@@@@@@@@@
+
+55. Which of the following are Tokio features? (Multiple correct)
+A) Async runtime
+B) Task spawning
+C) Timers
+D) I/O utilities
+E) Synchronization primitives
+F) All of the above
+
+Answer: F - All are Tokio features. Runtime (executor), Spawning (tokio::spawn), Timers (sleep, interval), I/O (AsyncRead, AsyncWrite), Sync (Mutex, RwLock, Semaphore). Comprehensive async ecosystem.
+
+#@@@@@@@@@@
+
+56. Complete this generic function:
+```rust
+fn largest<T: _______________>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+```
+
+Answer: `PartialOrd` or `Ord` - Trait bound for comparison. Generic constraints ensure type has required capabilities. PartialOrd for > operator. Compile-time type safety.
+
+#@@@@@@@@@@
+
+57. How do you implement custom iterators in Rust?
+
+Answer: Implement Iterator trait with next() method. Define Item associated type. Example: `impl Iterator for MyIter { type Item = i32; fn next(&mut self) -> Option<Self::Item> { /* logic */ } }`. Use IntoIterator for for loops.
+
+#@@@@@@@@@@
+
+58. Which of the following are Rust attribute types? (Multiple correct)
+A) #[derive]
+B) #[cfg]
+C) #[test]
+D) #[inline]
+E) #[allow]
+F) All of the above
+
+Answer: F - All are attributes. derive (auto-implement traits), cfg (conditional compilation), test (unit tests), inline (optimization hint), allow (suppress warnings). Metadata for compiler.
+
+#@@@@@@@@@@
+
+59. Find the bug:
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 0, y: 0 };
+    p.x = 5; // Bug: p is not mutable
+}
+```
+
+Answer: Cannot mutate immutable struct. Fix: `let mut p = Point { x: 0, y: 0 }`. Immutable by default in Rust. Explicit mut for mutability.
+
+#@@@@@@@@@@
+
+60. What is the difference between panic! and Result?
+
+Answer: panic! unwinds stack, terminates thread, for unrecoverable errors. Result returns error value, recoverable, caller handles. Use Result for expected errors, panic! for bugs/invariant violations. Prefer Result for library code.
+
+#@@@@@@@@@@
+
+61. Which of the following are reqwest features? (Multiple correct)
+A) HTTP client
+B) Async support
+C) JSON handling
+D) Cookie management
+E) Proxy support
+F) All of the above
+
+Answer: F - All are reqwest features. HTTP client (high-level), Async (tokio-based), JSON (serde integration), Cookies (cookie store), Proxy (HTTP/SOCKS). Ergonomic HTTP library.
+
+#@@@@@@@@@@
+
+62. Complete this match expression:
+```rust
+fn divide(a: i32, b: i32) -> Result<i32, String> {
+    match b {
+        0 => Err("Division by zero".to_string()),
+        _______________ => Ok(a / b),
+    }
+}
+```
+
+Answer: `_` or `n` - Catch-all pattern or bind to variable. Match must be exhaustive. _ ignores value, n binds for use. Pattern matching is powerful.
+
+#@@@@@@@@@@
+
+63. How do you implement builder pattern in Rust?
+
+Answer: Create builder struct with optional fields. Methods return self for chaining. build() consumes builder, returns target. Example: `Config::builder().host("localhost").port(8080).build()`. Use derive_builder crate or manual implementation.
+
+#@@@@@@@@@@
+
+64. Which of the following are Rust concurrency primitives? (Multiple correct)
+A) Mutex
+B) RwLock
+C) Atomic types
+D) Channels (mpsc)
+E) Arc
+F) All of the above
+
+Answer: F - All are concurrency primitives. Mutex (mutual exclusion), RwLock (read-write lock), Atomics (lock-free), Channels (message passing), Arc (shared ownership). Thread-safe by design.
+
+#@@@@@@@@@@
+
+65. Find the bug:
+```rust
+fn main() {
+    let x = 5;
+    let y = &x;
+    let z = &mut x; // Bug: cannot borrow as mutable
+
+    println!("{}, {}", y, z);
+}
+```
+
+Answer: Cannot have mutable and immutable references simultaneously. x is not mutable anyway. Fix: make x mutable, drop y before z. Borrowing rules prevent aliasing.
+
+#@@@@@@@@@@
+
+66. What is the difference between as and From/Into?
+
+Answer: as is type casting, for primitive types, can lose data, unsafe for some conversions. From/Into are traits, safe conversions, implement once (From implies Into). Use From/Into for custom types, as for primitives.
+
+#@@@@@@@@@@
+
+67. Which of the following are warp framework features? (Multiple correct)
+A) Composable filters
+B) Async support
+C) WebSocket support
+D) Type-safe routing
+E) Minimal boilerplate
+F) All of the above
+
+Answer: F - All are warp features. Filters (composable routing), Async (tokio-based), WebSocket (built-in), Type-safe (compile-time checks), Minimal (concise). Functional web framework.
+
+#@@@@@@@@@@
+
+68. Complete this async/await code:
+```rust
+async fn fetch_user(id: u64) -> Result<User, Error> {
+    let url = format!("https://api.example.com/users/{}", id);
+    let response = reqwest::get(&url).await?;
+    let user = response.json::<User>()._______________?;
+    Ok(user)
+}
+```
+
+Answer: `await` - Await JSON deserialization. Async methods return futures. ? propagates errors. Tokio runtime executes async code.
+
+#@@@@@@@@@@
+
+69. How do you implement Drop trait in Rust?
+
+Answer: Implement Drop trait with drop(&mut self) method. Called automatically when value goes out of scope. Use for cleanup (close files, release resources). Example: `impl Drop for MyType { fn drop(&mut self) { /* cleanup */ } }`. RAII pattern.
+
+#@@@@@@@@@@
+
+70. Which of the following are Rust collection types? (Multiple correct)
+A) Vec<T>
+B) HashMap<K, V>
+C) HashSet<T>
+D) BTreeMap<K, V>
+E) VecDeque<T>
+F) All of the above
+
+Answer: F - All are collections. Vec (dynamic array), HashMap (hash table), HashSet (unique values), BTreeMap (sorted map), VecDeque (double-ended queue). Standard library collections.
+
+#@@@@@@@@@@
+
+71. Find the bug:
+```rust
+fn main() {
+    let s1 = String::from("hello");
+    let s2 = s1;
+    let s3 = s1; // Bug: s1 already moved
+
+    println!("{}", s3);
+}
+```
+
+Answer: s1 moved to s2, cannot use again. Fix: clone s1, or use references. Move semantics prevent double-free. Ownership transferred on assignment.
+
+#@@@@@@@@@@
+
+72. What is the difference between std::sync::Mutex and std::sync::RwLock?
+
+Answer: Mutex allows one reader OR one writer. RwLock allows multiple readers OR one writer. RwLock better for read-heavy workloads. Both provide interior mutability. Use Mutex for simplicity, RwLock for performance.
+
+#@@@@@@@@@@
+
+73. Which of the following are sqlx features? (Multiple correct)
+A) Async database driver
+B) Compile-time query checking
+C) Multiple databases
+D) Connection pooling
+E) Migrations
+F) All of the above
+
+Answer: F - All are sqlx features. Async (tokio/async-std), Compile-time checks (query! macro), Databases (PostgreSQL, MySQL, SQLite), Pooling (built-in), Migrations (sqlx-cli). Modern async SQL toolkit.
+
+#@@@@@@@@@@
+
+74. Complete this trait bound:
+```rust
+fn print_debug<T: _______________>(value: &T) {
+    println!("{:?}", value);
+}
+```
+
+Answer: `Debug` or `std::fmt::Debug` - Trait bound for debug formatting. {:?} requires Debug trait. Derive or implement manually. Trait bounds ensure capabilities.
+
+#@@@@@@@@@@
+
+75. How do you implement const functions in Rust?
+
+Answer: Use const fn keyword. Evaluated at compile time. Limited to const-safe operations. Example: `const fn add(a: i32, b: i32) -> i32 { a + b }`. Use for compile-time computation, const generics.
+
+#@@@@@@@@@@
+
+76. Which of the following are Rust lifetime elision rules? (Multiple correct)
+A) Each parameter gets its own lifetime
+B) If one input lifetime, output gets same lifetime
+C) If &self or &mut self, output gets self's lifetime
+D) All of the above
+
+Answer: D - All are elision rules. Compiler infers lifetimes in common cases. Explicit annotations when ambiguous. Reduces boilerplate. Understand rules for complex cases.
+
+#@@@@@@@@@@
+
+77. Find the bug:
+```rust
+fn main() {
+    let mut v = vec![1, 2, 3];
+
+    for i in &mut v {
+        *i += 1;
+    }
+
+    v.push(4); // No bug here
+    println!("{:?}", v);
+}
+```
+
+Answer: No bug - mutable iteration completes before push. Borrow checker ensures safety. Output: [2, 3, 4, 4]. Mutable iteration modifies in place.
+
+#@@@@@@@@@@
+
+78. What is the difference between Cell<T> and RefCell<T>?
+
+Answer: Cell<T> for Copy types, get/set methods, no borrowing. RefCell<T> for any type, runtime borrow checking, borrow/borrow_mut methods. Both provide interior mutability. Use Cell for simple types, RefCell for complex types.
+
+#@@@@@@@@@@
+
+79. Which of the following are axum framework features? (Multiple correct)
+A) Built on Tower
+B) Extractors
+C) Middleware
+D) WebSocket support
+E) Type-safe routing
+F) All of the above
+
+Answer: F - All are axum features. Tower (service abstraction), Extractors (request parsing), Middleware (tower layers), WebSocket (built-in), Type-safe (compile-time). Modern, ergonomic web framework.
+
+#@@@@@@@@@@
+
+80. Complete this generic struct:
+```rust
+struct Pair<T, U> {
+    first: T,
+    second: U,
+}
+
+impl<T, U> Pair<T, U> {
+    fn new(first: T, second: U) -> _______________ {
+        Pair { first, second }
+    }
+}
+```
+
+Answer: `Self` or `Pair<T, U>` - Return type is Self (alias for Pair<T, U>). Generic structs parameterized by types. Flexible, reusable code.
+
+#@@@@@@@@@@
+
+81. How do you implement custom Debug trait in Rust?
+
+Answer: Implement std::fmt::Debug trait with fmt method. Use Formatter to write output. Example: `impl Debug for MyType { fn fmt(&self, f: &mut Formatter) -> fmt::Result { write!(f, "MyType {{ ... }}") } }`. Or use #[derive(Debug)].
+
+#@@@@@@@@@@
+
+82. Which of the following are Rust pattern matching features? (Multiple correct)
+A) Match expressions
+B) if let
+C) while let
+D) Destructuring
+E) Guards
+F) All of the above
+
+Answer: F - All are pattern matching features. Match (exhaustive), if let (single pattern), while let (loop with pattern), Destructuring (extract values), Guards (if condition). Powerful control flow.
+
+#@@@@@@@@@@
+
+83. Find the bug:
+```rust
+fn main() {
+    let data = vec![1, 2, 3];
+    let closure = || {
+        println!("{:?}", data); // Borrows data
+    };
+
+    drop(data); // Bug: data borrowed by closure
+    closure();
+}
+```
+
+Answer: Cannot drop data while borrowed by closure. Closure captures data by reference. Fix: call closure before drop, or use move closure. Borrow checker prevents use-after-free.
+
+#@@@@@@@@@@
+
+84. What is the difference between turbofish ::<> and type inference?
+
+Answer: Turbofish explicitly specifies generic types when inference fails. Example: `collect::<Vec<_>>()`. Type inference deduces types from context. Use turbofish for ambiguous cases. Helps compiler and readability.
+
+#@@@@@@@@@@
+
+85. Which of the following are rayon features? (Multiple correct)
+A) Data parallelism
+B) Work stealing
+C) Parallel iterators
+D) Thread pool
+E) Join/spawn
+F) All of the above
+
+Answer: F - All are rayon features. Data parallelism (parallel operations), Work stealing (load balancing), Parallel iterators (par_iter), Thread pool (automatic), Join/spawn (fork-join). Easy parallelism.
+
+#@@@@@@@@@@
+
+86. Complete this error propagation:
+```rust
+fn read_username() -> Result<String, std::io::Error> {
+    let mut file = File::open("username.txt")?;
+    let mut username = String::new();
+    file.read_to_string(&mut username)?;
+    Ok(_______________)
+}
+```
+
+Answer: `username` - Return success value. ? operator propagates errors. Result type for error handling. Idiomatic Rust pattern.
+
+#@@@@@@@@@@
+
+87. How do you implement newtype pattern in Rust?
+
+Answer: Wrap existing type in tuple struct. Example: `struct Meters(f64)`. Provides type safety, prevents mixing units. Implement traits for newtype. Zero runtime cost. Use for domain modeling.
+
+#@@@@@@@@@@
+
+88. Which of the following are Rust visibility modifiers? (Multiple correct)
+A) pub
+B) pub(crate)
+C) pub(super)
+D) pub(in path)
+E) private (default)
+F) All of the above
+
+Answer: F - All are visibility levels. pub (public), pub(crate) (crate-only), pub(super) (parent module), pub(in path) (specific path), private (default, module-only). Fine-grained access control.
+
+#@@@@@@@@@@
+
+89. Find the bug:
+```rust
+fn main() {
+    let x: &str = "hello";
+    let y: String = x; // Bug: type mismatch
+}
+```
+
+Answer: Cannot assign &str to String directly. Fix: `let y: String = x.to_string()` or `String::from(x)`. Different types, need conversion. Explicit conversion required.
+
+#@@@@@@@@@@
+
+90. What is the difference between associated functions and methods?
+
+Answer: Methods have self parameter, called on instances. Associated functions no self, called on type. Example: `String::new()` (associated), `s.len()` (method). Both defined in impl blocks.
+
+#@@@@@@@@@@
+
+91. Which of the following are tracing features? (Multiple correct)
+A) Structured logging
+B) Spans
+C) Events
+D) Subscribers
+E) Async support
+F) All of the above
+
+Answer: F - All are tracing features. Structured logging (key-value), Spans (execution context), Events (log points), Subscribers (output), Async (tokio integration). Modern observability framework.
+
+#@@@@@@@@@@
+
+92. Complete this macro:
+```rust
+macro_rules! vec_of_strings {
+    ($($x:expr),*) => {
+        vec![$(String::from($x)),*]
+    };
+}
+
+fn main() {
+    let v = vec_of_strings!["hello", "world"];
+    println!("{:?}", _______________);
+}
+```
+
+Answer: `v` - Print vector. Declarative macro creates vector of Strings. Metaprogramming with pattern matching. Powerful code generation.
+
+#@@@@@@@@@@
+
+93. How do you implement Send and Sync traits in Rust?
+
+Answer: Send and Sync are auto traits, automatically implemented if all fields are Send/Sync. Send: safe to transfer between threads. Sync: safe to share references between threads. Implement manually with unsafe impl for special cases.
+
+#@@@@@@@@@@
+
+94. Which of the following are Rust optimization techniques? (Multiple correct)
+A) Use &str instead of String when possible
+B) Preallocate collections
+C) Use iterators instead of loops
+D) Avoid unnecessary clones
+E) Profile before optimizing
+F) All of the above
+
+Answer: F - All are optimization techniques. &str (avoid allocation), Preallocate (reduce reallocations), Iterators (zero-cost), Avoid clones (reduce copies), Profile (measure first). Write idiomatic code first.
+
+#@@@@@@@@@@
+
+95. Find the bug:
+```rust
+fn main() {
+    let s = String::from("hello");
+    let len = calculate_length(&s);
+    println!("Length: {}, String: {}", len, s); // No bug
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+```
+
+Answer: No bug - borrowing works correctly. s borrowed, not moved. Can use s after function call. Prefer &str over &String for parameters (more flexible).
+
+#@@@@@@@@@@
+
+96. What is the difference between std::mem::drop and going out of scope?
+
+Answer: Both call Drop trait, but drop() is explicit, immediate. Out of scope is automatic, at end of block. Use drop() to release resources early. Example: `drop(file)` before end of function.
+
+#@@@@@@@@@@
+
+97. Which of the following are clap features? (Multiple correct)
+A) Command-line parsing
+B) Derive API
+C) Subcommands
+D) Validation
+E) Help generation
+F) All of the above
+
+Answer: F - All are clap features. CLI parsing (arguments), Derive (#[derive(Parser)]), Subcommands (nested commands), Validation (custom validators), Help (automatic). Comprehensive CLI framework.
+
+#@@@@@@@@@@
+
+98. Complete this type alias:
+```rust
+type Result<T> = std::result::Result<T, _______________>;
+
+fn read_file(path: &str) -> Result<String> {
+    // Implementation
+}
+```
+
+Answer: `Box<dyn std::error::Error>` or custom error type - Type alias for common Result pattern. Reduces boilerplate. Use for consistent error types across crate.
+
+#@@@@@@@@@@
+
+99. How do you implement zero-cost abstractions in Rust?
+
+Answer: Use generics (monomorphization), iterators (inline), traits (static dispatch). Compiler optimizes to same code as hand-written. No runtime overhead. Example: iterator chains compile to efficient loops. Abstraction without cost.
+
+#@@@@@@@@@@
+
+100. Which of the following are Rust best practices? (Multiple correct)
+A) Use Result for error handling
+B) Prefer borrowing over ownership
+C) Use iterators over manual loops
+D) Leverage type system
+E) Write tests
+F) All of the above
+
+Answer: F - All are best practices. Result (explicit errors), Borrowing (avoid clones), Iterators (expressive, efficient), Type system (compile-time safety), Tests (quality). Write idiomatic, safe Rust code.
+
+#@@@@@@@@@@
+
+101. How do you implement const generics in Rust?
+
+Answer: Use const parameters in generic types. Example: `struct Array<T, const N: usize> { data: [T; N] }`. Enables array sizes as generic parameters. Compile-time array lengths. Powerful for fixed-size collections.
+
+#@@@@@@@@@@
+
+102. Which of the following are parking_lot features? (Multiple correct)
+A) Faster Mutex
+B) Faster RwLock
+C) Smaller memory footprint
+D) No poisoning
+E) Deadlock detection
+F) All of the above
+
+Answer: F - All are parking_lot features. Faster (optimized), Smaller (less overhead), No poisoning (simpler API), Deadlock detection (optional). Drop-in replacement for std sync primitives.
+
+#@@@@@@@@@@
+
+103. Find the bug:
+```rust
+fn main() {
+    let mut v = vec![1, 2, 3];
+    let first = &v[0];
+    v.clear(); // Bug: cannot mutate while borrowed
+    println!("{}", first);
+}
+```
+
+Answer: Cannot mutate vector while immutable reference exists. clear() requires mutable borrow. Fix: use first before clear, or clone value. Borrow checker prevents dangling references.
+
+#@@@@@@@@@@
+
+104. What is the difference between PhantomData and actual fields?
+
+Answer: PhantomData is zero-sized, doesn't store data, only for type system. Actual fields store data. Use PhantomData for unused generic parameters, variance, drop check. Example: `PhantomData<T>` indicates ownership without storing T.
+
+#@@@@@@@@@@
+
+105. Which of the following are nom parser combinator features? (Multiple correct)
+A) Zero-copy parsing
+B) Streaming support
+C) Error recovery
+D) Composable parsers
+E) Binary and text parsing
+F) All of the above
+
+Answer: F - All are nom features. Zero-copy (efficient), Streaming (incremental), Error recovery (partial parsing), Composable (combine parsers), Binary/text (versatile). Powerful parsing library.
+
+#@@@@@@@@@@
+
+106. Complete this async trait:
+```rust
+#[async_trait]
+trait Repository {
+    async fn find_by_id(&self, id: u64) -> Result<User, Error>;
+    async fn save(&self, user: &User) -> Result<(), Error>;
+}
+
+// Requires async-trait crate
+use async_trait::_______________;
+```
+
+Answer: `async_trait` - Import async_trait macro. Enables async methods in traits. Workaround for language limitation. Use #[async_trait] attribute on trait and impl.
+
+#@@@@@@@@@@
+
+107. How do you implement custom allocators in Rust?
+
+Answer: Implement GlobalAlloc trait. Use #[global_allocator] attribute. Example: `#[global_allocator] static GLOBAL: MyAllocator = MyAllocator;`. Custom memory management. Use for performance, debugging, embedded systems.
+
+#@@@@@@@@@@
+
+108. Which of the following are crossbeam features? (Multiple correct)
+A) Lock-free data structures
+B) Scoped threads
+C) Channels
+D) Epoch-based memory reclamation
+E) Atomic utilities
+F) All of the above
+
+Answer: F - All are crossbeam features. Lock-free (concurrent data structures), Scoped threads (safe thread spawning), Channels (MPMC), Epoch (memory management), Atomics (utilities). Advanced concurrency toolkit.
+
+#@@@@@@@@@@
+
+109. Find the bug:
+```rust
+fn main() {
+    let x = Box::new(5);
+    let y = x;
+    println!("{}", *x); // Bug: x moved to y
+}
+```
+
+Answer: Box moved to y, x no longer valid. Fix: clone Box, or use reference. Move semantics apply to Box. Ownership transferred on assignment.
+
+#@@@@@@@@@@
+
+110. What is the difference between Cow and owned/borrowed types?
+
+Answer: Cow (Clone on Write) is enum: Borrowed or Owned. Delays cloning until mutation needed. Efficient for read-heavy scenarios. Example: `Cow<'a, str>` can be &str or String. Use for flexible ownership.
+
+#@@@@@@@@@@
+
+111. Which of the following are serde_json features? (Multiple correct)
+A) JSON serialization
+B) JSON deserialization
+C) Pretty printing
+D) Streaming
+E) Value type
+F) All of the above
+
+Answer: F - All are serde_json features. Serialize (to JSON), Deserialize (from JSON), Pretty (formatted output), Streaming (large files), Value (dynamic JSON). Comprehensive JSON support.
+
+#@@@@@@@@@@
+
+112. Complete this Pin usage:
+```rust
+use std::pin::Pin;
+
+async fn process(data: Pin<&mut Data>) {
+    // Pin prevents moving data
+    data.get_mut().process().await;
+}
+
+// Pin ensures data doesn't move in memory
+// Required for self-referential structs
+```
+
+Answer: Pin prevents moving pinned data. Required for async/await (self-referential futures). Use Pin::new_unchecked (unsafe) or Box::pin. Guarantees memory stability.
+
+#@@@@@@@@@@
+
+113. How do you implement workspace in Cargo?
+
+Answer: Create Cargo.toml with [workspace] section. List members: `members = ["crate1", "crate2"]`. Shared Cargo.lock, target directory. Manage multiple related crates. Example: `[workspace] members = ["server", "client", "common"]`.
+
+#@@@@@@@@@@
+
+114. Which of the following are thiserror features? (Multiple correct)
+A) Derive Error trait
+B) Display formatting
+C) Error source chaining
+D) Backtrace support
+E) Minimal boilerplate
+F) All of the above
+
+Answer: F - All are thiserror features. Derive (#[derive(Error)]), Display (#[error("...")]), Source (#[from]), Backtrace (automatic), Minimal (concise). Ergonomic error handling.
+
+#@@@@@@@@@@
+
+115. Find the bug:
+```rust
+fn main() {
+    let s = String::from("hello");
+    let r = &s[0]; // Bug: cannot index String directly
+    println!("{}", r);
+}
+```
+
+Answer: Cannot index String directly, returns byte not char. Use chars() or bytes(). Fix: `s.chars().nth(0)` or `&s[0..1]` for slice. UTF-8 complexity.
+
+#@@@@@@@@@@
+
+116. What is the difference between std::thread and tokio::task?
+
+Answer: std::thread is OS thread, blocking, heavier. tokio::task is async task, non-blocking, lightweight. Tasks multiplexed on thread pool. Use threads for CPU-bound, tasks for I/O-bound. Async tasks scale better.
+
+#@@@@@@@@@@
+
+117. Which of the following are anyhow features? (Multiple correct)
+A) Easy error handling
+B) Context addition
+C) Backtrace capture
+D) Downcast support
+E) Works with any error
+F) All of the above
+
+Answer: F - All are anyhow features. Easy (anyhow::Result), Context (.context("msg")), Backtrace (automatic), Downcast (to concrete type), Any error (Box<dyn Error>). Convenient for applications.
+
+#@@@@@@@@@@
+
+118. Complete this feature flag:
+```rust
+// Cargo.toml
+[features]
+default = ["std"]
+std = []
+no_std = []
+
+// lib.rs
+#[cfg(feature = "_______________")]
+use std::collections::HashMap;
+```
+
+Answer: `"std"` - Conditional compilation based on feature. Enable with --features. Use for optional dependencies, platform-specific code. Flexible crate configuration.
+
+#@@@@@@@@@@
+
+119. How do you implement no_std in Rust?
+
+Answer: Add #![no_std] attribute. Use core and alloc instead of std. Implement panic handler. Example: `#![no_std] extern crate alloc;`. For embedded, WebAssembly. Minimal runtime requirements.
+
+#@@@@@@@@@@
+
+120. Which of the following are criterion features? (Multiple correct)
+A) Statistical benchmarking
+B) HTML reports
+C) Regression detection
+D) Parameterized benchmarks
+E) Comparison with baselines
+F) All of the above
+
+Answer: F - All are criterion features. Statistical (rigorous analysis), HTML (visualizations), Regression (detect slowdowns), Parameterized (multiple inputs), Baselines (compare versions). Professional benchmarking.
+
+#@@@@@@@@@@
+
+121. Find the bug:
+```rust
+fn main() {
+    let v = vec![1, 2, 3];
+    let sum: i32 = v.iter().sum();
+    println!("{:?}", v); // No bug
+}
+```
+
+Answer: No bug - iter() borrows, doesn't consume. v still valid after sum. Use into_iter() to consume. Borrowing vs consuming iterators.
+
+#@@@@@@@@@@
+
+122. What is the difference between lazy_static and once_cell?
+
+Answer: Both provide lazy initialization. lazy_static uses macro, runtime initialization. once_cell is library-based, more flexible, OnceCell/Lazy types. once_cell becoming standard (std::lazy). Use once_cell for new code.
+
+#@@@@@@@@@@
+
+123. Which of the following are tonic features? (Multiple correct)
+A) gRPC client/server
+B) Async support
+C) Code generation
+D) Streaming
+E) Interceptors
+F) All of the above
+
+Answer: F - All are tonic features. gRPC (protocol buffers), Async (tokio-based), Code generation (prost), Streaming (bidirectional), Interceptors (middleware). Modern gRPC framework.
+
+#@@@@@@@@@@
+
+124. Complete this unsafe code:
+```rust
+fn main() {
+    let mut num = 5;
+    let r1 = &num as *const i32;
+    let r2 = &mut num as *mut i32;
+
+    unsafe {
+        println!("r1: {}", *_______________);
+        *r2 = 10;
+    }
+}
+```
+
+Answer: `r1` - Dereference raw pointer. Unsafe required for raw pointer operations. No borrow checking. Use carefully, document invariants.
+
+#@@@@@@@@@@
+
+125. How do you implement inline assembly in Rust?
+
+Answer: Use asm! macro (nightly or stable 1.59+). Example: `unsafe { asm!("nop") }`. Specify inputs, outputs, clobbers. Platform-specific. Use for performance-critical code, hardware access.
+
+#@@@@@@@@@@
+
+126. Which of the following are dashmap features? (Multiple correct)
+A) Concurrent HashMap
+B) Lock-free reads
+C) Sharded locking
+D) Iterators
+E) Drop-in replacement
+F) All of the above
+
+Answer: F - All are dashmap features. Concurrent (thread-safe), Lock-free reads (fast), Sharded (reduced contention), Iterators (safe), Drop-in (similar API). High-performance concurrent map.
+
+#@@@@@@@@@@
+
+127. Find the bug:
+```rust
+fn main() {
+    let x = 5;
+    let y = &x;
+    drop(x); // Bug: cannot move out of borrowed value
+}
+```
+
+Answer: Cannot move x while borrowed by y. drop takes ownership. Fix: drop y first, or don't borrow. Borrow prevents moving.
+
+#@@@@@@@@@@
+
+128. What is the difference between #[repr(C)] and default representation?
+
+Answer: #[repr(C)] uses C ABI layout, predictable, for FFI. Default is Rust layout, optimized, undefined order. Use #[repr(C)] for interop, default for Rust-only. Other options: #[repr(packed)], #[repr(align)].
+
+#@@@@@@@@@@
+
+129. Which of the following are bytes features? (Multiple correct)
+A) Efficient byte buffers
+B) Zero-copy slicing
+C) Reference counting
+D) Mutable and immutable variants
+E) Network I/O optimization
+F) All of the above
+
+Answer: F - All are bytes features. Efficient (optimized), Zero-copy (Bytes::slice), Reference counting (cheap clones), Variants (Bytes, BytesMut), Network I/O (designed for). Essential for async I/O.
+
+#@@@@@@@@@@
+
+130. Complete this procedural macro:
+```rust
+use proc_macro::TokenStream;
+
+#[proc_macro_derive(Builder)]
+pub fn derive_builder(input: TokenStream) -> TokenStream {
+    // Parse input
+    let ast = syn::parse(input).unwrap();
+
+    // Generate code
+    impl_builder(&_______________)
+}
+```
+
+Answer: `ast` - Pass parsed syntax tree to implementation. Procedural macros transform code. Use syn for parsing, quote for generation. Powerful metaprogramming.
+
+#@@@@@@@@@@
+
+131. How do you implement custom test frameworks in Rust?
+
+Answer: Use #![feature(custom_test_frameworks)] (nightly). Define test runner. Example: `#![test_runner(my_runner)]`. Implement runner function. Use for embedded, no_std, custom test harness.
+
+#@@@@@@@@@@
+
+132. Which of the following are regex features? (Multiple correct)
+A) Pattern matching
+B) Capture groups
+C) Unicode support
+D) Lazy compilation
+E) Set matching
+F) All of the above
+
+Answer: F - All are regex features. Pattern matching (search), Capture groups (extract), Unicode (full support), Lazy (RegexSet), Set matching (multiple patterns). Comprehensive regex library.
+
+#@@@@@@@@@@
+
+133. Find the bug:
+```rust
+fn main() {
+    let s = "hello".to_string();
+    let len = s.len();
+    let s2 = s;
+    println!("{}", len); // No bug
+}
+```
+
+Answer: No bug - len is Copy type (usize), not affected by s move. s moved to s2, but len independent. Copy types don't move.
+
+#@@@@@@@@@@
+
+134. What is the difference between Deref and AsRef?
+
+Answer: Deref enables automatic dereferencing (*), coercion. AsRef is explicit conversion, generic over reference types. Deref for smart pointers, AsRef for generic functions. Example: `fn foo<T: AsRef<str>>(s: T)`.
+
+#@@@@@@@@@@
+
+135. Which of the following are tower features? (Multiple correct)
+A) Service abstraction
+B) Middleware layers
+C) Load balancing
+D) Retry logic
+E) Timeout handling
+F) All of the above
+
+Answer: F - All are tower features. Service (trait), Layers (middleware), Load balancing (strategies), Retry (policies), Timeout (limits). Modular network services.
+
+#@@@@@@@@@@
+
+136. Complete this attribute macro:
+```rust
+#[route(GET, "/users/:id")]
+async fn get_user(id: u64) -> Result<Json<User>, Error> {
+    // Handler implementation
+}
+
+// Attribute macro transforms function
+// Generates routing code
+```
+
+Answer: Attribute macros modify items. Use #[proc_macro_attribute]. Parse attributes and item. Generate modified code. Use for custom syntax, DSLs.
+
+#@@@@@@@@@@
+
+137. How do you implement panic hooks in Rust?
+
+Answer: Use std::panic::set_hook. Example: `panic::set_hook(Box::new(|info| { /* custom handling */ }))`. Customize panic behavior. Use for logging, cleanup, custom error reporting.
+
+#@@@@@@@@@@
+
+138. Which of the following are proptest features? (Multiple correct)
+A) Property-based testing
+B) Shrinking
+C) Arbitrary value generation
+D) Regression testing
+E) Strategies
+F) All of the above
+
+Answer: F - All are proptest features. Property-based (test properties), Shrinking (minimal failing case), Arbitrary (random values), Regression (persist failures), Strategies (value generation). Advanced testing.
+
+#@@@@@@@@@@
+
+139. Find the bug:
+```rust
+fn main() {
+    let v = vec![1, 2, 3];
+    let item = v.get(10); // No bug, returns None
+    match item {
+        Some(x) => println!("{}", x),
+        None => println!("Not found"),
+    }
+}
+```
+
+Answer: No bug - get() returns Option, safe indexing. Returns None for out of bounds. Use get() instead of [] for safe access. Prevents panics.
+
+#@@@@@@@@@@
+
+140. What is the difference between std::sync::mpsc and crossbeam::channel?
+
+Answer: mpsc is standard library, MPSC only. crossbeam supports MPMC, more features, better performance. crossbeam has select! macro, bounded/unbounded. Use crossbeam for advanced use cases.
+
+#@@@@@@@@@@
+
+141. Which of the following are hyper features? (Multiple correct)
+A) HTTP client
+B) HTTP server
+C) HTTP/1 and HTTP/2
+D) Async support
+E) Low-level control
+F) All of the above
+
+Answer: F - All are hyper features. Client (requests), Server (responses), HTTP/1 and HTTP/2 (protocols), Async (tokio-based), Low-level (building block). Foundation for web frameworks.
+
+#@@@@@@@@@@
+
+142. Complete this const evaluation:
+```rust
+const fn factorial(n: u32) -> u32 {
+    match n {
+        0 => 1,
+        _ => n * factorial(n - 1),
+    }
+}
+
+const FACT_5: u32 = _______________;
+```
+
+Answer: `factorial(5)` - Const functions evaluated at compile time. Use for compile-time computation. Limited to const-safe operations. Powerful for const generics.
+
+#@@@@@@@@@@
+
+143. How do you implement custom derives with syn and quote?
+
+Answer: Use syn::parse for parsing, quote::quote for code generation. Parse DeriveInput, extract fields. Generate impl block. Example: `quote! { impl Trait for #name { } }`. Return TokenStream.
+
+#@@@@@@@@@@
+
+144. Which of the following are log features? (Multiple correct)
+A) Logging facade
+B) Multiple log levels
+C) Structured logging
+D) Compile-time filtering
+E) Runtime filtering
+F) All of the above
+
+Answer: F - All are log features. Facade (abstraction), Levels (trace, debug, info, warn, error), Structured (key-value), Compile-time (max_level), Runtime (filters). Standard logging interface.
+
+#@@@@@@@@@@
+
+145. Find the bug:
+```rust
+fn main() {
+    let mut s = String::from("hello");
+    let r = &s;
+    s.push_str(" world"); // Bug: cannot mutate while borrowed
+    println!("{}", r);
+}
+```
+
+Answer: Cannot mutate s while immutably borrowed by r. Fix: use r before mutation, or don't borrow. Borrow checker prevents data races.
+
+#@@@@@@@@@@
+
+146. What is the difference between trait objects and generics?
+
+Answer: Generics are static dispatch, monomorphization, compile-time, faster. Trait objects are dynamic dispatch, vtable, runtime, flexible. Use generics for performance, trait objects for heterogeneous collections.
+
+#@@@@@@@@@@
+
+147. Which of the following are futures features? (Multiple correct)
+A) Future trait
+B) Stream trait
+C) Sink trait
+D) Combinators
+E) Executors
+F) All of the above
+
+Answer: F - All are futures features. Future (async value), Stream (async iterator), Sink (async writer), Combinators (map, then, join), Executors (runtime). Foundation for async Rust.
+
+#@@@@@@@@@@
+
+148. Complete this benchmark:
+```rust
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+fn fibonacci(n: u64) -> u64 {
+    match n {
+        0 => 1,
+        1 => 1,
+        n => fibonacci(n-1) + fibonacci(n-2),
+    }
+}
+
+fn bench_fib(c: &mut Criterion) {
+    c.bench_function("fib 20", |b| b.iter(|| fibonacci(black_box(_______________))));
+}
+```
+
+Answer: `20` - Benchmark parameter. black_box prevents optimization. Criterion provides statistical analysis. Use for performance testing.
+
+#@@@@@@@@@@
+
+149. How do you implement global state in Rust?
+
+Answer: Use lazy_static or once_cell for lazy initialization. Use Mutex/RwLock for mutability. Example: `static CONFIG: Lazy<Mutex<Config>> = Lazy::new(|| Mutex::new(Config::default()))`. Avoid when possible, prefer dependency injection.
+
+#@@@@@@@@@@
+
+150. Which of the following are Rust edition features? (Multiple correct)
+A) 2015 (original)
+B) 2018 (module system, async/await)
+C) 2021 (disjoint capture, panic formatting)
+D) Backward compatible
+E) Opt-in per crate
+F) All of the above
+
+Answer: F - All are edition features. 2015 (first), 2018 (major improvements), 2021 (refinements), Backward compatible (interop), Opt-in (edition = "2021"). Language evolution without breaking changes.
+
+#@@@@@@@@@@
+
+151. How do you implement conditional compilation in Rust?
+
+Answer: Use #[cfg] attribute. Example: `#[cfg(target_os = "linux")]`, `#[cfg(feature = "serde")]`. cfg! macro for expressions. Use for platform-specific code, optional features. Compile-time code selection.
+
+#@@@@@@@@@@
+
+152. Which of the following are mio features? (Multiple correct)
+A) Low-level I/O
+B) Event loop
+C) Cross-platform
+D) Non-blocking sockets
+E) Foundation for async runtimes
+F) All of the above
+
+Answer: F - All are mio features. Low-level (OS primitives), Event loop (epoll, kqueue), Cross-platform (Windows, Linux, macOS), Non-blocking (async I/O), Foundation (tokio uses mio). Building block for async.
+
+#@@@@@@@@@@
+
+153. Find the bug:
+```rust
+fn main() {
+    let v = vec![1, 2, 3];
+    for i in v {
+        println!("{}", i);
+    }
+    println!("{:?}", v); // Bug: v moved in loop
+}
+```
+
+Answer: for loop consumes v (into_iter). v no longer valid. Fix: iterate with &v or v.iter(). Ownership transferred in for loop without &.
+
+#@@@@@@@@@@
+
+154. What is the difference between turbofish and type annotations?
+
+Answer: Turbofish (::<T>) specifies generic types inline. Type annotations (: T) specify variable types. Both provide type information. Use turbofish for method calls, annotations for variables. Example: `collect::<Vec<_>>()` vs `let v: Vec<i32>`.
+
+#@@@@@@@@@@
+
+155. Which of the following are rustfmt features? (Multiple correct)
+A) Code formatting
+B) Configurable style
+C) IDE integration
+D) CI integration
+E) Stable formatting
+F) All of the above
+
+Answer: F - All are rustfmt features. Formatting (automatic), Configurable (rustfmt.toml), IDE (editor support), CI (check formatting), Stable (consistent). Standard code formatter.
+
+#@@@@@@@@@@
+
+156. Complete this type state pattern:
+```rust
+struct Locked;
+struct Unlocked;
+
+struct Door<State> {
+    _state: PhantomData<State>,
+}
+
+impl Door<Locked> {
+    fn unlock(self) -> Door<_______________> {
+        Door { _state: PhantomData }
+    }
+}
+```
+
+Answer: `Unlocked` - Type state pattern encodes state in types. Compile-time state machine. Prevents invalid state transitions. Zero runtime cost.
+
+#@@@@@@@@@@
+
+157. How do you implement SIMD in Rust?
+
+Answer: Use std::simd (nightly) or packed_simd. Example: `use std::simd::*; let a = f32x4::splat(1.0)`. Vectorized operations. Use for performance-critical code. Platform-specific intrinsics available.
+
+#@@@@@@@@@@
+
+158. Which of the following are clippy lint categories? (Multiple correct)
+A) Correctness
+B) Performance
+C) Style
+D) Complexity
+E) Pedantic
+F) All of the above
+
+Answer: F - All are clippy categories. Correctness (bugs), Performance (inefficiencies), Style (idiomatic), Complexity (simplification), Pedantic (nitpicks). Comprehensive linter for Rust.
+
+#@@@@@@@@@@
+
+159. Find the bug:
+```rust
+fn main() {
+    let x = Some(5);
+    if let Some(y) = x {
+        println!("{}", y);
+    }
+    println!("{:?}", x); // No bug
+}
+```
+
+Answer: No bug - if let borrows, doesn't move (for Copy types). x still valid. For non-Copy types, would move. Pattern matching semantics.
+
+#@@@@@@@@@@
+
+160. What is the difference between std::mem::replace and std::mem::swap?
+
+Answer: replace takes ownership, returns old value, sets new value. swap exchanges two values. replace: `let old = replace(&mut x, new)`. swap: `swap(&mut x, &mut y)`. Both useful for working with &mut.
+
+#@@@@@@@@@@
+
+161. Which of the following are rustdoc features? (Multiple correct)
+A) Documentation generation
+B) Doc tests
+C) Markdown support
+D) Code examples
+E) Search functionality
+F) All of the above
+
+Answer: F - All are rustdoc features. Generation (HTML docs), Doc tests (executable examples), Markdown (formatting), Examples (code blocks), Search (built-in). Comprehensive documentation tool.
+
+#@@@@@@@@@@
+
+162. Complete this trait object:
+```rust
+trait Draw {
+    fn draw(&self);
+}
+
+fn render(objects: Vec<Box<dyn _______________>>) {
+    for obj in objects {
+        obj.draw();
+    }
+}
+```
+
+Answer: `Draw` - Trait object for dynamic dispatch. Box<dyn Trait> for heap allocation. Enables heterogeneous collections. Runtime polymorphism.
+
+#@@@@@@@@@@
+
+163. How do you implement custom panic messages in Rust?
+
+Answer: Use panic! macro with format string. Example: `panic!("Error: {}", msg)`. Or assert!/assert_eq! with message. Custom panic hook for global handling. Use for unrecoverable errors.
+
+#@@@@@@@@@@
+
+164. Which of the following are cargo-edit features? (Multiple correct)
+A) cargo add
+B) cargo rm
+C) cargo upgrade
+D) Dependency management
+E) Version resolution
+F) All of the above
+
+Answer: F - All are cargo-edit features. add (add dependency), rm (remove dependency), upgrade (update versions), Management (CLI), Resolution (automatic). Convenient dependency management.
+
+#@@@@@@@@@@
+
+165. Find the bug:
+```rust
+fn main() {
+    let s = String::from("hello");
+    let slice = &s[0..10]; // Bug: slice out of bounds
+    println!("{}", slice);
+}
+```
+
+Answer: Slice index out of bounds, panics at runtime. String is 5 bytes, accessing 0..10 invalid. Fix: use valid range or get() for Option. Runtime panic for invalid slices.
+
+#@@@@@@@@@@
+
+166. What is the difference between std::borrow::Cow and cloning?
+
+Answer: Cow delays cloning until mutation needed. Clone creates immediate copy. Cow efficient for read-heavy scenarios. Example: `Cow::Borrowed(&str)` vs `str.to_string()`. Use Cow to avoid unnecessary allocations.
+
+#@@@@@@@@@@
+
+167. Which of the following are rust-analyzer features? (Multiple correct)
+A) Code completion
+B) Go to definition
+C) Inline errors
+D) Refactoring
+E) Macro expansion
+F) All of the above
+
+Answer: F - All are rust-analyzer features. Completion (intelligent), Go to definition (navigation), Errors (real-time), Refactoring (automated), Macros (expansion view). Modern Rust IDE support.
+
+#@@@@@@@@@@
+
+168. Complete this lifetime bound:
+```rust
+struct Ref<'a, T: 'a> {
+    value: &'a T,
+}
+
+// 'a lifetime bound ensures T lives at least as long as 'a
+// Required when storing references in structs
+```
+
+Answer: Lifetime bound T: 'a ensures type T outlives lifetime 'a. Required for references in generic types. Prevents dangling references. Explicit lifetime relationships.
+
+#@@@@@@@@@@
+
+169. How do you implement custom Index trait in Rust?
+
+Answer: Implement Index and IndexMut traits. Example: `impl Index<usize> for MyType { type Output = T; fn index(&self, i: usize) -> &T { &self.data[i] } }`. Enables [] syntax. Custom indexing logic.
+
+#@@@@@@@@@@
+
+170. Which of the following are bindgen features? (Multiple correct)
+A) C header parsing
+B) Rust binding generation
+C) Whitelist/blacklist
+D) Type mapping
+E) Automatic builds
+F) All of the above
+
+Answer: F - All are bindgen features. Parsing (C headers), Generation (Rust FFI), Whitelist/blacklist (selective), Mapping (C to Rust types), Builds (build.rs integration). Automate FFI bindings.
+
+#@@@@@@@@@@
+
+171. Find the bug:
+```rust
+fn main() {
+    let mut v = vec![1, 2, 3];
+    v.iter_mut().for_each(|x| *x += 1);
+    println!("{:?}", v); // No bug
+}
+```
+
+Answer: No bug - iter_mut() provides mutable references. for_each modifies in place. v valid after iteration. Mutable iteration pattern.
+
+#@@@@@@@@@@
+
+172. What is the difference between std::marker::Send and Sync?
+
+Answer: Send: safe to transfer ownership between threads. Sync: safe to share references between threads (T is Sync if &T is Send). Most types are both. Use for thread safety guarantees. Compiler enforces.
+
+#@@@@@@@@@@
+
+173. Which of the following are structopt features? (Multiple correct)
+A) Derive-based CLI parsing
+B) Subcommands
+C) Environment variables
+D) Validation
+E) Help generation
+F) All of the above
+
+Answer: F - All are structopt features (now clap v3 derive). Derive (#[derive(StructOpt)]), Subcommands (nested), Env vars (fallback), Validation (custom), Help (automatic). Ergonomic CLI parsing.
+
+#@@@@@@@@@@
+
+174. Complete this error conversion:
+```rust
+use std::io;
+use std::num::ParseIntError;
+
+#[derive(Debug)]
+enum MyError {
+    Io(io::Error),
+    Parse(ParseIntError),
+}
+
+impl From<io::Error> for MyError {
+    fn from(err: io::Error) -> Self {
+        MyError::_______________
+    }
+}
+```
+
+Answer: `Io(err)` - Convert io::Error to MyError. From trait enables ? operator. Automatic error conversion. Implement for each error type.
+
+#@@@@@@@@@@
+
+175. How do you implement custom Display trait in Rust?
+
+Answer: Implement std::fmt::Display trait with fmt method. Example: `impl Display for MyType { fn fmt(&self, f: &mut Formatter) -> fmt::Result { write!(f, "MyType: {}", self.value) } }`. Enables {} formatting.
+
+#@@@@@@@@@@
+
+176. Which of the following are cargo-watch features? (Multiple correct)
+A) Watch for file changes
+B) Auto-rebuild
+C) Auto-test
+D) Custom commands
+E) Ignore patterns
+F) All of the above
+
+Answer: F - All are cargo-watch features. Watch (file monitoring), Rebuild (cargo build), Test (cargo test), Custom (any command), Ignore (exclude files). Development workflow automation.
+
+#@@@@@@@@@@
+
+177. Find the bug:
+```rust
+fn main() {
+    let x = 5;
+    let y = &x;
+    let z = &x;
+    println!("{}, {}", y, z); // No bug
+}
+```
+
+Answer: No bug - multiple immutable references allowed. Borrowing rules permit many &T. No mutation, no problem. Safe concurrent reads.
+
+#@@@@@@@@@@
+
+178. What is the difference between std::collections::HashMap and BTreeMap?
+
+Answer: HashMap uses hash table, O(1) average, unordered. BTreeMap uses B-tree, O(log n), sorted. HashMap faster for lookups, BTreeMap maintains order. Use HashMap by default, BTreeMap when order matters.
+
+#@@@@@@@@@@
+
+179. Which of the following are mockall features? (Multiple correct)
+A) Mock object generation
+B) Expectation setting
+C) Argument matching
+D) Return value specification
+E) Call verification
+F) All of the above
+
+Answer: F - All are mockall features. Mocking (automock), Expectations (expect_*), Matching (with), Returns (returning), Verification (times). Comprehensive mocking framework.
+
+#@@@@@@@@@@
+
+180. Complete this async block:
+```rust
+use tokio::time::{sleep, Duration};
+
+async fn example() {
+    let future = async {
+        sleep(Duration::from_secs(1)).await;
+        println!("Done");
+    };
+
+    future._______________.await;
+}
+```
+
+Answer: Future is already created, just await it directly. Or remove the intermediate variable. Async blocks create futures. Must be awaited to execute.
+
+#@@@@@@@@@@
+
+181. How do you implement custom PartialEq in Rust?
+
+Answer: Implement PartialEq trait with eq method. Example: `impl PartialEq for MyType { fn eq(&self, other: &Self) -> bool { self.field == other.field } }`. Enables == operator. Derive when possible.
+
+#@@@@@@@@@@
+
+182. Which of the following are insta features? (Multiple correct)
+A) Snapshot testing
+B) Inline snapshots
+C) Snapshot review
+D) Multiple formats
+E) Redactions
+F) All of the above
+
+Answer: F - All are insta features. Snapshots (golden tests), Inline (in source), Review (cargo insta review), Formats (JSON, YAML), Redactions (hide dynamic data). Modern snapshot testing.
+
+#@@@@@@@@@@
+
+183. Find the bug:
+```rust
+fn main() {
+    let v = vec![1, 2, 3];
+    let first = v.first();
+    v.push(4); // Bug: cannot mutate while borrowed
+    println!("{:?}", first);
+}
+```
+
+Answer: first() returns Option<&T>, borrows vector. Cannot mutate while borrowed. Fix: use first before push, or clone value. Borrow checker prevents invalidation.
+
+#@@@@@@@@@@
+
+184. What is the difference between std::rc::Weak and Rc?
+
+Answer: Rc is strong reference, keeps data alive. Weak is weak reference, doesn't prevent deallocation. Use Weak to break reference cycles. upgrade() converts Weak to Option<Rc>. Prevents memory leaks.
+
+#@@@@@@@@@@
+
+185. Which of the following are quickcheck features? (Multiple correct)
+A) Property-based testing
+B) Random value generation
+C) Shrinking
+D) Arbitrary trait
+E) Integration with test framework
+F) All of the above
+
+Answer: F - All are quickcheck features. Property-based (test properties), Random (Arbitrary), Shrinking (minimal case), Arbitrary (trait for generation), Integration (works with cargo test). Classic property testing.
+
+#@@@@@@@@@@
+
+186. Complete this macro invocation:
+```rust
+macro_rules! create_function {
+    ($func_name:ident) => {
+        fn $func_name() {
+            println!("Function {:?} called", stringify!($func_name));
+        }
+    };
+}
+
+create_function!(_______________);
+```
+
+Answer: `foo` or any identifier - Macro creates function with given name. Declarative macros use pattern matching. Metaprogramming for code generation.
+
+#@@@@@@@@@@
+
+187. How do you implement custom Hash trait in Rust?
+
+Answer: Implement Hash trait with hash method. Example: `impl Hash for MyType { fn hash<H: Hasher>(&self, state: &mut H) { self.field.hash(state); } }`. Required for HashMap keys. Derive when possible.
+
+#@@@@@@@@@@
+
+188. Which of the following are flamegraph features? (Multiple correct)
+A) Performance profiling
+B) Visualization
+C) CPU time analysis
+D) Call stack representation
+E) Integration with perf
+F) All of the above
+
+Answer: F - All are flamegraph features. Profiling (performance), Visualization (SVG), CPU time (analysis), Call stacks (hierarchical), perf (Linux integration). Identify performance bottlenecks.
+
+#@@@@@@@@@@
+
+189. Find the bug:
+```rust
+fn main() {
+    let s = String::from("hello");
+    let len = s.len();
+    drop(s);
+    println!("{}", len); // No bug
+}
+```
+
+Answer: No bug - len is Copy type, independent of s. drop(s) doesn't affect len. Copy types have independent values. No ownership issues.
+
+#@@@@@@@@@@
+
+190. What is the difference between std::path::Path and PathBuf?
+
+Answer: Path is borrowed, like &str. PathBuf is owned, like String. Path for parameters, PathBuf for storage. PathBuf implements Deref<Target=Path>. Use Path for function parameters.
+
+#@@@@@@@@@@
+
+191. Which of the following are cargo-deny features? (Multiple correct)
+A) License checking
+B) Dependency auditing
+C) Ban specific crates
+D) Duplicate detection
+E) Advisory checking
+F) All of the above
+
+Answer: F - All are cargo-deny features. Licenses (compliance), Auditing (security), Bans (forbidden crates), Duplicates (version conflicts), Advisories (vulnerabilities). Supply chain security.
+
+#@@@@@@@@@@
+
+192. Complete this iterator chain:
+```rust
+fn main() {
+    let numbers = vec![1, 2, 3, 4, 5];
+    let result: Vec<_> = numbers
+        .iter()
+        .filter(|&&x| x % 2 == 0)
+        .map(|&x| x * 2)
+        ._______________();
+    println!("{:?}", result);
+}
+```
+
+Answer: `collect` - Collect iterator into collection. Iterator chains are lazy. Terminal operation triggers evaluation. Functional programming style.
+
+#@@@@@@@@@@
+
+193. How do you implement custom Ord trait in Rust?
+
+Answer: Implement Ord trait with cmp method (requires PartialOrd, Eq, PartialEq). Example: `impl Ord for MyType { fn cmp(&self, other: &Self) -> Ordering { self.field.cmp(&other.field) } }`. Enables sorting, comparisons.
+
+#@@@@@@@@@@
+
+194. Which of the following are mdbook features? (Multiple correct)
+A) Markdown-based books
+B) Code highlighting
+C) Search functionality
+D) Themes
+E) Plugins
+F) All of the above
+
+Answer: F - All are mdbook features. Markdown (source), Highlighting (syntax), Search (built-in), Themes (customizable), Plugins (extensible). Documentation book generator.
+
+#@@@@@@@@@@
+
+195. Find the bug:
+```rust
+fn main() {
+    let mut x = 5;
+    let y = &mut x;
+    let z = &mut x; // Bug: two mutable references
+    *y += 1;
+    *z += 1;
+}
+```
+
+Answer: Cannot have two mutable references simultaneously. Violates borrowing rules. Fix: use y, drop it, then create z. Prevents data races.
+
+#@@@@@@@@@@
+
+196. What is the difference between std::env::args and std::env::args_os?
+
+Answer: args() returns String, assumes UTF-8, panics on invalid UTF-8. args_os() returns OsString, handles any encoding. Use args() for typical cases, args_os() for robustness. Platform differences.
+
+#@@@@@@@@@@
+
+197. Which of the following are Rust memory safety guarantees? (Multiple correct)
+A) No null pointer dereferences
+B) No data races
+C) No use-after-free
+D) No buffer overflows
+E) No iterator invalidation
+F) All of the above
+
+Answer: F - All are Rust guarantees (in safe code). Null (Option instead), Data races (borrow checker), Use-after-free (ownership), Buffer overflows (bounds checking), Iterator invalidation (borrowing). Memory safety without GC.
+
+#@@@@@@@@@@
+
+198. Complete this comprehensive Rust application structure:
+```rust
+// src/main.rs - Entry point
+// src/lib.rs - Library code
+// src/bin/ - Additional binaries
+// tests/ - Integration tests
+// benches/ - Benchmarks
+// examples/ - Example code
+
+// Cargo.toml defines package structure
+```
+
+Answer: Standard Rust project structure. Separation of concerns. Library and binary crates. Comprehensive testing and documentation. Best practices for organization.
+
+#@@@@@@@@@@
+
+199. How do you implement zero-sized types in Rust?
+
+Answer: Create struct with no fields or PhantomData. Example: `struct Marker;`. Zero runtime cost. Use for type-level programming, markers, phantom types. Compile-time only information.
+
+#@@@@@@@@@@
+
+200. Which of the following represent Rust's core principles? (Multiple correct)
+A) Memory safety without garbage collection
+B) Zero-cost abstractions
+C) Fearless concurrency
+D) Ownership system
+E) Type safety
+F) All of the above
+
+Answer: F - All are Rust core principles. Memory safety (borrow checker), Zero-cost (no runtime overhead), Fearless concurrency (thread safety), Ownership (resource management), Type safety (strong types). Rust enables safe, fast, concurrent systems programming without sacrificing control. The language design ensures correctness at compile time, preventing entire classes of bugs while maintaining performance comparable to C/C++. Rust empowers developers to write reliable, efficient software.
+
+#@@@@@@@@@@

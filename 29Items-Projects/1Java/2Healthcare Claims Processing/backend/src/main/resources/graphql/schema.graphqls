@@ -1,0 +1,221 @@
+# Healthcare Claims Processing GraphQL Schema
+
+scalar UUID
+scalar BigDecimal
+scalar LocalDate
+scalar LocalDateTime
+
+# Enums
+enum ClaimStatus {
+    SUBMITTED
+    VALIDATING
+    INVALID
+    PENDING_ADJUDICATION
+    AUTO_ADJUDICATED
+    PENDING_REVIEW
+    FLAGGED_FRAUD
+    APPROVED
+    DENIED
+    PAID
+}
+
+enum ClaimType {
+    MEDICAL
+    DENTAL
+    VISION
+    PHARMACY
+    MENTAL_HEALTH
+    REHABILITATION
+    DURABLE_MEDICAL_EQUIPMENT
+    LABORATORY
+    RADIOLOGY
+    EMERGENCY
+    INPATIENT
+    OUTPATIENT
+}
+
+# Types
+type Claim {
+    id: UUID!
+    claimNumber: String!
+    type: ClaimType!
+    status: ClaimStatus!
+    amount: BigDecimal!
+    allowedAmount: BigDecimal
+    serviceDate: LocalDate!
+    serviceEndDate: LocalDate
+    patientId: UUID!
+    providerId: UUID!
+    diagnosisCodes: String
+    procedureCodes: String
+    fraudScore: Float
+    fraudReasons: String
+    denialReason: String
+    notes: String
+    submittedBy: String
+    reviewedBy: String
+    reviewedAt: LocalDateTime
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type Patient {
+    id: UUID!
+    memberId: String!
+    firstName: String!
+    lastName: String!
+    dateOfBirth: LocalDate!
+    policyNumber: String!
+    groupNumber: String
+    email: String
+    phone: String
+    isActive: Boolean!
+}
+
+type Provider {
+    id: UUID!
+    npi: String!
+    name: String!
+    specialty: String
+    taxId: String
+    inNetwork: Boolean!
+    providerType: String
+    isActive: Boolean!
+}
+
+type AdjudicationResult {
+    id: UUID!
+    ruleApplied: String!
+    ruleVersion: String
+    decision: String!
+    allowedAmount: BigDecimal
+    copayAmount: BigDecimal
+    deductibleAmount: BigDecimal
+    coinsuranceAmount: BigDecimal
+    patientResponsibility: BigDecimal
+    reason: String
+    denialCode: String
+    isAutomated: Boolean!
+    processedAt: LocalDateTime!
+}
+
+type FraudScore {
+    claimId: UUID!
+    claimNumber: String!
+    score: Float!
+    riskLevel: String!
+    reasons: [String!]
+    requiresReview: Boolean!
+    likelyFraud: Boolean!
+}
+
+# Connection types for pagination
+type ClaimConnection {
+    edges: [Claim!]!
+    pageInfo: PageInfo!
+}
+
+type PageInfo {
+    currentPage: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
+}
+
+# Input types
+input ClaimInput {
+    type: ClaimType!
+    amount: BigDecimal!
+    serviceDate: LocalDate!
+    serviceEndDate: LocalDate
+    patientId: UUID!
+    providerId: UUID!
+    diagnosisCodes: String
+    procedureCodes: String
+    notes: String
+}
+
+input ClaimFilter {
+    status: ClaimStatus
+    patientId: UUID
+    providerId: UUID
+}
+
+input Pagination {
+    page: Int = 0
+    size: Int = 20
+}
+
+# Queries
+type Query {
+    "Get a claim by ID"
+    claim(id: UUID!): Claim
+
+    "Get a claim by claim number"
+    claimByNumber(claimNumber: String!): Claim
+
+    "Get paginated list of claims with optional filters"
+    claims(filter: ClaimFilter, pagination: Pagination): ClaimConnection!
+
+    "Get all claims for a specific patient"
+    claimsForPatient(patientId: UUID!): [Claim!]!
+
+    "Get claims that require human review"
+    claimsRequiringReview: [Claim!]!
+
+    "Search claims using full-text search"
+    searchClaims(query: String!, limit: Int = 20): [Claim!]!
+
+    "Get a patient by ID"
+    patient(id: UUID!): Patient
+
+    "Get a provider by ID"
+    provider(id: UUID!): Provider
+
+    "Get a provider by NPI"
+    providerByNpi(npi: String!): Provider
+}
+
+# Mutations
+type Mutation {
+    "Submit a new healthcare claim"
+    submitClaim(input: ClaimInput!): Claim!
+
+    "Update the status of a claim"
+    updateClaimStatus(id: UUID!, status: ClaimStatus!, notes: String): Claim!
+
+    "Approve a claim after review"
+    approveClaim(id: UUID!, reviewedBy: String!, notes: String): Claim!
+
+    "Deny a claim with reason"
+    denyClaim(id: UUID!, reason: String!, reviewedBy: String!): Claim!
+
+    "Process a claim through adjudication"
+    processClaim(id: UUID!): Claim!
+}
+
+# Subscriptions (for real-time updates)
+type Subscription {
+    "Subscribe to claim status changes"
+    claimStatusChanged(claimId: UUID!): ClaimStatusEvent!
+
+    "Subscribe to fraud alerts"
+    fraudAlertReceived: FraudAlertEvent!
+}
+
+type ClaimStatusEvent {
+    claimId: UUID!
+    claimNumber: String!
+    previousStatus: ClaimStatus!
+    newStatus: ClaimStatus!
+    changedBy: String
+    timestamp: LocalDateTime!
+}
+
+type FraudAlertEvent {
+    claimId: UUID!
+    claimNumber: String!
+    fraudScore: Float!
+    riskLevel: String!
+    reasons: [String!]!
+    timestamp: LocalDateTime!
+}

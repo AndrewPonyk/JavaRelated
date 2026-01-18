@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if not exist \"C:\\\\mygit\\\\JavaRelated\\\\29Items-Projects\\\\1Java\\\\2Healthcare Claims Processing\\\\backend\\\\src\\\\main\\\\resources\\\\db\\\\migration\" mkdir \"C:\\\\mygit\\\\JavaRelated\\\\29Items-Projects\\\\1Java\\\\2Healthcare Claims Processing\\\\backend\\\\src\\\\main\\\\resources\\\\db\\\\migration\")"
+    ]
+  }
+}

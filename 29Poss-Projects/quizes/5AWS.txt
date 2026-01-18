@@ -1,0 +1,3433 @@
+AWS Quiz - 200 Questions
+Tech Stack: EC2, S3, EKS, Kubernetes, Lambda, RDS, DynamoDB, VPC, IAM, CloudFormation, CloudWatch, SNS/SQS, Bedrock, Sagemaker
+
+1. What is the difference between EC2 On-Demand and Reserved Instances?
+
+Answer: On-Demand instances provide compute capacity with no upfront payment or long-term commitment, charged per hour/second. Reserved Instances offer significant discounts (up to 75%) in exchange for 1-3 year commitments. Reserved instances are ideal for steady-state workloads, On-Demand for variable workloads.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid S3 storage classes? (Multiple correct)
+A) Standard
+B) Standard-IA (Infrequent Access)
+C) Glacier
+D) Glacier Deep Archive
+E) One Zone-IA
+F) Intelligent-Tiering
+
+Answer: A, B, C, D, E, F - All are valid S3 storage classes. Standard for frequent access, Standard-IA for infrequent access, Glacier for archival, Glacier Deep Archive for long-term archival, One Zone-IA for non-critical infrequent access, Intelligent-Tiering for automatic cost optimization.
+
+#@@@@@@@@@@
+
+3. Complete this Lambda function deployment:
+```python
+import json
+import boto3
+
+def lambda_handler(event, context):
+    # Process the event
+    body = json.loads(event['body'])
+
+    # Connect to DynamoDB
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('MyTable')
+
+    # Insert item
+    response = table.put_item(
+        Item={
+            'id': body['id'],
+            'data': body['data'],
+            'timestamp': context.aws_request_id
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': 'Item created successfully',
+            'requestId': context._______________
+        })
+    }
+```
+
+Answer: `aws_request_id` - Lambda context object provides aws_request_id for tracking requests. Other useful context attributes include function_name, function_version, memory_limit_in_mb, and remaining_time_in_millis.
+
+#@@@@@@@@@@
+
+4. What is the purpose of VPC (Virtual Private Cloud)?
+
+Answer: VPC provides isolated virtual network within AWS cloud, enabling secure resource deployment. Offers complete control over network configuration including IP address ranges, subnets, route tables, and gateways. Supports hybrid connectivity to on-premises networks via VPN or Direct Connect.
+
+#@@@@@@@@@@
+
+5. Find the bug in this IAM policy:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::my-bucket"
+    }
+  ]
+}
+```
+
+Answer: Missing wildcard in Resource ARN. Should be "arn:aws:s3:::my-bucket/*" to allow access to objects within the bucket. Current ARN only grants access to the bucket itself, not its contents.
+
+#@@@@@@@@@@
+
+6. How do you implement auto-scaling for EC2 instances?
+
+Answer: Use Auto Scaling Groups (ASG) with Launch Templates/Configurations. Define minimum, maximum, and desired capacity. Configure scaling policies based on CloudWatch metrics (CPU, memory, custom metrics). Set up target tracking, step scaling, or simple scaling policies for automatic capacity adjustment.
+
+#@@@@@@@@@@
+
+7. Which of the following are valid RDS database engines? (Multiple correct)
+A) MySQL
+B) PostgreSQL
+C) Oracle
+D) SQL Server
+E) MariaDB
+F) MongoDB
+
+Answer: A, B, C, D, E - MongoDB is not supported by RDS (use DocumentDB instead). RDS supports MySQL, PostgreSQL, Oracle, SQL Server, MariaDB, and Amazon Aurora (MySQL/PostgreSQL compatible).
+
+#@@@@@@@@@@
+
+8. Predict the output of this CloudFormation template:
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-bucket-${AWS::AccountId}'
+
+Outputs:
+  BucketName:
+    Value: !Ref MyBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-BucketName'
+```
+
+Answer: Creates S3 bucket with name format "stackname-bucket-accountid" and exports the bucket name for cross-stack references. !Sub performs string substitution, !Ref returns the bucket name, Export makes the output available to other stacks.
+
+#@@@@@@@@@@
+
+9. What is the difference between SNS and SQS?
+
+Answer: SNS (Simple Notification Service) is pub/sub messaging for fan-out scenarios, delivers messages to multiple subscribers simultaneously. SQS (Simple Queue Service) is message queuing for decoupling applications, point-to-point communication. SNS for broadcasting, SQS for reliable message processing.
+
+#@@@@@@@@@@
+
+10. Which of the following are valid DynamoDB data types? (Multiple correct)
+A) String (S)
+B) Number (N)
+C) Binary (B)
+D) Boolean (BOOL)
+E) List (L)
+F) Map (M)
+
+Answer: A, B, C, D, E, F - All are valid DynamoDB data types. Scalar types: String, Number, Binary, Boolean. Document types: List, Map. Set types: String Set (SS), Number Set (NS), Binary Set (BS).
+
+#@@@@@@@@@@
+
+11. Complete this EKS cluster creation:
+```bash
+# Create EKS cluster
+eksctl create cluster \
+  --name my-cluster \
+  --version 1.24 \
+  --region us-west-2 \
+  --nodegroup-name standard-workers \
+  --node-type t3.medium \
+  --nodes 3 \
+  --nodes-min 1 \
+  --nodes-max 4 \
+  --managed
+
+# Configure kubectl
+aws eks update-kubeconfig --region us-west-2 --name _______________
+
+# Verify connection
+kubectl get nodes
+```
+
+Answer: `my-cluster` - The cluster name specified in the eksctl create command. update-kubeconfig configures kubectl to communicate with the specified EKS cluster.
+
+#@@@@@@@@@@
+
+12. How do you implement blue-green deployment on AWS?
+
+Answer: Use Elastic Load Balancer with two identical environments (blue/green). Deploy new version to green environment, test thoroughly, then switch traffic from blue to green using ELB target groups. Can use CodeDeploy, ECS, or Lambda for automated blue-green deployments.
+
+#@@@@@@@@@@
+
+13. Which of the following are valid CloudWatch metric types? (Multiple correct)
+A) Standard metrics
+B) Custom metrics
+C) High-resolution metrics
+D) Composite metrics
+E) Math expressions
+F) Log metrics
+
+Answer: A, B, C, D, E, F - All are valid CloudWatch metric types. Standard metrics from AWS services, Custom metrics from applications, High-resolution for sub-minute data, Composite metrics combining multiple metrics, Math expressions for calculations, Log metrics from log data.
+
+#@@@@@@@@@@
+
+14. Find the issue in this Lambda function:
+```python
+import boto3
+import json
+
+# Global variable - potential issue
+s3_client = boto3.client('s3')
+
+def lambda_handler(event, context):
+    bucket_name = event['bucket']
+    key = event['key']
+
+    # Download file
+    response = s3_client.get_object(Bucket=bucket_name, Key=key)
+    data = response['Body'].read()
+
+    # Process large file in memory - potential issue
+    processed_data = process_large_file(data)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'size': len(processed_data)})
+    }
+
+def process_large_file(data):
+    # Memory-intensive processing
+    return data * 2  # Doubles memory usage
+```
+
+Answer: Memory management issues - processing large files in Lambda's limited memory (128MB-10GB). Should use streaming processing, S3 Transfer Acceleration, or break into smaller chunks. Global S3 client is actually good practice for connection reuse.
+
+#@@@@@@@@@@
+
+15. What is the purpose of AWS Bedrock?
+
+Answer: AWS Bedrock provides access to foundation models (FMs) from leading AI companies through APIs. Enables building generative AI applications without managing infrastructure. Supports text generation, image generation, embeddings, and fine-tuning with models from Anthropic, Cohere, Meta, Stability AI, and Amazon.
+
+#@@@@@@@@@@
+
+16. Which of the following are valid EC2 instance types? (Multiple correct)
+A) t3.micro
+B) m5.large
+C) c5.xlarge
+D) r5.2xlarge
+E) p3.8xlarge
+F) z1d.medium
+
+Answer: A, B, C, D, E, F - All are valid EC2 instance types. t3 for burstable performance, m5 for general purpose, c5 for compute optimized, r5 for memory optimized, p3 for GPU instances, z1d for high frequency processors with NVMe SSD.
+
+#@@@@@@@@@@
+
+17. Complete this SageMaker training job:
+```python
+import boto3
+import sagemaker
+from sagemaker.estimator import Estimator
+
+# Initialize SageMaker session
+sagemaker_session = sagemaker.Session()
+role = sagemaker.get_execution_role()
+
+# Create estimator
+estimator = Estimator(
+    image_uri='382416733822.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest',
+    role=role,
+    instance_count=1,
+    instance_type='ml.m5.large',
+    output_path='s3://my-bucket/output',
+    sagemaker_session=sagemaker_session
+)
+
+# Set hyperparameters
+estimator.set_hyperparameters(
+    objective='reg:squarederror',
+    num_round=100,
+    max_depth=5
+)
+
+# Start training
+estimator.fit({'training': 's3://my-bucket/train.csv'})
+
+# Deploy model
+predictor = estimator._______________()
+```
+
+Answer: `deploy()` - Deploys trained model to SageMaker endpoint for real-time inference. Can specify instance_type and initial_instance_count for the endpoint configuration.
+
+#@@@@@@@@@@
+
+18. What is the difference between Application Load Balancer and Network Load Balancer?
+
+Answer: ALB operates at Layer 7 (HTTP/HTTPS), supports path-based routing, host-based routing, and WebSocket. NLB operates at Layer 4 (TCP/UDP), provides ultra-high performance, static IP addresses, and preserves source IP. ALB for web applications, NLB for extreme performance and non-HTTP protocols.
+
+#@@@@@@@@@@
+
+19. Find the bug in this DynamoDB query:
+```python
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Users')
+
+# Query with incorrect syntax
+response = table.query(
+    KeyConditionExpression='user_id = :uid',
+    ExpressionAttributeValues={
+        ':uid': '12345'
+    }
+)
+
+items = response['Items']
+```
+
+Answer: Missing Key() function in KeyConditionExpression. Should use `Key('user_id').eq('12345')` or proper expression syntax. Also need to import Key from boto3.dynamodb.conditions.
+
+#@@@@@@@@@@
+
+20. How do you implement cross-region replication for S3?
+
+Answer: Enable Cross-Region Replication (CRR) by creating replication rules in source bucket. Specify destination bucket, IAM role with replication permissions, and optional prefix/tag filters. Supports different storage classes, encryption, and ownership changes in destination.
+
+#@@@@@@@@@@
+
+21. Which of the following are valid Lambda triggers? (Multiple correct)
+A) S3 events
+B) DynamoDB streams
+C) API Gateway
+D) CloudWatch Events
+E) SNS
+F) Direct invocation
+
+Answer: A, B, C, D, E, F - All are valid Lambda triggers. S3 for object events, DynamoDB streams for data changes, API Gateway for HTTP requests, CloudWatch Events for scheduled/event-driven execution, SNS for message notifications, Direct invocation via SDK/CLI.
+
+#@@@@@@@@@@
+
+22. Complete this CloudFormation stack update:
+```bash
+# Update stack with new template
+aws cloudformation update-stack \
+  --stack-name my-stack \
+  --template-body file://template.yaml \
+  --parameters ParameterKey=Environment,ParameterValue=production \
+  --capabilities _______________
+
+# Wait for update to complete
+aws cloudformation wait stack-update-complete --stack-name my-stack
+
+# Check stack status
+aws cloudformation describe-stacks --stack-name my-stack
+```
+
+Answer: `CAPABILITY_IAM` or `CAPABILITY_NAMED_IAM` - Required when CloudFormation template creates or modifies IAM resources. CAPABILITY_NAMED_IAM needed for resources with custom names.
+
+#@@@@@@@@@@
+
+23. What is the purpose of AWS Systems Manager Parameter Store?
+
+Answer: Parameter Store provides secure, hierarchical storage for configuration data and secrets. Supports String, StringList, and SecureString (encrypted) parameter types. Integrates with IAM for access control, CloudTrail for auditing, and supports parameter versioning and notifications.
+
+#@@@@@@@@@@
+
+24. Which of the following are valid VPC components? (Multiple correct)
+A) Subnets
+B) Route Tables
+C) Internet Gateway
+D) NAT Gateway
+E) Security Groups
+F) Network ACLs
+
+Answer: A, B, C, D, E, F - All are valid VPC components. Subnets for network segmentation, Route Tables for traffic routing, Internet Gateway for internet access, NAT Gateway for outbound internet from private subnets, Security Groups for instance-level firewalls, NACLs for subnet-level firewalls.
+
+#@@@@@@@@@@
+
+25. Predict the output of this S3 lifecycle policy:
+```json
+{
+  "Rules": [
+    {
+      "ID": "TransitionRule",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "logs/"
+      },
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "STANDARD_IA"
+        },
+        {
+          "Days": 90,
+          "StorageClass": "GLACIER"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Answer: Objects with "logs/" prefix transition to Standard-IA after 30 days, then to Glacier after 90 days from creation. Reduces storage costs for infrequently accessed log files through automatic tiering.
+
+#@@@@@@@@@@
+
+26. How do you implement disaster recovery with RDS?
+
+Answer: Use Multi-AZ deployments for high availability, automated backups for point-in-time recovery, read replicas for read scaling and cross-region DR. Implement automated snapshots, manual snapshots for major changes, and cross-region snapshot copying for geographic redundancy.
+
+#@@@@@@@@@@
+
+27. Which of the following are valid ECS launch types? (Multiple correct)
+A) EC2
+B) Fargate
+C) Lambda
+D) EKS
+E) External
+
+Answer: A, B, E - Lambda and EKS are separate services. ECS launch types: EC2 for managing your own instances, Fargate for serverless containers, External for on-premises or other cloud providers (ECS Anywhere).
+
+#@@@@@@@@@@
+
+28. Find the issue in this API Gateway configuration:
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "My API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123456789012:function:GetUsers/invocations"
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: Mismatch between API method (GET) and integration httpMethod (POST). For Lambda proxy integration, httpMethod should always be POST regardless of the API method. The Lambda function receives the actual HTTP method in the event object.
+
+#@@@@@@@@@@
+
+29. What is the difference between CloudWatch Logs and CloudTrail?
+
+Answer: CloudWatch Logs collects and monitors log files from applications, systems, and AWS services for operational monitoring. CloudTrail records API calls and user activity for auditing and compliance. CloudWatch Logs for troubleshooting, CloudTrail for security and governance.
+
+#@@@@@@@@@@
+
+30. Which of the following are valid DynamoDB consistency models? (Multiple correct)
+A) Eventually consistent reads
+B) Strongly consistent reads
+C) Transactional reads
+D) Immediate consistency
+E) Causal consistency
+
+Answer: A, B, C - DynamoDB supports Eventually consistent reads (default, lower latency), Strongly consistent reads (higher latency, up-to-date data), and Transactional reads (ACID transactions across multiple items). Immediate and causal consistency are not DynamoDB terms.
+
+#@@@@@@@@@@
+
+31. Complete this Kubernetes deployment on EKS:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: my-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: AWS_REGION
+          value: us-west-2
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: _______________
+```
+
+Answer: `host` or `hostname` - The key name in the Kubernetes secret that contains the database host value. Secret keys are defined when creating the secret and referenced in valueFrom.secretKeyRef.key.
+
+#@@@@@@@@@@
+
+32. How do you implement cost optimization for EC2 instances?
+
+Answer: Use Reserved Instances for predictable workloads, Spot Instances for fault-tolerant applications, right-sizing based on CloudWatch metrics, Auto Scaling for dynamic capacity, Savings Plans for flexible commitments, and AWS Cost Explorer for analysis.
+
+#@@@@@@@@@@
+
+33. Which of the following are valid S3 event types? (Multiple correct)
+A) s3:ObjectCreated:*
+B) s3:ObjectRemoved:*
+C) s3:ObjectRestore:*
+D) s3:Replication:*
+E) s3:LifecycleTransition:*
+F) s3:BucketCreated:*
+
+Answer: A, B, C, D - S3 doesn't have BucketCreated or LifecycleTransition events. Valid events: ObjectCreated for new objects, ObjectRemoved for deletions, ObjectRestore for Glacier restores, Replication for cross-region replication events.
+
+#@@@@@@@@@@
+
+34. Find the bug in this Lambda function with SQS:
+```python
+import json
+import boto3
+
+def lambda_handler(event, context):
+    sqs = boto3.client('sqs')
+
+    for record in event['Records']:
+        # Process message
+        message_body = json.loads(record['body'])
+        process_message(message_body)
+
+        # Bug: manually deleting message
+        sqs.delete_message(
+            QueueUrl='https://sqs.us-east-1.amazonaws.com/123456789012/my-queue',
+            ReceiptHandle=record['receiptHandle']
+        )
+
+    return {'statusCode': 200}
+
+def process_message(message):
+    print(f"Processing: {message}")
+```
+
+Answer: Unnecessary manual message deletion. When Lambda is triggered by SQS, successful function execution automatically deletes messages. Manual deletion can cause errors if the message is already deleted or if the function fails after deletion.
+
+#@@@@@@@@@@
+
+35. What is the purpose of AWS Config?
+
+Answer: AWS Config tracks resource configurations and changes over time, evaluates compliance against rules, provides configuration history, and enables governance. Helps with security analysis, auditing, change management, and troubleshooting by maintaining detailed configuration snapshots.
+
+#@@@@@@@@@@
+
+36. Which of the following are valid CloudFormation template sections? (Multiple correct)
+A) AWSTemplateFormatVersion
+B) Description
+C) Parameters
+D) Resources
+E) Outputs
+F) Conditions
+
+Answer: A, B, C, D, E, F - All are valid CloudFormation template sections. AWSTemplateFormatVersion specifies template format, Description provides template info, Parameters for input values, Resources for AWS resources, Outputs for return values, Conditions for conditional resource creation.
+
+#@@@@@@@@@@
+
+37. Complete this DynamoDB Global Secondary Index:
+```python
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+
+table = dynamodb.create_table(
+    TableName='Orders',
+    KeySchema=[
+        {'AttributeName': 'order_id', 'KeyType': 'HASH'}
+    ],
+    AttributeDefinitions=[
+        {'AttributeName': 'order_id', 'AttributeType': 'S'},
+        {'AttributeName': 'customer_id', 'AttributeType': 'S'},
+        {'AttributeName': 'order_date', 'AttributeType': 'S'}
+    ],
+    GlobalSecondaryIndexes=[
+        {
+            'IndexName': 'CustomerIndex',
+            'KeySchema': [
+                {'AttributeName': 'customer_id', 'KeyType': 'HASH'},
+                {'AttributeName': 'order_date', 'KeyType': 'RANGE'}
+            ],
+            'Projection': {'ProjectionType': '_______________'},
+            'ProvisionedThroughput': {
+                'ReadCapacityUnits': 5,
+                'WriteCapacityUnits': 5
+            }
+        }
+    ],
+    ProvisionedThroughput={
+        'ReadCapacityUnits': 10,
+        'WriteCapacityUnits': 10
+    }
+)
+```
+
+Answer: `'ALL'` - Projects all attributes from the main table to the GSI. Other options: 'KEYS_ONLY' for key attributes only, 'INCLUDE' for specific attributes with IncludeProjection.
+
+#@@@@@@@@@@
+
+38. What is the difference between Security Groups and Network ACLs?
+
+Answer: Security Groups are stateful firewalls at instance level, allow rules only, automatically allow return traffic. Network ACLs are stateless firewalls at subnet level, support allow/deny rules, require explicit rules for return traffic. Security Groups for instance protection, NACLs for subnet-level control.
+
+#@@@@@@@@@@
+
+39. Find the issue in this Lambda function timeout:
+```python
+import time
+import boto3
+
+def lambda_handler(event, context):
+    # Long-running process
+    for i in range(1000):
+        # Simulate work
+        time.sleep(1)  # 1000 seconds total
+
+        # Check remaining time
+        remaining_time = context.get_remaining_time_in_millis()
+        print(f"Remaining time: {remaining_time}ms")
+
+        if remaining_time < 5000:  # Less than 5 seconds
+            break
+
+    return {'statusCode': 200, 'processed': i}
+```
+
+Answer: Lambda has maximum execution time of 15 minutes (900 seconds). The loop could run for 1000 seconds, exceeding the limit. Should break the work into smaller chunks, use Step Functions for long workflows, or process asynchronously with SQS.
+
+#@@@@@@@@@@
+
+40. How do you implement blue-green deployment with ECS?
+
+Answer: Use ECS services with Application Load Balancer target groups. Create new task definition, update service with new version, ALB gradually shifts traffic. Use CodeDeploy for automated blue-green deployments with rollback capabilities and traffic shifting controls.
+
+#@@@@@@@@@@
+
+41. Which of the following are valid RDS backup types? (Multiple correct)
+A) Automated backups
+B) Manual snapshots
+C) Point-in-time recovery
+D) Cross-region snapshots
+E) Incremental backups
+F) Real-time backups
+
+Answer: A, B, C, D - RDS doesn't have real-time backups or explicit incremental backups. Backup types: Automated backups with point-in-time recovery, Manual snapshots for specific points, Cross-region snapshot copying for DR. Automated backups are incremental but not explicitly called that.
+
+#@@@@@@@@@@
+
+42. Complete this CloudWatch custom metric:
+```python
+import boto3
+import datetime
+
+cloudwatch = boto3.client('cloudwatch')
+
+# Put custom metric
+response = cloudwatch.put_metric_data(
+    Namespace='MyApp/Performance',
+    MetricData=[
+        {
+            'MetricName': 'ProcessingTime',
+            'Value': 123.45,
+            'Unit': 'Seconds',
+            'Timestamp': datetime.datetime.utcnow(),
+            'Dimensions': [
+                {
+                    'Name': 'Environment',
+                    'Value': 'Production'
+                },
+                {
+                    'Name': 'Service',
+                    'Value': _______________
+                }
+            ]
+        }
+    ]
+)
+```
+
+Answer: `'OrderProcessor'` or any service name - Dimensions help categorize and filter metrics. Common dimension values include service names, environment types, instance IDs, or any categorical data for metric organization.
+
+#@@@@@@@@@@
+
+43. What is the purpose of AWS Step Functions?
+
+Answer: Step Functions orchestrates distributed applications using visual workflows. Coordinates AWS services, handles error handling and retries, supports parallel execution, and provides state management. Ideal for microservices orchestration, data processing pipelines, and complex business workflows.
+
+#@@@@@@@@@@
+
+44. Which of the following are valid Lambda runtime environments? (Multiple correct)
+A) Python 3.9
+B) Node.js 18.x
+C) Java 11
+D) .NET 6
+E) Go 1.x
+F) Ruby 2.7
+
+Answer: A, B, C, D, E, F - All are valid Lambda runtimes. AWS supports multiple versions of Python, Node.js, Java, .NET, Go, Ruby, and also provides custom runtime API for other languages.
+
+#@@@@@@@@@@
+
+45. Find the bug in this S3 presigned URL:
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+s3_client = boto3.client('s3')
+
+def generate_presigned_url(bucket_name, object_name, expiration=3600):
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': object_name},
+            ExpiresIn=expiration
+        )
+        return response
+    except ClientError as e:
+        return None
+
+# Usage - potential security issue
+url = generate_presigned_url('my-bucket', 'sensitive-file.txt', 86400)  # 24 hours
+print(f"Download URL: {url}")
+```
+
+Answer: Excessive expiration time (24 hours) for sensitive files creates security risk. Presigned URLs should have minimal expiration times. Also, no validation of bucket/object existence or user permissions before generating URL.
+
+#@@@@@@@@@@
+
+46. How do you implement cross-account access for S3?
+
+Answer: Use bucket policies to grant cross-account access, IAM roles for assume-role access, or Access Control Lists (ACLs) for object-level permissions. Bucket policies are preferred for programmatic access, IAM roles for temporary access with STS.
+
+#@@@@@@@@@@
+
+47. Which of the following are valid EKS node group types? (Multiple correct)
+A) Managed node groups
+B) Self-managed node groups
+C) Fargate profiles
+D) Spot node groups
+E) GPU node groups
+F) ARM node groups
+
+Answer: A, B, C, D, E, F - All are valid EKS compute options. Managed node groups for AWS-managed EC2 instances, Self-managed for custom control, Fargate for serverless pods, Spot for cost optimization, GPU for ML workloads, ARM for cost-effective computing.
+
+#@@@@@@@@@@
+
+48. Complete this DynamoDB transaction:
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.resource('dynamodb')
+
+def transfer_points(from_user, to_user, points):
+    try:
+        response = dynamodb.meta.client.transact_write_items(
+            TransactItems=[
+                {
+                    'Update': {
+                        'TableName': 'Users',
+                        'Key': {'user_id': {'S': from_user}},
+                        'UpdateExpression': 'ADD points :val',
+                        'ExpressionAttributeValues': {':val': {'N': str(-points)}},
+                        'ConditionExpression': 'points >= :val'
+                    }
+                },
+                {
+                    'Update': {
+                        'TableName': 'Users',
+                        'Key': {'user_id': {'S': to_user}},
+                        'UpdateExpression': 'ADD points :val',
+                        'ExpressionAttributeValues': {':val': {'N': str(points)}}
+                    }
+                }
+            ]
+        )
+        return True
+    except ClientError as e:
+        if e.response['Error']['Code'] == '_______________':
+            print("Transaction failed due to condition check")
+            return False
+        raise
+```
+
+Answer: `'TransactionCanceledException'` - Thrown when transaction fails due to condition check failures, conflicts, or validation errors. Indicates one or more transaction items couldn't be processed.
+
+#@@@@@@@@@@
+
+49. What is the difference between CloudFront and Global Accelerator?
+
+Answer: CloudFront is a CDN for caching static/dynamic content at edge locations, optimizes web content delivery. Global Accelerator uses AWS global network to route traffic to optimal endpoints, improves performance for any TCP/UDP application. CloudFront for web content, Global Accelerator for application acceleration.
+
+#@@@@@@@@@@
+
+50. Which of the following are valid IAM policy elements? (Multiple correct)
+A) Version
+B) Statement
+C) Effect
+D) Action
+E) Resource
+F) Principal
+
+Answer: A, B, C, D, E, F - All are valid IAM policy elements. Version specifies policy language version, Statement contains policy logic, Effect allows/denies, Action specifies operations, Resource identifies targets, Principal specifies who (for resource-based policies).
+
+#@@@@@@@@@@
+
+51. Predict the output of this Auto Scaling policy:
+```json
+{
+  "PolicyName": "ScaleUpPolicy",
+  "PolicyType": "TargetTrackingScaling",
+  "TargetTrackingConfiguration": {
+    "TargetValue": 70.0,
+    "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ASGAverageCPUUtilization"
+    },
+    "ScaleOutCooldown": 300,
+    "ScaleInCooldown": 300
+  }
+}
+```
+
+Answer: Auto Scaling maintains average CPU utilization around 70%. Scales out when CPU > 70% (adds instances), scales in when CPU < 70% (removes instances). 300-second cooldown prevents rapid scaling actions, ensuring stability.
+
+#@@@@@@@@@@
+
+52. How do you implement database connection pooling in Lambda?
+
+Answer: Use global variables to reuse database connections across invocations, implement connection pooling libraries (like connection-pool for Node.js), use RDS Proxy for managed connection pooling, or leverage container reuse in Lambda execution environment.
+
+#@@@@@@@@@@
+
+53. Which of the following are valid CloudWatch alarm states? (Multiple correct)
+A) OK
+B) ALARM
+C) INSUFFICIENT_DATA
+D) PENDING
+E) DISABLED
+F) ERROR
+
+Answer: A, B, C - CloudWatch alarms have three states: OK (metric within threshold), ALARM (metric breached threshold), INSUFFICIENT_DATA (not enough data to determine state). PENDING, DISABLED, and ERROR are not valid alarm states.
+
+#@@@@@@@@@@
+
+54. Find the issue in this ECS task definition:
+```json
+{
+  "family": "my-app",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "my-app:latest",
+      "memory": 1024,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Answer: Memory mismatch - task memory is 512MB but container memory is 1024MB. Container memory cannot exceed task memory. Also, hostPort should not be specified for Fargate with awsvpc network mode.
+
+#@@@@@@@@@@
+
+55. What is the purpose of AWS Secrets Manager?
+
+Answer: Secrets Manager securely stores, retrieves, and rotates database credentials, API keys, and other secrets. Provides automatic rotation, fine-grained access control, audit logging, and integration with AWS services. Eliminates hardcoded credentials and enables centralized secret management.
+
+#@@@@@@@@@@
+
+56. Which of the following are valid S3 bucket naming rules? (Multiple correct)
+A) Must be globally unique
+B) 3-63 characters long
+C) Can contain uppercase letters
+D) Can start with a number
+E) Cannot contain periods
+F) Must be DNS-compliant
+
+Answer: A, B, D, F - S3 bucket names must be globally unique, 3-63 characters, DNS-compliant, can start with numbers. Cannot contain uppercase letters or consecutive periods. Must start and end with lowercase letter or number.
+
+#@@@@@@@@@@
+
+57. Complete this CodePipeline configuration:
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: S3
+                Version: '1'
+              Configuration:
+                S3Bucket: !Ref SourceBucket
+                S3ObjectKey: source.zip
+              OutputArtifacts:
+                - Name: SourceOutput
+        - Name: Deploy
+          Actions:
+            - Name: DeployAction
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: _______________
+                Version: '1'
+              Configuration:
+                ApplicationName: !Ref CodeDeployApplication
+                DeploymentGroupName: !Ref DeploymentGroup
+              InputArtifacts:
+                - Name: SourceOutput
+```
+
+Answer: `CodeDeploy` - AWS CodeDeploy provider for deployment actions in CodePipeline. Other common providers include CloudFormation, ECS, Lambda, S3, and ElasticBeanstalk.
+
+#@@@@@@@@@@
+
+58. What is the difference between RDS and Aurora?
+
+Answer: Aurora is AWS's cloud-native database built for the cloud, offering better performance (5x MySQL, 3x PostgreSQL), automatic scaling, continuous backup to S3, and multi-master capabilities. RDS is managed traditional databases. Aurora for cloud-native apps, RDS for existing database compatibility.
+
+#@@@@@@@@@@
+
+59. Find the bug in this Lambda environment variable:
+```python
+import os
+import boto3
+
+def lambda_handler(event, context):
+    # Get environment variables
+    db_host = os.environ['DB_HOST']
+    db_password = os.environ['DB_PASSWORD']  # Security issue
+
+    # Connect to database
+    connection = connect_to_db(db_host, db_password)
+
+    # Process request
+    result = process_request(event, connection)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps(result)
+    }
+
+def connect_to_db(host, password):
+    # Database connection logic
+    pass
+```
+
+Answer: Storing sensitive data (password) in environment variables is insecure. Environment variables are visible in Lambda console and logs. Should use AWS Secrets Manager or Systems Manager Parameter Store with SecureString for sensitive data.
+
+#@@@@@@@@@@
+
+60. How do you implement canary deployments with Lambda?
+
+Answer: Use Lambda aliases and weighted routing to split traffic between versions. Create alias pointing to new version with small weight (5-10%), monitor metrics, gradually increase weight if successful. Use CodeDeploy for automated canary deployments with rollback capabilities.
+
+#@@@@@@@@@@
+
+61. Which of the following are valid DynamoDB stream record types? (Multiple correct)
+A) INSERT
+B) MODIFY
+C) REMOVE
+D) UPDATE
+E) DELETE
+F) CREATE
+
+Answer: A, B, C - DynamoDB Streams record types: INSERT for new items, MODIFY for updated items, REMOVE for deleted items. UPDATE, DELETE, and CREATE are not valid stream record types.
+
+#@@@@@@@@@@
+
+62. Complete this VPC endpoint configuration:
+```json
+{
+  "Type": "AWS::EC2::VPCEndpoint",
+  "Properties": {
+    "VpcId": {"Ref": "MyVPC"},
+    "ServiceName": "com.amazonaws.us-east-1.s3",
+    "VpcEndpointType": "_______________",
+    "RouteTableIds": [
+      {"Ref": "PrivateRouteTable"}
+    ],
+    "PolicyDocument": {
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": "*",
+          "Action": "s3:*",
+          "Resource": "*"
+        }
+      ]
+    }
+  }
+}
+```
+
+Answer: `Gateway` - S3 and DynamoDB use Gateway VPC endpoints that route through route tables. Interface VPC endpoints use ENIs for other AWS services. Gateway endpoints are free, Interface endpoints have hourly charges.
+
+#@@@@@@@@@@
+
+63. What is the purpose of AWS X-Ray?
+
+Answer: X-Ray provides distributed tracing for applications, helping analyze performance bottlenecks, debug errors, and understand service dependencies. Traces requests across microservices, provides service maps, and integrates with Lambda, ECS, API Gateway, and other AWS services.
+
+#@@@@@@@@@@
+
+64. Which of the following are valid CloudFormation stack states? (Multiple correct)
+A) CREATE_COMPLETE
+B) UPDATE_IN_PROGRESS
+C) DELETE_FAILED
+D) ROLLBACK_COMPLETE
+E) REVIEW_IN_PROGRESS
+F) IMPORT_COMPLETE
+
+Answer: A, B, C, D, E, F - All are valid CloudFormation stack states. Stacks progress through various states during create, update, delete, rollback, review, and import operations.
+
+#@@@@@@@@@@
+
+65. Find the issue in this SQS message processing:
+```python
+import boto3
+import json
+
+sqs = boto3.client('sqs')
+queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/my-queue'
+
+def process_messages():
+    while True:
+        # Receive messages
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            MaxNumberOfMessages=10,
+            WaitTimeSeconds=20
+        )
+
+        messages = response.get('Messages', [])
+
+        for message in messages:
+            try:
+                # Process message
+                body = json.loads(message['Body'])
+                process_message(body)
+
+                # Delete message after processing
+                sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=message['ReceiptHandle']
+                )
+            except Exception as e:
+                print(f"Error processing message: {e}")
+                # Bug: not handling failed messages properly
+                pass
+
+def process_message(body):
+    # Message processing logic
+    pass
+```
+
+Answer: Failed messages are not handled properly - they remain in queue and will be reprocessed. Should implement dead letter queue for failed messages, use visibility timeout extension for long processing, or move failed messages to error queue.
+
+#@@@@@@@@@@
+
+66. How do you implement multi-region deployment with Route 53?
+
+Answer: Use Route 53 health checks and failover routing policies. Configure primary and secondary regions, set up health checks for each region, use failover routing to automatically switch traffic to healthy region. Can also use geolocation or latency-based routing.
+
+#@@@@@@@@@@
+
+67. Which of the following are valid Elastic Beanstalk deployment policies? (Multiple correct)
+A) All at once
+B) Rolling
+C) Rolling with additional batch
+D) Immutable
+E) Blue/Green
+F) Canary
+
+Answer: A, B, C, D, E - Elastic Beanstalk deployment policies: All at once (fastest, downtime), Rolling (no downtime, reduced capacity), Rolling with additional batch (no downtime, full capacity), Immutable (safest, new instances), Blue/Green (manual traffic switching). Canary is not a Beanstalk policy.
+
+#@@@@@@@@@@
+
+68. Complete this API Gateway Lambda authorizer:
+```python
+import json
+
+def lambda_handler(event, context):
+    token = event['authorizationToken']
+    method_arn = event['methodArn']
+
+    # Validate token
+    if validate_token(token):
+        effect = 'Allow'
+        principal_id = get_user_id(token)
+    else:
+        effect = 'Deny'
+        principal_id = 'unauthorized'
+
+    # Build policy
+    policy = {
+        'principalId': principal_id,
+        'policyDocument': {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Effect': effect,
+                    'Resource': method_arn
+                }
+            ]
+        },
+        'context': {
+            'userId': principal_id,
+            'role': get_user_role(token) if effect == 'Allow' else None
+        }
+    }
+
+    return _______________
+
+def validate_token(token):
+    # Token validation logic
+    return True
+
+def get_user_id(token):
+    return 'user123'
+
+def get_user_role(token):
+    return 'admin'
+```
+
+Answer: `policy` - Lambda authorizer must return the policy document with principalId, policyDocument, and optional context. API Gateway caches the policy for the principal.
+
+#@@@@@@@@@@
+
+69. What is the difference between EBS and Instance Store?
+
+Answer: EBS provides persistent, network-attached storage that survives instance termination, supports snapshots and encryption. Instance Store provides temporary, high-performance local storage that's lost on instance stop/termination. EBS for persistent data, Instance Store for temporary/cache data.
+
+#@@@@@@@@@@
+
+70. Which of the following are valid Lambda event source mappings? (Multiple correct)
+A) DynamoDB Streams
+B) Kinesis Data Streams
+C) SQS
+D) MSK (Kafka)
+E) S3
+F) SNS
+
+Answer: A, B, C, D - Event source mappings: DynamoDB Streams, Kinesis, SQS, MSK for poll-based invocation. S3 and SNS use push-based invocation (event notifications), not event source mappings.
+
+#@@@@@@@@@@
+
+71. Predict the output of this CloudWatch dashboard:
+```json
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          ["AWS/Lambda", "Duration", "FunctionName", "MyFunction"],
+          ["AWS/Lambda", "Errors", "FunctionName", "MyFunction"],
+          ["AWS/Lambda", "Invocations", "FunctionName", "MyFunction"]
+        ],
+        "period": 300,
+        "stat": "Average",
+        "region": "us-east-1",
+        "title": "Lambda Metrics"
+      }
+    }
+  ]
+}
+```
+
+Answer: Creates CloudWatch dashboard with single metric widget showing Lambda function metrics: average duration, errors, and invocations over 5-minute periods. Provides visual monitoring of Lambda function performance and health.
+
+#@@@@@@@@@@
+
+72. How do you implement cross-account IAM role assumption?
+
+Answer: Create IAM role in target account with trust policy allowing source account. In source account, grant sts:AssumeRole permission to users/roles. Use AWS STS AssumeRole API to obtain temporary credentials for cross-account access.
+
+#@@@@@@@@@@
+
+73. Which of the following are valid S3 server-side encryption options? (Multiple correct)
+A) SSE-S3 (AES-256)
+B) SSE-KMS
+C) SSE-C (Customer-provided keys)
+D) SSE-EBS
+E) Client-side encryption
+F) SSE-CloudHSM
+
+Answer: A, B, C, E - Valid S3 encryption: SSE-S3 with AES-256, SSE-KMS with AWS KMS keys, SSE-C with customer-provided keys, Client-side encryption. SSE-EBS is for EBS volumes, SSE-CloudHSM is not a standard S3 option.
+
+#@@@@@@@@@@
+
+74. Find the bug in this RDS connection:
+```python
+import pymysql
+import boto3
+
+def get_db_connection():
+    # Get RDS endpoint from environment
+    rds_endpoint = os.environ['RDS_ENDPOINT']
+
+    # Bug: hardcoded credentials
+    connection = pymysql.connect(
+        host=rds_endpoint,
+        user='admin',
+        password='mypassword123',
+        database='myapp',
+        charset='utf8mb4'
+    )
+
+    return connection
+
+def lambda_handler(event, context):
+    # Create new connection for each invocation - inefficient
+    conn = get_db_connection()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        results = cursor.fetchall()
+        return {'statusCode': 200, 'body': json.dumps(results)}
+    finally:
+        conn.close()
+```
+
+Answer: Multiple issues: hardcoded credentials (use Secrets Manager), creating new connection per invocation (use connection pooling/global variables), and potential security exposure. Should use IAM database authentication or Secrets Manager for credentials.
+
+#@@@@@@@@@@
+
+75. What is the purpose of AWS EventBridge?
+
+Answer: EventBridge is a serverless event bus service for building event-driven applications. Routes events between AWS services, SaaS applications, and custom applications. Supports event filtering, transformation, and replay. Enables loose coupling and real-time application integration.
+
+#@@@@@@@@@@
+
+76. Which of the following are valid EC2 placement groups? (Multiple correct)
+A) Cluster
+B) Partition
+C) Spread
+D) Availability
+E) Regional
+F) Dedicated
+
+Answer: A, B, C - EC2 placement groups: Cluster for low latency within single AZ, Partition for distributed applications across logical partitions, Spread for critical instances on distinct hardware. Availability, Regional, and Dedicated are not placement group types.
+
+#@@@@@@@@@@
+
+77. Complete this SageMaker endpoint deployment:
+```python
+import boto3
+import sagemaker
+
+# Create SageMaker client
+sm_client = boto3.client('sagemaker')
+
+# Deploy model to endpoint
+endpoint_config_name = 'my-model-config'
+endpoint_name = 'my-model-endpoint'
+
+# Create endpoint configuration
+sm_client.create_endpoint_config(
+    EndpointConfigName=endpoint_config_name,
+    ProductionVariants=[
+        {
+            'VariantName': 'primary',
+            'ModelName': 'my-trained-model',
+            'InitialInstanceCount': 1,
+            'InstanceType': 'ml.m5.large',
+            'InitialVariantWeight': 1.0
+        }
+    ]
+)
+
+# Create endpoint
+sm_client.create_endpoint(
+    EndpointName=endpoint_name,
+    EndpointConfigName=endpoint_config_name
+)
+
+# Wait for endpoint to be in service
+waiter = sm_client.get_waiter('_______________')
+waiter.wait(EndpointName=endpoint_name)
+
+print(f"Endpoint {endpoint_name} is ready for inference")
+```
+
+Answer: `'endpoint_in_service'` - SageMaker waiter that polls until endpoint status becomes 'InService'. Other waiters include 'training_job_completed_or_stopped' and 'transform_job_completed_or_stopped'.
+
+#@@@@@@@@@@
+
+78. What is the difference between Kinesis Data Streams and Kinesis Data Firehose?
+
+Answer: Data Streams provides real-time data streaming with custom processing, requires manual scaling, data retention 1-365 days. Data Firehose delivers streaming data to destinations (S3, Redshift, etc.), auto-scaling, near real-time (60s minimum). Streams for real-time processing, Firehose for data delivery.
+
+#@@@@@@@@@@
+
+79. Find the issue in this CloudFormation nested stack:
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-bucket/network-template.yaml
+      Parameters:
+        VpcCidr: 10.0.0.0/16
+
+  ApplicationStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-bucket/app-template.yaml
+      Parameters:
+        VpcId: !GetAtt NetworkStack.Outputs.VpcId
+        SubnetId: !GetAtt NetworkStack.Outputs.SubnetId
+    # Missing dependency
+```
+
+Answer: Missing DependsOn property. ApplicationStack should depend on NetworkStack to ensure proper creation order: `DependsOn: NetworkStack`. Without explicit dependency, CloudFormation might try to create stacks in parallel, causing failures.
+
+#@@@@@@@@@@
+
+80. How do you implement cost allocation tags in AWS?
+
+Answer: Apply consistent tags to resources (Environment, Project, Owner), activate cost allocation tags in Billing console, use AWS Cost Explorer and Cost and Usage Reports for analysis. Implement tag policies with AWS Organizations for governance and automated cost tracking.
+
+#@@@@@@@@@@
+
+81. Which of the following are valid DynamoDB query operations? (Multiple correct)
+A) Query by partition key
+B) Query by sort key only
+C) Query with filter expressions
+D) Query with projection expressions
+E) Query across multiple partitions
+F) Query with global secondary index
+
+Answer: A, C, D, F - DynamoDB Query operations: by partition key (required), with filter expressions for additional filtering, with projection expressions for specific attributes, on GSI for different access patterns. Cannot query by sort key only or across multiple partitions.
+
+#@@@@@@@@@@
+
+82. Complete this Lambda Layer usage:
+```python
+# Lambda function using layer
+import json
+import sys
+
+# Add layer to Python path
+sys.path.append('/opt/python')
+
+# Import from layer
+from my_layer_module import utility_function
+import requests  # From layer
+
+def lambda_handler(event, context):
+    # Use layer function
+    result = utility_function(event['data'])
+
+    # Use layer library
+    response = requests.get('https://api.example.com/data')
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'result': result,
+            'api_data': response.json()
+        })
+    }
+
+# Layer structure should be:
+# layer.zip
+# └── python/
+#     ├── my_layer_module.py
+#     └── requests/
+```
+
+Answer: Layer path `/opt/python` is correct for Python runtime. Layers are extracted to /opt directory, and Python libraries should be in /opt/python. Other runtimes use different paths: Node.js uses /opt/nodejs/node_modules, Java uses /opt/java/lib.
+
+#@@@@@@@@@@
+
+83. What is the purpose of AWS WAF?
+
+Answer: WAF (Web Application Firewall) protects web applications from common attacks like SQL injection, XSS, and DDoS. Provides customizable rules, rate limiting, IP blocking, and geographic restrictions. Integrates with CloudFront, ALB, and API Gateway for comprehensive protection.
+
+#@@@@@@@@@@
+
+84. Which of the following are valid CloudWatch log retention periods? (Multiple correct)
+A) 1 day
+B) 7 days
+C) 30 days
+D) 1 year
+E) 10 years
+F) Never expire
+
+Answer: A, B, C, D, E, F - CloudWatch Logs supports retention periods from 1 day to 10 years, plus never expire option. Common periods: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 days, and never expire.
+
+#@@@@@@@@@@
+
+85. Find the bug in this API Gateway CORS configuration:
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "My API"
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "CORS preflight",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string"
+              },
+              "Access-Control-Allow-Methods": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: Missing Access-Control-Allow-Headers in OPTIONS response for preflight requests. Also, headers should specify actual values, not just types. Should include headers like "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token".
+
+#@@@@@@@@@@
+
+86. How do you implement database read replicas with RDS?
+
+Answer: Create read replicas in same or different regions, configure applications to route read traffic to replicas, use connection pooling for efficient connections. Read replicas provide read scaling, disaster recovery, and can be promoted to standalone databases.
+
+#@@@@@@@@@@
+
+87. Which of the following are valid Lambda concurrency types? (Multiple correct)
+A) Reserved concurrency
+B) Provisioned concurrency
+C) Unreserved concurrency
+D) Burst concurrency
+E) Auto concurrency
+F) Scheduled concurrency
+
+Answer: A, B, C - Lambda concurrency types: Reserved concurrency (dedicated capacity), Provisioned concurrency (pre-warmed instances), Unreserved concurrency (shared pool). Burst, Auto, and Scheduled concurrency are not valid Lambda terms.
+
+#@@@@@@@@@@
+
+88. Complete this ECS service with load balancer:
+```json
+{
+  "serviceName": "my-app-service",
+  "cluster": "my-cluster",
+  "taskDefinition": "my-app:1",
+  "desiredCount": 3,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["subnet-12345", "subnet-67890"],
+      "securityGroups": ["sg-abcdef"],
+      "assignPublicIp": "ENABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/my-targets/1234567890123456",
+      "containerName": "my-app",
+      "containerPort": _______________
+    }
+  ]
+}
+```
+
+Answer: `8080` or the port number exposed by the container - Must match the containerPort defined in the task definition. ECS registers tasks with the target group using this port for health checks and traffic routing.
+
+#@@@@@@@@@@
+
+89. What is the difference between AWS Config and CloudTrail?
+
+Answer: Config tracks resource configurations and compliance over time, focuses on "what changed" in resource state. CloudTrail logs API calls and user activities, focuses on "who did what when". Config for compliance monitoring, CloudTrail for security auditing and troubleshooting.
+
+#@@@@@@@@@@
+
+90. Which of the following are valid S3 Cross-Origin Resource Sharing (CORS) methods? (Multiple correct)
+A) GET
+B) PUT
+C) POST
+D) DELETE
+E) HEAD
+F) PATCH
+
+Answer: A, B, C, D, E, F - All are valid HTTP methods for S3 CORS configuration. CORS rules specify which origins can access bucket resources and which HTTP methods are allowed for cross-origin requests.
+
+#@@@@@@@@@@
+
+91. Predict the output of this Lambda function with SQS DLQ:
+```python
+import json
+
+def lambda_handler(event, context):
+    for record in event['Records']:
+        message_body = json.loads(record['body'])
+
+        # Simulate processing failure
+        if message_body.get('fail', False):
+            raise Exception("Processing failed")
+
+        print(f"Processed: {message_body}")
+
+    return {'statusCode': 200}
+
+# SQS configuration:
+# - maxReceiveCount: 3
+# - Dead Letter Queue configured
+```
+
+Answer: Messages with 'fail': true will be retried 3 times, then moved to Dead Letter Queue. Successful messages are processed normally and deleted from source queue. Failed messages don't affect processing of other messages in the batch.
+
+#@@@@@@@@@@
+
+92. How do you implement blue-green deployment with Route 53?
+
+Answer: Use Route 53 weighted routing policies to gradually shift traffic between blue and green environments. Start with 100% traffic to blue, deploy to green, test, then gradually increase green weight (10%, 50%, 100%) while monitoring metrics. Instant rollback by changing weights.
+
+#@@@@@@@@@@
+
+93. Which of the following are valid EBS volume types? (Multiple correct)
+A) gp3 (General Purpose SSD)
+B) io2 (Provisioned IOPS SSD)
+C) st1 (Throughput Optimized HDD)
+D) sc1 (Cold HDD)
+E) magnetic (Previous Generation)
+F) nvme (NVMe SSD)
+
+Answer: A, B, C, D, E - Valid EBS types: gp3/gp2 for general purpose, io2/io1 for high IOPS, st1 for throughput-optimized, sc1 for cold storage, magnetic for previous generation. NVMe is interface type, not volume type.
+
+#@@@@@@@@@@
+
+94. Find the issue in this Lambda function memory configuration:
+```python
+import json
+import numpy as np
+
+def lambda_handler(event, context):
+    # Process large dataset
+    data_size = event.get('size', 1000000)
+
+    # Create large numpy array - memory intensive
+    large_array = np.random.rand(data_size, data_size)
+
+    # Process array
+    result = np.sum(large_array)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'result': float(result)})
+    }
+
+# Lambda configuration: 128 MB memory
+```
+
+Answer: Insufficient memory allocation. Creating 1M x 1M float64 array requires ~8GB memory, but Lambda is configured with only 128MB. Should increase memory allocation or process data in chunks to avoid memory errors.
+
+#@@@@@@@@@@
+
+95. What is the purpose of AWS Systems Manager Session Manager?
+
+Answer: Session Manager provides secure shell access to EC2 instances without SSH keys, bastion hosts, or open inbound ports. Uses IAM for access control, logs sessions to CloudWatch/S3, supports port forwarding, and enables secure remote management through AWS console or CLI.
+
+#@@@@@@@@@@
+
+96. Which of the following are valid AWS Lambda deployment packages? (Multiple correct)
+A) ZIP file
+B) Container image
+C) JAR file
+D) TAR file
+E) Docker image
+F) OCI image
+
+Answer: A, B, E, F - Lambda supports ZIP files (up to 50MB direct upload, 250MB via S3) and container images (up to 10GB). Docker images and OCI-compatible images are supported. JAR files must be packaged in ZIP, TAR is not supported.
+
+#@@@@@@@@@@
+
+97. Complete this DynamoDB batch operation:
+```python
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Users')
+
+def batch_write_users(users):
+    with table.batch_writer() as batch:
+        for user in users:
+            batch.put_item(Item=user)
+
+def batch_get_users(user_ids):
+    response = dynamodb.batch_get_item(
+        RequestItems={
+            'Users': {
+                'Keys': [{'user_id': uid} for uid in user_ids],
+                'ProjectionExpression': 'user_id, #name, email',
+                'ExpressionAttributeNames': {
+                    '#name': _______________
+                }
+            }
+        }
+    )
+    return response['Responses']['Users']
+```
+
+Answer: `'name'` - DynamoDB reserved word that needs expression attribute name mapping. Other reserved words include 'status', 'data', 'timestamp', 'type', etc. Use ExpressionAttributeNames to avoid conflicts.
+
+#@@@@@@@@@@
+
+98. What is the difference between AWS Fargate and EC2 launch types in ECS?
+
+Answer: Fargate is serverless - AWS manages infrastructure, automatic scaling, pay per task. EC2 launch type - you manage instances, more control over infrastructure, potentially lower costs for consistent workloads. Fargate for simplicity, EC2 for control and optimization.
+
+#@@@@@@@@@@
+
+99. Find the bug in this CloudWatch alarm:
+```json
+{
+  "AlarmName": "HighCPUUtilization",
+  "ComparisonOperator": "GreaterThanThreshold",
+  "EvaluationPeriods": 2,
+  "MetricName": "CPUUtilization",
+  "Namespace": "AWS/EC2",
+  "Period": 300,
+  "Statistic": "Average",
+  "Threshold": 80.0,
+  "ActionsEnabled": true,
+  "AlarmActions": [
+    "arn:aws:sns:us-east-1:123456789012:high-cpu-topic"
+  ],
+  "Dimensions": [
+    {
+      "Name": "InstanceId",
+      "Value": "i-1234567890abcdef0"
+    }
+  ],
+  "Unit": "Percent",
+  "TreatMissingData": "breaching"
+}
+```
+
+Answer: TreatMissingData set to "breaching" can cause false alarms when instance is stopped or terminated. Should use "notBreaching" or "ignore" for EC2 instances to avoid alarms during maintenance or scaling events.
+
+#@@@@@@@@@@
+
+100. How do you implement disaster recovery with multi-region architecture?
+
+Answer: Use Route 53 health checks and failover routing, replicate data with S3 Cross-Region Replication or DynamoDB Global Tables, deploy applications in multiple regions, implement automated failover with Lambda or Step Functions, and regularly test DR procedures.
+
+#@@@@@@@@@@
+
+101. Which of the following are valid S3 Transfer Acceleration endpoints? (Multiple correct)
+A) bucketname.s3-accelerate.amazonaws.com
+B) bucketname.s3-accelerate.dualstack.amazonaws.com
+C) s3-accelerate.amazonaws.com
+D) bucketname.s3.amazonaws.com
+E) bucketname.s3-accelerate.region.amazonaws.com
+
+Answer: A, B - Transfer Acceleration endpoints: standard accelerate endpoint and dualstack (IPv4/IPv6) accelerate endpoint. Regular S3 endpoints don't provide acceleration. Region-specific accelerate endpoints don't exist.
+
+#@@@@@@@@@@
+
+102. Complete this Step Functions state machine:
+```json
+{
+  "Comment": "Process order workflow",
+  "StartAt": "ValidateOrder",
+  "States": {
+    "ValidateOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ValidateOrder",
+      "Next": "ProcessPayment",
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationError"],
+          "Next": "OrderFailed"
+        }
+      ]
+    },
+    "ProcessPayment": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ProcessPayment",
+      "Next": "ShipOrder",
+      "Retry": [
+        {
+          "ErrorEquals": ["PaymentTimeout"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ]
+    },
+    "ShipOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ShipOrder",
+      "End": true
+    },
+    "OrderFailed": {
+      "Type": "_______________",
+      "Cause": "Order validation failed"
+    }
+  }
+}
+```
+
+Answer: `"Fail"` - Step Functions Fail state terminates execution with error. Other state types include Pass, Wait, Choice, Parallel, Map, and Succeed for successful termination.
+
+#@@@@@@@@@@
+
+103. What is the purpose of AWS CloudHSM?
+
+Answer: CloudHSM provides dedicated hardware security modules for cryptographic operations, key management, and compliance requirements (FIPS 140-2 Level 3). Offers single-tenant hardware, customer-controlled encryption keys, and integration with AWS services for high-security applications.
+
+#@@@@@@@@@@
+
+104. Which of the following are valid RDS Multi-AZ deployment benefits? (Multiple correct)
+A) High availability
+B) Automatic failover
+C) Read scaling
+D) Backup from standby
+E) Maintenance with minimal downtime
+F) Cross-region disaster recovery
+
+Answer: A, B, D, E - Multi-AZ provides high availability, automatic failover, backups from standby (reduces I/O impact), and maintenance with minimal downtime. Does not provide read scaling (use read replicas) or cross-region DR (use cross-region read replicas).
+
+#@@@@@@@@@@
+
+105. Find the issue in this Lambda function with API Gateway:
+```python
+import json
+
+def lambda_handler(event, context):
+    # Extract request data
+    http_method = event['httpMethod']
+    path = event['path']
+    query_params = event['queryStringParameters']
+    body = event['body']
+
+    if http_method == 'GET':
+        # Process GET request
+        result = process_get_request(query_params)
+    elif http_method == 'POST':
+        # Process POST request - potential issue
+        data = json.loads(body)
+        result = process_post_request(data)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps(result)
+    }
+
+def process_get_request(params):
+    return {'message': 'GET processed'}
+
+def process_post_request(data):
+    return {'message': 'POST processed'}
+```
+
+Answer: Missing null check for body and queryStringParameters. API Gateway can pass null values when no query parameters or body are present. Should check `if body:` before json.loads() and `if query_params:` before accessing parameters.
+
+#@@@@@@@@@@
+
+106. How do you implement cost optimization for S3 storage?
+
+Answer: Use S3 Intelligent-Tiering for automatic cost optimization, implement lifecycle policies for transitioning to cheaper storage classes, enable S3 Storage Lens for analytics, use S3 Select for query optimization, and regularly review access patterns with S3 Analytics.
+
+#@@@@@@@@@@
+
+107. Which of the following are valid CloudFormation intrinsic functions? (Multiple correct)
+A) !Ref
+B) !GetAtt
+C) !Sub
+D) !Join
+E) !Select
+F) !ImportValue
+
+Answer: A, B, C, D, E, F - All are valid CloudFormation intrinsic functions. !Ref references resources/parameters, !GetAtt gets resource attributes, !Sub substitutes variables, !Join concatenates values, !Select chooses from list, !ImportValue imports cross-stack values.
+
+#@@@@@@@@@@
+
+108. Complete this EKS RBAC configuration:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: _______________
+```
+
+Answer: `rbac.authorization.k8s.io` - The API group for RBAC resources in Kubernetes. RoleBinding connects subjects (users, groups, service accounts) to roles within a namespace.
+
+#@@@@@@@@@@
+
+109. What is the difference between AWS Direct Connect and VPN?
+
+Answer: Direct Connect provides dedicated network connection from on-premises to AWS, offers consistent bandwidth and lower latency. VPN creates encrypted tunnel over internet, variable performance but quick setup. Direct Connect for predictable workloads, VPN for flexibility and cost.
+
+#@@@@@@@@@@
+
+110. Which of the following are valid DynamoDB stream view types? (Multiple correct)
+A) KEYS_ONLY
+B) NEW_IMAGE
+C) OLD_IMAGE
+D) NEW_AND_OLD_IMAGES
+E) FULL_IMAGE
+F) CHANGES_ONLY
+
+Answer: A, B, C, D - DynamoDB stream view types: KEYS_ONLY (key attributes only), NEW_IMAGE (entire item after modification), OLD_IMAGE (entire item before modification), NEW_AND_OLD_IMAGES (both before and after). FULL_IMAGE and CHANGES_ONLY are not valid.
+
+#@@@@@@@@@@
+
+111. Predict the output of this Lambda function with EventBridge:
+```python
+import json
+import boto3
+
+eventbridge = boto3.client('events')
+
+def lambda_handler(event, context):
+    # Send custom event
+    response = eventbridge.put_events(
+        Entries=[
+            {
+                'Source': 'myapp.orders',
+                'DetailType': 'Order Processed',
+                'Detail': json.dumps({
+                    'orderId': '12345',
+                    'amount': 99.99,
+                    'status': 'completed'
+                }),
+                'Resources': [
+                    'arn:aws:lambda:us-east-1:123456789012:function:ProcessOrder'
+                ]
+            }
+        ]
+    )
+
+    return {
+        'statusCode': 200,
+        'eventsPublished': len(response['Entries']),
+        'failedEntries': response['FailedEntryCount']
+    }
+```
+
+Answer: Returns statusCode 200, eventsPublished: 1, failedEntries: 0 (assuming successful event publishing). EventBridge receives the custom event and routes it to configured targets based on rules matching the source and detail-type.
+
+#@@@@@@@@@@
+
+112. How do you implement database connection pooling with RDS Proxy?
+
+Answer: Create RDS Proxy with target RDS instance, configure connection pooling settings (max connections, idle timeout), update application connection strings to use proxy endpoint, enable IAM authentication for enhanced security, and monitor connections through CloudWatch metrics.
+
+#@@@@@@@@@@
+
+113. Which of the following are valid Lambda environment variable limitations? (Multiple correct)
+A) 4 KB total size limit
+B) Key names must start with letter
+C) Cannot contain spaces in keys
+D) Values are encrypted at rest
+E) Maximum 100 variables
+F) Cannot use reserved prefixes
+
+Answer: A, C, D, F - Lambda environment variable limits: 4KB total size, keys cannot contain spaces, values encrypted at rest with KMS, cannot use AWS_ prefix (reserved). Keys can start with letters or underscores, no explicit limit on number of variables within size constraint.
+
+#@@@@@@@@@@
+
+114. Find the bug in this S3 bucket policy:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowPublicRead",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-public-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:ExistingObjectTag/Environment": "public"
+        }
+      }
+    }
+  ]
+}
+```
+
+Answer: No explicit bug in syntax, but security consideration: allows public access to all objects with "Environment=public" tag. Should consider IP restrictions, referrer checks, or time-based conditions for better security. Also ensure bucket doesn't have "Block Public Access" enabled.
+
+#@@@@@@@@@@
+
+115. What is the purpose of AWS Organizations?
+
+Answer: Organizations provides centralized management of multiple AWS accounts, consolidated billing, service control policies (SCPs) for governance, organizational units for grouping, and automated account creation. Enables enterprise-scale AWS management with security and compliance controls.
+
+#@@@@@@@@@@
+
+116. Which of the following are valid EC2 instance states? (Multiple correct)
+A) pending
+B) running
+C) stopping
+D) stopped
+E) shutting-down
+F) terminated
+
+Answer: A, B, C, D, E, F - All are valid EC2 instance states. Instances transition: pending → running → stopping → stopped, or running → shutting-down → terminated. Stopped instances can be restarted, terminated instances cannot.
+
+#@@@@@@@@@@
+
+117. Complete this SageMaker batch transform job:
+```python
+import boto3
+import sagemaker
+
+# Create SageMaker client
+sm_client = boto3.client('sagemaker')
+
+# Start batch transform job
+response = sm_client.create_transform_job(
+    TransformJobName='my-batch-inference',
+    ModelName='my-trained-model',
+    TransformInput={
+        'DataSource': {
+            'S3DataSource': {
+                'S3DataType': 'S3Prefix',
+                'S3Uri': 's3://my-bucket/input-data/',
+                'S3DataDistributionType': 'FullyReplicated'
+            }
+        },
+        'ContentType': 'text/csv',
+        'SplitType': _______________
+    },
+    TransformOutput={
+        'S3OutputPath': 's3://my-bucket/output-data/',
+        'Accept': 'text/csv'
+    },
+    TransformResources={
+        'InstanceType': 'ml.m5.large',
+        'InstanceCount': 1
+    }
+)
+```
+
+Answer: `'Line'` - SplitType determines how input data is split for processing. Options include 'Line' for line-by-line processing, 'RecordIO' for RecordIO format, or 'None' for single file processing.
+
+#@@@@@@@@@@
+
+118. What is the difference between CloudWatch and CloudWatch Logs?
+
+Answer: CloudWatch monitors metrics, alarms, and dashboards for AWS resources and applications. CloudWatch Logs specifically handles log file collection, monitoring, and analysis. CloudWatch Logs is a subset of CloudWatch focused on log management and analysis.
+
+#@@@@@@@@@@
+
+119. Find the issue in this DynamoDB scan operation:
+```python
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('LargeTable')
+
+def get_all_items():
+    # Inefficient scan operation
+    response = table.scan()
+    items = response['Items']
+
+    # Missing pagination handling
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
+        items.extend(response['Items'])
+
+    return items
+
+# Usage on large table - performance issue
+all_items = get_all_items()
+print(f"Retrieved {len(all_items)} items")
+```
+
+Answer: Scan operation on large table is inefficient and expensive. Should use Query with partition key when possible, implement parallel scans for better performance, add FilterExpression to reduce data transfer, or use DynamoDB Streams for real-time processing instead of full table scans.
+
+#@@@@@@@@@@
+
+120. How do you implement zero-downtime deployment with ELB?
+
+Answer: Use Application Load Balancer with target groups, deploy new version to separate target group, perform health checks, gradually shift traffic using weighted routing, monitor metrics during transition, and maintain ability to quickly rollback by adjusting weights.
+
+#@@@@@@@@@@
+
+121. Which of the following are valid API Gateway throttling configurations? (Multiple correct)
+A) Rate limit (requests per second)
+B) Burst limit (concurrent requests)
+C) Usage plans
+D) API keys
+E) Per-client throttling
+F) Geographic throttling
+
+Answer: A, B, C, D, E - API Gateway throttling: Rate limit for sustained requests, Burst limit for traffic spikes, Usage plans for different tiers, API keys for client identification, Per-client throttling for individual limits. Geographic throttling is not a built-in feature.
+
+#@@@@@@@@@@
+
+122. Complete this CloudWatch custom dashboard:
+```json
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "my-alb"],
+          ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "my-alb"]
+        ],
+        "period": 300,
+        "stat": "Sum",
+        "region": "us-east-1",
+        "title": "ALB Metrics",
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "_______________",
+      "properties": {
+        "query": "SOURCE '/aws/lambda/my-function' | fields @timestamp, @message | filter @message like /ERROR/ | sort @timestamp desc | limit 20",
+        "region": "us-east-1",
+        "title": "Recent Errors"
+      }
+    }
+  ]
+}
+```
+
+Answer: `"log"` - CloudWatch Logs Insights widget type for querying and visualizing log data. Supports complex queries with filtering, sorting, and aggregation capabilities.
+
+#@@@@@@@@@@
+
+123. What is the purpose of AWS Transit Gateway?
+
+Answer: Transit Gateway simplifies network connectivity by acting as central hub for VPCs, on-premises networks, and AWS services. Enables transitive routing, reduces complexity of VPC peering, supports multicast, and provides centralized monitoring and control of network traffic.
+
+#@@@@@@@@@@
+
+124. Which of the following are valid S3 replication requirements? (Multiple correct)
+A) Source bucket versioning enabled
+B) Destination bucket in different region
+C) IAM role with replication permissions
+D) Different storage class allowed
+E) Source and destination buckets owned by same account
+F) Encryption compatibility
+
+Answer: A, C, D, F - S3 replication requirements: source versioning enabled, IAM role with permissions, different storage classes allowed, encryption compatibility required. Destination can be same region (SRR) or different region (CRR), and can be cross-account.
+
+#@@@@@@@@@@
+
+125. Find the bug in this Lambda function with DynamoDB:
+```python
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+
+def lambda_handler(event, context):
+    table = dynamodb.Table('Users')
+
+    # Process multiple records
+    for record in event['Records']:
+        user_data = json.loads(record['body'])
+
+        # Potential issue: no error handling for individual records
+        table.put_item(Item=user_data)
+
+    # Return success even if some items failed
+    return {
+        'statusCode': 200,
+        'message': 'All records processed'
+    }
+```
+
+Answer: No error handling for individual DynamoDB operations. If one put_item fails, the entire Lambda function fails and all records are retried. Should implement try-catch for individual operations, use batch operations, or implement partial failure handling with SQS.
+
+#@@@@@@@@@@
+
+126. How do you implement database encryption at rest with RDS?
+
+Answer: Enable encryption during database creation (cannot be added later), choose AWS KMS key (default or customer-managed), ensure automated backups and snapshots are encrypted, use SSL/TLS for encryption in transit, and consider Transparent Data Encryption (TDE) for Oracle/SQL Server.
+
+#@@@@@@@@@@
+
+127. Which of the following are valid CloudFormation template formats? (Multiple correct)
+A) JSON
+B) YAML
+C) XML
+D) TOML
+E) Properties
+F) HCL
+
+Answer: A, B - CloudFormation supports JSON and YAML template formats. XML, TOML, Properties, and HCL (Terraform) are not supported CloudFormation formats.
+
+#@@@@@@@@@@
+
+128. Complete this ECS task definition with secrets:
+```json
+{
+  "family": "my-app",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "my-app:latest",
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:db-password-_______________"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Answer: `AbCdEf` (6-character suffix) - Secrets Manager ARNs end with 6-character suffix. ECS retrieves secret value at container startup using the execution role permissions. Format: secret-name-6chars.
+
+#@@@@@@@@@@
+
+129. What is the difference between AWS Config Rules and AWS Config Conformance Packs?
+
+Answer: Config Rules evaluate individual resource compliance against specific configurations. Conformance Packs are collections of Config Rules and remediation actions packaged together for compliance frameworks (PCI-DSS, HIPAA). Conformance Packs provide comprehensive compliance management.
+
+#@@@@@@@@@@
+
+130. Which of the following are valid Lambda function URL configurations? (Multiple correct)
+A) HTTPS only
+B) IAM authentication
+C) CORS configuration
+D) Custom domain support
+E) Request/response streaming
+F) WebSocket support
+
+Answer: A, B, C - Lambda function URLs support HTTPS only, IAM authentication (or none), and CORS configuration. Custom domains require API Gateway, streaming and WebSocket are not supported with function URLs.
+
+#@@@@@@@@@@
+
+131. Predict the output of this S3 event notification:
+```json
+{
+  "Rules": [
+    {
+      "Id": "ObjectCreatedRule",
+      "Status": "Enabled",
+      "Filter": {
+        "Key": {
+          "FilterRules": [
+            {
+              "Name": "prefix",
+              "Value": "uploads/"
+            },
+            {
+              "Name": "suffix",
+              "Value": ".jpg"
+            }
+          ]
+        }
+      },
+      "CloudWatchConfiguration": {
+        "CloudWatchMetrics": {
+          "Status": "Enabled"
+        }
+      }
+    }
+  ]
+}
+```
+
+Answer: This is S3 Intelligent-Tiering configuration, not event notification. For event notifications, would trigger on objects in "uploads/" folder with ".jpg" extension. CloudWatch metrics would be enabled for monitoring access patterns.
+
+#@@@@@@@@@@
+
+132. How do you implement cross-region backup for DynamoDB?
+
+Answer: Use DynamoDB Global Tables for multi-region replication, enable point-in-time recovery (PITR), create on-demand backups and copy to different regions, use AWS Backup for centralized backup management, or implement custom backup solution with DynamoDB Streams.
+
+#@@@@@@@@@@
+
+133. Which of the following are valid EKS add-ons? (Multiple correct)
+A) VPC CNI
+B) CoreDNS
+C) kube-proxy
+D) AWS Load Balancer Controller
+E) EBS CSI Driver
+F) Cluster Autoscaler
+
+Answer: A, B, C, D, E, F - All are valid EKS add-ons. VPC CNI for networking, CoreDNS for service discovery, kube-proxy for service networking, AWS Load Balancer Controller for ALB/NLB integration, EBS CSI Driver for persistent volumes, Cluster Autoscaler for node scaling.
+
+#@@@@@@@@@@
+
+134. Find the issue in this API Gateway integration:
+```json
+{
+  "type": "aws_proxy",
+  "httpMethod": "POST",
+  "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:123456789012:function:MyFunction/invocations",
+  "requestTemplates": {
+    "application/json": "{\"body\": $input.body}"
+  },
+  "responses": {
+    "default": {
+      "statusCode": "200"
+    }
+  }
+}
+```
+
+Answer: aws_proxy integration type doesn't support requestTemplates or responses configuration. These are automatically handled by the proxy integration. Should either use aws_proxy without templates/responses, or use aws integration type with custom templates.
+
+#@@@@@@@@@@
+
+135. What is the purpose of AWS Resource Access Manager (RAM)?
+
+Answer: RAM enables sharing of AWS resources across accounts and within AWS Organizations. Share VPC subnets, Route 53 Resolver rules, License Manager configurations, and other resources. Simplifies resource management and reduces duplication across multiple accounts.
+
+#@@@@@@@@@@
+
+136. Which of the following are valid CloudWatch alarm comparison operators? (Multiple correct)
+A) GreaterThanThreshold
+B) LessThanThreshold
+C) GreaterThanOrEqualToThreshold
+D) LessThanOrEqualToThreshold
+E) GreaterThanUpperThreshold
+F) LessThanLowerThreshold
+
+Answer: A, B, C, D, E, F - All are valid CloudWatch alarm comparison operators. First four for single threshold comparisons, last two for anomaly detection models with upper and lower thresholds.
+
+#@@@@@@@@@@
+
+137. Complete this CodeDeploy deployment configuration:
+```json
+{
+  "deploymentConfigName": "MyDeploymentConfig",
+  "minimumHealthyHosts": {
+    "type": "_______________",
+    "value": 50
+  },
+  "trafficRoutingConfig": {
+    "type": "TimeBasedCanary",
+    "timeBasedCanary": {
+      "canaryPercentage": 10,
+      "canaryInterval": 5
+    }
+  }
+}
+```
+
+Answer: `"FLEET_PERCENT"` - Specifies percentage of instances that must remain healthy during deployment. Alternative is "HOST_COUNT" for absolute number of instances. Ensures minimum capacity during rolling deployments.
+
+#@@@@@@@@@@
+
+138. How do you implement database connection security with RDS?
+
+Answer: Use VPC security groups to restrict access, enable SSL/TLS encryption in transit, implement IAM database authentication, use RDS Proxy for connection pooling and security, enable encryption at rest, and regularly rotate database credentials with Secrets Manager.
+
+#@@@@@@@@@@
+
+139. Which of the following are valid S3 object lock modes? (Multiple correct)
+A) Governance mode
+B) Compliance mode
+C) Legal hold
+D) Retention mode
+E) Archive mode
+F) Immutable mode
+
+Answer: A, B, C - S3 Object Lock modes: Governance mode (can be overridden with permissions), Compliance mode (cannot be overridden), Legal hold (indefinite retention). Retention, Archive, and Immutable are not valid Object Lock modes.
+
+#@@@@@@@@@@
+
+140. Find the bug in this Lambda function with SQS batch processing:
+```python
+import json
+
+def lambda_handler(event, context):
+    successful_messages = []
+    failed_messages = []
+
+    for record in event['Records']:
+        try:
+            # Process message
+            message_body = json.loads(record['body'])
+            process_message(message_body)
+            successful_messages.append(record['messageId'])
+        except Exception as e:
+            failed_messages.append({
+                'itemIdentifier': record['messageId']
+            })
+
+    # Return partial batch failure response
+    if failed_messages:
+        return {
+            'batchItemFailures': failed_messages
+        }
+
+    return {'statusCode': 200}
+
+def process_message(message):
+    # Message processing logic
+    if message.get('fail'):
+        raise Exception("Processing failed")
+```
+
+Answer: Missing ReportBatchItemFailures configuration in SQS event source mapping. Without this setting, Lambda doesn't support partial batch failure responses. Must enable ReportBatchItemFailures for the response format to work properly.
+
+#@@@@@@@@@@
+
+141. What is the purpose of AWS Service Catalog?
+
+Answer: Service Catalog enables organizations to create and manage catalogs of approved IT services, standardize deployments, enforce governance and compliance, provide self-service capabilities to end users, and maintain control over AWS resource provisioning through approved templates.
+
+#@@@@@@@@@@
+
+142. Which of the following are valid ECS service deployment strategies? (Multiple correct)
+A) Rolling update
+B) Blue/green
+C) Canary
+D) Recreate
+E) External
+F) CodeDeploy
+
+Answer: A, B, F - ECS deployment strategies: Rolling update (default), Blue/green with CodeDeploy, External for custom deployment controllers. Canary and Recreate are Kubernetes strategies, not ECS-specific.
+
+#@@@@@@@@@@
+
+143. Complete this CloudWatch Logs metric filter:
+```json
+{
+  "filterName": "ErrorCount",
+  "filterPattern": "[timestamp, request_id, level=\"ERROR\", ...]",
+  "logGroupName": "/aws/lambda/my-function",
+  "metricTransformations": [
+    {
+      "metricName": "ErrorCount",
+      "metricNamespace": "MyApp/Errors",
+      "metricValue": "1",
+      "defaultValue": 0,
+      "unit": _______________
+    }
+  ]
+}
+```
+
+Answer: `"Count"` - Appropriate unit for counting error occurrences. Other valid CloudWatch units include Seconds, Bytes, Percent, Count/Second, Bytes/Second, etc.
+
+#@@@@@@@@@@
+
+144. How do you implement automated scaling for DynamoDB?
+
+Answer: Enable DynamoDB Auto Scaling for read/write capacity, set target utilization percentage (typically 70%), configure minimum and maximum capacity units, use Application Auto Scaling for custom scaling policies, or implement on-demand billing for automatic scaling.
+
+#@@@@@@@@@@
+
+145. Which of the following are valid AWS Backup supported services? (Multiple correct)
+A) EC2
+B) EBS
+C) RDS
+D) DynamoDB
+E) EFS
+F) S3
+
+Answer: A, B, C, D, E, F - AWS Backup supports EC2 instances, EBS volumes, RDS databases, DynamoDB tables, EFS file systems, S3 buckets, and many other AWS services for centralized backup management.
+
+#@@@@@@@@@@
+
+146. Find the issue in this CloudFormation stack update:
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: my-database
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+      AllocatedStorage: 20
+      # Changing this requires replacement
+      DBName: newdatabase
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+
+Parameters:
+  DBPassword:
+    Type: String
+    NoEcho: true
+```
+
+Answer: Changing DBName requires database replacement, which will cause data loss despite Retain policies. Retain policies only apply when stack is deleted, not during updates that require replacement. Should use database migration strategy instead.
+
+#@@@@@@@@@@
+
+147. What is the difference between AWS Glue and AWS Data Pipeline?
+
+Answer: Glue is serverless ETL service with automatic schema discovery, visual job authoring, and managed Apache Spark. Data Pipeline is workflow orchestration service for data movement and transformation across AWS services. Glue for ETL, Data Pipeline for complex workflows.
+
+#@@@@@@@@@@
+
+148. Which of the following are valid Lambda function configuration options? (Multiple correct)
+A) Memory allocation (128 MB - 10,240 MB)
+B) Timeout (1 second - 15 minutes)
+C) Environment variables
+D) VPC configuration
+E) Dead letter queue
+F) Reserved concurrency
+
+Answer: A, B, C, D, E, F - All are valid Lambda configuration options. Memory affects CPU allocation, timeout prevents runaway functions, environment variables for configuration, VPC for private resource access, DLQ for failed invocations, reserved concurrency for capacity management.
+
+#@@@@@@@@@@
+
+149. Complete this S3 bucket notification configuration:
+```json
+{
+  "CloudWatchConfigurations": [
+    {
+      "Id": "ObjectCreatedEvents",
+      "CloudWatchConfiguration": {
+        "LogGroupName": "/aws/s3/my-bucket"
+      },
+      "Events": ["s3:ObjectCreated:*"],
+      "Filter": {
+        "Key": {
+          "FilterRules": [
+            {
+              "Name": "prefix",
+              "Value": "logs/"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+Answer: This is not valid S3 event notification syntax. S3 doesn't support CloudWatch Logs as direct notification destination. Valid destinations are SNS, SQS, and Lambda. Should use Lambda function to forward events to CloudWatch Logs.
+
+#@@@@@@@@@@
+
+150. How do you implement high availability for NAT Gateway?
+
+Answer: Deploy NAT Gateways in multiple Availability Zones, update route tables to use local NAT Gateway in each AZ, implement monitoring and automated failover if needed, or use NAT Instances with Auto Scaling Groups for more control and cost optimization.
+
+#@@@@@@@@@@
+
+151. Which of the following are valid CloudFront cache behaviors? (Multiple correct)
+A) Path pattern matching
+B) HTTP methods allowed
+C) TTL settings
+D) Origin selection
+E) Viewer protocol policy
+F) Geographic restrictions
+
+Answer: A, B, C, D, E - CloudFront cache behaviors support path patterns, HTTP methods, TTL settings, origin selection, and viewer protocol policies. Geographic restrictions are configured at distribution level, not behavior level.
+
+#@@@@@@@@@@
+
+152. Find the bug in this DynamoDB conditional update:
+```python
+import boto3
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Users')
+
+def update_user_score(user_id, new_score):
+    try:
+        response = table.update_item(
+            Key={'user_id': user_id},
+            UpdateExpression='SET score = :new_score',
+            ConditionExpression='score < :new_score',  # Only update if new score is higher
+            ExpressionAttributeValues={
+                ':new_score': new_score
+            },
+            ReturnValues='UPDATED_NEW'
+        )
+        return response['Attributes']
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
+            print("Score not updated - new score not higher than current")
+            return None
+        raise
+```
+
+Answer: No explicit bug in the code logic, but potential issue: if the item doesn't exist, the condition will fail. Should handle item creation separately or use a condition that accounts for missing items: `attribute_not_exists(score) OR score < :new_score`.
+
+#@@@@@@@@@@
+
+153. What is the purpose of AWS CloudShell?
+
+Answer: CloudShell provides browser-based shell environment with AWS CLI, development tools, and 1GB persistent storage. Pre-configured with AWS credentials, supports multiple programming languages, includes common tools, and enables quick AWS management without local setup.
+
+#@@@@@@@@@@
+
+154. Which of the following are valid EKS cluster logging types? (Multiple correct)
+A) API server
+B) Audit
+C) Authenticator
+D) Controller manager
+E) Scheduler
+F) Worker nodes
+
+Answer: A, B, C, D, E - EKS control plane logging types: API server, Audit, Authenticator, Controller manager, Scheduler. Worker node logs are managed separately through CloudWatch agent or Fluent Bit.
+
+#@@@@@@@@@@
+
+155. Complete this Lambda function with custom runtime:
+```python
+import json
+import sys
+import os
+
+def lambda_handler(event, context):
+    # Custom runtime handler
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': 'Hello from custom runtime',
+            'runtime': os.environ.get('AWS_EXECUTION_ENV'),
+            'version': sys.version
+        })
+    }
+
+# Bootstrap file for custom runtime
+def main():
+    while True:
+        # Get next invocation
+        response = requests.get(f"http://{os.environ['AWS_LAMBDA_RUNTIME_API']}/2018-06-01/runtime/invocation/next")
+
+        request_id = response.headers['Lambda-Runtime-Aws-Request-Id']
+        event = response.json()
+
+        try:
+            # Process event
+            result = lambda_handler(event, None)
+
+            # Send response
+            requests.post(
+                f"http://{os.environ['AWS_LAMBDA_RUNTIME_API']}/2018-06-01/runtime/invocation/{request_id}/response",
+                json=result
+            )
+        except Exception as e:
+            # Send error
+            requests.post(
+                f"http://{os.environ['AWS_LAMBDA_RUNTIME_API']}/2018-06-01/runtime/invocation/{request_id}/_______________",
+                json={'errorMessage': str(e)}
+            )
+
+if __name__ == '__main__':
+    main()
+```
+
+Answer: `error` - Lambda Runtime API endpoint for reporting invocation errors. Custom runtimes must implement the Runtime API protocol for receiving events and sending responses/errors.
+
+#@@@@@@@@@@
+
+156. How do you implement cost monitoring and alerting?
+
+Answer: Use AWS Cost Explorer for analysis, set up billing alerts with CloudWatch, create budgets with AWS Budgets, implement cost allocation tags, use AWS Cost Anomaly Detection for unusual spending, and set up SNS notifications for budget thresholds.
+
+#@@@@@@@@@@
+
+157. Which of the following are valid S3 inventory configuration options? (Multiple correct)
+A) Daily or weekly frequency
+B) CSV or ORC format
+C) Encryption status
+D) Object size and last modified date
+E) Storage class information
+F) Multipart upload status
+
+Answer: A, B, C, D, E, F - S3 Inventory supports daily/weekly frequency, CSV/ORC/Parquet formats, encryption status, object metadata, storage class, multipart upload status, and many other object attributes for comprehensive bucket analysis.
+
+#@@@@@@@@@@
+
+158. Find the issue in this ECS task definition with logging:
+```json
+{
+  "family": "my-app",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "my-app:latest",
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/my-app",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
+```
+
+Answer: Missing awslogs-create-group option or pre-created log group. If log group doesn't exist, task will fail to start. Should either set "awslogs-create-group": "true" or ensure log group exists before task execution.
+
+#@@@@@@@@@@
+
+159. What is the difference between AWS Secrets Manager and Systems Manager Parameter Store?
+
+Answer: Secrets Manager provides automatic rotation, versioning, and fine-grained access control for secrets, charges per secret. Parameter Store offers hierarchical storage for configuration data, supports SecureString encryption, free tier available. Secrets Manager for sensitive data, Parameter Store for configuration.
+
+#@@@@@@@@@@
+
+160. Which of the following are valid API Gateway request validation options? (Multiple correct)
+A) Request body validation
+B) Request parameter validation
+C) Request header validation
+D) Response validation
+E) Schema validation
+F) Custom validation
+
+Answer: A, B, C, E - API Gateway supports request body validation against JSON schema, request parameter validation (required/optional), request header validation, and schema validation. Response validation and custom validation are not built-in features.
+
+#@@@@@@@@@@
+
+161. Complete this Auto Scaling lifecycle hook:
+```json
+{
+  "LifecycleHookName": "my-launch-hook",
+  "AutoScalingGroupName": "my-asg",
+  "LifecycleTransition": "autoscaling:EC2_INSTANCE_LAUNCHING",
+  "HeartbeatTimeout": 300,
+  "DefaultResult": "ABANDON",
+  "NotificationTargetARN": "arn:aws:sns:us-east-1:123456789012:my-topic",
+  "RoleARN": "arn:aws:iam::123456789012:role/AutoScalingNotificationRole",
+  "NotificationMetadata": "{\"environment\": \"production\"}"
+}
+```
+
+Answer: Configuration is complete and valid. Lifecycle hook pauses instance launch for 300 seconds, sends notification to SNS topic, defaults to ABANDON if no action taken. Allows custom initialization before instance enters service.
+
+#@@@@@@@@@@
+
+162. How do you implement database read scaling with Aurora?
+
+Answer: Create Aurora read replicas (up to 15), use Aurora reader endpoint for automatic load balancing, implement connection pooling, configure read-only application connections, use Aurora Serverless for automatic scaling, and monitor read replica lag.
+
+#@@@@@@@@@@
+
+163. Which of the following are valid CloudWatch Events (EventBridge) rule targets? (Multiple correct)
+A) Lambda functions
+B) SNS topics
+C) SQS queues
+D) ECS tasks
+E) Step Functions
+F) Kinesis streams
+
+Answer: A, B, C, D, E, F - EventBridge supports numerous targets: Lambda functions, SNS topics, SQS queues, ECS tasks, Step Functions, Kinesis streams, plus many other AWS services for event-driven architectures.
+
+#@@@@@@@@@@
+
+164. Find the bug in this S3 cross-region replication:
+```json
+{
+  "Role": "arn:aws:iam::123456789012:role/replication-role",
+  "Rules": [
+    {
+      "ID": "ReplicateAll",
+      "Status": "Enabled",
+      "Priority": 1,
+      "Filter": {
+        "Prefix": ""
+      },
+      "Destination": {
+        "Bucket": "arn:aws:s3:::destination-bucket",
+        "StorageClass": "STANDARD_IA",
+        "ReplicationTime": {
+          "Status": "Enabled",
+          "Time": {
+            "Minutes": 15
+          }
+        },
+        "Metrics": {
+          "Status": "Enabled",
+          "EventThreshold": {
+            "Minutes": 15
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+Answer: Missing DeleteMarkerReplication and ReplicaKmsKeyID configurations for complete replication setup. Also, should specify AccessControlTranslation if buckets have different owners. Configuration is functional but incomplete for production use.
+
+#@@@@@@@@@@
+
+165. What is the purpose of AWS Resource Groups?
+
+Answer: Resource Groups organize AWS resources using tags or CloudFormation stacks, enable bulk operations, provide unified view of related resources, support automation with Systems Manager, and simplify resource management across multiple services and regions.
+
+#@@@@@@@@@@
+
+166. Which of the following are valid Lambda function invocation types? (Multiple correct)
+A) Synchronous (RequestResponse)
+B) Asynchronous (Event)
+C) DryRun
+D) Scheduled
+E) Stream-based
+F) HTTP
+
+Answer: A, B, C - Lambda invocation types: Synchronous for immediate response, Asynchronous for fire-and-forget, DryRun for validation. Scheduled uses EventBridge, Stream-based uses event source mappings, HTTP uses function URLs or API Gateway.
+
+#@@@@@@@@@@
+
+167. Complete this VPC Flow Logs configuration:
+```json
+{
+  "ResourceType": "VPC",
+  "ResourceId": "vpc-12345678",
+  "TrafficType": "ALL",
+  "LogDestinationType": "cloud-watch-logs",
+  "LogGroupName": "/aws/vpc/flowlogs",
+  "DeliverLogsPermissionArn": "arn:aws:iam::123456789012:role/flowlogsRole",
+  "LogFormat": "${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${windowstart} ${windowend} ${action}",
+  "MaxAggregationInterval": _______________
+}
+```
+
+Answer: `60` - VPC Flow Logs aggregation interval in seconds. Valid values are 60 seconds (1 minute) or 600 seconds (10 minutes). Shorter intervals provide more granular data but higher costs.
+
+#@@@@@@@@@@
+
+168. How do you implement disaster recovery testing?
+
+Answer: Create automated DR runbooks, schedule regular failover tests, use AWS Backup for recovery testing, implement infrastructure as code for consistent environments, document RTO/RPO requirements, test data restoration procedures, and validate application functionality post-failover.
+
+#@@@@@@@@@@
+
+169. Which of the following are valid EBS snapshot features? (Multiple correct)
+A) Incremental backups
+B) Cross-region copying
+C) Encryption support
+D) Fast snapshot restore
+E) Automated lifecycle management
+F) Point-in-time recovery
+
+Answer: A, B, C, D, E, F - EBS snapshots support incremental backups, cross-region copying, encryption, fast snapshot restore for quick volume creation, automated lifecycle management with Data Lifecycle Manager, and enable point-in-time recovery.
+
+#@@@@@@@@@@
+
+170. Find the issue in this CloudFormation custom resource:
+```python
+import json
+import boto3
+import urllib3
+
+def lambda_handler(event, context):
+    response_url = event['ResponseURL']
+
+    try:
+        if event['RequestType'] == 'Create':
+            # Create resource logic
+            physical_resource_id = create_resource(event['ResourceProperties'])
+            send_response(event, context, 'SUCCESS', {'PhysicalResourceId': physical_resource_id})
+        elif event['RequestType'] == 'Update':
+            # Update resource logic
+            update_resource(event['ResourceProperties'], event['PhysicalResourceId'])
+            send_response(event, context, 'SUCCESS', {'PhysicalResourceId': event['PhysicalResourceId']})
+        elif event['RequestType'] == 'Delete':
+            # Delete resource logic
+            delete_resource(event['PhysicalResourceId'])
+            send_response(event, context, 'SUCCESS', {'PhysicalResourceId': event['PhysicalResourceId']})
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        # Missing: send failure response to CloudFormation
+        # send_response(event, context, 'FAILED', {'Reason': str(e)})
+
+def send_response(event, context, status, response_data):
+    # Send response to CloudFormation
+    pass
+
+def create_resource(properties):
+    return 'resource-123'
+
+def update_resource(properties, resource_id):
+    pass
+
+def delete_resource(resource_id):
+    pass
+```
+
+Answer: Missing failure response to CloudFormation in exception handler. If custom resource fails without sending response, CloudFormation stack will hang for hours. Must always send SUCCESS or FAILED response to ResponseURL.
+
+#@@@@@@@@@@
+
+171. What is the purpose of AWS Control Tower?
+
+Answer: Control Tower provides automated setup of secure, compliant multi-account AWS environment based on best practices. Creates landing zone, implements guardrails, provides account factory, enables centralized logging and monitoring, and simplifies governance at scale.
+
+#@@@@@@@@@@
+
+172. Which of the following are valid DynamoDB backup options? (Multiple correct)
+A) On-demand backups
+B) Point-in-time recovery
+C) Cross-region backup replication
+D) Automated daily backups
+E) Continuous backups
+F) Incremental backups
+
+Answer: A, B, C, E - DynamoDB backup options: On-demand backups for specific points, Point-in-time recovery for continuous protection, Cross-region backup copying, Continuous backups (PITR). No automated daily backups or explicit incremental backups (PITR is continuous).
+
+#@@@@@@@@@@
+
+173. Complete this EKS node group configuration:
+```yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: my-cluster
+  region: us-west-2
+
+nodeGroups:
+  - name: standard-workers
+    instanceType: t3.medium
+    desiredCapacity: 3
+    minSize: 1
+    maxSize: 5
+    volumeSize: 20
+    ssh:
+      allow: true
+      publicKeyName: my-key
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        appMesh: true
+        ebs: true
+        fsx: true
+        efs: true
+        albIngress: _______________
+        cloudWatch: true
+```
+
+Answer: `true` - Enables AWS Load Balancer Controller addon policy for ALB/NLB integration. This policy allows the controller to manage AWS load balancers for Kubernetes ingress resources.
+
+#@@@@@@@@@@
+
+174. How do you implement cost allocation and chargeback?
+
+Answer: Implement consistent tagging strategy, activate cost allocation tags, use AWS Cost Categories for grouping, create detailed billing reports, implement showback/chargeback processes, use AWS Budgets for department limits, and automate cost reporting with Cost Explorer APIs.
+
+#@@@@@@@@@@
+
+175. Which of the following are valid CloudWatch Synthetics canary types? (Multiple correct)
+A) Heartbeat monitoring
+B) API canary
+C) Broken link checker
+D) Visual monitoring
+E) Multi-step API
+F) Custom script
+
+Answer: A, B, C, D, E, F - CloudWatch Synthetics supports heartbeat monitoring for endpoint availability, API canaries for REST APIs, broken link checkers for websites, visual monitoring for UI changes, multi-step API workflows, and custom scripts for complex scenarios.
+
+#@@@@@@@@@@
+
+176. Find the issue in this Lambda function with API Gateway proxy integration:
+```python
+import json
+
+def lambda_handler(event, context):
+    # Extract request information
+    http_method = event['httpMethod']
+    path = event['path']
+    headers = event['headers']
+    body = event['body']
+
+    # Process request
+    if http_method == 'GET':
+        result = {'message': 'GET request processed'}
+    elif http_method == 'POST':
+        data = json.loads(body) if body else {}
+        result = {'message': 'POST request processed', 'data': data}
+
+    # Return response - missing required format
+    return {
+        'statusCode': 200,
+        'body': json.dumps(result)
+        # Missing headers for CORS
+    }
+```
+
+Answer: Missing CORS headers in response. API Gateway proxy integration requires proper response format with headers. Should include 'headers': {'Access-Control-Allow-Origin': '*'} for CORS support, and ensure body is JSON string.
+
+#@@@@@@@@@@
+
+177. What is the difference between AWS DataSync and AWS Storage Gateway?
+
+Answer: DataSync is one-time or scheduled data transfer service between on-premises and AWS storage. Storage Gateway provides hybrid cloud storage with on-premises gateways (File, Volume, Tape). DataSync for migration, Storage Gateway for ongoing hybrid integration.
+
+#@@@@@@@@@@
+
+178. Which of the following are valid RDS Performance Insights metrics? (Multiple correct)
+A) Database load
+B) Top SQL statements
+C) Top wait events
+D) Top database users
+E) Connection count
+F) Query execution plans
+
+Answer: A, B, C, D, E - Performance Insights provides database load metrics, top SQL statements, wait events, database users, and connection counts. Query execution plans are available in database-specific tools, not Performance Insights dashboard.
+
+#@@@@@@@@@@
+
+179. Complete this AWS Batch job definition:
+```json
+{
+  "jobDefinitionName": "my-batch-job",
+  "type": "container",
+  "containerProperties": {
+    "image": "my-app:latest",
+    "vcpus": 2,
+    "memory": 4096,
+    "jobRoleArn": "arn:aws:iam::123456789012:role/BatchJobRole",
+    "environment": [
+      {
+        "name": "S3_BUCKET",
+        "value": "my-data-bucket"
+      }
+    ],
+    "mountPoints": [
+      {
+        "sourceVolume": "tmp",
+        "containerPath": "/tmp",
+        "readOnly": false
+      }
+    ],
+    "volumes": [
+      {
+        "name": "tmp",
+        "host": {
+          "sourcePath": "/tmp"
+        }
+      }
+    ],
+    "retryStrategy": {
+      "attempts": _______________
+    }
+  }
+}
+```
+
+Answer: `3` - Number of retry attempts for failed jobs. AWS Batch supports 1-10 retry attempts. Jobs are retried automatically on failure, useful for handling transient errors in batch processing workloads.
+
+#@@@@@@@@@@
+
+180. How do you implement blue-green deployment with Lambda aliases?
+
+Answer: Create new Lambda version, update alias weights to gradually shift traffic (e.g., 10% to new version), monitor metrics and errors, gradually increase weight to 100% if successful, or quickly rollback by resetting alias weights to previous version.
+
+#@@@@@@@@@@
+
+181. Which of the following are valid AWS WAF rule types? (Multiple correct)
+A) Rate-based rules
+B) IP match rules
+C) String match rules
+D) SQL injection rules
+E) Cross-site scripting rules
+F) Geographic rules
+
+Answer: A, B, C, D, E, F - AWS WAF supports rate-based rules for DDoS protection, IP match rules for blocking/allowing IPs, string match rules for content filtering, SQL injection detection, XSS protection, and geographic restrictions.
+
+#@@@@@@@@@@
+
+182. Find the bug in this DynamoDB Global Secondary Index query:
+```python
+import boto3
+from boto3.dynamodb.conditions import Key
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Orders')
+
+def get_orders_by_status(status, limit=10):
+    # Query GSI by status
+    response = table.query(
+        IndexName='StatusIndex',
+        KeyConditionExpression=Key('status').eq(status),
+        Limit=limit,
+        ScanIndexForward=False  # Sort in descending order
+    )
+
+    return response['Items']
+
+# Usage
+recent_completed_orders = get_orders_by_status('completed', 20)
+```
+
+Answer: No explicit bug in the code, but potential performance issue: querying GSI without sort key may return items in unpredictable order. ScanIndexForward only works with sort key. Consider adding timestamp as sort key for predictable ordering.
+
+#@@@@@@@@@@
+
+183. What is the purpose of AWS App Runner?
+
+Answer: App Runner is fully managed service for containerized web applications and APIs. Automatically builds, deploys, scales, and load balances applications from source code or container images. Simplifies deployment without managing infrastructure or container orchestration.
+
+#@@@@@@@@@@
+
+184. Which of the following are valid CloudFormation stack policies? (Multiple correct)
+A) Prevent updates to specific resources
+B) Allow updates only from specific principals
+C) Require approval for destructive changes
+D) Prevent stack deletion
+E) Allow updates during specific time windows
+F) Require MFA for updates
+
+Answer: A, B - Stack policies support preventing updates to specific resources and allowing updates from specific principals. Other options require different AWS services: deletion protection (stack termination protection), approval workflows (Change Sets), time windows (custom automation), MFA (IAM policies).
+
+#@@@@@@@@@@
+
+185. Complete this EventBridge custom event bus:
+```json
+{
+  "Name": "my-custom-bus",
+  "EventSourceName": "myapp.orders",
+  "Rules": [
+    {
+      "Name": "ProcessOrderRule",
+      "EventPattern": {
+        "source": ["myapp.orders"],
+        "detail-type": ["Order Placed"],
+        "detail": {
+          "amount": [{"numeric": [">", 100]}]
+        }
+      },
+      "Targets": [
+        {
+          "Id": "1",
+          "Arn": "arn:aws:lambda:us-east-1:123456789012:function:ProcessLargeOrder",
+          "InputTransformer": {
+            "InputPathsMap": {
+              "orderId": "$.detail.orderId",
+              "amount": "$.detail.amount"
+            },
+            "InputTemplate": "{\"orderId\": \"<orderId>\", \"amount\": <amount>, \"priority\": \"_______________\"}"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+Answer: `"high"` - Static value for priority field in input transformation. InputTransformer allows combining dynamic values from event with static values to create custom input for targets.
+
+#@@@@@@@@@@
+
+186. How do you implement automated remediation with AWS Config?
+
+Answer: Create Config Rules for compliance checks, set up remediation configurations with Systems Manager Automation documents, configure automatic remediation triggers, use Lambda functions for custom remediation, and implement approval workflows for critical changes.
+
+#@@@@@@@@@@
+
+187. Which of the following are valid S3 access point features? (Multiple correct)
+A) VPC-only access
+B) Internet access
+C) Custom access policies
+D) Cross-region access
+E) Bucket-level permissions
+F) Object-level permissions
+
+Answer: A, B, C, E - S3 Access Points support VPC-only access, internet access, custom access policies per access point, and bucket-level permissions. Cross-region access requires Cross-Region Replication, object-level permissions are managed through bucket policies.
+
+#@@@@@@@@@@
+
+188. Find the issue in this Lambda function with RDS connection:
+```python
+import pymysql
+import os
+
+# Global connection - potential issue
+connection = None
+
+def get_connection():
+    global connection
+    if connection is None:
+        connection = pymysql.connect(
+            host=os.environ['RDS_ENDPOINT'],
+            user=os.environ['DB_USER'],
+            password=os.environ['DB_PASSWORD'],
+            database=os.environ['DB_NAME'],
+            charset='utf8mb4',
+            autocommit=True
+        )
+    return connection
+
+def lambda_handler(event, context):
+    conn = get_connection()
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM users")
+        result = cursor.fetchone()
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'count': result[0]})
+        }
+    except Exception as e:
+        # Connection might be stale - should reconnect
+        print(f"Database error: {e}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Database connection failed'})
+        }
+```
+
+Answer: No connection health check or reconnection logic. RDS connections can timeout or become stale between Lambda invocations. Should implement connection validation, reconnection on failure, or use RDS Proxy for managed connection pooling.
+
+#@@@@@@@@@@
+
+189. What is the purpose of AWS Amplify?
+
+Answer: Amplify provides full-stack development platform for building web and mobile applications. Offers hosting, authentication, APIs, storage, CI/CD, and monitoring. Supports React, Angular, Vue, React Native, and Flutter with backend services integration.
+
+#@@@@@@@@@@
+
+190. Which of the following are valid ECS capacity providers? (Multiple correct)
+A) EC2
+B) Fargate
+C) Fargate Spot
+D) External
+E) Lambda
+F) EKS
+
+Answer: A, B, C, D - ECS capacity providers: EC2 for managing EC2 instances, Fargate for serverless containers, Fargate Spot for cost optimization, External for on-premises or other cloud providers. Lambda and EKS are separate services.
+
+#@@@@@@@@@@
+
+191. Complete this CloudWatch composite alarm:
+```json
+{
+  "AlarmName": "ApplicationHealthAlarm",
+  "AlarmDescription": "Composite alarm for application health",
+  "AlarmRule": "(ALARM(HighCPUAlarm) OR ALARM(HighMemoryAlarm)) AND ALARM(HighErrorRateAlarm)",
+  "ActionsEnabled": true,
+  "AlarmActions": [
+    "arn:aws:sns:us-east-1:123456789012:alert-topic"
+  ],
+  "OKActions": [
+    "arn:aws:sns:us-east-1:123456789012:ok-topic"
+  ],
+  "TreatMissingData": "_______________"
+}
+```
+
+Answer: `"breaching"` - For composite alarms, TreatMissingData determines how missing data from child alarms is handled. Options include "breaching", "notBreaching", "ignore", or "missing". "breaching" treats missing data as alarm state.
+
+#@@@@@@@@@@
+
+192. How do you implement cross-account resource sharing with RAM?
+
+Answer: Create resource share in RAM, specify resources to share (VPC subnets, Route 53 rules, etc.), add target accounts or organizational units, accept resource share in target accounts, and configure appropriate permissions and policies.
+
+#@@@@@@@@@@
+
+193. Which of the following are valid API Gateway caching configurations? (Multiple correct)
+A) Cache cluster size
+B) Cache key parameters
+C) Cache TTL settings
+D) Cache encryption
+E) Per-method caching
+F) Cache invalidation
+
+Answer: A, B, C, D, E, F - API Gateway caching supports cluster sizing (0.5GB-237GB), cache key customization, TTL configuration (0-3600 seconds), encryption at rest, per-method cache settings, and manual cache invalidation.
+
+#@@@@@@@@@@
+
+194. Find the issue in this Step Functions error handling:
+```json
+{
+  "Comment": "Error handling example",
+  "StartAt": "ProcessData",
+  "States": {
+    "ProcessData": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ProcessData",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "HandleError",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Next": "Success"
+    },
+    "HandleError": {
+      "Type": "Pass",
+      "Result": "Error handled",
+      "End": true
+    },
+    "Success": {
+      "Type": "Succeed"
+    }
+  }
+}
+```
+
+Answer: Using generic "States.TaskFailed" instead of specific error types. Should catch specific errors like "Lambda.ServiceException", "Lambda.AWSLambdaException", or custom error types for better error handling granularity.
+
+#@@@@@@@@@@
+
+195. What is the difference between AWS Fargate and AWS Lambda?
+
+Answer: Fargate runs containerized applications with persistent compute, supports long-running processes, provides more control over runtime environment. Lambda executes functions in response to events, 15-minute maximum execution, automatic scaling. Fargate for applications, Lambda for event-driven functions.
+
+#@@@@@@@@@@
+
+196. Which of the following are valid CloudFormation change set actions? (Multiple correct)
+A) Add
+B) Modify
+C) Remove
+D) Replace
+E) Import
+F) Export
+
+Answer: A, B, C, D, E - CloudFormation change set actions: Add for new resources, Modify for property changes, Remove for resource deletion, Replace for resources requiring replacement, Import for existing resources. Export is not a change set action.
+
+#@@@@@@@@@@
+
+197. Complete this DynamoDB accelerator (DAX) configuration:
+```json
+{
+  "ClusterName": "my-dax-cluster",
+  "NodeType": "dax.r4.large",
+  "ReplicationFactor": 3,
+  "IAMRoleArn": "arn:aws:iam::123456789012:role/DAXServiceRole",
+  "SubnetGroupName": "my-dax-subnet-group",
+  "SecurityGroupIds": ["sg-12345678"],
+  "ParameterGroupName": "default.dax1.0",
+  "MaintenanceWindow": "sun:05:00-sun:06:00",
+  "NotificationTopicArn": "arn:aws:sns:us-east-1:123456789012:dax-notifications",
+  "ClusterEndpointEncryptionType": "_______________"
+}
+```
+
+Answer: `"TLS"` - DAX supports TLS encryption for cluster endpoints. Other option is "NONE" for no encryption. TLS encryption secures data in transit between clients and DAX cluster.
+
+#@@@@@@@@@@
+
+198. How do you implement automated disaster recovery testing?
+
+Answer: Create automated runbooks with Systems Manager, schedule regular DR drills with EventBridge, use AWS Backup for automated restore testing, implement infrastructure as code for consistent environments, validate RTO/RPO with CloudWatch metrics, and document lessons learned.
+
+#@@@@@@@@@@
+
+199. Which of the following are valid AWS Batch job queue priorities? (Multiple correct)
+A) 1 (highest)
+B) 100
+C) 500
+D) 1000 (lowest)
+E) 0
+F) -1
+
+Answer: A, B, C, D, E - AWS Batch job queue priorities range from 0-1000, where higher numbers indicate higher priority. Priority 1000 is highest, 0 is lowest. Negative priorities are not supported.
+
+#@@@@@@@@@@
+
+200. Find the final issue in this comprehensive AWS architecture:
+```yaml
+# Multi-tier application with all AWS services
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Complete AWS architecture with all services integrated'
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+
+  # Application Load Balancer
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internet-facing
+      Subnets: [!Ref PublicSubnet1, !Ref PublicSubnet2]
+      SecurityGroups: [!Ref ALBSecurityGroup]
+
+  # ECS Fargate Service
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 3
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: app
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+
+  # RDS Database
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups: [!Ref DBSecurityGroup]
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
+  # Lambda Function
+  ProcessorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {'statusCode': 200}
+      Environment:
+        Variables:
+          DB_ENDPOINT: !GetAtt Database.Endpoint.Address
+
+  # S3 Bucket
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-data-bucket'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # DynamoDB Table
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+
+# Missing critical components for production readiness
+```
+
+Answer: Missing essential production components: IAM roles and policies for services, security groups definitions, subnet configurations, monitoring and logging setup (CloudWatch, X-Ray), backup strategies, encryption configurations, auto-scaling policies, and disaster recovery planning. Architecture needs comprehensive security, monitoring, and operational excellence implementations.
+
+#@@@@@@@@@@

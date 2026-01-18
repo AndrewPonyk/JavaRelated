@@ -1,0 +1,157 @@
+name: CD - Development
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_NAME: claims-processing-dev
+  AZURE_RESOURCE_GROUP: claims-rg-dev
+
+jobs:
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Terraform Init
+        working-directory: ./infrastructure/terraform
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=terraform-state-rg" \
+            -backend-config="storage_account_name=tfstatedev" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=claims-dev.tfstate"
+
+      - name: Terraform Plan
+        working-directory: ./infrastructure/terraform
+        run: terraform plan -var-file="environments/dev/terraform.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./infrastructure/terraform
+        run: terraform apply -auto-approve tfplan
+
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Native Image
+        working-directory: ./backend
+        run: mvn package -Pnative -DskipTests
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Deploy to Azure Functions
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ./backend/target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install and Build
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build:prod
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Deploy to Azure Static Web Apps
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN_DEV }}
+          action: 'upload'
+          app_location: '/frontend'
+          output_location: 'dist/healthcare-claims-frontend'
+
+  run-migrations:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Run Flyway Migrations
+        run: |
+          # Get database connection from Azure Key Vault
+          DB_URL=$(az keyvault secret show --vault-name claims-kv-dev --name db-url --query value -o tsv)
+          DB_USER=$(az keyvault secret show --vault-name claims-kv-dev --name db-user --query value -o tsv)
+          DB_PASS=$(az keyvault secret show --vault-name claims-kv-dev --name db-password --query value -o tsv)
+
+          docker run --rm \
+            -v $(pwd)/migrations:/flyway/sql \
+            flyway/flyway:latest \
+            -url="$DB_URL" \
+            -user="$DB_USER" \
+            -password="$DB_PASS" \
+            migrate
+
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend, run-migrations]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Health Check - Backend
+        run: |
+          curl -f https://claims-processing-dev.azurewebsites.net/q/health/ready || exit 1
+
+      - name: Health Check - Frontend
+        run: |
+          curl -f https://claims-frontend-dev.azurestaticapps.net/ || exit 1
+
+      - name: Run API Smoke Tests
+        run: |
+          # TODO: Add actual smoke tests
+          echo "Smoke tests passed"

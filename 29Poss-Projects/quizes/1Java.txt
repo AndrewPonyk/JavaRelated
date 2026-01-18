@@ -1,0 +1,2774 @@
+JAVA COMPREHENSIVE QUIZ - 200 QUESTIONS
+Tech Stack: Java, Spring Boot, Jakarta EE, Hibernate, Maven, Gradle, JUnit, Micronaut, Quarkus, Vert.x, GraalVM, SLF4J, Testcontainers, Grafana, Swagger/OpenAPI, Flyway/Liquibase, WebFlux/Reactor
+
+#@@@@@@@@@@
+
+1. What is the difference between `@Component`, `@Service`, `@Repository`, and `@Controller` annotations in Spring Boot?
+Answer: All are specializations of @Component. @Service for business logic, @Repository for data access (adds exception translation), @Controller for web controllers. They provide semantic meaning and enable component scanning.
+
+#@@@@@@@@@@
+
+2. Which of the following are valid ways to create a Spring Boot application? (Multiple correct answers)
+A) Using Spring Initializr
+B) Using @SpringBootApplication annotation
+C) Using SpringApplication.run()
+D) Using @EnableAutoConfiguration
+
+Answer: A, B, C, D - All are valid. Spring Initializr generates project structure, @SpringBootApplication enables auto-configuration, SpringApplication.run() starts the application, @EnableAutoConfiguration can be used instead of @SpringBootApplication.
+
+#@@@@@@@@@@
+
+3. Find the bug in this Hibernate entity:
+```java
+@Entity
+public class User {
+    private Long id;
+    private String name;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+```
+
+Answer: Missing @Table annotation is not required, but the main issue is that @Id and @GeneratedValue should be on the field, not the getter method, or use @Access(AccessType.PROPERTY) to specify property-based access.
+
+#@@@@@@@@@@
+
+4. Explain the difference between `@Transactional(propagation = Propagation.REQUIRED)` and `@Transactional(propagation = Propagation.REQUIRES_NEW)`.
+
+Answer: REQUIRED joins existing transaction or creates new one if none exists. REQUIRES_NEW always creates a new transaction, suspending the current one if it exists. REQUIRES_NEW is useful for logging or audit operations that should commit regardless of main transaction outcome.
+
+#@@@@@@@@@@
+
+5. What will this code output?
+```java
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public void createUser() {
+        User user = new User("John");
+        userRepository.save(user);
+        throw new RuntimeException("Error");
+    }
+}
+```
+
+Answer: The user will NOT be saved to the database. The RuntimeException will cause the transaction to rollback, undoing the save operation. The exception will propagate to the caller.
+
+#@@@@@@@@@@
+
+6. How do you configure multiple datasources in Spring Boot?
+
+Answer: Define multiple DataSource beans with @Primary for default, use @Qualifier to inject specific datasource, configure separate EntityManagerFactory and TransactionManager for each datasource, use @EnableJpaRepositories with basePackages and entityManagerFactoryRef.
+
+#@@@@@@@@@@
+
+7. Which Maven lifecycle phases are executed when running `mvn package`? (Multiple correct)
+A) validate
+B) compile
+C) test
+D) package
+E) install
+
+Answer: A, B, C, D - Maven executes all phases up to and including the specified phase. validate, compile, test, and package are all executed. install is not executed.
+
+#@@@@@@@@@@
+
+8. Complete this Gradle build script for a Spring Boot application:
+```gradle
+plugins {
+    id 'org.springframework.boot' version '3.1.0'
+    id '_______________'
+    id 'java'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    _______________('org.springframework.boot:spring-boot-starter-test')
+}
+```
+
+Answer: Missing plugin: `io.spring.dependency-management`, Missing scope: `testImplementation`
+
+#@@@@@@@@@@
+
+9. What is the purpose of `@MockBean` vs `@Mock` in Spring Boot testing?
+
+Answer: @MockBean creates mock and adds it to Spring ApplicationContext, replacing any existing bean. @Mock creates mock but doesn't integrate with Spring context. Use @MockBean for Spring integration tests, @Mock for unit tests without Spring context.
+
+#@@@@@@@@@@
+
+10. Explain the difference between JPA's `EntityManager.persist()` and `EntityManager.merge()`.
+
+Answer: persist() makes transient entity persistent, throws exception if entity already exists. merge() copies state of detached entity to persistent entity, returns managed entity. Use persist() for new entities, merge() for updating detached entities.
+
+#@@@@@@@@@@
+
+11. Which of the following are valid JUnit 5 annotations? (Multiple correct)
+A) @Test
+B) @BeforeEach
+C) @AfterAll
+D) @DisplayName
+E) @Before
+
+Answer: A, B, C, D - @Before is JUnit 4, replaced by @BeforeEach in JUnit 5.
+
+#@@@@@@@@@@
+
+12. Find the issue in this Spring Security configuration:
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/public/**").permitAll()
+            .anyRequest().authenticated()
+        );
+        return http.build();
+    }
+}
+```
+
+Answer: Missing authentication mechanism. Need to add .formLogin(), .httpBasic(), or .oauth2Login() to enable authentication. Also might need .csrf().disable() depending on requirements.
+
+#@@@@@@@@@@
+
+13. What is the difference between `@Value` and `@ConfigurationProperties` in Spring Boot?
+
+Answer: @Value injects single property values, supports SpEL expressions, good for simple cases. @ConfigurationProperties binds groups of related properties to POJO, provides type safety, validation, and better IDE support for complex configurations.
+
+#@@@@@@@@@@
+
+14. Predict the output of this code:
+```java
+@Component
+public class BeanA {
+    @Autowired
+    private BeanB beanB;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("BeanA init: " + (beanB != null));
+    }
+}
+
+@Component
+public class BeanB {
+    @PostConstruct
+    public void init() {
+        System.out.println("BeanB init");
+    }
+}
+```
+
+Answer: Output will be "BeanB init" followed by "BeanA init: true". Spring resolves dependencies before calling @PostConstruct, so beanB will be injected and not null.
+
+#@@@@@@@@@@
+
+15. How do you implement custom validation in Spring Boot using Bean Validation?
+
+Answer: Create custom annotation with @Constraint, implement ConstraintValidator interface, use @Valid or @Validated to trigger validation. Example: @NotEmpty, @Email, or custom @ValidAge annotation with corresponding validator class.
+
+#@@@@@@@@@@
+
+16. What is the difference between `@RestController` and `@Controller` in Spring MVC?
+
+Answer: @RestController = @Controller + @ResponseBody. @RestController automatically serializes return values to JSON/XML. @Controller requires explicit @ResponseBody on methods or returns view names for template rendering.
+
+#@@@@@@@@@@
+
+17. Which Hibernate caching strategies are available? (Multiple correct)
+A) READ_ONLY
+B) NONSTRICT_READ_WRITE
+C) READ_WRITE
+D) TRANSACTIONAL
+E) WRITE_ONLY
+
+Answer: A, B, C, D - WRITE_ONLY is not a valid Hibernate caching strategy.
+
+#@@@@@@@@@@
+
+18. Complete this Spring Data JPA repository method:
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    List<User> findBy_______________AndAge_______________Than(String name, int age);
+}
+```
+
+Answer: `findByNameAndAgeGreaterThan` or `findByNameAndAgeLessThan` - Spring Data JPA derives queries from method names using keywords like GreaterThan, LessThan, Between, etc.
+
+#@@@@@@@@@@
+
+19. What is the purpose of `@Transactional(readOnly = true)` and when should you use it?
+
+Answer: Optimizes read-only operations by setting Hibernate session to FlushMode.MANUAL, preventing dirty checking. Database may optimize read-only transactions. Use for queries that don't modify data to improve performance.
+
+#@@@@@@@@@@
+
+20. Find the bug in this Spring Boot application:
+```java
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        return new HikariDataSource();
+    }
+}
+```
+
+Answer: HikariDataSource is created without configuration. Need to set URL, username, password, and driver class. Should use @ConfigurationProperties or configure properties manually.
+
+#@@@@@@@@@@
+
+21. Explain the difference between `@Autowired`, `@Inject`, and `@Resource` annotations.
+
+Answer: @Autowired is Spring-specific, injects by type then by name. @Inject is JSR-330 standard, similar to @Autowired. @Resource is JSR-250, injects by name then by type. @Autowired and @Inject are interchangeable in most cases.
+
+#@@@@@@@@@@
+
+22. What will happen when this code runs?
+```java
+@Service
+@Transactional
+public class UserService {
+    public void createUser() {
+        saveUser();
+        throw new RuntimeException();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private void saveUser() {
+        // save user logic
+    }
+}
+```
+
+Answer: The user WILL be saved. Even though createUser() throws exception, saveUser() runs in REQUIRES_NEW transaction which commits independently. However, private method calls don't trigger proxy, so propagation won't work as expected - need public method or self-injection.
+
+#@@@@@@@@@@
+
+23. Which of the following are valid Spring Boot actuator endpoints? (Multiple correct)
+A) /actuator/health
+B) /actuator/metrics
+C) /actuator/info
+D) /actuator/beans
+E) /actuator/database
+
+Answer: A, B, C, D - /actuator/database is not a standard actuator endpoint.
+
+#@@@@@@@@@@
+
+24. How do you configure Spring Boot to use a specific profile?
+
+Answer: Set spring.profiles.active property via application.properties, command line (-Dspring.profiles.active=prod), environment variable (SPRING_PROFILES_ACTIVE), or @ActiveProfiles in tests. Can specify multiple profiles comma-separated.
+
+#@@@@@@@@@@
+
+25. Complete this JPA query:
+```java
+@Query("SELECT u FROM User u WHERE u.age > :age AND u.name _____ :name")
+List<User> findUsersWithAgeAndName(@Param("age") int age, @Param("name") String name);
+```
+
+Answer: `LIKE` - for pattern matching with wildcards, or `=` for exact match, or `ILIKE` for case-insensitive matching (PostgreSQL).
+
+#@@@@@@@@@@
+
+26. What is the difference between `@Entity` and `@Table` annotations in JPA?
+
+Answer: @Entity marks class as JPA entity, required for persistence. @Table specifies database table details (name, schema, catalog, indexes), optional - defaults to entity class name. @Entity is mandatory, @Table is for customization.
+
+#@@@@@@@@@@
+
+27. Find the issue in this Spring configuration:
+```java
+@Configuration
+public class AppConfig {
+    @Bean
+    public UserService userService() {
+        return new UserService(userRepository());
+    }
+
+    @Bean
+    public UserRepository userRepository() {
+        return new UserRepositoryImpl();
+    }
+}
+```
+
+Answer: Calling userRepository() directly creates new instance instead of using Spring-managed bean. Should inject UserRepository as parameter or use @Autowired. Direct method calls bypass Spring proxy and bean lifecycle.
+
+#@@@@@@@@@@
+
+28. Which Maven scopes are available for dependencies? (Multiple correct)
+A) compile
+B) provided
+C) runtime
+D) test
+E) system
+F) import
+
+Answer: A, B, C, D, E, F - All are valid Maven dependency scopes.
+
+#@@@@@@@@@@
+
+29. What is the purpose of `@Conditional` annotations in Spring Boot?
+
+Answer: Control bean creation based on conditions. @ConditionalOnProperty checks property values, @ConditionalOnClass checks class presence, @ConditionalOnMissingBean creates bean only if another doesn't exist. Enables auto-configuration flexibility.
+
+#@@@@@@@@@@
+
+30. Predict the output:
+```java
+@Component
+public class MyBean {
+    @Value("${app.name:DefaultApp}")
+    private String appName;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("App name: " + appName);
+    }
+}
+```
+Given that app.name property is not defined.
+
+Answer: "App name: DefaultApp" - The :DefaultApp provides default value when property is not found.
+
+#@@@@@@@@@@
+
+31. How do you implement pagination in Spring Data JPA?
+
+Answer: Use Pageable parameter in repository methods, return Page<T> or Slice<T>. Create PageRequest with page number, size, and optional Sort. Example: `Page<User> findAll(Pageable pageable)` called with `PageRequest.of(0, 10, Sort.by("name"))`.
+
+#@@@@@@@@@@
+
+32. Which of the following are valid Spring Boot starter dependencies? (Multiple correct)
+A) spring-boot-starter-web
+B) spring-boot-starter-data-jpa
+C) spring-boot-starter-security
+D) spring-boot-starter-database
+E) spring-boot-starter-test
+
+Answer: A, B, C, E - spring-boot-starter-database is not a valid starter.
+
+#@@@@@@@@@@
+
+33. Complete this Hibernate mapping:
+```java
+@Entity
+public class Order {
+    @Id
+    private Long id;
+
+    @_______________
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+}
+```
+
+Answer: `@ManyToOne` - Multiple orders can belong to one customer. Could also be `@OneToOne` depending on business requirements, but @ManyToOne is most common for Order-Customer relationship.
+
+#@@@@@@@@@@
+
+34. What is the difference between `@Component` and `@Bean` annotations?
+
+Answer: @Component is class-level, marks class for component scanning, Spring creates instance automatically. @Bean is method-level, used in @Configuration classes, gives full control over bean creation and configuration. Use @Component for your classes, @Bean for third-party classes or complex initialization.
+
+#@@@@@@@@@@
+
+35. Find the bug in this JUnit test:
+```java
+@SpringBootTest
+class UserServiceTest {
+    @Autowired
+    private UserService userService;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @Test
+    void testCreateUser() {
+        when(userRepository.save(any())).thenReturn(new User());
+        userService.createUser("John");
+        verify(userRepository, times(1)).save(any());
+    }
+}
+```
+
+Answer: No apparent bug - this is a well-structured Spring Boot test. @MockBean mocks the repository, when() sets up behavior, verify() checks interaction. Test should pass if UserService.createUser() calls repository.save().
+
+#@@@@@@@@@@
+
+36. What is the purpose of `@Lazy` annotation in Spring?
+
+Answer: Delays bean initialization until first access. Useful for expensive beans, circular dependencies, or conditional initialization. Can be applied to @Component classes or @Bean methods. Improves startup time but may delay error detection.
+
+#@@@@@@@@@@
+
+37. Which HTTP methods are supported by Spring MVC? (Multiple correct)
+A) GET
+B) POST
+C) PUT
+D) DELETE
+E) PATCH
+F) OPTIONS
+
+Answer: A, B, C, D, E, F - Spring MVC supports all standard HTTP methods through @RequestMapping or specific annotations like @GetMapping, @PostMapping, etc.
+
+#@@@@@@@@@@
+
+38. Complete this Spring Security method security:
+```java
+@Service
+public class UserService {
+    @_______________("hasRole('ADMIN')")
+    public void deleteUser(Long id) {
+        // delete logic
+    }
+}
+```
+
+Answer: `@PreAuthorize` - Checks authorization before method execution. Could also use `@Secured("ROLE_ADMIN")` or `@RolesAllowed("ADMIN")` but @PreAuthorize supports SpEL expressions.
+
+#@@@@@@@@@@
+
+39. What will this code output?
+```java
+@RestController
+public class TestController {
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok()
+            .header("Custom-Header", "Value")
+            .body("Hello World");
+    }
+}
+```
+
+Answer: Returns HTTP 200 OK response with body "Hello World" and custom header "Custom-Header: Value". ResponseEntity allows full control over HTTP response including status, headers, and body.
+
+#@@@@@@@@@@
+
+40. How do you handle exceptions globally in Spring Boot?
+
+Answer: Use @ControllerAdvice with @ExceptionHandler methods. Create class annotated with @ControllerAdvice, add methods with @ExceptionHandler(SpecificException.class), return appropriate ResponseEntity or error view. Handles exceptions across all controllers.
+
+#@@@@@@@@@@
+
+41. Which of the following are valid JPA cascade types? (Multiple correct)
+A) CascadeType.PERSIST
+B) CascadeType.MERGE
+C) CascadeType.REMOVE
+D) CascadeType.REFRESH
+E) CascadeType.ALL
+F) CascadeType.UPDATE
+
+Answer: A, B, C, D, E - CascadeType.UPDATE is not valid, use CascadeType.MERGE for updates.
+
+#@@@@@@@@@@
+
+42. Find the issue in this Spring Data JPA repository:
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("SELECT u FROM User u WHERE u.name = ?1")
+    Optional<User> findByName(String name);
+
+    @Modifying
+    @Query("UPDATE User u SET u.email = ?2 WHERE u.id = ?1")
+    void updateEmail(Long id, String email);
+}
+```
+
+Answer: Missing @Transactional on updateEmail method. @Modifying queries require transaction context. Should add @Transactional to method or ensure calling service method is transactional.
+
+#@@@@@@@@@@
+
+43. What is the difference between `@RequestParam` and `@PathVariable` in Spring MVC?
+
+Answer: @RequestParam extracts query parameters (?name=value) or form data. @PathVariable extracts values from URL path template (/users/{id}). @RequestParam is optional by default, @PathVariable is required unless Optional<T> is used.
+
+#@@@@@@@@@@
+
+44. Complete this Spring Boot configuration:
+```java
+@ConfigurationProperties(prefix = "app.database")
+public class DatabaseConfig {
+    private String url;
+    private String username;
+    private String password;
+
+    // getters and setters
+}
+
+@Configuration
+@_______________
+public class AppConfig {
+    // configuration
+}
+```
+
+Answer: `@EnableConfigurationProperties(DatabaseConfig.class)` - Enables configuration properties binding for the specified class.
+
+#@@@@@@@@@@
+
+45. What will happen when this code runs?
+```java
+@Service
+public class UserService {
+    @Autowired
+    private UserService self;
+
+    public void createUser() {
+        self.saveUser();
+    }
+
+    @Transactional
+    public void saveUser() {
+        // save logic
+    }
+}
+```
+
+Answer: Will work correctly. Self-injection allows calling @Transactional methods from within the same class through the Spring proxy. Without self-injection, internal method calls bypass proxy and transaction won't work.
+
+#@@@@@@@@@@
+
+46. Which Maven plugins are commonly used in Spring Boot projects? (Multiple correct)
+A) spring-boot-maven-plugin
+B) maven-compiler-plugin
+C) maven-surefire-plugin
+D) maven-failsafe-plugin
+E) maven-database-plugin
+
+Answer: A, B, C, D - maven-database-plugin is not a standard Maven plugin.
+
+#@@@@@@@@@@
+
+47. How do you implement custom health indicators in Spring Boot Actuator?
+
+Answer: Implement HealthIndicator interface with health() method returning Health object. Use Health.up() for healthy, Health.down() for unhealthy, Health.unknown() for unknown state. Register as @Component and it appears in /actuator/health endpoint.
+
+#@@@@@@@@@@
+
+48. Find the bug in this Hibernate entity relationship:
+```java
+@Entity
+public class User {
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
+}
+
+@Entity
+public class Order {
+    @Id
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+}
+```
+
+Answer: No bug - this is a correct bidirectional @OneToMany/@ManyToOne relationship. User is the parent, Order is the child, mappedBy indicates the owning side is in Order entity.
+
+#@@@@@@@@@@
+
+49. What is the purpose of `@Primary` annotation in Spring?
+
+Answer: Marks a bean as primary candidate for injection when multiple beans of same type exist. Resolves ambiguity without requiring @Qualifier. Useful for default implementations or preferred beans among multiple candidates.
+
+#@@@@@@@@@@
+
+50. Predict the output:
+```java
+@Component
+public class OrderService {
+    @EventListener
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        System.out.println("Order created: " + event.getOrderId());
+    }
+}
+
+// In another service
+applicationEventPublisher.publishEvent(new OrderCreatedEvent(123L));
+```
+
+Answer: "Order created: 123" - Spring's event mechanism allows decoupled communication. @EventListener methods are called when matching events are published via ApplicationEventPublisher.
+
+#@@@@@@@@@@
+
+51. Which of the following are valid Spring Boot profiles activation methods? (Multiple correct)
+A) spring.profiles.active in application.properties
+B) --spring.profiles.active=prod command line argument
+C) SPRING_PROFILES_ACTIVE environment variable
+D) @ActiveProfiles in test classes
+E) @Profile annotation on beans
+
+Answer: A, B, C, D, E - All are valid ways to activate or specify profiles in Spring Boot.
+
+#@@@@@@@@@@
+
+52. Complete this Spring WebFlux reactive controller:
+```java
+@RestController
+public class UserController {
+    @GetMapping("/users")
+    public _____ getAllUsers() {
+        return userService.findAll();
+    }
+
+    @GetMapping("/users/{id}")
+    public _____ getUser(@PathVariable Long id) {
+        return userService.findById(id);
+    }
+}
+```
+
+Answer: First blank: `Flux<User>` (for multiple users), Second blank: `Mono<User>` (for single user). WebFlux uses reactive types Mono (0-1 element) and Flux (0-N elements).
+
+#@@@@@@@@@@
+
+53. What is the difference between `@MockBean` and `@SpyBean` in Spring Boot testing?
+
+Answer: @MockBean creates a complete mock replacing the real bean. @SpyBean creates a spy wrapping the real bean, allowing partial mocking - real methods are called unless stubbed. Use @MockBean for complete replacement, @SpyBean when you want to verify calls but keep some real behavior.
+
+#@@@@@@@@@@
+
+54. Find the issue in this Spring Security configuration:
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new InMemoryUserDetailsManager(
+            User.withUsername("admin")
+                .password("password")
+                .roles("ADMIN")
+                .build()
+        );
+    }
+}
+```
+
+Answer: Password is not encoded. Should use passwordEncoder().encode("password") or User.withDefaultPasswordEncoder() (deprecated). Raw passwords won't work with BCryptPasswordEncoder.
+
+#@@@@@@@@@@
+
+55. What will this Gradle task do?
+```gradle
+task customJar(type: Jar) {
+    archiveBaseName = 'my-app'
+    archiveVersion = '1.0'
+    from sourceSets.main.output
+    include '**/*.class'
+    exclude '**/Test*.class'
+}
+```
+
+Answer: Creates a JAR file named 'my-app-1.0.jar' containing only compiled .class files from main source set, excluding any test classes (files starting with 'Test').
+
+#@@@@@@@@@@
+
+56. How do you implement custom Spring Boot auto-configuration?
+
+Answer: Create @Configuration class with @ConditionalOnClass, @ConditionalOnMissingBean annotations. Add META-INF/spring.factories file with org.springframework.boot.autoconfigure.EnableAutoConfiguration key pointing to your configuration class. Use @ConfigurationProperties for customizable properties.
+
+#@@@@@@@@@@
+
+57. Which of the following are valid JPA fetch types? (Multiple correct)
+A) FetchType.LAZY
+B) FetchType.EAGER
+C) FetchType.IMMEDIATE
+D) FetchType.DEFERRED
+
+Answer: A, B - Only LAZY and EAGER are valid JPA fetch types. LAZY loads data on demand, EAGER loads immediately with parent entity.
+
+#@@@@@@@@@@
+
+58. Complete this Spring Data JPA specification:
+```java
+public class UserSpecification {
+    public static Specification<User> hasName(String name) {
+        return (root, query, criteriaBuilder) ->
+            criteriaBuilder._____(root.get("name"), name);
+    }
+
+    public static Specification<User> ageGreaterThan(int age) {
+        return (root, query, criteriaBuilder) ->
+            criteriaBuilder._____(root.get("age"), age);
+    }
+}
+```
+
+Answer: First blank: `equal`, Second blank: `greaterThan`. CriteriaBuilder provides methods like equal(), greaterThan(), lessThan(), like() for building type-safe queries.
+
+#@@@@@@@@@@
+
+59. What is the purpose of `@DirtiesContext` in Spring testing?
+
+Answer: Marks test class/method to reload ApplicationContext after test execution. Useful when test modifies shared state (beans, configuration) that could affect other tests. Ensures test isolation but impacts performance due to context reloading.
+
+#@@@@@@@@@@
+
+60. Find the bug in this Spring Boot application properties:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=user
+spring.datasource.password=pass
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+```
+
+Answer: No bug - this is a valid configuration for MySQL database with Hibernate. Creates/drops schema on startup/shutdown, shows SQL queries, and uses MySQL 8 dialect.
+
+#@@@@@@@@@@
+
+61. What will this code output?
+```java
+@Component
+@Scope("prototype")
+public class PrototypeBean {
+    private static int counter = 0;
+    private int id;
+
+    public PrototypeBean() {
+        this.id = ++counter;
+        System.out.println("Created bean with id: " + id);
+    }
+}
+
+// In another component
+@Autowired
+private PrototypeBean bean1;
+@Autowired
+private PrototypeBean bean2;
+```
+
+Answer: "Created bean with id: 1" and "Created bean with id: 2" - Prototype scope creates new instance for each injection point, so two separate beans are created with different IDs.
+
+#@@@@@@@@@@
+
+62. How do you implement database migrations in Spring Boot using Flyway?
+
+Answer: Add Flyway dependency, place SQL migration files in src/main/resources/db/migration with naming pattern V{version}__{description}.sql (e.g., V1__Create_user_table.sql). Flyway automatically runs migrations on startup. Configure with spring.flyway.* properties.
+
+#@@@@@@@@@@
+
+63. Which of the following are valid Spring AOP advice types? (Multiple correct)
+A) @Before
+B) @After
+C) @Around
+D) @AfterReturning
+E) @AfterThrowing
+F) @During
+
+Answer: A, B, C, D, E - @During is not a valid AOP advice type.
+
+#@@@@@@@@@@
+
+64. Complete this Spring Boot test configuration:
+```java
+@SpringBootTest
+@_______________
+@Sql("/test-data.sql")
+class UserRepositoryTest {
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private UserRepository userRepository;
+}
+```
+
+Answer: `@DataJpaTest` - Configures in-memory database, scans @Entity classes, configures TestEntityManager. Alternative could be @Transactional if using full @SpringBootTest.
+
+#@@@@@@@@@@
+
+65. What is the difference between `@RequestBody` and `@ModelAttribute` in Spring MVC?
+
+Answer: @RequestBody deserializes HTTP request body (JSON/XML) to object using HttpMessageConverter. @ModelAttribute binds form data/query parameters to object using data binding. Use @RequestBody for REST APIs, @ModelAttribute for form submissions.
+
+#@@@@@@@@@@
+
+66. Find the issue in this reactive Spring WebFlux code:
+```java
+@Service
+public class UserService {
+    public Mono<User> createUser(User user) {
+        return userRepository.save(user)
+            .doOnNext(savedUser -> {
+                emailService.sendWelcomeEmail(savedUser.getEmail());
+            });
+    }
+}
+```
+
+Answer: emailService.sendWelcomeEmail() is likely blocking operation in reactive chain. Should return Mono/Flux or use .flatMap() with reactive email service. Blocking operations break reactive streams and can cause thread starvation.
+
+#@@@@@@@@@@
+
+67. What will this Maven command do: `mvn clean compile test-compile`?
+
+Answer: Cleans target directory, compiles main source code, and compiles test source code. Does NOT run tests - only compiles them. To run tests, need `mvn test` or include test phase.
+
+#@@@@@@@@@@
+
+68. How do you implement custom Spring Boot metrics for Micrometer?
+
+Answer: Inject MeterRegistry, create counters/timers/gauges using Counter.builder(), Timer.builder(), Gauge.builder(). Use @Timed annotation for automatic timing, or manually increment counters. Metrics appear in /actuator/metrics endpoint.
+
+#@@@@@@@@@@
+
+69. Which of the following are valid Spring transaction isolation levels? (Multiple correct)
+A) Isolation.DEFAULT
+B) Isolation.READ_UNCOMMITTED
+C) Isolation.READ_COMMITTED
+D) Isolation.REPEATABLE_READ
+E) Isolation.SERIALIZABLE
+F) Isolation.SNAPSHOT
+
+Answer: A, B, C, D, E - SNAPSHOT is not a standard isolation level, though some databases support snapshot isolation.
+
+#@@@@@@@@@@
+
+70. Complete this Spring Boot Docker configuration:
+```dockerfile
+FROM openjdk:17-jre-slim
+COPY target/app.jar app.jar
+EXPOSE ____
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+Answer: `8080` - Default port for Spring Boot applications. Could also be configured via SERVER_PORT environment variable or server.port property.
+
+#@@@@@@@@@@
+
+71. What is the purpose of `@ConditionalOnProperty` in Spring Boot?
+
+Answer: Creates bean only when specified property has expected value. Supports havingValue, prefix, name, matchIfMissing attributes. Enables conditional configuration based on application properties. Example: @ConditionalOnProperty(name="feature.enabled", havingValue="true").
+
+#@@@@@@@@@@
+
+72. Find the bug in this JPA entity:
+```java
+@Entity
+public class User {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(unique = true)
+    private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Order> orders = new HashSet<>();
+}
+```
+
+Answer: FetchType.EAGER on collection can cause performance issues and N+1 queries. Should use LAZY loading and fetch data when needed. EAGER loading of collections can lead to cartesian product and memory issues.
+
+#@@@@@@@@@@
+
+73. What will this code output?
+```java
+@RestController
+public class TestController {
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Hello");
+        response.put("timestamp", LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+}
+```
+
+Answer: Returns HTTP 200 with JSON response containing message "Hello" and current timestamp. LocalDateTime is serialized to ISO-8601 format by default Jackson configuration.
+
+#@@@@@@@@@@
+
+74. How do you implement Spring Boot application events?
+
+Answer: Create event class extending ApplicationEvent or plain POJO. Publish using ApplicationEventPublisher.publishEvent(). Listen with @EventListener methods or implement ApplicationListener interface. Events are synchronous by default, use @Async for asynchronous processing.
+
+#@@@@@@@@@@
+
+75. Which Gradle configurations are commonly used in Spring Boot projects? (Multiple correct)
+A) implementation
+B) testImplementation
+C) compileOnly
+D) runtimeOnly
+E) api
+F) compile
+
+Answer: A, B, C, D, E - 'compile' is deprecated, replaced by 'implementation'. 'api' is used in library projects for transitive dependencies.
+
+#@@@@@@@@@@
+
+76. Complete this Spring Boot WebSocket configuration:
+```java
+@Configuration
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new MyWebSocketHandler(), "/websocket")
+                ._______________();
+    }
+}
+```
+
+Answer: `setAllowedOrigins("*")` or `setAllowedOriginPatterns("*")` - Configures CORS for WebSocket connections. For security, specify actual origins instead of wildcard in production.
+
+#@@@@@@@@@@
+
+77. What is the difference between `@Cacheable`, `@CachePut`, and `@CacheEvict` in Spring?
+
+Answer: @Cacheable caches method result, skips execution if cached. @CachePut always executes method and updates cache. @CacheEvict removes entries from cache. Use @Cacheable for reads, @CachePut for updates, @CacheEvict for deletions.
+
+#@@@@@@@@@@
+
+78. Find the bug in this Spring Boot configuration:
+```java
+@Configuration
+public class DatabaseConfig {
+    @Bean
+    @Primary
+    public DataSource primaryDataSource() {
+        return DataSourceBuilder.create()
+            .url("jdbc:mysql://localhost:3306/primary")
+            .build();
+    }
+
+    @Bean
+    public DataSource secondaryDataSource() {
+        return DataSourceBuilder.create()
+            .url("jdbc:mysql://localhost:3306/secondary")
+            .build();
+    }
+}
+```
+
+Answer: Missing username and password configuration for DataSources. Should add .username() and .password() calls or configure via properties. Also missing driver class name configuration.
+
+#@@@@@@@@@@
+
+79. What will this reactive code output?
+```java
+Flux.just(1, 2, 3, 4, 5)
+    .filter(n -> n % 2 == 0)
+    .map(n -> n * 2)
+    .subscribe(System.out::println);
+```
+
+Answer: Outputs "4" and "8" on separate lines. Filters even numbers (2, 4), multiplies by 2 (4, 8), then prints each result.
+
+#@@@@@@@@@@
+
+80. How do you implement custom Spring Boot banner?
+
+Answer: Create banner.txt file in src/main/resources with ASCII art. Use ${application.version}, ${spring-boot.version} placeholders. Configure with spring.banner.location, spring.banner.charset properties. Can disable with spring.main.banner-mode=off.
+
+#@@@@@@@@@@
+
+81. Which of the following are valid Spring Data JPA query methods? (Multiple correct)
+A) findByNameContaining
+B) findByAgeGreaterThanEqual
+C) findByEmailIsNull
+D) findByCreatedDateBetween
+E) findByNameStartingWith
+F) findByIdEquals
+
+Answer: A, B, C, D, E, F - All are valid Spring Data JPA query method keywords.
+
+#@@@@@@@@@@
+
+82. Complete this Spring Security JWT configuration:
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
+                                  FilterChain filterChain) throws ServletException, IOException {
+        String token = extractToken(request);
+        if (token != null && jwtUtil.validateToken(token)) {
+            String username = jwtUtil.getUsernameFromToken(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext()._______________();
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+Answer: `setAuthentication(auth)` - Sets the authentication object in the security context for the current request.
+
+#@@@@@@@@@@
+
+83. What is the purpose of `@Retryable` annotation in Spring?
+
+Answer: Automatically retries method execution on specified exceptions. Configure with maxAttempts, delay, backoff properties. Requires @EnableRetry on configuration class. Use with @Recover method for fallback logic when all retries fail.
+
+#@@@@@@@@@@
+
+84. Find the issue in this Hibernate query:
+```java
+@Repository
+public class UserRepository {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<User> findActiveUsers() {
+        return entityManager.createQuery(
+            "SELECT u FROM User u WHERE u.active = true", User.class)
+            .getResultList();
+    }
+}
+```
+
+Answer: No apparent issue - this is a correct JPQL query. Returns list of users where active field is true. Query is type-safe with User.class parameter.
+
+#@@@@@@@@@@
+
+85. What will this Spring Boot test output?
+```java
+@SpringBootTest
+@TestPropertySource(properties = {"app.name=TestApp", "app.version=1.0"})
+class ApplicationTest {
+    @Value("${app.name}")
+    private String appName;
+
+    @Test
+    void testProperties() {
+        System.out.println("App: " + appName);
+    }
+}
+```
+
+Answer: "App: TestApp" - @TestPropertySource overrides properties for test execution, so app.name resolves to "TestApp".
+
+#@@@@@@@@@@
+
+86. How do you implement Spring Boot custom error pages?
+
+Answer: Create error.html in src/main/resources/templates or static folder. For specific status codes, use 404.html, 500.html. Implement ErrorController for programmatic error handling. Use @ControllerAdvice for global exception handling with custom error responses.
+
+#@@@@@@@@@@
+
+87. Which of the following are valid Spring Boot logging configurations? (Multiple correct)
+A) logging.level.com.example=DEBUG
+B) logging.file.name=app.log
+C) logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+D) logging.level.root=INFO
+E) logging.config=logback-spring.xml
+
+Answer: A, B, C, D, E - All are valid Spring Boot logging configuration properties.
+
+#@@@@@@@@@@
+
+88. Complete this Spring Boot GraphQL resolver:
+```java
+@Controller
+public class UserController {
+    @QueryMapping
+    public List<User> users() {
+        return userService.findAll();
+    }
+
+    @_______________
+    public User createUser(@Argument String name, @Argument String email) {
+        return userService.create(name, email);
+    }
+}
+```
+
+Answer: `@MutationMapping` - Used for GraphQL mutations (create, update, delete operations). @QueryMapping is for read operations, @MutationMapping for write operations.
+
+#@@@@@@@@@@
+
+89. What is the difference between `@Component` and `@Configuration` classes?
+
+Answer: @Component creates single bean instance of the class. @Configuration creates configuration class where @Bean methods define other beans. @Configuration classes are proxied to ensure singleton behavior of @Bean methods. Use @Component for business logic, @Configuration for bean definitions.
+
+#@@@@@@@@@@
+
+90. Find the bug in this Spring Data JPA repository:
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("SELECT u FROM User u WHERE u.name = :name")
+    List<User> findByName(@Param("name") String name);
+
+    @Query("DELETE FROM User u WHERE u.id = :id")
+    void deleteById(@Param("id") Long id);
+}
+```
+
+Answer: Missing @Modifying annotation on deleteById method. DELETE queries require @Modifying annotation. Also should be @Transactional for proper transaction management.
+
+#@@@@@@@@@@
+
+91. What will this code output?
+```java
+@Service
+@Transactional
+public class OrderService {
+    @Autowired
+    private PaymentService paymentService;
+
+    public void processOrder() {
+        try {
+            paymentService.processPayment();
+        } catch (PaymentException e) {
+            // Log error but don't rethrow
+            log.error("Payment failed", e);
+        }
+    }
+}
+
+@Service
+public class PaymentService {
+    @Transactional
+    public void processPayment() throws PaymentException {
+        throw new PaymentException("Payment failed");
+    }
+}
+```
+
+Answer: Transaction will NOT rollback. Exception is caught and not rethrown, so Spring doesn't see the exception. For rollback, either rethrow exception or use @Transactional(rollbackFor = PaymentException.class) if it's checked exception.
+
+#@@@@@@@@@@
+
+92. How do you implement Spring Boot application monitoring with Micrometer and Prometheus?
+
+Answer: Add micrometer-registry-prometheus dependency, expose /actuator/prometheus endpoint, configure Prometheus to scrape endpoint. Use @Timed, @Counted annotations or inject MeterRegistry for custom metrics. Configure management.endpoints.web.exposure.include=prometheus.
+
+#@@@@@@@@@@
+
+93. Which of the following are valid Spring Boot externalized configuration sources? (Multiple correct)
+A) application.properties
+B) application.yml
+C) Environment variables
+D) Command line arguments
+E) @PropertySource files
+F) Config server
+
+Answer: A, B, C, D, E, F - All are valid externalized configuration sources in Spring Boot, listed in order of precedence.
+
+#@@@@@@@@@@
+
+94. Complete this Spring Boot Redis configuration:
+```java
+@Configuration
+@EnableCaching
+public class RedisConfig {
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+    }
+
+    @Bean
+    public _____ cacheManager() {
+        return RedisCacheManager.builder(redisConnectionFactory()).build();
+    }
+}
+```
+
+Answer: `CacheManager` - Interface for cache management in Spring. RedisCacheManager implements CacheManager for Redis-based caching.
+
+#@@@@@@@@@@
+
+95. What is the purpose of `@ConditionalOnMissingBean` in Spring Boot?
+
+Answer: Creates bean only if no bean of the same type exists in ApplicationContext. Enables default implementations that can be overridden. Commonly used in auto-configuration to provide fallback beans. Prevents duplicate bean creation conflicts.
+
+#@@@@@@@@@@
+
+96. Find the issue in this Spring Boot REST controller:
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    @GetMapping
+    public List<User> getUsers(@RequestParam(required = false) String name) {
+        if (name != null) {
+            return userService.findByName(name);
+        }
+        return userService.findAll();
+    }
+
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userService.save(user);
+    }
+}
+```
+
+Answer: No validation on input User object. Should add @Valid annotation to @RequestBody User parameter and implement validation constraints on User entity. Also missing proper HTTP status codes (201 for creation).
+
+#@@@@@@@@@@
+
+97. What will this Maven dependency resolution output?
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>6.0.0</version>
+    </dependency>
+</dependencies>
+```
+
+Answer: Maven will use spring-core 6.0.0 due to explicit version declaration, potentially causing version conflicts with spring-boot-starter-web's transitive dependencies. Should rely on Spring Boot's dependency management or use dependencyManagement section.
+
+#@@@@@@@@@@
+
+98. How do you implement Spring Boot custom auto-configuration with conditional beans?
+
+Answer: Create @Configuration class with @ConditionalOnClass, @ConditionalOnProperty, @ConditionalOnMissingBean annotations. Add to META-INF/spring.factories under EnableAutoConfiguration key. Use @ConfigurationProperties for customizable settings. Test with @AutoConfigureTestDatabase.
+
+#@@@@@@@@@@
+
+99. Which of the following are valid Spring transaction propagation behaviors? (Multiple correct)
+A) Propagation.REQUIRED
+B) Propagation.REQUIRES_NEW
+C) Propagation.SUPPORTS
+D) Propagation.NOT_SUPPORTED
+E) Propagation.NEVER
+F) Propagation.NESTED
+
+Answer: A, B, C, D, E, F - All are valid Spring transaction propagation behaviors defining how transactions behave when called from other transactional methods.
+
+#@@@@@@@@@@
+
+100. Complete this Spring Boot integration test:
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class UserControllerIntegrationTest {
+    @Autowired
+    private _____ testRestTemplate;
+
+    @Test
+    void testCreateUser() {
+        User user = new User("John", "john@example.com");
+        ResponseEntity<User> response = testRestTemplate.postForEntity("/api/users", user, User.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+}
+```
+
+Answer: `TestRestTemplate` - Provides convenient methods for testing REST endpoints in integration tests with real HTTP requests.
+
+#@@@@@@@@@@
+
+101. What is the difference between `@Scheduled` and `@Async` in Spring Boot?
+
+Answer: @Scheduled executes methods at fixed intervals/cron expressions, runs in scheduled thread pool. @Async executes methods asynchronously in separate thread, returns immediately. @Scheduled for periodic tasks, @Async for non-blocking operations. Both require @EnableScheduling/@EnableAsync.
+
+#@@@@@@@@@@
+
+102. Find the bug in this Spring Boot application:
+```java
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(Application.class);
+        app.setDefaultProperties(Collections.singletonMap("server.port", "8080"));
+        app.run(args);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "feature.enabled", havingValue = "true")
+    public FeatureService featureService() {
+        return new FeatureService();
+    }
+}
+```
+
+Answer: No apparent bug - this is valid Spring Boot application setup. Sets default port to 8080 and conditionally creates FeatureService bean based on property value.
+
+#@@@@@@@@@@
+
+103. What will this Testcontainers test do?
+```java
+@SpringBootTest
+@Testcontainers
+class DatabaseIntegrationTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+}
+```
+
+Answer: Starts PostgreSQL container for integration testing, configures Spring Boot to use container database. @DynamicPropertySource updates datasource properties with container connection details. Provides isolated database for each test run.
+
+#@@@@@@@@@@
+
+104. How do you implement Spring Boot custom health indicators?
+
+Answer: Implement HealthIndicator interface with health() method returning Health object. Use Health.up().withDetail() for healthy state with details, Health.down() for unhealthy. Register as @Component, appears in /actuator/health. Can group indicators and configure show-details property.
+
+#@@@@@@@@@@
+
+105. Which of the following are valid Spring Boot actuator endpoints? (Multiple correct)
+A) /actuator/health
+B) /actuator/metrics
+C) /actuator/env
+D) /actuator/configprops
+E) /actuator/threaddump
+F) /actuator/database
+
+Answer: A, B, C, D, E - /actuator/database is not a standard actuator endpoint.
+
+#@@@@@@@@@@
+
+106. Complete this Spring Boot WebFlux error handling:
+```java
+@Component
+public class GlobalErrorHandler implements ErrorWebExceptionHandler {
+    @Override
+    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        String errorMessage = "{\"error\":\"" + ex.getMessage() + "\"}";
+        DataBuffer buffer = response.bufferFactory().wrap(errorMessage.getBytes());
+
+        return response._____(Mono.just(buffer));
+    }
+}
+```
+
+Answer: `writeWith` - Writes the response body using reactive streams. WebFlux uses DataBuffer for reactive HTTP response writing.
+
+#@@@@@@@@@@
+
+107. What is the purpose of `@JsonView` in Spring Boot REST APIs?
+
+Answer: Controls JSON serialization based on views/profiles. Define view interfaces, annotate fields with @JsonView, use @JsonView on controller methods. Enables different JSON representations for same entity (e.g., public vs admin views) without creating separate DTOs.
+
+#@@@@@@@@@@
+
+108. Find the issue in this Spring Boot security configuration:
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(Customizer.withDefaults());
+        return http.build();
+    }
+}
+```
+
+Answer: No apparent issue - this is a valid Spring Security configuration. Allows public access to /public/**, requires ADMIN role for /admin/**, and authentication for all other requests with default form login.
+
+#@@@@@@@@@@
+
+109. What will this reactive code output?
+```java
+Mono.just("Hello")
+    .map(String::toUpperCase)
+    .flatMap(s -> Mono.just(s + " World"))
+    .doOnNext(System.out::println)
+    .subscribe();
+```
+
+Answer: "HELLO WORLD" - Transforms "Hello" to uppercase, concatenates " World", prints result. doOnNext performs side effect without changing the stream.
+
+#@@@@@@@@@@
+
+110. How do you implement Spring Boot custom banner with dynamic content?
+
+Answer: Implement Banner interface with printBanner() method, or create banner.txt with placeholders like ${application.version}, ${spring-boot.version}, ${application.title}. Register custom banner with SpringApplication.setBanner(). Can access Environment for dynamic properties.
+
+#@@@@@@@@@@
+
+111. Which of the following are valid Spring Data JPA auditing annotations? (Multiple correct)
+A) @CreatedDate
+B) @LastModifiedDate
+C) @CreatedBy
+D) @LastModifiedBy
+E) @Version
+F) @UpdatedDate
+
+Answer: A, B, C, D, E - @UpdatedDate is not valid, use @LastModifiedDate. Requires @EnableJpaAuditing and AuditorAware bean for @CreatedBy/@LastModifiedBy.
+
+#@@@@@@@@@@
+
+112. Complete this Spring Boot OAuth2 configuration:
+```java
+@Configuration
+@EnableWebSecurity
+public class OAuth2Config {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+            ._____(oauth2 -> oauth2
+                .loginPage("/oauth2/authorization/google")
+            );
+        return http.build();
+    }
+}
+```
+
+Answer: `oauth2Login` - Configures OAuth2 login with external providers like Google, GitHub, Facebook. Requires spring-boot-starter-oauth2-client dependency and provider configuration.
+
+#@@@@@@@@@@
+
+113. What is the difference between `@Entity` and `@Embeddable` in JPA?
+
+Answer: @Entity represents database table with primary key, managed by EntityManager. @Embeddable represents value object embedded in entities, no separate table or primary key. Use @Entity for domain objects, @Embeddable for value objects like Address, Money.
+
+#@@@@@@@@@@
+
+114. Find the bug in this Spring Boot configuration:
+```java
+@Configuration
+public class AsyncConfig implements AsyncConfigurer {
+    @Override
+    public Executor getAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("async-");
+        return executor;
+    }
+}
+```
+
+Answer: Missing executor.initialize() call. ThreadPoolTaskExecutor needs to be initialized before use. Should call executor.initialize() before returning, or use @Bean method instead of AsyncConfigurer.
+
+#@@@@@@@@@@
+
+115. What will this Spring Boot test output?
+```java
+@SpringBootTest
+@MockBean
+UserService userService;
+
+@Test
+void testMockBean() {
+    when(userService.findById(1L)).thenReturn(new User("John"));
+    User user = userService.findById(1L);
+    System.out.println("User: " + user.getName());
+}
+```
+
+Answer: "User: John" - @MockBean creates mock that replaces real bean in ApplicationContext. when().thenReturn() stubs the method to return specified User object.
+
+#@@@@@@@@@@
+
+116. How do you implement Spring Boot custom property validation?
+
+Answer: Create custom annotation with @Constraint, implement ConstraintValidator interface. Use @ConfigurationProperties with @Validated for property validation. Can validate individual properties or cross-field validation with class-level constraints.
+
+#@@@@@@@@@@
+
+117. Which of the following are valid Spring Boot logging levels? (Multiple correct)
+A) TRACE
+B) DEBUG
+C) INFO
+D) WARN
+E) ERROR
+F) FATAL
+
+Answer: A, B, C, D, E - FATAL is not a standard Spring Boot logging level. Spring Boot uses SLF4J levels: TRACE, DEBUG, INFO, WARN, ERROR.
+
+#@@@@@@@@@@
+
+118. Complete this Spring Boot GraphQL subscription:
+```java
+@Controller
+public class NotificationController {
+    @_______________
+    public Flux<Notification> notifications(@Argument String userId) {
+        return notificationService.getNotificationStream(userId);
+    }
+}
+```
+
+Answer: `@SubscriptionMapping` - Used for GraphQL subscriptions that return reactive streams (Flux) for real-time updates over WebSocket connections.
+
+#@@@@@@@@@@
+
+119. What is the purpose of `@DependsOn` annotation in Spring?
+
+Answer: Controls bean initialization order by specifying dependencies. Bean annotated with @DependsOn waits for specified beans to be created first. Useful when beans have implicit dependencies not expressed through injection. Example: @DependsOn("databaseInitializer").
+
+#@@@@@@@@@@
+
+120. Find the issue in this Spring Data JPA query:
+```java
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("SELECT u FROM User u WHERE u.email = ?1 AND u.active = ?2")
+    Optional<User> findByEmailAndActive(String email, boolean active);
+
+    @Query(value = "SELECT * FROM users WHERE email = ?1", nativeQuery = true)
+    List<User> findByEmailNative(String email);
+}
+```
+
+Answer: No apparent issue - both queries are valid. First uses JPQL with positional parameters, second uses native SQL. Native queries return raw database results, JPQL queries return managed entities.
+
+#@@@@@@@@@@
+
+121. What will this code output?
+```java
+@Component
+public class EventPublisher {
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    @EventListener
+    public void handleEvent(CustomEvent event) {
+        System.out.println("Received: " + event.getMessage());
+        publisher.publishEvent(new AnotherEvent("Response"));
+    }
+}
+```
+
+Answer: When CustomEvent is published, prints "Received: [message]" and publishes AnotherEvent. Events are processed synchronously by default, so AnotherEvent will be published immediately after handling CustomEvent.
+
+#@@@@@@@@@@
+
+122. How do you implement Spring Boot distributed tracing with Sleuth?
+
+Answer: Add spring-cloud-starter-sleuth dependency, optionally add zipkin for trace collection. Sleuth automatically instruments HTTP requests, database calls, messaging. Configure spring.sleuth.zipkin.base-url for trace export. Provides correlation IDs across microservices.
+
+#@@@@@@@@@@
+
+123. Which of the following are valid Spring Boot configuration metadata annotations? (Multiple correct)
+A) @ConfigurationProperties
+B) @NestedConfigurationProperty
+C) @DefaultValue
+D) @DeprecatedConfigurationProperty
+E) @PropertySource
+
+Answer: A, B, D, E - @DefaultValue is not a Spring Boot annotation. Use default values in @Value or field initialization in @ConfigurationProperties classes.
+
+#@@@@@@@@@@
+
+124. Complete this Spring Boot WebSocket STOMP configuration:
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")._______________();
+    }
+}
+```
+
+Answer: `withSockJS()` - Enables SockJS fallback for browsers that don't support WebSocket. Provides transparent fallback to HTTP-based transport mechanisms.
+
+#@@@@@@@@@@
+
+125. What is the difference between `@Transactional` on class vs method level?
+
+Answer: Class-level @Transactional applies to all public methods in class as default. Method-level @Transactional overrides class-level settings for specific methods. Method-level has higher precedence. Can mix different transaction configurations within same class.
+
+#@@@@@@@@@@
+
+126. Find the bug in this Spring Boot REST client:
+```java
+@Service
+public class ExternalApiClient {
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public User getUser(Long id) {
+        String url = "https://api.example.com/users/" + id;
+        return restTemplate.getForObject(url, User.class);
+    }
+}
+```
+
+Answer: RestTemplate should be injected as bean, not created directly. Direct instantiation bypasses Spring configuration, interceptors, and connection pooling. Should inject RestTemplate or use RestTemplateBuilder.
+
+#@@@@@@@@@@
+
+127. What will this reactive error handling output?
+```java
+Mono.just("test")
+    .map(s -> {
+        if (s.equals("test")) {
+            throw new RuntimeException("Error");
+        }
+        return s.toUpperCase();
+    })
+    .onErrorReturn("DEFAULT")
+    .subscribe(System.out::println);
+```
+
+Answer: "DEFAULT" - RuntimeException is thrown in map operator, onErrorReturn catches error and provides fallback value "DEFAULT".
+
+#@@@@@@@@@@
+
+128. How do you implement Spring Boot custom metrics with tags?
+
+Answer: Inject MeterRegistry, use Counter.builder("metric.name").tag("key", "value").register(registry). Tags enable dimensional metrics for filtering/grouping. Example: counter.tag("endpoint", "/api/users").tag("method", "GET").increment().
+
+#@@@@@@@@@@
+
+129. Which of the following are valid Spring Boot test slices? (Multiple correct)
+A) @WebMvcTest
+B) @DataJpaTest
+C) @JsonTest
+D) @RestClientTest
+E) @WebFluxTest
+F) @ServiceTest
+
+Answer: A, B, C, D, E - @ServiceTest is not a standard Spring Boot test slice annotation.
+
+#@@@@@@@@@@
+
+130. Complete this Spring Boot custom starter:
+```java
+@Configuration
+@ConditionalOnClass(MyService.class)
+@EnableConfigurationProperties(MyProperties.class)
+public class MyAutoConfiguration {
+    @Bean
+    @ConditionalOnMissingBean
+    public MyService myService(MyProperties properties) {
+        return new MyService(properties);
+    }
+}
+```
+
+META-INF/spring.factories:
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.example._______________
+```
+
+Answer: `MyAutoConfiguration` - Full qualified class name of the auto-configuration class. Spring Boot loads auto-configurations listed in spring.factories file.
+
+#@@@@@@@@@@
+
+131. What is the purpose of `@PostConstruct` and `@PreDestroy` in Spring?
+
+Answer: @PostConstruct executes after dependency injection, before bean is ready for use. @PreDestroy executes before bean destruction during shutdown. Use for initialization/cleanup logic. Alternative to InitializingBean/DisposableBean interfaces or @Bean(initMethod/destroyMethod).
+
+#@@@@@@@@@@
+
+132. Find the issue in this Spring Boot caching configuration:
+```java
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    @Bean
+    public CacheManager cacheManager() {
+        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        cacheManager.setCaches(Arrays.asList(
+            new ConcurrentMapCache("users"),
+            new ConcurrentMapCache("orders")
+        ));
+        return cacheManager;
+    }
+}
+```
+
+Answer: No apparent issue - this is a valid in-memory cache configuration using SimpleCacheManager with ConcurrentMapCache. Suitable for single-instance applications, not for distributed caching.
+
+#@@@@@@@@@@
+
+133. What will this Spring Boot validation output?
+```java
+public class User {
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @Min(value = 18, message = "Must be at least 18")
+    private int age;
+}
+
+@PostMapping("/users")
+public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
+    if (result.hasErrors()) {
+        return ResponseEntity.badRequest().body(result.getAllErrors());
+    }
+    return ResponseEntity.ok(userService.save(user));
+}
+```
+
+Answer: If validation fails, returns HTTP 400 with list of validation errors. If User has blank name, invalid email, or age < 18, corresponding error messages are returned. If valid, saves user and returns HTTP 200.
+
+#@@@@@@@@@@
+
+134. How do you implement Spring Boot custom endpoint for actuator?
+
+Answer: Create @Component implementing Endpoint interface or extend AbstractEndpoint. Use @ReadOperation, @WriteOperation, @DeleteOperation annotations on methods. Configure with @Endpoint(id = "custom"). Appears at /actuator/custom endpoint.
+
+#@@@@@@@@@@
+
+135. Which of the following are valid Spring Boot externalized configuration precedence? (Correct order)
+A) Command line arguments > Environment variables > application.properties
+B) application.properties > Environment variables > Command line arguments
+C) Environment variables > Command line arguments > application.properties
+D) Command line arguments > application.properties > Environment variables
+
+Answer: A - Command line arguments have highest precedence, followed by environment variables, then application.properties. This allows runtime overrides of configuration.
+
+#@@@@@@@@@@
+
+136. Complete this Spring Boot WebClient configuration:
+```java
+@Configuration
+public class WebClientConfig {
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder()
+            .baseUrl("https://api.example.com")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            ._______________()
+            .build();
+    }
+}
+```
+
+Answer: `codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024))` - Configures codec settings like max in-memory size for request/response buffering. Other options: `.filter()`, `.exchangeStrategies()`, `.clientConnector()`.
+
+#@@@@@@@@@@
+
+137. What is the difference between `@Repository`, `@Service`, and `@Component` exception handling?
+
+Answer: @Repository adds automatic exception translation from database-specific exceptions to Spring's DataAccessException hierarchy. @Service and @Component don't provide automatic exception translation. @Repository is specifically for data access layer with additional persistence exception handling.
+
+#@@@@@@@@@@
+
+138. Find the bug in this Spring Boot batch configuration:
+```java
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+    @Bean
+    public Job importUserJob(JobBuilderFactory jobBuilderFactory, Step step1) {
+        return jobBuilderFactory.get("importUserJob")
+            .incrementer(new RunIdIncrementer())
+            .flow(step1)
+            .end()
+            .build();
+    }
+
+    @Bean
+    public Step step1(StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("step1")
+            .<User, User>chunk(10)
+            .reader(reader())
+            .processor(processor())
+            .writer(writer())
+            .build();
+    }
+}
+```
+
+Answer: Missing reader(), processor(), and writer() bean definitions. These methods are called but not defined. Should create @Bean methods for ItemReader, ItemProcessor, and ItemWriter implementations.
+
+#@@@@@@@@@@
+
+139. What will this Spring Boot scheduling output?
+```java
+@Component
+@EnableScheduling
+public class ScheduledTasks {
+    private int counter = 0;
+
+    @Scheduled(fixedRate = 1000)
+    public void reportCurrentTime() {
+        System.out.println("Current time: " + new Date() + ", Counter: " + ++counter);
+    }
+}
+```
+
+Answer: Prints current time and incrementing counter every 1000ms (1 second). Output like "Current time: Mon Jan 01 12:00:00 UTC 2024, Counter: 1" repeating every second.
+
+#@@@@@@@@@@
+
+140. How do you implement Spring Boot custom health check with external dependency?
+
+Answer: Implement HealthIndicator interface, check external service availability in health() method. Return Health.up() if healthy, Health.down() if unhealthy. Add details with .withDetail(). Example: ping database, call external API, check disk space.
+
+#@@@@@@@@@@
+
+141. Which of the following are valid Spring Boot Maven plugin goals? (Multiple correct)
+A) spring-boot:run
+B) spring-boot:build-image
+C) spring-boot:repackage
+D) spring-boot:start
+E) spring-boot:stop
+F) spring-boot:deploy
+
+Answer: A, B, C, D, E - spring-boot:deploy is not a valid Spring Boot Maven plugin goal.
+
+#@@@@@@@@@@
+
+142. Complete this Spring Boot custom converter:
+```java
+@Component
+public class StringToUserConverter implements Converter<String, User> {
+    @Override
+    public User convert(String source) {
+        String[] parts = source.split(",");
+        User user = new User();
+        user.setName(parts[0]);
+        user.setEmail(parts[1]);
+        return user;
+    }
+}
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry._______________();
+    }
+}
+```
+
+Answer: `addConverter(new StringToUserConverter())` - Registers custom converter for automatic type conversion in Spring MVC request parameter binding.
+
+#@@@@@@@@@@
+
+143. What is the purpose of `@ConditionalOnWebApplication` in Spring Boot?
+
+Answer: Creates bean only when running as web application. Has type attribute for SERVLET, REACTIVE, or ANY web application types. Useful for web-specific configurations that shouldn't be loaded in non-web contexts like batch jobs or command-line applications.
+
+#@@@@@@@@@@
+
+144. Find the issue in this Spring Boot security method:
+```java
+@RestController
+public class AdminController {
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/users")
+    public List<User> getAllUsers() {
+        return userService.findAll();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') and #id == authentication.principal.id")
+    @DeleteMapping("/admin/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+    }
+}
+```
+
+Answer: Second @PreAuthorize expression assumes authentication.principal.id exists and is Long type. Should check authentication.principal type and handle potential ClassCastException. Also, admin deleting themselves might not be desired business logic.
+
+#@@@@@@@@@@
+
+145. What will this reactive WebFlux code output?
+```java
+@GetMapping("/users")
+public Flux<User> getUsers() {
+    return Flux.fromIterable(Arrays.asList(
+        new User("John"), new User("Jane"), new User("Bob")
+    ))
+    .delayElements(Duration.ofSeconds(1))
+    .doOnNext(user -> System.out.println("Sending: " + user.getName()));
+}
+```
+
+Answer: Returns users with 1-second delay between each emission. Prints "Sending: John", then after 1 second "Sending: Jane", then after another second "Sending: Bob". Client receives users as server-sent events.
+
+#@@@@@@@@@@
+
+146. How do you implement Spring Boot custom banner with ASCII art?
+
+Answer: Create banner.txt in src/main/resources with ASCII art. Use ${application.version}, ${spring-boot.version} placeholders. Configure spring.banner.location for custom location. Can implement Banner interface for programmatic banner generation with colors and formatting.
+
+#@@@@@@@@@@
+
+147. Which of the following are valid Spring Boot Docker layering strategies? (Multiple correct)
+A) dependencies
+B) spring-boot-loader
+C) snapshot-dependencies
+D) application
+E) resources
+
+Answer: A, B, C, D - resources is not a standard Docker layer in Spring Boot layering. Standard layers: dependencies, spring-boot-loader, snapshot-dependencies, application.
+
+#@@@@@@@@@@
+
+148. Complete this Spring Boot Redis session configuration:
+```java
+@Configuration
+@EnableRedisHttpSession
+public class SessionConfig {
+    @Bean
+    public LettuceConnectionFactory connectionFactory() {
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+    }
+
+    @Bean
+    public _____ cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setCookieName("JSESSIONID");
+        serializer.setCookiePath("/");
+        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        return serializer;
+    }
+}
+```
+
+Answer: `CookieSerializer` - Interface for customizing session cookie serialization in Spring Session. DefaultCookieSerializer is the default implementation.
+
+#@@@@@@@@@@
+
+149. What is the difference between `@Autowired` and `@Resource` injection behavior?
+
+Answer: @Autowired injects by type first, then by name if multiple candidates. @Resource injects by name first, then by type. @Autowired is Spring-specific, @Resource is JSR-250 standard. @Resource has name attribute for explicit naming.
+
+#@@@@@@@@@@
+
+150. Find the bug in this Spring Boot JPA auditing:
+```java
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+public class User {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
+
+    @CreatedBy
+    private String createdBy;
+}
+
+@Configuration
+@EnableJpaAuditing
+public class AuditConfig {
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        return () -> Optional.of("system");
+    }
+}
+```
+
+Answer: No apparent bug - this is correct JPA auditing configuration. @EnableJpaAuditing enables auditing, AuditorAware provides current user, @EntityListeners enables audit annotations on entity.
+
+#@@@@@@@@@@
+
+151. What will this Spring Boot configuration property binding output?
+```java
+@ConfigurationProperties(prefix = "app")
+public class AppProperties {
+    private String name;
+    private Database database = new Database();
+
+    public static class Database {
+        private String url;
+        private int maxConnections = 10;
+        // getters and setters
+    }
+    // getters and setters
+}
+
+# application.properties
+app.name=MyApp
+app.database.url=jdbc:mysql://localhost:3306/db
+app.database.max-connections=20
+```
+
+Answer: AppProperties will have name="MyApp", database.url="jdbc:mysql://localhost:3306/db", database.maxConnections=20. Nested properties are bound using dot notation, kebab-case is converted to camelCase.
+
+#@@@@@@@@@@
+
+152. How do you implement Spring Boot custom error controller?
+
+Answer: Implement ErrorController interface with @RequestMapping("/error"). Handle different error scenarios based on HttpStatus. Use ErrorAttributes to access error details. Can return different views/responses for HTML vs JSON requests using content negotiation.
+
+#@@@@@@@@@@
+
+153. Which of the following are valid Spring Boot test annotations for web layer testing? (Multiple correct)
+A) @WebMvcTest
+B) @WebFluxTest
+C) @AutoConfigureWebMvc
+D) @AutoConfigureMockMvc
+E) @AutoConfigureWebTestClient
+
+Answer: A, B, D, E - @AutoConfigureWebMvc is not a standard Spring Boot test annotation. Use @WebMvcTest for Spring MVC testing, @WebFluxTest for WebFlux testing.
+
+#@@@@@@@@@@
+
+154. Complete this Spring Boot custom validation annotation:
+```java
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = EmailValidator.class)
+public @interface ValidEmail {
+    String message() default "Invalid email format";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+
+public class EmailValidator implements _______________<ValidEmail, String> {
+    @Override
+    public boolean isValid(String email, ConstraintValidatorContext context) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    }
+}
+```
+
+Answer: `ConstraintValidator` - Interface for implementing custom validation logic. Generic parameters specify annotation type and validated value type.
+
+#@@@@@@@@@@
+
+155. What is the purpose of `@DirtiesContext` in Spring Boot testing?
+
+Answer: Marks test to reload ApplicationContext after execution. Useful when test modifies shared beans or configuration that could affect other tests. Has TestExecutionEvent options: BEFORE_METHOD, AFTER_METHOD, BEFORE_CLASS, AFTER_CLASS. Impacts performance due to context reloading.
+
+#@@@@@@@@@@
+
+156. Find the issue in this Spring Boot WebSocket handler:
+```java
+@Component
+public class ChatWebSocketHandler extends TextWebSocketHandler {
+    private final Set<WebSocketSession> sessions = new HashSet<>();
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        sessions.add(session);
+    }
+
+    @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        for (WebSocketSession s : sessions) {
+            s.sendMessage(message);
+        }
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        sessions.remove(session);
+    }
+}
+```
+
+Answer: HashSet is not thread-safe. Multiple concurrent connections can cause ConcurrentModificationException. Should use ConcurrentHashMap.newKeySet() or Collections.synchronizedSet() for thread-safe session management.
+
+#@@@@@@@@@@
+
+157. What will this Spring Boot actuator custom endpoint output?
+```java
+@Component
+@Endpoint(id = "custom")
+public class CustomEndpoint {
+    @ReadOperation
+    public Map<String, Object> customInfo() {
+        Map<String, Object> info = new HashMap<>();
+        info.put("status", "UP");
+        info.put("timestamp", Instant.now());
+        info.put("version", "1.0.0");
+        return info;
+    }
+}
+```
+
+Answer: GET /actuator/custom returns JSON: {"status":"UP","timestamp":"2024-01-01T12:00:00Z","version":"1.0.0"}. Custom endpoint provides application-specific information accessible via actuator.
+
+#@@@@@@@@@@
+
+158. How do you implement Spring Boot graceful shutdown?
+
+Answer: Set server.shutdown=graceful and spring.lifecycle.timeout-per-shutdown-phase properties. Spring Boot waits for active requests to complete before shutdown. Can implement SmartLifecycle for custom shutdown logic. Use @PreDestroy for cleanup tasks.
+
+#@@@@@@@@@@
+
+159. Which of the following are valid Spring Boot Maven profiles for different environments? (Multiple correct)
+A) -Pdev
+B) -Ptest
+C) -Pprod
+D) -Plocal
+E) -Pstaging
+
+Answer: A, B, C, D, E - All are valid Maven profile names. Profiles can be activated with -P flag and used to configure environment-specific properties and dependencies.
+
+#@@@@@@@@@@
+
+160. Complete this Spring Boot custom auto-configuration test:
+```java
+@TestAutoConfiguration
+public class TestConfig {
+    @Bean
+    @Primary
+    public UserService mockUserService() {
+        return Mockito.mock(UserService.class);
+    }
+}
+
+@SpringBootTest
+@Import(TestConfig.class)
+class UserControllerTest {
+    @Autowired
+    private _____ mockMvc;
+
+    @Test
+    void testGetUser() throws Exception {
+        mockMvc.perform(get("/users/1"))
+            .andExpect(status().isOk());
+    }
+}
+```
+
+Answer: `MockMvc` - Provides Spring MVC testing support for testing controllers without starting full HTTP server. Requires @AutoConfigureMockMvc or @WebMvcTest.
+
+#@@@@@@@@@@
+
+161. What is the difference between `@ComponentScan` and `@EnableAutoConfiguration`?
+
+Answer: @ComponentScan scans for @Component, @Service, @Repository, @Controller classes in specified packages. @EnableAutoConfiguration automatically configures beans based on classpath dependencies and properties. @SpringBootApplication combines both with @Configuration.
+
+#@@@@@@@@@@
+
+162. Find the issue in this Spring Boot reactive repository:
+```java
+@Repository
+public interface UserRepository extends ReactiveCrudRepository<User, Long> {
+    Flux<User> findByName(String name);
+
+    @Query("SELECT u FROM User u WHERE u.age > :age")
+    Flux<User> findByAgeGreaterThan(@Param("age") int age);
+}
+```
+
+Answer: @Query uses JPQL syntax which is not supported in reactive repositories. Should use native queries with nativeQuery=true or rely on method name derivation. Reactive repositories don't support JPQL, only native SQL queries.
+
+#@@@@@@@@@@
+
+163. What will this Spring Boot caching code output?
+```java
+@Service
+public class UserService {
+    @Cacheable("users")
+    public User findById(Long id) {
+        System.out.println("Fetching user from database: " + id);
+        return new User(id, "User" + id);
+    }
+}
+
+// Called twice
+userService.findById(1L);
+userService.findById(1L);
+```
+
+Answer: "Fetching user from database: 1" printed only once. First call executes method and caches result, second call returns cached value without executing method. @Cacheable prevents repeated expensive operations.
+
+#@@@@@@@@@@
+
+164. How do you implement Spring Boot custom configuration processor?
+
+Answer: Create META-INF/spring-configuration-metadata.json file with property metadata. Use @ConfigurationProperties with proper JavaDoc. Add spring-boot-configuration-processor dependency for automatic metadata generation. Provides IDE autocomplete and validation.
+
+#@@@@@@@@@@
+
+165. Which of the following are valid Spring Boot embedded server configurations? (Multiple correct)
+A) server.port=8080
+B) server.servlet.context-path=/api
+C) server.compression.enabled=true
+D) server.ssl.key-store=keystore.p12
+E) server.max-http-header-size=8KB
+
+Answer: A, B, C, D, E - All are valid Spring Boot embedded server configuration properties for Tomcat, Jetty, or Undertow.
+
+#@@@@@@@@@@
+
+166. Complete this Spring Boot integration test with TestContainers:
+```java
+@SpringBootTest
+@Testcontainers
+class DatabaseIntegrationTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "_______________");
+    }
+}
+```
+
+Answer: `create-drop` - Creates database schema at startup and drops it at shutdown. Suitable for integration tests to ensure clean state. Other options: `create`, `update`, `validate`, `none`.
+
+#@@@@@@@@@@
+
+167. What is the purpose of `@ConditionalOnBean` vs `@ConditionalOnMissingBean`?
+
+Answer: @ConditionalOnBean creates bean only if specified bean exists in ApplicationContext. @ConditionalOnMissingBean creates bean only if specified bean doesn't exist. Use @ConditionalOnBean for dependent beans, @ConditionalOnMissingBean for default implementations.
+
+#@@@@@@@@@@
+
+168. Find the issue in this Spring Boot async method:
+```java
+@Service
+public class EmailService {
+    @Async
+    public void sendEmail(String to, String subject, String body) {
+        // Email sending logic
+        System.out.println("Sending email to: " + to);
+    }
+
+    public void sendWelcomeEmail(String email) {
+        sendEmail(email, "Welcome", "Welcome to our service!");
+    }
+}
+```
+
+Answer: Internal method call to @Async method won't work asynchronously. Spring AOP proxy is bypassed for internal calls. Should inject self-reference or move sendEmail to separate service for proper async execution.
+
+#@@@@@@@@@@
+
+169. What will this Spring Boot profile-specific configuration output?
+```yaml
+# application.yml
+spring:
+  profiles:
+    active: dev
+app:
+  name: MyApp
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+app:
+  name: MyApp-Dev
+  debug: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+app:
+  name: MyApp-Prod
+  debug: false
+```
+
+Answer: With active profile 'dev', app.name="MyApp-Dev" and app.debug=true. Profile-specific properties override default properties. YAML uses --- to separate profile sections.
+
+#@@@@@@@@@@
+
+170. How do you implement Spring Boot custom failure analyzer?
+
+Answer: Implement FailureAnalyzer interface with analyze() method. Return FailureAnalysis with description and action for specific exceptions. Register in META-INF/spring.factories under org.springframework.boot.diagnostics.FailureAnalyzer key. Provides user-friendly error messages.
+
+#@@@@@@@@@@
+
+171. Which of the following are valid Spring Boot Gradle plugin tasks? (Multiple correct)
+A) bootRun
+B) bootJar
+C) bootBuildImage
+D) bootWar
+E) bootTest
+
+Answer: A, B, C, D - bootTest is not a valid Spring Boot Gradle plugin task. Use 'test' task for running tests.
+
+#@@@@@@@@@@
+
+172. Complete this Spring Boot WebFlux functional routing:
+```java
+@Configuration
+public class RouterConfig {
+    @Bean
+    public RouterFunction<ServerResponse> routes(UserHandler handler) {
+        return RouterFunctions
+            .route(GET("/users"), handler::getAllUsers)
+            .andRoute(GET("/users/{id}"), handler::getUser)
+            .andRoute(_______________("/users"), handler::createUser)
+            .andRoute(PUT("/users/{id}"), handler::updateUser);
+    }
+}
+```
+
+Answer: `POST` - HTTP POST method for creating new resources. WebFlux functional routing uses method references for handler functions.
+
+#@@@@@@@@@@
+
+173. What is the difference between `@Value` and `@ConfigurationProperties` for configuration injection?
+
+Answer: @Value injects single properties with SpEL support, good for simple values. @ConfigurationProperties binds groups of related properties to POJOs with type safety, validation, and IDE support. Use @Value for simple cases, @ConfigurationProperties for complex configuration objects.
+
+#@@@@@@@@@@
+
+174. Find the issue in this Spring Boot security JWT implementation:
+```java
+@Component
+public class JwtUtil {
+    private String secret = "mySecret";
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+            .setSubject(username)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact();
+    }
+}
+```
+
+Answer: Hardcoded secret key is security vulnerability. Should use strong, randomly generated secret from configuration. Secret should be at least 256 bits for HS256. Also missing proper key encoding and should use SecretKey instead of String.
+
+#@@@@@@@@@@
+
+175. What will this Spring Boot event handling output?
+```java
+@Component
+public class OrderEventHandler {
+    @EventListener
+    @Async
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        System.out.println("Processing order: " + event.getOrderId() + " in thread: " + Thread.currentThread().getName());
+    }
+}
+
+// Publishing event
+applicationEventPublisher.publishEvent(new OrderCreatedEvent(123L));
+System.out.println("Event published in thread: " + Thread.currentThread().getName());
+```
+
+Answer: "Event published in thread: main" (or current thread), then "Processing order: 123 in thread: task-1" (or async thread name). @Async makes event handling asynchronous, so publisher doesn't wait for handler completion.
+
+#@@@@@@@@@@
+
+176. How do you implement Spring Boot custom health indicator with external service check?
+
+Answer: Implement HealthIndicator interface, check external service in health() method using RestTemplate or WebClient. Return Health.up() if service responds, Health.down() if timeout/error. Add details like response time, service version. Configure timeout for health checks.
+
+#@@@@@@@@@@
+
+177. Which of the following are valid Spring Boot Docker Compose integration features? (Multiple correct)
+A) Automatic service discovery
+B) Container lifecycle management
+C) Environment variable injection
+D) Volume mounting
+E) Network configuration
+
+Answer: A, B, C, D, E - Spring Boot 3.1+ provides Docker Compose integration with automatic service discovery, lifecycle management, and configuration injection.
+
+#@@@@@@@@@@
+
+178. Complete this Spring Boot custom metrics implementation:
+```java
+@RestController
+public class UserController {
+    private final MeterRegistry meterRegistry;
+    private final Counter userCreationCounter;
+
+    public UserController(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+        this.userCreationCounter = Counter.builder("users.created")
+            .description("Number of users created")
+            .tag("version", "v1")
+            ._______________();
+    }
+
+    @PostMapping("/users")
+    public User createUser(@RequestBody User user) {
+        User savedUser = userService.save(user);
+        userCreationCounter.increment();
+        return savedUser;
+    }
+}
+```
+
+Answer: `register(meterRegistry)` - Registers the counter with the meter registry to make it available for metrics collection and export.
+
+#@@@@@@@@@@
+
+179. What is the purpose of `@ConditionalOnCloudPlatform` in Spring Boot?
+
+Answer: Creates bean only when running on specific cloud platform (CLOUD_FOUNDRY, HEROKU, KUBERNETES, SAP). Enables cloud-specific configurations and auto-configurations. Useful for platform-specific features like service discovery, configuration management.
+
+#@@@@@@@@@@
+
+180. Find the issue in this Spring Boot WebSocket security configuration:
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages
+            .simpDestMatchers("/app/**").authenticated()
+            .simpSubscribeDestMatchers("/topic/**").authenticated()
+            .anyMessage().denyAll();
+    }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
+}
+```
+
+Answer: sameOriginDisabled() returns true, which disables CSRF protection for WebSocket connections. This can be security vulnerability. Should return false unless specifically needed and other security measures are in place.
+
+#@@@@@@@@@@
+
+181. What will this Spring Boot conditional bean creation output?
+```java
+@Configuration
+public class ConditionalConfig {
+    @Bean
+    @ConditionalOnProperty(name = "feature.enabled", havingValue = "true", matchIfMissing = false)
+    public FeatureService featureService() {
+        System.out.println("Creating FeatureService bean");
+        return new FeatureService();
+    }
+}
+
+# application.properties is empty
+```
+
+Answer: "Creating FeatureService bean" will NOT be printed. Property feature.enabled is missing and matchIfMissing=false, so condition fails and bean is not created.
+
+#@@@@@@@@@@
+
+182. How do you implement Spring Boot custom banner with dynamic information?
+
+Answer: Implement Banner interface with printBanner() method. Access Environment to get dynamic properties. Use AnsiOutput for colors. Can combine with banner.txt for static content and add dynamic elements programmatically. Register with SpringApplication.setBanner().
+
+#@@@@@@@@@@
+
+183. Which of the following are valid Spring Boot test execution listeners? (Multiple correct)
+A) DependencyInjectionTestExecutionListener
+B) TransactionalTestExecutionListener
+C) SqlScriptsTestExecutionListener
+D) MockitoTestExecutionListener
+E) DirtiesContextTestExecutionListener
+
+Answer: A, B, C, E - MockitoTestExecutionListener is not a standard Spring test execution listener. Mockito integration is handled through @MockBean and @SpyBean annotations.
+
+#@@@@@@@@@@
+
+184. Complete this Spring Boot reactive error handling:
+```java
+@RestControllerAdvice
+public class GlobalErrorHandler {
+    @ExceptionHandler(UserNotFoundException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleUserNotFound(UserNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("USER_NOT_FOUND", ex.getMessage());
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(error));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public _____ handleGenericError(Exception ex) {
+        ErrorResponse error = new ErrorResponse("INTERNAL_ERROR", "An error occurred");
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error));
+    }
+}
+```
+
+Answer: `Mono<ResponseEntity<ErrorResponse>>` - Reactive error handlers return Mono or Flux for consistency with reactive programming model.
+
+#@@@@@@@@@@
+
+185. What is the difference between `@Transactional(readOnly = true)` and no annotation?
+
+Answer: readOnly=true optimizes for read operations by setting Hibernate FlushMode.MANUAL, preventing dirty checking and automatic flushing. Database may optimize read-only transactions. Without annotation, no transaction context exists unless called from transactional method.
+
+#@@@@@@@@@@
+
+186. Find the issue in this Spring Boot data source configuration:
+```java
+@Configuration
+public class DataSourceConfig {
+    @Bean
+    @Primary
+    @ConfigurationProperties("spring.datasource.primary")
+    public DataSource primaryDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    @ConfigurationProperties("spring.datasource.secondary")
+    public DataSource secondaryDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+}
+```
+
+Answer: No apparent issue - this is correct multi-datasource configuration. @Primary marks default datasource, @ConfigurationProperties binds properties with different prefixes. Requires corresponding properties in application.yml/properties.
+
+#@@@@@@@@@@
+
+187. What will this Spring Boot caching with TTL output?
+```java
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    @Bean
+    public CacheManager cacheManager() {
+        RedisCacheManager.Builder builder = RedisCacheManager
+            .RedisCacheManagerBuilder
+            .fromConnectionFactory(redisConnectionFactory())
+            .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(5)));
+        return builder.build();
+    }
+}
+
+@Cacheable("users")
+public User findById(Long id) {
+    return userRepository.findById(id);
+}
+```
+
+Answer: Cached user data expires after 5 minutes. First call caches result, subsequent calls within 5 minutes return cached value. After 5 minutes, cache entry expires and next call executes method again.
+
+#@@@@@@@@@@
+
+188. How do you implement Spring Boot custom configuration metadata?
+
+Answer: Create META-INF/additional-spring-configuration-metadata.json with property definitions including name, type, description, defaultValue. Add spring-boot-configuration-processor dependency for automatic generation. Provides IDE autocomplete and documentation.
+
+#@@@@@@@@@@
+
+189. Which of the following are valid Spring Boot production-ready features? (Multiple correct)
+A) Health checks
+B) Metrics collection
+C) Distributed tracing
+D) External configuration
+E) Security hardening
+F) Performance monitoring
+
+Answer: A, B, C, D, E, F - All are production-ready features provided by Spring Boot Actuator, Micrometer, Spring Security, and configuration management.
+
+#@@@@@@@@@@
+
+190. Complete this Spring Boot custom starter test:
+```java
+@SpringBootTest
+@TestPropertySource(properties = {
+    "myservice.enabled=true",
+    "myservice.timeout=5000"
+})
+class MyServiceAutoConfigurationTest {
+    @Autowired(required = false)
+    private MyService myService;
+
+    @Test
+    void testAutoConfiguration() {
+        assertThat(myService)._______________();
+        assertThat(myService.getTimeout()).isEqualTo(5000);
+    }
+}
+```
+
+Answer: `isNotNull()` - Verifies that auto-configuration created the MyService bean when properties are set correctly.
+
+#@@@@@@@@@@
+
+191. What is the purpose of `@EnableConfigurationProperties` vs `@ConfigurationPropertiesScan`?
+
+Answer: @EnableConfigurationProperties explicitly enables specific @ConfigurationProperties classes. @ConfigurationPropertiesScan automatically scans packages for @ConfigurationProperties classes. Use @EnableConfigurationProperties for explicit control, @ConfigurationPropertiesScan for automatic discovery.
+
+#@@@@@@@@@@
+
+192. Find the issue in this Spring Boot reactive stream:
+```java
+@GetMapping("/users")
+public Flux<User> getUsers() {
+    return userRepository.findAll()
+        .map(user -> {
+            // Blocking database call
+            Profile profile = profileRepository.findByUserId(user.getId());
+            user.setProfile(profile);
+            return user;
+        });
+}
+```
+
+Answer: Blocking database call inside reactive stream breaks reactive principles. Should use reactive repository methods or flatMap with reactive operations. Blocking operations can cause thread starvation in reactive applications.
+
+#@@@@@@@@@@
+
+193. What will this Spring Boot application context hierarchy output?
+```java
+@SpringBootApplication
+public class ParentApplication {
+    public static void main(String[] args) {
+        SpringApplication parent = new SpringApplication(ParentApplication.class);
+        ConfigurableApplicationContext parentContext = parent.run(args);
+
+        SpringApplication child = new SpringApplication(ChildConfiguration.class);
+        child.setParent(parentContext);
+        child.run(args);
+    }
+}
+```
+
+Answer: Creates parent-child application context hierarchy. Child context can access beans from parent context but not vice versa. Useful for modular applications where child contexts have specific configurations while sharing common parent beans.
+
+#@@@@@@@@@@
+
+194. How do you implement Spring Boot custom environment post-processor?
+
+Answer: Implement EnvironmentPostProcessor interface with postProcessEnvironment() method. Register in META-INF/spring.factories under org.springframework.boot.env.EnvironmentPostProcessor key. Allows modification of Environment before ApplicationContext refresh. Useful for custom property sources.
+
+#@@@@@@@@@@
+
+195. Which of the following are valid Spring Boot logging configuration patterns? (Multiple correct)
+A) %d{yyyy-MM-dd HH:mm:ss} - %msg%n
+B) %d{ISO8601} [%thread] %-5level %logger{36} - %msg%n
+C) %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr([%thread]){magenta} %clr(%logger{36}){cyan} %clr(-){faint} %msg%n
+D) %X{traceId} %X{spanId} %d [%thread] %-5level %logger - %msg%n
+
+Answer: A, B, C, D - All are valid Logback pattern configurations. %clr adds colors, %X accesses MDC values for tracing, %d formats dates, %-5level left-aligns log levels.
+
+#@@@@@@@@@@
+
+196. Complete this Spring Boot WebFlux security configuration:
+```java
+@Configuration
+@EnableWebFluxSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        return http
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/public/**").permitAll()
+                .anyExchange().authenticated()
+            )
+            ._______________()
+            .build();
+    }
+}
+```
+
+Answer: `oauth2ResourceServer(OAuth2ResourceServerSpec::jwt)` - Configures OAuth2 resource server with JWT token validation for WebFlux applications. Alternative: `.httpBasic()` or `.formLogin()`.
+
+#@@@@@@@@@@
+
+197. What is the difference between `@TestConfiguration` and `@TestComponent`?
+
+Answer: @TestConfiguration creates configuration class for tests, not scanned by default, must be imported explicitly. @TestComponent creates test-specific component, automatically scanned in test context. Use @TestConfiguration for test-specific bean definitions, @TestComponent for test utilities.
+
+#@@@@@@@@@@
+
+198. Find the issue in this Spring Boot batch job configuration:
+```java
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+    @Bean
+    public Job importJob(JobRepository jobRepository, Step step1) {
+        return new JobBuilder("importJob", jobRepository)
+            .start(step1)
+            .build();
+    }
+
+    @Bean
+    public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("step1", jobRepository)
+            .<String, String>chunk(10, transactionManager)
+            .reader(itemReader())
+            .writer(itemWriter())
+            .build();
+    }
+}
+```
+
+Answer: Missing processor in step configuration. While processor is optional, the step has reader and writer but no processor. If no processing is needed, can omit processor or use PassThroughItemProcessor.
+
+#@@@@@@@@@@
+
+199. What will this Spring Boot conditional auto-configuration output?
+```java
+@Configuration
+@ConditionalOnClass(RedisTemplate.class)
+@ConditionalOnProperty(name = "spring.redis.enabled", havingValue = "true", matchIfMissing = true)
+public class RedisAutoConfiguration {
+    @Bean
+    @ConditionalOnMissingBean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        System.out.println("Creating RedisTemplate bean");
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
+}
+```
+
+Answer: "Creating RedisTemplate bean" prints if RedisTemplate class is on classpath, spring.redis.enabled is true (or missing), and no existing RedisTemplate bean exists. Auto-configuration creates default RedisTemplate with proper configuration.
+
+#@@@@@@@@@@
+
+200. How do you implement Spring Boot graceful degradation with circuit breaker pattern?
+
+Answer: Use Resilience4j with @CircuitBreaker annotation on methods. Configure failure threshold, wait duration, and fallback methods. Circuit opens on failures, provides fallback responses, and automatically recovers. Integrate with Spring Boot Actuator for monitoring circuit breaker state and metrics.
+
+#@@@@@@@@@@

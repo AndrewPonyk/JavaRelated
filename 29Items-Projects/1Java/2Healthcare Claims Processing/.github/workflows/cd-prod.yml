@@ -1,0 +1,217 @@
+name: CD - Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        type: string
+
+env:
+  AZURE_FUNCTIONAPP_NAME: claims-processing-prod
+  AZURE_RESOURCE_GROUP: claims-rg-prod
+
+jobs:
+  approval-check:
+    name: Deployment Approval
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Approval Gate
+        run: echo "Deployment approved for version ${{ inputs.version }}"
+
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: approval-check
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Terraform Init
+        working-directory: ./infrastructure/terraform
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=terraform-state-rg" \
+            -backend-config="storage_account_name=tfstateprod" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=claims-prod.tfstate"
+
+      - name: Terraform Plan
+        working-directory: ./infrastructure/terraform
+        run: terraform plan -var-file="environments/prod/terraform.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./infrastructure/terraform
+        run: terraform apply -auto-approve tfplan
+
+  deploy-backend:
+    name: Deploy Backend (Blue-Green)
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Native Image
+        working-directory: ./backend
+        run: mvn package -Pnative -DskipTests
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      # Deploy to staging slot first
+      - name: Deploy to Staging Slot
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          slot-name: staging
+          package: ./backend/target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}
+
+      - name: Validate Staging Deployment
+        run: |
+          sleep 30
+          curl -f https://claims-processing-prod-staging.azurewebsites.net/q/health/ready || exit 1
+
+      # Swap slots for zero-downtime deployment
+      - name: Swap Staging to Production
+        run: |
+          az functionapp deployment slot swap \
+            -g ${{ env.AZURE_RESOURCE_GROUP }} \
+            -n ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --slot staging \
+            --target-slot production
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install and Build
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build:prod
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Deploy to Azure Static Web Apps
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN_PROD }}
+          action: 'upload'
+          app_location: '/frontend'
+          output_location: 'dist/healthcare-claims-frontend'
+
+  run-migrations:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Run Flyway Migrations
+        run: |
+          DB_URL=$(az keyvault secret show --vault-name claims-kv-prod --name db-url --query value -o tsv)
+          DB_USER=$(az keyvault secret show --vault-name claims-kv-prod --name db-user --query value -o tsv)
+          DB_PASS=$(az keyvault secret show --vault-name claims-kv-prod --name db-password --query value -o tsv)
+
+          docker run --rm \
+            -v $(pwd)/migrations:/flyway/sql \
+            flyway/flyway:latest \
+            -url="$DB_URL" \
+            -user="$DB_USER" \
+            -password="$DB_PASS" \
+            migrate
+
+  post-deployment-validation:
+    name: Post-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend, run-migrations]
+    steps:
+      - name: Health Check - Backend
+        run: |
+          for i in {1..5}; do
+            curl -f https://claims-processing-prod.azurewebsites.net/q/health/ready && break
+            sleep 10
+          done
+
+      - name: Health Check - Frontend
+        run: |
+          curl -f https://claims-frontend-prod.azurestaticapps.net/
+
+      - name: Notify Success
+        run: |
+          echo "Production deployment completed successfully for version ${{ inputs.version }}"
+          # TODO: Send notification to Slack/Teams
+
+  rollback:
+    name: Rollback (if needed)
+    runs-on: ubuntu-latest
+    needs: post-deployment-validation
+    if: failure()
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Rollback Backend
+        run: |
+          az functionapp deployment slot swap \
+            -g ${{ env.AZURE_RESOURCE_GROUP }} \
+            -n ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --slot staging \
+            --target-slot production
+
+      - name: Notify Rollback
+        run: |
+          echo "ALERT: Production deployment rolled back!"
+          # TODO: Send alert notification

@@ -1,0 +1,192 @@
+Medicine Quiz - 200 Questions
+Tech Stack: FHIR (Fast Healthcare Interoperability Resources), AlphaFold, CRISPR-Cas9, DICOM (Digital Imaging/Communications in Medicine)
+
+1. Which of the following are FHIR resource types? (Multiple correct)
+A) Patient
+B) Observation
+C) Medication
+D) Encounter
+E) Practitioner
+F) DiagnosticReport
+
+Answer: A, B, C, D, E, F - All are FHIR resources. Patient (demographics), Observation (measurements), Medication (drugs), Encounter (visits), Practitioner (healthcare providers), DiagnosticReport (test results). FHIR provides standardized healthcare data exchange.
+
+#@@@@@@@@@@
+
+2. Complete this FHIR Patient resource:
+```json
+{
+  "resourceType": "Patient",
+  "id": "example",
+  "name": [{
+    "use": "official",
+    "family": "Smith",
+    "given": ["John", "Robert"]
+  }],
+  "gender": "male",
+  "birthDate": "1974-12-25",
+  "address": [{
+    "use": "home",
+    "line": ["123 Main St"],
+    "city": "Boston",
+    "state": "MA",
+    "postalCode": "02101",
+    "country": "_______________"
+  }]
+}
+```
+
+Answer: `USA` or `US` - Country code in address. FHIR uses JSON/XML for healthcare data representation with standardized resource structures.
+
+#@@@@@@@@@@
+
+3. What is the difference between HL7 v2 and FHIR?
+
+Answer: HL7 v2 uses pipe-delimited messages, complex parsing, legacy systems, point-to-point integration. FHIR uses RESTful API, JSON/XML, modern web standards, resource-based, easier implementation, mobile-friendly. FHIR is modern replacement for HL7 v2 with better interoperability.
+
+#@@@@@@@@@@
+
+4. Which of the following are DICOM modalities? (Multiple correct)
+A) CT (Computed Tomography)
+B) MRI (Magnetic Resonance Imaging)
+C) US (Ultrasound)
+D) XA (X-ray Angiography)
+E) PET (Positron Emission Tomography)
+F) CR (Computed Radiography)
+
+Answer: A, B, C, D, E, F - All are DICOM modalities. CT (cross-sectional imaging), MRI (soft tissue imaging), US (real-time imaging), XA (vascular imaging), PET (metabolic imaging), CR (digital X-ray). DICOM standardizes medical imaging communication.
+
+#@@@@@@@@@@
+
+5. Find the issue in this FHIR query:
+```http
+GET /Patient?name=Smith&birthdate=1974-12-25&_format=json
+
+# Issue: incorrect parameter name
+```
+
+Answer: Parameter should be `birthDate` (camelCase), not `birthdate`. FHIR search parameters are case-sensitive. Correct: `GET /Patient?name=Smith&birthDate=1974-12-25&_format=json`. Always check FHIR specification for exact parameter names.
+
+#@@@@@@@@@@
+
+6. How does AlphaFold predict protein structure?
+
+Answer: AlphaFold uses deep learning (attention mechanisms), trained on protein sequence database, predicts 3D structure from amino acid sequence, uses multiple sequence alignments, evolutionary information, achieves near-experimental accuracy. Revolutionary for structural biology and drug discovery.
+
+#@@@@@@@@@@
+
+7. Which of the following are CRISPR-Cas9 components? (Multiple correct)
+A) Guide RNA (gRNA)
+B) Cas9 enzyme
+C) PAM sequence
+D) Target DNA
+E) Donor template
+F) Homology-directed repair
+
+Answer: A, B, C, D, E, F - All are CRISPR components. Guide RNA (target specificity), Cas9 (nuclease), PAM (protospacer adjacent motif), Target DNA (gene to edit), Donor template (repair template), HDR (precise editing). CRISPR enables precise genome editing.
+
+#@@@@@@@@@@
+
+8. Complete this DICOM tag query:
+```python
+import pydicom
+
+# Read DICOM file
+ds = pydicom.dcmread('image.dcm')
+
+# Get patient name
+patient_name = ds._______________
+
+# Get study date
+study_date = ds.StudyDate
+
+# Get modality
+modality = ds.Modality
+
+print(f"Patient: {patient_name}")
+print(f"Study Date: {study_date}")
+print(f"Modality: {modality}")
+```
+
+Answer: `PatientName` - DICOM tag for patient name. DICOM uses standardized tags (data elements) for medical imaging metadata. Common tags: PatientID, StudyDate, Modality, SeriesDescription.
+
+#@@@@@@@@@@
+
+9. What is the difference between FHIR and CDA (Clinical Document Architecture)?
+
+Answer: FHIR is RESTful API, resource-based, granular data, real-time exchange, modern web standards. CDA is document-based, XML, narrative + structured data, document exchange, legacy integration. FHIR for APIs and apps, CDA for document exchange and continuity of care.
+
+#@@@@@@@@@@
+
+10. Which of the following are AlphaFold applications? (Multiple correct)
+A) Drug discovery
+B) Protein function prediction
+C) Disease mechanism understanding
+D) Enzyme engineering
+E) Antibody design
+F) Structural genomics
+
+Answer: A, B, C, D, E, F - All are AlphaFold applications. Drug discovery (target identification), Protein function (structure-function relationship), Disease mechanisms (pathogenic variants), Enzyme engineering (catalyst design), Antibody design (therapeutic development), Structural genomics (proteome mapping).
+
+#@@@@@@@@@@
+
+11. Predict the output of this FHIR search:
+```http
+GET /Observation?patient=123&code=http://loinc.org|8867-4&_sort=-date&_count=10
+```
+
+Answer: Returns 10 most recent heart rate observations (LOINC 8867-4) for patient 123, sorted by date descending. FHIR search supports filtering, sorting, and pagination for efficient data retrieval.
+
+#@@@@@@@@@@
+
+12. How do you implement CRISPR off-target detection?
+
+Answer: Use bioinformatics tools (BLAST, Cas-OFFinder), analyze genome for similar sequences, consider PAM requirements, evaluate mismatch tolerance, perform whole-genome sequencing, use paired nickases or high-fidelity Cas9 variants, validate with targeted sequencing. Minimize off-target effects for safe gene editing.
+
+#@@@@@@@@@@
+
+13. Which of the following are DICOM services? (Multiple correct)
+A) C-STORE (storage)
+B) C-FIND (query)
+C) C-MOVE (retrieve)
+D) C-GET (retrieve)
+E) C-ECHO (verification)
+F) WADO (web access)
+
+Answer: A, B, C, D, E, F - All are DICOM services. C-STORE (send images), C-FIND (search), C-MOVE (retrieve to third party), C-GET (retrieve to self), C-ECHO (connectivity test), WADO (web-based retrieval). DICOM services enable PACS communication.
+
+#@@@@@@@@@@
+
+14. Complete this FHIR Bundle creation:
+```json
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "request": {
+        "method": "POST",
+        "url": "Patient"
+      },
+      "resource": {
+        "resourceType": "_______________",
+        "name": [{
+          "family": "Doe",
+          "given": ["Jane"]
+        }],
+        "gender": "female"
+      }
+    }
+  ]
+}
+```
+
+Answer: `Patient` - Resource type must match the URL. FHIR Bundles group multiple resources for batch/transaction operations, enabling atomic updates.
+
+#@@@@@@@@@@
+
+15. What is the difference between genome editing and gene therapy?
+
+Answer: Genome editing (CRISPR) permanently modifies DNA, heritable if germline, precise changes, ex vivo or in vivo. Gene therapy adds/replaces genes, typically non-heritable, viral vectors, treats genetic diseases. Genome editing is precise modification, gene therapy is gene addition/replacement.
+
+#@@@@@@@@@@

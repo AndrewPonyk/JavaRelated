@@ -1,0 +1,2424 @@
+Web Design Quiz - 200 Questions
+Tech Stack: HTML5, Bulma, Sass, Bootstrap, Tailwind CSS, Figma, Adobe XD, Sketch, Webflow
+
+1. Which of the following are new HTML5 semantic elements? (Multiple correct)
+A) <header>
+B) <nav>
+C) <article>
+D) <section>
+E) <aside>
+F) <footer>
+
+Answer: A, B, C, D, E, F - All are HTML5 semantic elements. header (page/section header), nav (navigation links), article (standalone content), section (thematic grouping), aside (sidebar content), footer (page/section footer).
+
+#@@@@@@@@@@
+
+2. Complete this HTML5 form with validation:
+```html
+<form>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required>
+
+  <label for="phone">Phone:</label>
+  <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+
+  <label for="age">Age:</label>
+  <input type="number" id="age" name="age" min="18" max="120" _______________>
+
+  <label for="website">Website:</label>
+  <input type="url" id="website" name="website">
+
+  <button type="submit">Submit</button>
+</form>
+```
+
+Answer: `required` - Add the required attribute to make the age field mandatory for form submission.
+
+#@@@@@@@@@@
+
+3. What is the difference between Sass and SCSS?
+
+Answer: Sass has two syntaxes: indented syntax (Sass) uses indentation and newlines, no braces or semicolons. SCSS (Sassy CSS) uses braces and semicolons like regular CSS. Both compile to CSS, SCSS is more popular due to CSS similarity.
+
+#@@@@@@@@@@
+
+4. Which of the following are Bootstrap utility classes? (Multiple correct)
+A) .text-center
+B) .d-flex
+C) .mb-3
+D) .bg-primary
+E) .w-100
+F) .position-relative
+
+Answer: A, B, C, D, E, F - All are Bootstrap utility classes. text-center (center text), d-flex (display flex), mb-3 (margin bottom), bg-primary (background color), w-100 (width 100%), position-relative (relative positioning).
+
+#@@@@@@@@@@
+
+5. Find the issue in this Tailwind CSS configuration:
+```javascript
+module.exports = {
+  content: [
+    "./src/**/*.{html,js,jsx,ts,tsx}",
+    "./public/index.html"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#3B82F6',
+        secondary: '#10B981'
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif']
+      }
+    }
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography')
+  ]
+}
+```
+
+Answer: No issue in this configuration. This is a properly configured Tailwind CSS config file with content paths, theme extensions for colors and fonts, and commonly used plugins.
+
+#@@@@@@@@@@
+
+6. How do you create a responsive grid in Bulma?
+
+Answer: Use Bulma's column system with `.columns` container and `.column` elements. Add responsive modifiers like `.is-half-tablet`, `.is-one-third-desktop`. Use `.is-mobile` for mobile columns, `.is-desktop` for desktop-only columns. Bulma uses flexbox for responsive behavior.
+
+#@@@@@@@@@@
+
+7. Which of the following are Figma features? (Multiple correct)
+A) Components and variants
+B) Auto Layout
+C) Prototyping
+D) Version history
+E) Real-time collaboration
+F) Design systems
+
+Answer: A, B, C, D, E, F - All are Figma features. Components/variants (reusable elements), Auto Layout (responsive design), prototyping (interactive mockups), version history (change tracking), real-time collaboration (team editing), design systems (shared libraries).
+
+#@@@@@@@@@@
+
+8. Complete this CSS Grid layout:
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+  gap: 20px;
+  min-height: 100vh;
+}
+
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main { grid-area: _______________; }
+.footer { grid-area: footer; }
+```
+
+Answer: `main` - The main content area should be assigned to the "main" grid area defined in grid-template-areas.
+
+#@@@@@@@@@@
+
+9. What is the difference between Adobe XD and Sketch?
+
+Answer: Adobe XD is cross-platform (Windows, Mac, web), has voice prototyping, integrates with Adobe Creative Suite. Sketch is Mac-only, has extensive plugin ecosystem, better for UI design, stronger developer handoff tools. XD focuses on UX/prototyping, Sketch on UI design precision.
+
+#@@@@@@@@@@
+
+10. Which of the following are CSS Flexbox properties? (Multiple correct)
+A) justify-content
+B) align-items
+C) flex-direction
+D) flex-wrap
+E) align-self
+F) flex-grow
+
+Answer: A, B, C, D, E, F - All are Flexbox properties. justify-content (main axis alignment), align-items (cross axis alignment), flex-direction (main axis direction), flex-wrap (wrapping behavior), align-self (individual item alignment), flex-grow (growth factor).
+
+#@@@@@@@@@@
+
+11. Predict the output of this CSS:
+```css
+.container {
+  width: 300px;
+  padding: 20px;
+  border: 5px solid black;
+  margin: 10px;
+  box-sizing: border-box;
+}
+```
+
+Answer: Total width = 300px (due to box-sizing: border-box). The padding and border are included within the 300px width. Content width = 300px - 40px (padding) - 10px (border) = 250px. Margin adds 10px on each side but doesn't affect the element's width.
+
+#@@@@@@@@@@
+
+12. How do you implement dark mode in CSS?
+
+Answer: Use CSS custom properties (variables) and `prefers-color-scheme` media query. Define color variables for light/dark themes, use media query to detect system preference, or add data attribute/class to toggle themes programmatically. Example: `@media (prefers-color-scheme: dark) { :root { --bg-color: #333; } }`
+
+#@@@@@@@@@@
+
+13. Which of the following are Webflow features? (Multiple correct)
+A) Visual CSS Grid editor
+B) CMS (Content Management System)
+C) E-commerce functionality
+D) Custom code injection
+E) Responsive design tools
+F) SEO optimization
+
+Answer: A, B, C, D, E, F - All are Webflow features. Visual CSS Grid editor (drag-and-drop layout), CMS (dynamic content), e-commerce (online stores), custom code (HTML/CSS/JS), responsive design (breakpoint editing), SEO optimization (meta tags, structured data).
+
+#@@@@@@@@@@
+
+14. Complete this Sass mixin:
+```scss
+@mixin button-style($bg-color, $text-color: white, $padding: 10px 20px) {
+  background-color: $bg-color;
+  color: $text-color;
+  padding: $padding;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: _______________($bg-color, 10%);
+  }
+}
+
+.primary-btn {
+  @include button-style(#007bff);
+}
+```
+
+Answer: `darken` - Use the Sass darken() function to make the background color darker on hover. Could also use `lighten` for a lighter effect.
+
+#@@@@@@@@@@
+
+15. What is the difference between CSS Grid and Flexbox?
+
+Answer: CSS Grid is 2D layout system (rows and columns), best for page layouts, can overlap items. Flexbox is 1D layout system (row or column), best for component layouts, items don't overlap. Grid for macro layouts, Flexbox for micro layouts. Grid has explicit placement, Flexbox has content-based sizing.
+
+#@@@@@@@@@@
+
+16. Which of the following are HTML5 input types? (Multiple correct)
+A) email
+B) date
+C) range
+D) color
+E) search
+F) password
+
+Answer: A, B, C, D, E, F - All are HTML5 input types. email (email validation), date (date picker), range (slider), color (color picker), search (search field), password (hidden text). Password existed before HTML5 but others are HTML5 additions.
+
+#@@@@@@@@@@
+
+17. Find the bug in this Bootstrap grid system:
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">Column 1</div>
+    <div class="col-md-4">Column 2</div>
+    <div class="col-md-6">Column 3</div>
+  </div>
+</div>
+```
+
+Answer: The columns add up to 14 (4+4+6) but Bootstrap grid system is based on 12 columns. The third column should be `col-md-4` to make it 4+4+4=12, or adjust other columns to total 12.
+
+#@@@@@@@@@@
+
+18. How do you create animations in CSS?
+
+Answer: Use `@keyframes` to define animation steps, then apply with `animation` property. Specify duration, timing function, delay, iteration count, direction. Example: `@keyframes slide { from { left: 0; } to { left: 100px; } }` then `.element { animation: slide 2s ease-in-out; }`. Also use `transition` for simple property changes.
+
+#@@@@@@@@@@
+
+19. Which of the following are Tailwind CSS responsive prefixes? (Multiple correct)
+A) sm:
+B) md:
+C) lg:
+D) xl:
+E) 2xl:
+F) xs:
+
+Answer: A, B, C, D, E - All except xs: are Tailwind responsive prefixes. sm: (640px+), md: (768px+), lg: (1024px+), xl: (1280px+), 2xl: (1536px+). Tailwind doesn't have xs: prefix; mobile-first approach means no prefix for smallest screens.
+
+#@@@@@@@@@@
+
+20. Complete this Bulma navbar:
+```html
+<nav class="navbar" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <img src="logo.png" alt="Logo">
+    </a>
+    <a role="button" class="navbar-burger" data-target="navbarMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </a>
+  </div>
+
+  <div id="navbarMenu" class="_______________">
+    <div class="navbar-start">
+      <a class="navbar-item" href="/home">Home</a>
+      <a class="navbar-item" href="/about">About</a>
+    </div>
+    <div class="navbar-end">
+      <a class="navbar-item" href="/login">Login</a>
+    </div>
+  </div>
+</nav>
+```
+
+Answer: `navbar-menu` - The container for navbar items should have the class "navbar-menu" to work with Bulma's navbar component structure.
+
+#@@@@@@@@@@
+
+21. What is the difference between rem and em units?
+
+Answer: `rem` (root em) is relative to root element's font size, consistent across nested elements. `em` is relative to parent element's font size, compounds with nesting. Use `rem` for consistent sizing, `em` for proportional scaling. 1rem = root font size (usually 16px), 1em = parent font size.
+
+#@@@@@@@@@@
+
+22. Which of the following are CSS pseudo-classes? (Multiple correct)
+A) :hover
+B) :focus
+C) :nth-child()
+D) :first-of-type
+E) :not()
+F) :before
+
+Answer: A, B, C, D, E - All except :before are pseudo-classes. :before is a pseudo-element (::before in CSS3). Pseudo-classes select elements based on state or position, pseudo-elements create virtual elements.
+
+#@@@@@@@@@@
+
+23. How do you implement a mobile-first responsive design?
+
+Answer: Start with mobile styles as base, use min-width media queries to add styles for larger screens. Design for smallest screen first, progressively enhance for tablets and desktop. Use relative units, flexible layouts, touch-friendly interfaces. Test on actual devices, consider performance and loading times.
+
+#@@@@@@@@@@
+
+24. Complete this Figma Auto Layout configuration:
+```
+Direction: _______________
+Spacing: 16px
+Padding: 24px
+Alignment: Center
+Sizing: Hug contents
+```
+
+Answer: `Vertical` or `Horizontal` - Auto Layout direction can be vertical (stacks items vertically) or horizontal (stacks items horizontally). Choose based on desired layout flow.
+
+#@@@@@@@@@@
+
+25. Which of the following are CSS positioning values? (Multiple correct)
+A) static
+B) relative
+C) absolute
+D) fixed
+E) sticky
+F) inherit
+
+Answer: A, B, C, D, E, F - All are valid CSS position values. static (default), relative (relative to normal position), absolute (relative to positioned ancestor), fixed (relative to viewport), sticky (switches between relative and fixed), inherit (inherits from parent).
+
+#@@@@@@@@@@
+
+26. Find the issue in this Sass code:
+```scss
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+
+.button {
+  background-color: $primary-color;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+
+  &.secondary {
+    background-color: $secondary-color;
+  }
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+
+  &.secondary:hover {
+    background-color: darken($secondary-color, 10%);
+  }
+}
+```
+
+Answer: No issue in this Sass code. This is properly written Sass with variables, nesting, and the darken() function. The code correctly defines button styles with hover states for both primary and secondary variants.
+
+#@@@@@@@@@@
+
+27. How do you create a CSS-only hamburger menu?
+
+Answer: Use checkbox input and label for toggle functionality. Hide checkbox with `display: none`, style label as hamburger icon. Use `:checked` pseudo-class to show/hide menu. Transform hamburger lines to X on active state. Use CSS transitions for smooth animations. No JavaScript required.
+
+#@@@@@@@@@@
+
+28. Which of the following are Adobe XD prototyping features? (Multiple correct)
+A) Drag triggers
+B) Time triggers
+C) Voice triggers
+D) Keyboard triggers
+E) Component states
+F) Overlay transitions
+
+Answer: A, B, C, D, E, F - All are Adobe XD prototyping features. Drag triggers (swipe gestures), time triggers (auto-advance), voice triggers (voice commands), keyboard triggers (key presses), component states (interactive components), overlay transitions (modal/popup effects).
+
+#@@@@@@@@@@
+
+29. Predict the CSS specificity of this selector:
+```css
+#header .nav ul li a:hover
+```
+
+Answer: Specificity = 0,1,2,2 (0 inline styles, 1 ID, 2 classes/pseudo-classes, 2 elements). Total specificity value = 122. The selector has high specificity due to the ID selector (#header) and will override most other selectors targeting the same element.
+
+#@@@@@@@@@@
+
+30. What is the difference between Sketch symbols and components?
+
+Answer: Sketch Symbols are reusable design elements that can be overridden in instances. Components (newer feature) are more advanced with better organization, nested overrides, and component states. Components replace symbols with improved functionality, better performance, and enhanced design system capabilities.
+
+#@@@@@@@@@@
+
+31. Which of the following are Webflow CMS field types? (Multiple correct)
+A) Plain text
+B) Rich text
+C) Image
+D) Link
+E) Number
+F) Date/Time
+
+Answer: A, B, C, D, E, F - All are Webflow CMS field types. Plain text (simple text), rich text (formatted text), image (media files), link (URL references), number (numeric values), date/time (temporal data). Webflow CMS supports various field types for dynamic content.
+
+#@@@@@@@@@@
+
+32. Complete this CSS custom property implementation:
+```css
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --font-size-base: 16px;
+  --spacing-unit: 8px;
+}
+
+.button {
+  background-color: var(--primary-color);
+  font-size: var(--font-size-base);
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+
+  &:hover {
+    background-color: var(--primary-color, _______________);
+  }
+}
+```
+
+Answer: `#0056b3` or any fallback color - The second parameter in var() is a fallback value used when the custom property is not defined. Provide a default color that matches the design intent.
+
+#@@@@@@@@@@
+
+33. How do you implement CSS Grid subgrid?
+
+Answer: Subgrid allows grid items to inherit parent grid's track sizing. Use `grid-template-columns: subgrid` or `grid-template-rows: subgrid`. Child grid aligns with parent's grid lines. Limited browser support (Firefox). Useful for complex layouts where nested grids need to align with parent grid structure.
+
+#@@@@@@@@@@
+
+34. Which of the following are Bootstrap breakpoints? (Multiple correct)
+A) xs (extra small)
+B) sm (small)
+C) md (medium)
+D) lg (large)
+E) xl (extra large)
+F) xxl (extra extra large)
+
+Answer: B, C, D, E, F - Bootstrap 5 breakpoints are sm (576px+), md (768px+), lg (992px+), xl (1200px+), xxl (1400px+). xs was removed in Bootstrap 4; mobile-first approach means no prefix for smallest screens.
+
+#@@@@@@@@@@
+
+35. Find the accessibility issue in this HTML:
+```html
+<div class="modal" role="dialog">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Modal Title</h2>
+    <p>Modal content goes here.</p>
+    <button>Submit</button>
+  </div>
+</div>
+```
+
+Answer: Missing aria-labelledby, aria-describedby, and keyboard accessibility. Add aria-labelledby pointing to title, aria-describedby for content, tabindex management, focus trapping, and keyboard event handlers (Escape key). Close button needs proper labeling and keyboard support.
+
+#@@@@@@@@@@
+
+36. How do you create a CSS-only tooltip?
+
+Answer: Use `::before` and `::after` pseudo-elements with `content` property. Position tooltip with absolute positioning, hide with `opacity: 0`, show on `:hover` with `opacity: 1`. Use CSS transitions for smooth appearance. Add arrow with border tricks on pseudo-element.
+
+#@@@@@@@@@@
+
+37. Which of the following are Tailwind CSS spacing utilities? (Multiple correct)
+A) p-4 (padding)
+B) m-2 (margin)
+C) space-x-4 (horizontal spacing)
+D) gap-6 (grid/flex gap)
+E) divide-y (border between elements)
+F) ring-2 (outline ring)
+
+Answer: A, B, C, D, E - All except ring-2 are spacing utilities. p-4 (padding), m-2 (margin), space-x-4 (horizontal spacing between children), gap-6 (grid/flex gap), divide-y (borders between elements). ring-2 is a ring utility for focus states, not spacing.
+
+#@@@@@@@@@@
+
+38. Complete this Bulma form validation:
+```html
+<div class="field">
+  <label class="label">Email</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input _______________" type="email" placeholder="Email">
+    <span class="icon is-small is-left">
+      <i class="fas fa-envelope"></i>
+    </span>
+    <span class="icon is-small is-right">
+      <i class="fas fa-exclamation-triangle"></i>
+    </span>
+  </div>
+  <p class="help is-danger">This email is invalid</p>
+</div>
+```
+
+Answer: `is-danger` - Add the "is-danger" class to the input to show error state styling that matches the help text and icon.
+
+#@@@@@@@@@@
+
+39. What is the difference between CSS transitions and animations?
+
+Answer: Transitions animate between two states (start/end) triggered by events like :hover. Animations use @keyframes for complex multi-step sequences, can loop, and run automatically. Transitions are simpler for basic effects, animations offer more control and complexity.
+
+#@@@@@@@@@@
+
+40. Which of the following are Figma constraints? (Multiple correct)
+A) Left and Right
+B) Center
+C) Scale
+D) Top and Bottom
+E) Left and Top
+F) Right and Bottom
+
+Answer: A, B, C, D, E, F - All are Figma constraint options. Constraints control how elements resize and reposition when their parent frame changes size. Used for responsive design within Figma prototypes.
+
+#@@@@@@@@@@
+
+41. Find the performance issue in this CSS:
+```css
+* {
+  box-sizing: border-box;
+}
+
+.container * {
+  margin: 0;
+  padding: 0;
+}
+
+div > * {
+  font-family: Arial, sans-serif;
+}
+
+.content * * * {
+  line-height: 1.5;
+}
+```
+
+Answer: Overly broad selectors cause performance issues. Universal selector (*) and deep descendant selectors (.content * * *) force browser to check every element. Use specific class selectors instead. The universal box-sizing reset is acceptable, but other rules should be more targeted.
+
+#@@@@@@@@@@
+
+42. How do you implement CSS container queries?
+
+Answer: Use `@container` rule with container-type property. Define containment context with `container-type: inline-size` on parent. Query container size with `@container (min-width: 400px)`. Enables component-based responsive design independent of viewport size. Limited browser support, requires polyfill.
+
+#@@@@@@@@@@
+
+43. Which of the following are Sketch plugins categories? (Multiple correct)
+A) Design tools
+B) Data population
+C) Export utilities
+D) Prototyping
+E) Version control
+F) Accessibility
+
+Answer: A, B, C, D, E, F - All are common Sketch plugin categories. Design tools (drawing aids), data population (content generation), export utilities (asset export), prototyping (interaction design), version control (Git integration), accessibility (a11y checking).
+
+#@@@@@@@@@@
+
+44. Complete this CSS Grid auto-placement:
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 200px;
+  grid-auto-flow: _______________dense;
+  gap: 20px;
+}
+
+.item-large {
+  grid-column: span 2;
+}
+```
+
+Answer: `row` or `column` - grid-auto-flow can be "row dense" (fill rows first, pack tightly) or "column dense" (fill columns first, pack tightly). Dense keyword fills gaps with smaller items.
+
+#@@@@@@@@@@
+
+45. What is the difference between Adobe XD and Figma?
+
+Answer: Adobe XD is desktop-focused with Creative Suite integration, voice prototyping, offline capability. Figma is web-based with superior real-time collaboration, better developer handoff, component systems, and cross-platform accessibility. Figma has gained popularity for team collaboration and design systems.
+
+#@@@@@@@@@@
+
+46. Which of the following are CSS logical properties? (Multiple correct)
+A) margin-inline-start
+B) padding-block-end
+C) border-inline-width
+D) inset-inline
+E) block-size
+F) inline-size
+
+Answer: A, B, C, D, E, F - All are CSS logical properties. They adapt to writing direction (LTR/RTL). margin-inline-start (left in LTR), padding-block-end (bottom in horizontal writing), border-inline-width (left/right borders), inset-inline (left/right positioning), block-size (height), inline-size (width).
+
+#@@@@@@@@@@
+
+47. Find the bug in this Webflow interaction:
+```javascript
+// Webflow custom code
+$(document).ready(function() {
+  $('.trigger').click(function() {
+    $('.target').addClass('active');
+  });
+
+  $('.close').click(function() {
+    $('.target').removeClass('active');
+  });
+});
+```
+
+Answer: No bug in this code. This is valid jQuery code for Webflow custom interactions. It adds/removes 'active' class on click events. However, Webflow's built-in interactions are preferred over custom code for better visual editing and maintenance.
+
+#@@@@@@@@@@
+
+48. How do you create a CSS sticky header?
+
+Answer: Use `position: sticky` with `top: 0` on header element. Ensure parent container has sufficient height. Sticky element switches between relative and fixed positioning based on scroll position. Add z-index for layering. Works well for navigation bars that stick to top when scrolling.
+
+#@@@@@@@@@@
+
+49. Which of the following are Bootstrap component classes? (Multiple correct)
+A) .navbar
+B) .card
+C) .modal
+D) .carousel
+E) .accordion
+F) .dropdown
+
+Answer: A, B, C, D, E, F - All are Bootstrap component classes. navbar (navigation), card (content container), modal (dialog), carousel (image slider), accordion (collapsible content), dropdown (menu). Bootstrap provides extensive pre-built components.
+
+#@@@@@@@@@@
+
+50. Complete this Sass function:
+```scss
+@function calculate-rem($px-value, $base-font-size: 16px) {
+  @return #{$px-value / $base-font-size}rem;
+}
+
+.heading {
+  font-size: calculate-rem(24px);
+  margin-bottom: calculate-rem(16px);
+}
+
+@function strip-unit($value) {
+  @return $value / (_______________);
+}
+```
+
+Answer: `($value * 0 + 1)` - This removes the unit from a value. Multiplying by 0 removes the number, adding 1 gives the unit, then dividing removes it. Alternative: `@return $value / ($value * 0 + 1);`
+
+#@@@@@@@@@@
+
+51. What is the difference between CSS Grid and CSS Subgrid?
+
+Answer: CSS Grid creates a grid container with explicit tracks. CSS Subgrid allows grid items to inherit parent grid's track sizing, creating alignment across nested grids. Subgrid maintains parent's grid lines while allowing independent content placement. Limited browser support currently.
+
+#@@@@@@@@@@
+
+52. Which of the following are HTML5 semantic elements for forms? (Multiple correct)
+A) <fieldset>
+B) <legend>
+C) <label>
+D) <output>
+E) <datalist>
+F) <progress>
+
+Answer: A, B, C, D, E, F - All are form-related semantic elements. fieldset (groups form controls), legend (fieldset caption), label (form control label), output (calculation result), datalist (input options), progress (task progress). Some existed before HTML5 but gained semantic meaning.
+
+#@@@@@@@@@@
+
+53. Find the issue in this Tailwind CSS responsive design:
+```html
+<div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
+  <img src="image.jpg" class="w-full h-auto" alt="Image">
+  <h3 class="text-lg font-bold mt-4">Title</h3>
+  <p class="text-gray-600 mt-2">Description text here.</p>
+</div>
+```
+
+Answer: No issue in this code. This is properly written responsive Tailwind CSS. The div uses responsive width classes (full width on mobile, half on medium screens, third on large, quarter on extra large). Image is responsive with w-full h-auto.
+
+#@@@@@@@@@@
+
+54. How do you implement CSS scroll snapping?
+
+Answer: Use `scroll-snap-type` on container (x/y mandatory/proximity) and `scroll-snap-align` on children (start/center/end). Creates smooth scrolling that snaps to defined points. Useful for carousels, galleries, and full-page sections. Example: `scroll-snap-type: x mandatory; scroll-snap-align: start;`
+
+#@@@@@@@@@@
+
+55. Which of the following are Bulma modifiers? (Multiple correct)
+A) is-primary
+B) is-large
+C) is-active
+D) is-loading
+E) is-outlined
+F) is-rounded
+
+Answer: A, B, C, D, E, F - All are Bulma modifiers. is-primary (color), is-large (size), is-active (state), is-loading (loading state), is-outlined (style variant), is-rounded (border radius). Bulma uses consistent modifier naming convention.
+
+#@@@@@@@@@@
+
+56. Complete this CSS clamp() function:
+```css
+.responsive-text {
+  font-size: clamp(1rem, _______________vw, 3rem);
+  line-height: clamp(1.2, 2.5vw, 1.8);
+}
+
+.container {
+  width: clamp(300px, 90%, 1200px);
+  padding: clamp(1rem, 5%, 3rem);
+}
+```
+
+Answer: `2.5` or any appropriate viewport width value - clamp(min, preferred, max) sets responsive values. For font-size, a value like 2.5vw creates fluid typography that scales with viewport width while respecting minimum and maximum bounds.
+
+#@@@@@@@@@@
+
+57. What is the difference between Figma and Sketch for design systems?
+
+Answer: Figma has superior design system features: shared libraries across teams, real-time updates, better component variants, auto-layout for responsive components. Sketch requires plugins for advanced design system features, has local libraries, less collaborative. Figma's web-based nature enables better design system distribution.
+
+#@@@@@@@@@@
+
+58. Which of the following are CSS pseudo-elements? (Multiple correct)
+A) ::before
+B) ::after
+C) ::first-line
+D) ::first-letter
+E) ::selection
+F) ::placeholder
+
+Answer: A, B, C, D, E, F - All are CSS pseudo-elements. ::before/::after (generated content), ::first-line (first line styling), ::first-letter (drop caps), ::selection (text selection styling), ::placeholder (input placeholder styling). Use double colon notation in modern CSS.
+
+#@@@@@@@@@@
+
+59. Find the accessibility issue in this navigation:
+```html
+<nav>
+  <ul>
+    <li><a href="#" onclick="showSubmenu()">Products</a>
+      <ul class="submenu">
+        <li><a href="/product1">Product 1</a></li>
+        <li><a href="/product2">Product 2</a></li>
+      </ul>
+    </li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+```
+
+Answer: Missing ARIA attributes and keyboard navigation. Add aria-haspopup="true", aria-expanded="false/true", role="menubar/menu/menuitem", and keyboard event handlers (Enter, Escape, Arrow keys). Ensure focus management and screen reader compatibility.
+
+#@@@@@@@@@@
+
+60. How do you create a CSS-only accordion?
+
+Answer: Use radio buttons or checkboxes with labels for triggers. Hide inputs with `display: none`, style labels as headers. Use `:checked` pseudo-class to show/hide content with `max-height` transitions. Use `overflow: hidden` for smooth animations. No JavaScript required for basic functionality.
+
+#@@@@@@@@@@
+
+61. Which of the following are Webflow layout options? (Multiple correct)
+A) Flexbox
+B) CSS Grid
+C) Float
+D) Position
+E) Display
+F) Auto Layout
+
+Answer: A, B, C, D, E - All except Auto Layout are Webflow layout options. Flexbox (flexible layouts), CSS Grid (2D layouts), Float (legacy positioning), Position (absolute/relative), Display (block/inline/flex). Auto Layout is a Figma feature, not Webflow.
+
+#@@@@@@@@@@
+
+62. Complete this Bootstrap utility API:
+```scss
+$utilities: (
+  "custom-margin": (
+    property: margin,
+    class: m,
+    values: (
+      0: 0,
+      1: $spacer * .25,
+      2: $spacer * .5,
+      3: $spacer,
+      4: $spacer * 1.5,
+      5: $spacer * 3,
+      auto: _______________
+    )
+  )
+);
+```
+
+Answer: `auto` - The auto value should be set to "auto" for automatic margins. This creates utility classes like .m-auto for automatic margins, commonly used for centering elements.
+
+#@@@@@@@@@@
+
+63. What is the difference between CSS Grid areas and line-based placement?
+
+Answer: Grid areas use named regions defined in grid-template-areas, more intuitive for complex layouts. Line-based placement uses grid-column/grid-row with line numbers or names, more precise control. Areas are better for semantic layouts, lines for mathematical positioning.
+
+#@@@@@@@@@@
+
+64. Which of the following are Sass control directives? (Multiple correct)
+A) @if
+B) @else
+C) @for
+D) @each
+E) @while
+F) @switch
+
+Answer: A, B, C, D, E - All except @switch are Sass control directives. @if/@else (conditionals), @for (loops with counter), @each (iteration over lists/maps), @while (conditional loops). Sass doesn't have @switch; use @if/@else if chains instead.
+
+#@@@@@@@@@@
+
+65. Find the performance issue in this CSS animation:
+```css
+.animated-box {
+  width: 100px;
+  height: 100px;
+  background: red;
+  transition: all 0.3s ease;
+}
+
+.animated-box:hover {
+  width: 200px;
+  height: 200px;
+  background: blue;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+```
+
+Answer: Animating width/height causes layout recalculation (reflow). Use transform: scale() instead for better performance. Also, "transition: all" is inefficient; specify exact properties. Use transform and opacity for smooth 60fps animations that only trigger compositing.
+
+#@@@@@@@@@@
+
+66. How do you implement CSS aspect ratio?
+
+Answer: Use `aspect-ratio` property: `aspect-ratio: 16 / 9;` for modern browsers. For older browsers, use padding-bottom trick: `padding-bottom: 56.25%;` (9/16 * 100) with absolute positioning for content. Aspect ratio maintains width-to-height ratio regardless of container size.
+
+#@@@@@@@@@@
+
+67. Which of the following are Tailwind CSS color utilities? (Multiple correct)
+A) bg-blue-500
+B) text-red-600
+C) border-green-400
+D) ring-purple-300
+E) from-pink-500
+F) to-yellow-400
+
+Answer: A, B, C, D, E, F - All are Tailwind color utilities. bg (background), text (text color), border (border color), ring (ring color), from/to (gradient colors). Tailwind provides comprehensive color system with shades 50-900.
+
+#@@@@@@@@@@
+
+68. Complete this Bootstrap modal implementation:
+```html
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+  Launch Modal
+</button>
+
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Modal Title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="_______________"></button>
+      </div>
+      <div class="modal-body">
+        Modal content goes here
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+Answer: `modal` - Add data-bs-dismiss="modal" to close button. Bootstrap modals require proper data attributes for toggle and dismiss functionality.
+
+#@@@@@@@@@@
+
+69. What is the difference between CSS variables and Sass variables?
+
+Answer: CSS variables (custom properties) are runtime, can be changed with JavaScript, cascade and inherit, scoped to selectors. Sass variables are compile-time, static, don't cascade, global or local scope. Use CSS variables for theming/dynamic values, Sass variables for build-time configuration.
+
+#@@@@@@@@@@
+
+70. Which of the following are Figma component properties? (Multiple correct)
+A) Variants
+B) Boolean
+C) Text
+D) Instance swap
+E) Nested instances
+F) Auto layout
+
+Answer: A, B, C, D, E, F - All are Figma component features. Variants (component variations), Boolean (show/hide), Text (text overrides), Instance swap (component switching), Nested instances (components within components), Auto layout (responsive frames).
+
+#@@@@@@@@@@
+
+71. Find the bug in this CSS Flexbox layout:
+```css
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item {
+  flex: 1 1 auto;
+  width: 300px; /* Bug: conflicts with flex */
+  margin: 10px;
+}
+```
+
+Answer: Setting fixed width conflicts with flex: 1 1 auto. The flex-grow: 1 tries to expand items, but width: 300px constrains them. Remove width or use flex-basis: 300px instead. Also consider using gap instead of margin for spacing.
+
+#@@@@@@@@@@
+
+72. How do you create a CSS gradient background?
+
+Answer: Linear gradient: `background: linear-gradient(to right, #ff0000, #0000ff);` Radial gradient: `background: radial-gradient(circle, #ff0000, #0000ff);` Conic gradient: `background: conic-gradient(from 0deg, red, yellow, green, blue, red);` Can combine multiple gradients and use color stops.
+
+#@@@@@@@@@@
+
+73. Which of the following are Bulma layout components? (Multiple correct)
+A) Container
+B) Columns
+C) Level
+D) Hero
+E) Section
+F) Tile
+
+Answer: A, B, C, D, E, F - All are Bulma layout components. Container (centered wrapper), Columns (grid system), Level (horizontal layout), Hero (full-height banner), Section (page sections), Tile (Metro-style grid).
+
+#@@@@@@@@@@
+
+74. Complete this Sass @extend directive:
+```scss
+%button-base {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-primary {
+  @extend _______________;
+  background: blue;
+  color: white;
+}
+
+.btn-secondary {
+  @extend %button-base;
+  background: gray;
+  color: white;
+}
+```
+
+Answer: `%button-base` - Extend the placeholder selector. Placeholders (%) are not output to CSS unless extended, reducing code duplication.
+
+#@@@@@@@@@@
+
+75. What is the difference between inline, inline-block, and block display?
+
+Answer: Inline doesn't break line, no width/height, only horizontal margin/padding (span, a). Inline-block doesn't break line, accepts width/height, all margin/padding (button, img). Block breaks line, full width by default, all properties (div, p). Choose based on layout needs.
+
+#@@@@@@@@@@
+
+76. Which of the following are Sketch artboard presets? (Multiple correct)
+A) iPhone 14 Pro
+B) iPad Pro
+C) Desktop HD
+D) Apple Watch
+E) Android Mobile
+F) Web 1920
+
+Answer: A, B, C, D, E, F - All are Sketch artboard presets. Sketch provides device-specific presets for iOS, Android, web, and wearables. Custom artboard sizes can also be created.
+
+#@@@@@@@@@@
+
+77. Find the accessibility issue in this form:
+```html
+<form>
+  <input type="text" placeholder="Enter your name">
+  <input type="email" placeholder="Enter your email">
+  <input type="password" placeholder="Enter your password">
+  <button type="submit">Submit</button>
+</form>
+```
+
+Answer: Missing labels for screen readers. Add <label> elements or aria-label attributes. Placeholders alone are insufficient for accessibility. Also missing form validation and error messages.
+
+#@@@@@@@@@@
+
+78. How do you implement CSS Grid auto-fit vs auto-fill?
+
+Answer: auto-fill creates as many tracks as fit, leaving empty tracks. auto-fit collapses empty tracks, expanding items. Use `grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))` for fixed number of columns, `auto-fit` for flexible expansion. auto-fit is better for responsive designs.
+
+#@@@@@@@@@@
+
+79. Which of the following are Tailwind CSS layout utilities? (Multiple correct)
+A) container
+B) flex
+C) grid
+D) block
+E) hidden
+F) overflow-auto
+
+Answer: A, B, C, D, E, F - All are Tailwind layout utilities. container (responsive container), flex (flexbox), grid (CSS grid), block (display block), hidden (display none), overflow-auto (scrolling). Tailwind provides comprehensive layout system.
+
+#@@@@@@@@@@
+
+80. Complete this Webflow CMS collection:
+```javascript
+// Collection structure
+{
+  name: "Blog Posts",
+  slug: "blog-posts",
+  fields: [
+    { name: "Title", type: "PlainText", required: true },
+    { name: "Slug", type: "PlainText", required: true },
+    { name: "Content", type: "RichText" },
+    { name: "Author", type: "_______________" },
+    { name: "Published Date", type: "DateTime" },
+    { name: "Featured Image", type: "Image" }
+  ]
+}
+```
+
+Answer: `Reference` - Use Reference field type to link to another collection (Authors). Webflow CMS supports various field types including references for relational data.
+
+#@@@@@@@@@@
+
+81. What is the difference between CSS min(), max(), and clamp()?
+
+Answer: min() returns smallest value: `width: min(100%, 500px)`. max() returns largest value: `width: max(50%, 300px)`. clamp() constrains between min and max: `font-size: clamp(1rem, 2vw, 2rem)`. Use for responsive sizing without media queries.
+
+#@@@@@@@@@@
+
+82. Which of the following are Bootstrap form components? (Multiple correct)
+A) Form control
+B) Form select
+C) Form check
+D) Input group
+E) Floating labels
+F) Form validation
+
+Answer: A, B, C, D, E, F - All are Bootstrap form components. Form control (text inputs), Form select (dropdowns), Form check (checkboxes/radios), Input group (input with addons), Floating labels (Material Design style), Form validation (client-side validation).
+
+#@@@@@@@@@@
+
+83. Find the bug in this Figma Auto Layout:
+```
+Frame (Auto Layout)
+├─ Direction: Horizontal
+├─ Spacing: 16px
+├─ Padding: 24px
+├─ Alignment: Center
+└─ Resizing: Hug contents
+
+Child elements:
+- Text (Fixed width: 200px)
+- Button (Fill container)  // Bug: conflicts with Hug
+```
+
+Answer: "Fill container" on child conflicts with "Hug contents" on parent. Hug contents sizes frame to children, but Fill container tries to expand child to frame. Use "Hug contents" for children or "Fixed" for parent.
+
+#@@@@@@@@@@
+
+84. How do you create a CSS-only image carousel?
+
+Answer: Use scroll-snap with overflow-x: scroll. Set scroll-snap-type: x mandatory on container, scroll-snap-align: start on items. Add smooth scrolling with scroll-behavior: smooth. Use :target or checkbox hack for navigation. Modern approach uses scroll-snap for native feel.
+
+#@@@@@@@@@@
+
+85. Which of the following are Sass data types? (Multiple correct)
+A) Numbers
+B) Strings
+C) Colors
+D) Lists
+E) Maps
+F) Booleans
+
+Answer: A, B, C, D, E, F - All are Sass data types. Numbers (with/without units), Strings (quoted/unquoted), Colors (hex, rgb, hsl), Lists (space/comma separated), Maps (key-value pairs), Booleans (true/false). Sass provides rich type system for programming.
+
+#@@@@@@@@@@
+
+86. What is the difference between Adobe XD components and Figma components?
+
+Answer: Adobe XD uses master components with states for interactions. Figma uses components with variants for different states. Figma has more powerful component properties (boolean, text, instance swap). Both support nesting and overrides, but Figma's variant system is more flexible for design systems.
+
+#@@@@@@@@@@
+
+87. Which of the following are CSS transform functions? (Multiple correct)
+A) translate()
+B) rotate()
+C) scale()
+D) skew()
+E) matrix()
+F) perspective()
+
+Answer: A, B, C, D, E, F - All are CSS transform functions. translate (move), rotate (rotate), scale (resize), skew (slant), matrix (2D transformation matrix), perspective (3D perspective). Transforms don't trigger layout recalculation, making them performant for animations.
+
+#@@@@@@@@@@
+
+88. Complete this Tailwind CSS responsive design:
+```html
+<div class="grid grid-cols-1 _______________  lg:grid-cols-3 gap-4">
+  <div class="bg-blue-500 p-4">Item 1</div>
+  <div class="bg-green-500 p-4">Item 2</div>
+  <div class="bg-red-500 p-4">Item 3</div>
+</div>
+```
+
+Answer: `md:grid-cols-2` - Add medium breakpoint for 2 columns. Tailwind uses mobile-first approach: base (mobile), sm (640px), md (768px), lg (1024px), xl (1280px), 2xl (1536px).
+
+#@@@@@@@@@@
+
+89. How do you implement CSS scroll-driven animations?
+
+Answer: Use @scroll-timeline or animation-timeline: scroll(). Define keyframes, set animation-timeline to scroll container. Modern approach uses view() and scroll() functions. Polyfills available for older browsers. Enables parallax, reveal animations, and progress indicators without JavaScript.
+
+#@@@@@@@@@@
+
+90. Which of the following are Bulma color modifiers? (Multiple correct)
+A) is-primary
+B) is-link
+C) is-info
+D) is-success
+E) is-warning
+F) is-danger
+
+Answer: A, B, C, D, E, F - All are Bulma color modifiers. is-primary (brand color), is-link (link color), is-info (information), is-success (success state), is-warning (warning state), is-danger (error state). Bulma provides semantic color system.
+
+#@@@@@@@@@@
+
+91. Find the issue in this CSS Grid layout:
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 20px; /* Deprecated property */
+}
+
+.item:nth-child(1) {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+```
+
+Answer: `grid-gap` is deprecated. Use `gap` instead. Modern CSS uses gap for both grid and flexbox. The property works but using the standard `gap` is recommended for consistency and future compatibility.
+
+#@@@@@@@@@@
+
+92. How do you create a CSS sticky footer?
+
+Answer: Use flexbox: container with `display: flex; flex-direction: column; min-height: 100vh`, main content with `flex: 1`, footer stays at bottom. Or use Grid: `grid-template-rows: auto 1fr auto`. Sticky footer stays at bottom even with little content.
+
+#@@@@@@@@@@
+
+93. Which of the following are Sketch layer types? (Multiple correct)
+A) Shape
+B) Text
+C) Image
+D) Symbol
+E) Artboard
+F) Group
+
+Answer: A, B, C, D, E, F - All are Sketch layer types. Shape (vector shapes), Text (text layers), Image (bitmap images), Symbol (reusable components), Artboard (canvas), Group (layer organization). Sketch provides comprehensive layer system for design.
+
+#@@@@@@@@@@
+
+94. Complete this Bootstrap grid system:
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">Main content</div>
+    <div class="col-md-_______________">Sidebar</div>
+  </div>
+</div>
+```
+
+Answer: `4` - Bootstrap uses 12-column grid. 8 + 4 = 12 columns. col-md-4 creates 4-column sidebar on medium+ screens. Grid system is responsive and mobile-first.
+
+#@@@@@@@@@@
+
+95. What is the difference between CSS position: sticky and position: fixed?
+
+Answer: sticky is positioned relative until scroll threshold, then becomes fixed within container. fixed is always positioned relative to viewport, removed from document flow. sticky respects parent boundaries, fixed doesn't. Use sticky for headers that scroll then stick, fixed for persistent overlays.
+
+#@@@@@@@@@@
+
+96. Which of the following are Figma plugins categories? (Multiple correct)
+A) Design tools
+B) Productivity
+C) Content
+D) Accessibility
+E) Export
+F) Integration
+
+Answer: A, B, C, D, E, F - All are Figma plugin categories. Design tools (design utilities), Productivity (workflow), Content (placeholder data), Accessibility (a11y checking), Export (export formats), Integration (third-party services). Figma has extensive plugin ecosystem.
+
+#@@@@@@@@@@
+
+97. Find the performance issue in this CSS:
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+div {
+  border: 1px solid black;
+}
+
+.container > * {
+  margin: 10px;
+}
+```
+
+Answer: Universal selector (*) is inefficient, applied to every element. Descendant selectors (.container > *) can be slow with deep nesting. Use specific selectors or utility classes. Modern CSS resets use more targeted selectors for better performance.
+
+#@@@@@@@@@@
+
+98. How do you implement CSS custom scrollbars?
+
+Answer: Use ::-webkit-scrollbar pseudo-elements for WebKit browsers: `::-webkit-scrollbar`, `::-webkit-scrollbar-track`, `::-webkit-scrollbar-thumb`. For Firefox, use `scrollbar-width` and `scrollbar-color`. Standard `scrollbar-*` properties coming to all browsers. Style for better UX and branding.
+
+#@@@@@@@@@@
+
+99. Which of the following are Tailwind CSS typography utilities? (Multiple correct)
+A) text-sm
+B) font-bold
+C) italic
+D) underline
+E) tracking-wide
+F) leading-relaxed
+
+Answer: A, B, C, D, E, F - All are Tailwind typography utilities. text-sm (font size), font-bold (font weight), italic (font style), underline (text decoration), tracking-wide (letter spacing), leading-relaxed (line height). Comprehensive typography system.
+
+#@@@@@@@@@@
+
+100. Complete this Webflow interaction:
+```javascript
+// Trigger: Click
+// Target: Modal
+// Animation: _______________
+// Duration: 300ms
+// Easing: ease-out
+```
+
+Answer: `Fade in` or `Scale in` or `Slide in` - Choose animation type for modal appearance. Webflow provides visual interaction builder with various animation presets and custom animations.
+
+#@@@@@@@@@@
+
+101. What is the difference between CSS overflow: auto and overflow: scroll?
+
+Answer: overflow: auto shows scrollbars only when content overflows. overflow: scroll always shows scrollbars even if content fits. auto is better UX, scroll is predictable layout. Use overflow-x/overflow-y for directional control. Consider overflow: overlay for non-layout-affecting scrollbars.
+
+#@@@@@@@@@@
+
+102. Which of the following are Bootstrap spacing utilities? (Multiple correct)
+A) m-3 (margin)
+B) p-4 (padding)
+C) mt-2 (margin-top)
+D) px-5 (padding-x)
+E) mb-auto (margin-bottom)
+F) g-3 (gap)
+
+Answer: A, B, C, D, E, F - All are Bootstrap spacing utilities. m (margin all), p (padding all), mt/mb/ms/me (directional), px/py (horizontal/vertical), auto (auto margin), g (gap for grid). Bootstrap uses spacing scale 0-5.
+
+#@@@@@@@@@@
+
+103. Find the bug in this Sass nesting:
+```scss
+.nav {
+  background: blue;
+
+  ul {
+    list-style: none;
+
+    li {
+      display: inline-block;
+
+      a {
+        color: white;
+
+        &:hover {
+          color: yellow;
+
+          // Bug: too deeply nested
+          span {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: Excessive nesting (6 levels deep) creates overly specific selectors, hard to maintain and override. Sass best practice: max 3-4 levels. Flatten structure, use BEM methodology, or extract nested rules to separate blocks for better maintainability.
+
+#@@@@@@@@@@
+
+104. How do you create a CSS masonry layout?
+
+Answer: Use CSS Grid with `grid-template-rows: masonry` (experimental). For current support, use `column-count` and `column-gap` for multi-column layout. JavaScript libraries (Masonry.js, Isotope) provide full control. Native CSS masonry coming to browsers.
+
+#@@@@@@@@@@
+
+105. Which of the following are Adobe XD features? (Multiple correct)
+A) Repeat Grid
+B) Auto-Animate
+C) Voice prototyping
+D) Component States
+E) Responsive Resize
+F) Coediting
+
+Answer: A, B, C, D, E, F - All are Adobe XD features. Repeat Grid (duplicate elements), Auto-Animate (transitions), Voice prototyping (voice UI), Component States (interactive states), Responsive Resize (adaptive layouts), Coediting (real-time collaboration).
+
+#@@@@@@@@@@
+
+106. What is the difference between CSS Grid and Flexbox for responsive design?
+
+Answer: Grid is 2D (rows and columns), better for page layouts, explicit placement. Flexbox is 1D (row or column), better for components, content-driven sizing. Grid for macro layouts, Flexbox for micro layouts. Can combine both: Grid for page structure, Flexbox for component internals.
+
+#@@@@@@@@@@
+
+107. Which of the following are HTML5 media elements? (Multiple correct)
+A) <video>
+B) <audio>
+C) <source>
+D) <track>
+E) <picture>
+F) <canvas>
+
+Answer: A, B, C, D, E, F - All are HTML5 media elements. video (video playback), audio (audio playback), source (media sources), track (subtitles/captions), picture (responsive images), canvas (graphics drawing). HTML5 provides rich media support.
+
+#@@@@@@@@@@
+
+108. Complete this Bulma hero section:
+```html
+<section class="hero is-primary is-fullheight">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">Hero Title</h1>
+      <h2 class="_______________">Hero Subtitle</h2>
+      <button class="button is-large is-light">Get Started</button>
+    </div>
+  </div>
+</section>
+```
+
+Answer: `subtitle` - Use subtitle class for hero subtitle. Bulma hero component provides full-height sections with consistent typography and spacing.
+
+#@@@@@@@@@@
+
+109. How do you implement CSS dark mode with prefers-color-scheme?
+
+Answer: Use media query: `@media (prefers-color-scheme: dark) { /* dark styles */ }`. Define CSS custom properties for colors, override in dark mode. Use `color-scheme: light dark` meta tag. Respect user's system preference for better UX and accessibility.
+
+#@@@@@@@@@@
+
+110. Which of the following are Tailwind CSS state variants? (Multiple correct)
+A) hover:
+B) focus:
+C) active:
+D) disabled:
+E) group-hover:
+F) peer-checked:
+
+Answer: A, B, C, D, E, F - All are Tailwind state variants. hover (mouse over), focus (keyboard focus), active (pressed), disabled (disabled state), group-hover (parent hover), peer-checked (sibling checked). Tailwind provides comprehensive state management.
+
+#@@@@@@@@@@
+
+111. Find the accessibility issue in this button:
+```html
+<div class="button" onclick="submitForm()">
+  <img src="submit-icon.png">
+</div>
+```
+
+Answer: Multiple issues: div instead of button (not keyboard accessible), missing alt text on image, no visible text label, onclick instead of proper form submission. Fix: Use <button>, add aria-label or visible text, add alt text, use proper form handling.
+
+#@@@@@@@@@@
+
+112. How do you create a CSS-only dropdown menu?
+
+Answer: Use :hover or :focus-within pseudo-classes. Structure: nav > ul > li > ul. Hide submenu with display: none or opacity: 0. Show on parent hover: `li:hover > ul { display: block; }`. Add transitions for smooth appearance. Consider accessibility with keyboard navigation.
+
+#@@@@@@@@@@
+
+113. Which of the following are Sass built-in modules? (Multiple correct)
+A) sass:math
+B) sass:color
+C) sass:string
+D) sass:list
+E) sass:map
+F) sass:selector
+
+Answer: A, B, C, D, E, F - All are Sass built-in modules. math (mathematical functions), color (color manipulation), string (string operations), list (list functions), map (map operations), selector (selector functions). Use @use to import modules.
+
+#@@@@@@@@@@
+
+114. Complete this Figma component variant:
+```
+Component: Button
+Variants:
+- Type: Primary, Secondary, Tertiary
+- Size: Small, Medium, Large
+- State: Default, Hover, _______________
+
+Total variants: 3 × 3 × 3 = 27
+```
+
+Answer: `Disabled` or `Pressed` or `Focus` - Add third state for complete button component. Figma variants enable systematic component libraries with all combinations.
+
+#@@@@@@@@@@
+
+115. What is the difference between CSS em and rem units?
+
+Answer: em is relative to parent font-size, compounds with nesting. rem is relative to root (html) font-size, consistent throughout. em for component-scoped sizing, rem for global consistency. rem prevents compounding issues, easier to maintain.
+
+#@@@@@@@@@@
+
+116. Which of the following are Bootstrap card components? (Multiple correct)
+A) card-header
+B) card-body
+C) card-footer
+D) card-img-top
+E) card-title
+F) card-text
+
+Answer: A, B, C, D, E, F - All are Bootstrap card components. card-header (top section), card-body (main content), card-footer (bottom section), card-img-top (header image), card-title (title), card-text (body text). Cards are flexible content containers.
+
+#@@@@@@@@@@
+
+117. Find the bug in this Tailwind configuration:
+```javascript
+module.exports = {
+  content: ['./src/**/*.{html,js}'],
+  theme: {
+    colors: {
+      blue: '#1fb6ff',
+      pink: '#ff49db',
+    },
+    extend: {
+      spacing: {
+        '128': '32rem',
+      }
+    }
+  }
+}
+```
+
+Answer: Overriding colors completely removes default Tailwind colors. Should use extend: { colors: {...} } to add custom colors while keeping defaults. Without extend, only blue and pink are available, breaking utility classes.
+
+#@@@@@@@@@@
+
+118. How do you implement CSS container queries?
+
+Answer: Use @container rule: `@container (min-width: 400px) { /* styles */ }`. Set container-type on parent: `container-type: inline-size`. Container queries enable component-based responsive design, styling based on container size not viewport. Modern alternative to media queries.
+
+#@@@@@@@@@@
+
+119. Which of the following are Webflow CMS features? (Multiple correct)
+A) Collections
+B) Dynamic lists
+C) CMS filters
+D) Multi-reference fields
+E) Conditional visibility
+F) CMS API
+
+Answer: A, B, C, D, E, F - All are Webflow CMS features. Collections (content types), Dynamic lists (collection display), CMS filters (filtering), Multi-reference (relationships), Conditional visibility (show/hide), CMS API (headless CMS). Powerful visual CMS.
+
+#@@@@@@@@@@
+
+120. Complete this CSS animation:
+```css
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: _______________;
+  }
+}
+
+.animated {
+  animation: slideIn 0.5s ease-out forwards;
+}
+```
+
+Answer: `1` - Set opacity to 1 for fully visible. Animation slides element in from left while fading in. forwards keeps final state after animation completes.
+
+#@@@@@@@@@@
+
+121. What is the difference between CSS Grid implicit and explicit grid?
+
+Answer: Explicit grid is defined with grid-template-columns/rows. Implicit grid is auto-generated for items beyond explicit grid. Control implicit with grid-auto-rows/columns/flow. Explicit for known structure, implicit for dynamic content. Both work together for flexible layouts.
+
+#@@@@@@@@@@
+
+122. Which of the following are Sketch Smart Layout features? (Multiple correct)
+A) Auto-resize
+B) Pin to edge
+C) Fix width/height
+D) Spacing distribution
+E) Padding
+F) Stacking
+
+Answer: A, B, C, D, E, F - All are Sketch Smart Layout features. Auto-resize (responsive), Pin to edge (anchoring), Fix width/height (constraints), Spacing distribution (gaps), Padding (internal spacing), Stacking (arrangement). Smart Layout makes symbols responsive.
+
+#@@@@@@@@@@
+
+123. Find the issue in this responsive image:
+```html
+<img src="large-image.jpg"
+     width="1200"
+     height="800"
+     alt="Description">
+```
+
+Answer: Missing responsive attributes. Add srcset for multiple sizes, sizes for viewport conditions, loading="lazy" for performance. Fixed width/height prevents responsive scaling. Use CSS max-width: 100% and height: auto for responsive images.
+
+#@@@@@@@@@@
+
+124. How do you create a CSS grid with named areas?
+
+Answer: Define template: `grid-template-areas: "header header" "sidebar main" "footer footer"`. Assign areas: `grid-area: header`. Named areas make layouts semantic and maintainable. Can redefine areas in media queries for responsive layouts.
+
+#@@@@@@@@@@
+
+125. Which of the following are Tailwind CSS plugin types? (Multiple correct)
+A) Official plugins
+B) Component plugins
+C) Utility plugins
+D) Base plugins
+E) Variant plugins
+F) Theme plugins
+
+Answer: A, B, C, D, E - All except theme plugins are Tailwind plugin types. Official (forms, typography, aspect-ratio), Component (custom components), Utility (custom utilities), Base (base styles), Variant (custom variants). Extend Tailwind functionality with plugins.
+
+#@@@@@@@@@@
+
+126. What is the difference between CSS visibility: hidden and display: none?
+
+Answer: visibility: hidden hides element but preserves space in layout, still in DOM, can receive events. display: none removes from layout, no space, no events. opacity: 0 similar to visibility but can receive events. Choose based on layout and interaction needs.
+
+#@@@@@@@@@@
+
+127. Which of the following are Bootstrap navigation components? (Multiple correct)
+A) Navbar
+B) Nav
+C) Breadcrumb
+D) Pagination
+E) Tabs
+F) Pills
+
+Answer: A, B, C, D, E, F - All are Bootstrap navigation components. Navbar (site navigation), Nav (navigation lists), Breadcrumb (hierarchical navigation), Pagination (page navigation), Tabs (tabbed interface), Pills (pill-style navigation). Comprehensive navigation system.
+
+#@@@@@@@@@@
+
+128. Complete this Sass mixin with arguments:
+```scss
+@mixin button-variant($bg-color, $text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: 2px solid darken($bg-color, 10%);
+
+  &:hover {
+    background-color: darken($bg-color, _______________);
+  }
+}
+
+.btn-primary {
+  @include button-variant(#007bff, #fff);
+}
+```
+
+Answer: `10%` or `15%` - Darken background on hover. Sass mixins with arguments enable reusable, parameterized styles. Use color functions for dynamic theming.
+
+#@@@@@@@@@@
+
+129. How do you implement CSS logical properties for internationalization?
+
+Answer: Use logical properties: margin-inline-start instead of margin-left, padding-block instead of padding-top/bottom. Automatically adapts to writing direction (LTR/RTL). Use inline (horizontal), block (vertical), start/end instead of left/right. Better for multilingual sites.
+
+#@@@@@@@@@@
+
+130. Which of the following are Figma prototyping triggers? (Multiple correct)
+A) On click
+B) On hover
+C) On drag
+D) On key press
+E) After delay
+F) Mouse enter/leave
+
+Answer: A, B, C, D, E, F - All are Figma prototyping triggers. On click (tap), On hover (mouse over), On drag (drag interaction), On key press (keyboard), After delay (timed), Mouse enter/leave (hover states). Rich interaction prototyping.
+
+#@@@@@@@@@@
+
+131. Find the bug in this CSS Flexbox:
+```css
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* Default */
+}
+
+.item {
+  flex: 1;
+  height: 100px; /* Bug: conflicts with stretch */
+}
+```
+
+Answer: Fixed height conflicts with align-items: stretch. Stretch tries to fill container height, but height: 100px constrains it. Remove height or use align-items: flex-start. Let flex items stretch naturally or set explicit alignment.
+
+#@@@@@@@@@@
+
+132. How do you create a CSS parallax scrolling effect?
+
+Answer: Use background-attachment: fixed for simple parallax. For advanced: use transform: translateZ() with perspective on container. Modern approach: scroll-driven animations with animation-timeline. Layer elements with different scroll speeds for depth effect.
+
+#@@@@@@@@@@
+
+133. Which of the following are Bulma modifier classes? (Multiple correct)
+A) is-large
+B) is-small
+C) is-rounded
+D) is-outlined
+E) is-loading
+F) is-fullwidth
+
+Answer: A, B, C, D, E, F - All are Bulma modifiers. is-large/small (sizing), is-rounded (border-radius), is-outlined (outline style), is-loading (loading state), is-fullwidth (full width). Bulma uses consistent modifier system.
+
+#@@@@@@@@@@
+
+134. Complete this Adobe XD repeat grid:
+```
+Repeat Grid Settings:
+- Horizontal spacing: 20px
+- Vertical spacing: 20px
+- Columns: 3
+- Rows: _______________
+- Total items: 12
+```
+
+Answer: `4` - 3 columns × 4 rows = 12 items. Repeat Grid automatically duplicates elements in grid pattern, perfect for card layouts and galleries.
+
+#@@@@@@@@@@
+
+135. What is the difference between CSS nth-child and nth-of-type?
+
+Answer: nth-child counts all siblings regardless of type. nth-of-type counts only siblings of same element type. nth-child(2) is second child of any type, nth-of-type(2) is second element of that type. Use nth-of-type for more specific selection.
+
+#@@@@@@@@@@
+
+136. Which of the following are Tailwind CSS spacing scale values? (Multiple correct)
+A) 0 (0px)
+B) 1 (0.25rem)
+C) 4 (1rem)
+D) 8 (2rem)
+E) 16 (4rem)
+F) px (1px)
+
+Answer: A, B, C, D, E, F - All are Tailwind spacing values. Scale: 0, px, 0.5, 1-96 (0.25rem increments). Consistent spacing system for margin, padding, gap. Use spacing scale for design consistency.
+
+#@@@@@@@@@@
+
+137. Find the performance issue in this CSS:
+```css
+.container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+```
+
+Answer: Animating background-position can be expensive. For better performance, use transform on pseudo-element or CSS Houdini Paint API. Consider using will-change: background-position to optimize, but use sparingly.
+
+#@@@@@@@@@@
+
+138. How do you implement CSS subgrid?
+
+Answer: Set display: grid on parent, grid-template-columns: subgrid on child. Subgrid inherits parent's grid tracks, enabling alignment across nested grids. Useful for card layouts where content needs to align. Browser support improving.
+
+#@@@@@@@@@@
+
+139. Which of the following are Sketch export formats? (Multiple correct)
+A) PNG
+B) JPG
+C) SVG
+D) PDF
+E) WebP
+F) TIFF
+
+Answer: A, B, C, D, E, F - All are Sketch export formats. PNG (raster with transparency), JPG (compressed raster), SVG (vector), PDF (vector document), WebP (modern format), TIFF (high-quality raster). Multiple export options for different use cases.
+
+#@@@@@@@@@@
+
+140. Complete this Bootstrap utility class:
+```html
+<div class="d-flex justify-content-between align-items-center p-3 mb-4 bg-light _______________">
+  <h2>Header</h2>
+  <button class="btn btn-primary">Action</button>
+</div>
+```
+
+Answer: `rounded` or `border` or `shadow` - Add visual styling. Bootstrap utilities enable rapid prototyping without custom CSS. Common additions: rounded (border-radius), border (borders), shadow (box-shadow).
+
+#@@@@@@@@@@
+
+141. What is the difference between CSS Grid auto-placement and manual placement?
+
+Answer: Auto-placement uses grid-auto-flow to automatically position items (row/column/dense). Manual placement uses grid-column/grid-row or grid-area for explicit positioning. Auto for dynamic content, manual for specific layouts. Can combine both approaches.
+
+#@@@@@@@@@@
+
+142. Which of the following are Webflow Designer panels? (Multiple correct)
+A) Navigator
+B) Style panel
+C) Settings panel
+D) Assets panel
+E) Pages panel
+F) CMS panel
+
+Answer: A, B, C, D, E, F - All are Webflow Designer panels. Navigator (DOM tree), Style panel (CSS), Settings panel (element settings), Assets panel (images/files), Pages panel (site structure), CMS panel (collections). Visual web design interface.
+
+#@@@@@@@@@@
+
+143. Find the accessibility issue in this navigation:
+```html
+<nav>
+  <a href="#home">Home</a>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#contact">Contact</a>
+</nav>
+```
+
+Answer: Missing aria-label or aria-labelledby on nav element. Should identify navigation purpose: `<nav aria-label="Main navigation">`. Also consider skip link for keyboard users, current page indicator with aria-current="page".
+
+#@@@@@@@@@@
+
+144. How do you create a CSS tooltip?
+
+Answer: Use ::before or ::after pseudo-element with content attribute. Position absolute on pseudo-element, relative on parent. Show on :hover. Add arrow with border trick or clip-path. Use data attributes for dynamic content: `content: attr(data-tooltip)`.
+
+#@@@@@@@@@@
+
+145. Which of the following are Tailwind CSS animation utilities? (Multiple correct)
+A) animate-spin
+B) animate-ping
+C) animate-pulse
+D) animate-bounce
+E) transition
+F) duration-300
+
+Answer: A, B, C, D, E, F - All are Tailwind animation utilities. animate-spin (rotation), animate-ping (radar), animate-pulse (fade), animate-bounce (bounce), transition (transition properties), duration-300 (timing). Built-in animations and transition utilities.
+
+#@@@@@@@@@@
+
+146. What is the difference between CSS filter and backdrop-filter?
+
+Answer: filter applies effects to element itself (blur, brightness, contrast). backdrop-filter applies effects to content behind element (frosted glass effect). backdrop-filter requires semi-transparent background. Use filter for element effects, backdrop-filter for background effects.
+
+#@@@@@@@@@@
+
+147. Which of the following are Figma Auto Layout properties? (Multiple correct)
+A) Direction (horizontal/vertical)
+B) Spacing between items
+C) Padding
+D) Alignment
+E) Resizing (hug/fill/fixed)
+F) Absolute positioning
+
+Answer: A, B, C, D, E - All except absolute positioning are Auto Layout properties. Direction (layout axis), Spacing (gaps), Padding (internal spacing), Alignment (item alignment), Resizing (sizing behavior). Absolute positioning removes from Auto Layout.
+
+#@@@@@@@@@@
+
+148. Complete this Sass @each loop:
+```scss
+$colors: (
+  primary: #007bff,
+  secondary: #6c757d,
+  success: #28a745,
+  danger: #dc3545
+);
+
+@each $name, $color in $colors {
+  .btn-#{$name} {
+    background-color: $color;
+    border-color: darken($color, 10%);
+
+    &:hover {
+      background-color: darken($color, _______________);
+    }
+  }
+}
+```
+
+Answer: `15%` or `10%` - Darken on hover. @each loop generates button variants for each color in map. Interpolation #{$name} creates class names dynamically.
+
+#@@@@@@@@@@
+
+149. How do you implement CSS focus-visible for better accessibility?
+
+Answer: Use :focus-visible instead of :focus. Shows focus indicator only for keyboard navigation, not mouse clicks. Improves UX by removing focus rings on click while maintaining keyboard accessibility. Modern browsers support, polyfill available.
+
+#@@@@@@@@@@
+
+150. Which of the following are Bootstrap alert components? (Multiple correct)
+A) alert-primary
+B) alert-success
+C) alert-warning
+D) alert-danger
+E) alert-dismissible
+F) alert-link
+
+Answer: A, B, C, D, E, F - All are Bootstrap alert components. alert-primary/success/warning/danger (color variants), alert-dismissible (closeable), alert-link (styled links). Alerts provide contextual feedback messages.
+
+#@@@@@@@@@@
+
+151. Find the bug in this CSS Grid:
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.item:first-child {
+  grid-column: span 2; /* Bug: can overflow */
+}
+```
+
+Answer: span 2 can cause overflow when grid has only 1 column on small screens. Use media queries or grid-column: 1 / -1 for full width. Consider min() function: grid-column: span min(2, var(--columns)).
+
+#@@@@@@@@@@
+
+152. How do you create a CSS sticky header?
+
+Answer: Use position: sticky with top: 0. Element scrolls normally until reaching threshold, then sticks. Requires parent with overflow visible. Add box-shadow on scroll for depth. Modern alternative to fixed headers with better document flow.
+
+#@@@@@@@@@@
+
+153. Which of the following are Bulma column modifiers? (Multiple correct)
+A) is-half
+B) is-one-third
+C) is-three-quarters
+D) is-offset-2
+E) is-narrow
+F) is-centered
+
+Answer: A, B, C, D, E, F - All are Bulma column modifiers. is-half (50%), is-one-third (33%), is-three-quarters (75%), is-offset-2 (offset), is-narrow (content width), is-centered (center column). Flexible grid system.
+
+#@@@@@@@@@@
+
+154. Complete this Tailwind dark mode configuration:
+```javascript
+module.exports = {
+  darkMode: '_______________', // 'media' or 'class'
+  theme: {
+    extend: {
+      colors: {
+        dark: {
+          bg: '#1a202c',
+          text: '#e2e8f0'
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: `class` or `media` - Choose dark mode strategy. 'media' uses prefers-color-scheme, 'class' uses manual toggle with dark class on html. Class mode gives user control.
+
+#@@@@@@@@@@
+
+155. What is the difference between CSS object-fit values?
+
+Answer: fill (default, stretch to fit), contain (fit inside, maintain aspect), cover (fill container, maintain aspect, crop), none (original size), scale-down (smaller of none or contain). Use with object-position for alignment. Essential for responsive images/videos.
+
+#@@@@@@@@@@
+
+156. Which of the following are Sketch symbol overrides? (Multiple correct)
+A) Text overrides
+B) Image overrides
+C) Layer style overrides
+D) Nested symbol overrides
+E) Color overrides
+F) Size overrides
+
+Answer: A, B, C, D - Text, Image, Layer style, and Nested symbol overrides are available. Color and size are part of layer style overrides. Symbol overrides enable customization while maintaining component structure.
+
+#@@@@@@@@@@
+
+157. Find the issue in this responsive typography:
+```css
+h1 {
+  font-size: 48px;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+}
+```
+
+Answer: Fixed breakpoints don't scale smoothly. Use clamp() for fluid typography: `font-size: clamp(1.5rem, 5vw, 3rem)`. Scales automatically between min and max based on viewport. More maintainable than multiple media queries.
+
+#@@@@@@@@@@
+
+158. How do you implement CSS scroll snapping?
+
+Answer: Set scroll-snap-type on container: `scroll-snap-type: x mandatory`. Set scroll-snap-align on children: `scroll-snap-align: start`. Use proximity for loose snapping, mandatory for strict. Add scroll-padding for offset. Creates carousel-like scrolling.
+
+#@@@@@@@@@@
+
+159. Which of the following are Adobe XD component states? (Multiple correct)
+A) Default
+B) Hover
+C) Pressed
+D) Disabled
+E) Selected
+F) Error
+
+Answer: A, B, C, D - Default, Hover, Pressed, and Disabled are built-in states. Selected and Error can be created as custom states. Component states enable interactive prototypes without multiple components.
+
+#@@@@@@@@@@
+
+160. Complete this Bootstrap modal JavaScript:
+```javascript
+const myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+  backdrop: 'static',
+  keyboard: false,
+  focus: _______________
+});
+
+myModal.show();
+```
+
+Answer: `true` - Enable focus management. Bootstrap modal options: backdrop (true/static/false), keyboard (ESC key), focus (auto-focus). Proper focus management improves accessibility.
+
+#@@@@@@@@@@
+
+161. What is the difference between CSS will-change and transform?
+
+Answer: will-change hints browser to optimize property changes, creates new layer. transform actually transforms element. Use will-change sparingly before animation, remove after. Overuse hurts performance. transform is the actual transformation, will-change is optimization hint.
+
+#@@@@@@@@@@
+
+162. Which of the following are Tailwind CSS breakpoints? (Multiple correct)
+A) sm (640px)
+B) md (768px)
+C) lg (1024px)
+D) xl (1280px)
+E) 2xl (1536px)
+F) 3xl (1920px)
+
+Answer: A, B, C, D, E - All except 3xl are default Tailwind breakpoints. sm, md, lg, xl, 2xl. Mobile-first approach: base styles apply to all, breakpoints apply upward. Can customize in tailwind.config.js.
+
+#@@@@@@@@@@
+
+163. Find the bug in this Figma constraint:
+```
+Frame (400x300)
+└─ Rectangle (200x100)
+   ├─ Constraints: Left & Right
+   └─ Position: X=100, Y=100
+```
+
+Answer: Left & Right constraints with fixed width (200px) creates conflict. Rectangle can't maintain both constraints and fixed width when frame resizes. Use Left & Right without fixed width, or use single constraint (Left or Right) with fixed width.
+
+#@@@@@@@@@@
+
+164. How do you create a CSS grid with auto-fill and minmax?
+
+Answer: Use `grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))`. auto-fill creates as many columns as fit, minmax sets min/max size. Responsive grid without media queries. auto-fit collapses empty tracks, auto-fill keeps them.
+
+#@@@@@@@@@@
+
+165. Which of the following are Sass color functions? (Multiple correct)
+A) lighten()
+B) darken()
+C) saturate()
+D) desaturate()
+E) adjust-hue()
+F) mix()
+
+Answer: A, B, C, D, E, F - All are Sass color functions. lighten/darken (lightness), saturate/desaturate (saturation), adjust-hue (hue rotation), mix (blend colors). Powerful color manipulation for theming.
+
+#@@@@@@@@@@
+
+166. Complete this Webflow interaction timeline:
+```
+Trigger: Page load
+Animation: Fade in + Move
+Elements: Hero heading, Hero text, CTA button
+Timing:
+- Heading: 0s delay, 0.6s duration
+- Text: 0.2s delay, 0.6s duration
+- Button: _______________s delay, 0.6s duration
+```
+
+Answer: `0.4` - Stagger animations with increasing delays (0s, 0.2s, 0.4s). Creates sequential reveal effect. Webflow timeline enables complex choreographed animations.
+
+#@@@@@@@@@@
+
+167. What is the difference between CSS Grid and CSS Columns?
+
+Answer: Grid is 2D layout system, explicit control, items in cells. Columns is multi-column text layout, newspaper style, content flows vertically then horizontally. Grid for layouts, Columns for text formatting. Different use cases.
+
+#@@@@@@@@@@
+
+168. Which of the following are Bootstrap button variants? (Multiple correct)
+A) btn-primary
+B) btn-outline-secondary
+C) btn-lg
+D) btn-block
+E) btn-link
+F) btn-group
+
+Answer: A, B, C, D, E - All except btn-group are button variants. btn-primary (solid), btn-outline-* (outlined), btn-lg (large), btn-block (full width), btn-link (link style). btn-group is container for button groups.
+
+#@@@@@@@@@@
+
+169. Find the performance issue in this animation:
+```css
+.box {
+  width: 100px;
+  height: 100px;
+  background: red;
+  transition: all 0.3s;
+}
+
+.box:hover {
+  margin-left: 100px;
+  width: 200px;
+  background: blue;
+}
+```
+
+Answer: Animating margin-left and width causes layout recalculation (reflow). Use transform: translateX() and scale() instead. "transition: all" is inefficient. Specify exact properties. Use transform and opacity for 60fps animations.
+
+#@@@@@@@@@@
+
+170. How do you implement CSS custom properties (variables) with fallbacks?
+
+Answer: Use var() with fallback: `color: var(--primary-color, #007bff)`. If --primary-color undefined, uses fallback. Can nest: `var(--color-1, var(--color-2, blue))`. Define in :root for global scope. Update with JavaScript for dynamic theming.
+
+#@@@@@@@@@@
+
+171. Which of the following are Tailwind CSS filter utilities? (Multiple correct)
+A) blur
+B) brightness
+C) contrast
+D) grayscale
+E) saturate
+F) backdrop-blur
+
+Answer: A, B, C, D, E, F - All are Tailwind filter utilities. blur (blur effect), brightness (brightness adjustment), contrast (contrast adjustment), grayscale (desaturation), saturate (saturation), backdrop-blur (background blur). Comprehensive filter system.
+
+#@@@@@@@@@@
+
+172. Complete this Bulma navbar:
+```html
+<nav class="navbar" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">Logo</a>
+    <a class="navbar-burger" data-target="navMenu">
+      <span></span><span></span><span></span>
+    </a>
+  </div>
+  <div id="navMenu" class="_______________">
+    <div class="navbar-start">
+      <a class="navbar-item">Home</a>
+    </div>
+  </div>
+</nav>
+```
+
+Answer: `navbar-menu` - Container for navbar items. Bulma navbar requires navbar-brand, navbar-menu, navbar-burger for responsive navigation. JavaScript needed for mobile toggle.
+
+#@@@@@@@@@@
+
+173. What is the difference between CSS :is() and :where() pseudo-classes?
+
+Answer: Both group selectors, but :is() has specificity of most specific selector in list. :where() has zero specificity. Use :is() for normal specificity, :where() to avoid specificity issues. Both reduce selector repetition.
+
+#@@@@@@@@@@
+
+174. Which of the following are Figma plugin API capabilities? (Multiple correct)
+A) Read/write document
+B) Create UI
+C) Network requests
+D) File system access
+E) Export assets
+F) Run code on selection
+
+Answer: A, B, C, E, F - All except file system access. Plugins can read/write document, create UI, make network requests, export assets, run on selection. No direct file system access for security. Powerful plugin ecosystem.
+
+#@@@@@@@@@@
+
+175. Find the accessibility issue in this color contrast:
+```css
+.button {
+  background-color: #ffeb3b; /* Yellow */
+  color: #ffffff; /* White */
+  padding: 10px 20px;
+  border: none;
+}
+```
+
+Answer: Insufficient color contrast between yellow background and white text. WCAG AA requires 4.5:1 for normal text, 3:1 for large text. Use darker text color or darker background. Check with contrast checker tools.
+
+#@@@@@@@@@@
+
+176. How do you implement CSS aspect-ratio for responsive videos?
+
+Answer: Use aspect-ratio property: `aspect-ratio: 16 / 9`. For older browsers, padding-bottom trick: `padding-bottom: 56.25%` (9/16 * 100) with absolute positioned video. Modern aspect-ratio is cleaner and more intuitive.
+
+#@@@@@@@@@@
+
+177. Which of the following are Sketch library features? (Multiple correct)
+A) Shared styles
+B) Shared symbols
+C) Color variables
+D) Text styles
+E) Layer styles
+F) Library updates
+
+Answer: A, B, C, D, E, F - All are Sketch library features. Shared styles (reusable styles), Shared symbols (components), Color variables (color system), Text styles (typography), Layer styles (effects), Library updates (sync changes). Design system management.
+
+#@@@@@@@@@@
+
+178. Complete this Sass @function:
+```scss
+@function calculate-rem($px-value) {
+  $base-font-size: 16px;
+  @return ($px-value / $base-font-size) * _______________;
+}
+
+.heading {
+  font-size: calculate-rem(24px); // 1.5rem
+}
+```
+
+Answer: `1rem` - Convert pixels to rem. Sass functions enable calculations and reusable logic. Useful for responsive typography and spacing systems.
+
+#@@@@@@@@@@
+
+179. What is the difference between CSS Grid gap and margin?
+
+Answer: gap creates space between grid items, doesn't add to outer edges, cleaner syntax. margin adds space around items, includes outer edges, more control. gap is grid-specific, margin is universal. Use gap for grid spacing, margin for individual item spacing.
+
+#@@@@@@@@@@
+
+180. Which of the following are Bootstrap utility classes for spacing? (Multiple correct)
+A) m-auto (margin auto)
+B) p-0 (padding 0)
+C) mt-3 (margin-top)
+D) px-4 (padding-x)
+E) mb-n2 (negative margin-bottom)
+F) g-5 (gap)
+
+Answer: A, B, C, D, E, F - All are Bootstrap spacing utilities. m/p (margin/padding), t/b/s/e (top/bottom/start/end), x/y (horizontal/vertical), auto (auto margin), n (negative), g (gap). Comprehensive spacing system.
+
+#@@@@@@@@@@
+
+181. Find the bug in this Tailwind JIT mode:
+```html
+<div class="w-[${width}px] h-[${height}px]">
+  Dynamic sizing
+</div>
+```
+
+Answer: Template literals don't work in class strings. Tailwind JIT compiles at build time, can't use runtime JavaScript variables. Use style attribute for dynamic values or generate classes at build time. Arbitrary values work: w-[200px], but not variables.
+
+#@@@@@@@@@@
+
+182. How do you create a CSS-only accordion?
+
+Answer: Use checkbox hack: hidden checkbox, label as trigger, content with max-height: 0 and overflow: hidden. On :checked, set max-height to large value. Add transition for smooth animation. Modern approach uses <details> and <summary> elements.
+
+#@@@@@@@@@@
+
+183. Which of the following are Webflow responsive breakpoints? (Multiple correct)
+A) Desktop (default)
+B) Tablet
+C) Mobile Landscape
+D) Mobile Portrait
+E) Large Desktop
+F) Small Mobile
+
+Answer: A, B, C, D - Desktop, Tablet, Mobile Landscape, Mobile Portrait are default breakpoints. No Large Desktop or Small Mobile by default. Can customize breakpoints in project settings. Design mobile-first or desktop-first.
+
+#@@@@@@@@@@
+
+184. Complete this Adobe XD auto-animate transition:
+```
+Source Artboard: Home
+Destination Artboard: Details
+Trigger: Tap
+Action: Auto-Animate
+Easing: _______________
+Duration: 0.4s
+```
+
+Answer: `Ease Out` or `Ease In-Out` - Choose easing function. Auto-Animate automatically animates matching layers between artboards. Easing options: Linear, Ease In, Ease Out, Ease In-Out, Custom Bezier.
+
+#@@@@@@@@@@
+
+185. What is the difference between CSS Grid and Flexbox wrapping?
+
+Answer: Grid wrapping uses grid-auto-flow: dense or explicit rows/columns. Flexbox wrapping uses flex-wrap: wrap, items flow to new line. Grid maintains alignment across rows, Flexbox doesn't. Grid for 2D layouts, Flexbox for 1D with wrapping.
+
+#@@@@@@@@@@
+
+186. Which of the following are Tailwind CSS typography plugin features? (Multiple correct)
+A) Prose classes
+B) Responsive typography
+C) Dark mode support
+D) Color themes
+E) Custom modifiers
+F) Markdown styling
+
+Answer: A, B, C, D, E, F - All are typography plugin features. Prose classes (article styling), Responsive typography (breakpoint variants), Dark mode (dark:prose-invert), Color themes (prose-slate), Custom modifiers (prose-lg), Markdown styling (automatic formatting).
+
+#@@@@@@@@@@
+
+187. Find the issue in this CSS custom property:
+```css
+:root {
+  --primary-color: #007bff;
+  --secondary-color: var(--primary-color);
+}
+
+.button {
+  background: var(--secondary-color);
+  border: 2px solid darken(var(--primary-color), 10%); /* Bug */
+}
+```
+
+Answer: CSS custom properties can't be used in Sass functions like darken(). Sass functions compile before CSS runs. Use CSS calc() or color-mix() for runtime color manipulation, or use Sass variables for compile-time functions.
+
+#@@@@@@@@@@
+
+188. How do you implement CSS scroll-margin for anchor links?
+
+Answer: Set scroll-margin-top on target elements: `scroll-margin-top: 80px`. Offsets scroll position when navigating to anchors, useful for fixed headers. Also scroll-padding on container. Improves UX for in-page navigation.
+
+#@@@@@@@@@@
+
+189. Which of the following are Bootstrap form validation states? (Multiple correct)
+A) is-valid
+B) is-invalid
+C) was-validated
+D) needs-validation
+E) valid-feedback
+F) invalid-feedback
+
+Answer: A, B, C, D, E, F - All are Bootstrap validation classes. is-valid/invalid (manual validation), was-validated (form-level validation), needs-validation (pre-validation), valid/invalid-feedback (feedback messages). Comprehensive validation system.
+
+#@@@@@@@@@@
+
+190. Complete this Figma component property:
+```
+Component: Card
+Properties:
+- Image: Instance Swap (Image1, Image2, Image3)
+- Title: Text
+- Description: Text
+- Button: Boolean (Show/Hide)
+- Style: Variant (Default, Highlighted, _______________)
+```
+
+Answer: `Disabled` or `Featured` or `Compact` - Add third variant. Component properties enable flexible, reusable components. Combine variants, boolean, text, and instance swap for powerful components.
+
+#@@@@@@@@@@
+
+191. What is the difference between CSS contain and content-visibility?
+
+Answer: contain hints browser about element isolation (layout, paint, size). content-visibility controls rendering of off-screen content. content-visibility: auto skips rendering off-screen elements. Both improve performance, different mechanisms. Use for large lists and complex layouts.
+
+#@@@@@@@@@@
+
+192. Which of the following are Bulma form elements? (Multiple correct)
+A) input
+B) textarea
+C) select
+D) checkbox
+E) radio
+F) file
+
+Answer: A, B, C, D, E, F - All are Bulma form elements. Bulma provides consistent styling for all form inputs. Use control class for wrapper, input/select/textarea classes for elements. Supports icons, addons, and validation states.
+
+#@@@@@@@@@@
+
+193. Find the bug in this responsive image:
+```html
+<picture>
+  <source media="(min-width: 1200px)" srcset="large.jpg">
+  <source media="(min-width: 768px)" srcset="medium.jpg">
+  <source media="(min-width: 480px)" srcset="small.jpg">
+  <img src="default.jpg" alt="Description">
+</picture>
+```
+
+Answer: Source order should be reversed (largest first). Browser uses first matching source. Current order: small matches first on all screens. Correct order: large (1200px+), medium (768px+), small (480px+), then default.
+
+#@@@@@@@@@@
+
+194. How do you implement CSS @supports for feature detection?
+
+Answer: Use @supports rule: `@supports (display: grid) { /* grid styles */ }`. Test CSS property support before applying. Combine with not, and, or: `@supports (display: grid) and (gap: 1rem)`. Progressive enhancement for modern features.
+
+#@@@@@@@@@@
+
+195. Which of the following are Sketch Smart Layout directions? (Multiple correct)
+A) Horizontal
+B) Vertical
+C) Left to Right
+D) Right to Left
+E) Top to Bottom
+F) Bottom to Top
+
+Answer: A, B, C, D - Horizontal, Vertical, Left to Right, Right to Left are Smart Layout directions. Top to Bottom and Bottom to Top are part of vertical direction. Smart Layout enables responsive symbol resizing.
+
+#@@@@@@@@@@
+
+196. Complete this Tailwind config for custom colors:
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          900: '#0c4a6e',
+          DEFAULT: '_______________'
+        }
+      }
+    }
+  }
+}
+```
+
+Answer: `#0ea5e9` or any brand color - Set DEFAULT for brand class without number. Enables `bg-brand` instead of `bg-brand-500`. Custom color scales follow Tailwind's 50-900 pattern.
+
+#@@@@@@@@@@
+
+197. What is the difference between CSS :has() and :not() pseudo-classes?
+
+Answer: :has() selects parent based on children (parent selector): `.card:has(img)`. :not() excludes elements: `.card:not(.featured)`. :has() is relational, :not() is negation. :has() enables parent selection, powerful for complex selectors.
+
+#@@@@@@@@@@
+
+198. Which of the following are Webflow CMS field types? (Multiple correct)
+A) Plain text
+B) Rich text
+C) Image
+D) Multi-reference
+E) Number
+F) Date/Time
+
+Answer: A, B, C, D, E, F - All are Webflow CMS field types. Plain text (short text), Rich text (formatted content), Image (media), Multi-reference (relationships), Number (numeric), Date/Time (temporal). Comprehensive CMS field system.
+
+#@@@@@@@@@@
+
+199. Find the performance issue in this CSS:
+```css
+.container {
+  width: 100%;
+  height: 100vh;
+}
+
+.item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+  filter: blur(5px); /* Performance issue */
+}
+```
+
+Answer: Combining transform, box-shadow, and filter can be expensive. filter: blur() is particularly costly. Use will-change: transform, filter sparingly before animation. Consider using pre-blurred images or simpler effects for better performance.
+
+#@@@@@@@@@@
+
+200. How do you implement CSS logical properties for better internationalization?
+
+Answer: Use logical properties: margin-inline-start (instead of margin-left), padding-block (instead of padding-top/bottom), border-inline-end (instead of border-right). Automatically adapts to writing direction (LTR/RTL). Use inline (horizontal in current writing mode), block (vertical), start/end (directional). Essential for multilingual sites supporting RTL languages like Arabic and Hebrew.
+
+#@@@@@@@@@@

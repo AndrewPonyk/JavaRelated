@@ -1,0 +1,2494 @@
+PHP Quiz - 200 Questions
+Tech Stack: Laravel, Symfony, Composer, PHPUnit, Doctrine, Twig
+
+1. Which of the following are Laravel Artisan commands? (Multiple correct)
+A) php artisan make:controller
+B) php artisan migrate
+C) php artisan serve
+D) php artisan route:list
+E) php artisan queue:work
+F) php artisan cache:clear
+
+Answer: A, B, C, D, E, F - All are Laravel Artisan commands. make:controller (create controller), migrate (run migrations), serve (start dev server), route:list (show routes), queue:work (process jobs), cache:clear (clear cache).
+
+#@@@@@@@@@@
+
+2. Complete this Laravel Eloquent model:
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class User extends Model
+{
+    protected $fillable = ['name', 'email', 'password'];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function posts(): _______________
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+```
+
+Answer: `HasMany` - Return type for the relationship method. Laravel uses return type declarations for better IDE support and type safety in Eloquent relationships.
+
+#@@@@@@@@@@
+
+3. What is the difference between Laravel and Symfony?
+
+Answer: Laravel is full-stack framework with batteries included, rapid development, Eloquent ORM, Blade templating. Symfony is component-based, more flexible, reusable components, Doctrine ORM, Twig templating. Laravel uses Symfony components internally. Choose Laravel for rapid development, Symfony for enterprise flexibility.
+
+#@@@@@@@@@@
+
+4. Which of the following are Composer commands? (Multiple correct)
+A) composer install
+B) composer update
+C) composer require
+D) composer remove
+E) composer dump-autoload
+F) composer show
+
+Answer: A, B, C, D, E, F - All are Composer commands. install (install dependencies), update (update dependencies), require (add dependency), remove (remove dependency), dump-autoload (regenerate autoloader), show (list packages).
+
+#@@@@@@@@@@
+
+5. Find the SQL injection vulnerability in this PHP code:
+```php
+<?php
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+$result = mysqli_query($connection, $query);
+
+if (mysqli_num_rows($result) > 0) {
+    echo "Login successful";
+} else {
+    echo "Login failed";
+}
+?>
+```
+
+Answer: Direct string concatenation without sanitization allows SQL injection. User can inject malicious SQL. Fix with prepared statements: `$stmt = $connection->prepare("SELECT * FROM users WHERE username = ? AND password = ?"); $stmt->bind_param("ss", $username, $password);`
+
+#@@@@@@@@@@
+
+6. How do you implement middleware in Laravel?
+
+Answer: Create middleware with `php artisan make:middleware`, implement handle() method, register in Kernel.php, apply to routes with ->middleware() or route groups. Middleware can modify requests/responses, handle authentication, CORS, rate limiting, etc.
+
+#@@@@@@@@@@
+
+7. Which of the following are Symfony components? (Multiple correct)
+A) HttpFoundation
+B) Routing
+C) Console
+D) EventDispatcher
+E) DependencyInjection
+F) Security
+
+Answer: A, B, C, D, E, F - All are Symfony components. HttpFoundation (HTTP abstraction), Routing (URL routing), Console (CLI commands), EventDispatcher (event system), DependencyInjection (DI container), Security (authentication/authorization).
+
+#@@@@@@@@@@
+
+8. Complete this PHPUnit test:
+```php
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+class CalculatorTest extends TestCase
+{
+    public function testAddition()
+    {
+        $calculator = new Calculator();
+        $result = $calculator->add(2, 3);
+
+        $this->_______________($result, 5);
+    }
+
+    public function testDivisionByZero()
+    {
+        $calculator = new Calculator();
+
+        $this->_______________(\InvalidArgumentException::class);
+        $calculator->divide(10, 0);
+    }
+}
+```
+
+Answer: `assertEquals` and `expectException` - assertEquals checks if values are equal, expectException verifies that specific exception is thrown during test execution.
+
+#@@@@@@@@@@
+
+9. What is the difference between include and require in PHP?
+
+Answer: include continues execution if file not found (warning), require stops execution if file not found (fatal error). include_once/require_once prevent multiple inclusions. Use require for critical files, include for optional files. require_once commonly used for class files.
+
+#@@@@@@@@@@
+
+10. Which of the following are Doctrine ORM features? (Multiple correct)
+A) Entity mapping
+B) Query builder
+C) Migrations
+D) Caching
+E) Event listeners
+F) Lazy loading
+
+Answer: A, B, C, D, E, F - All are Doctrine features. Entity mapping (object-relational mapping), Query builder (DQL/SQL), Migrations (schema versioning), Caching (query/result cache), Event listeners (lifecycle events), Lazy loading (performance optimization).
+
+#@@@@@@@@@@
+
+11. Predict the output of this PHP code:
+```php
+<?php
+$array = [1, 2, 3, 4, 5];
+
+$result = array_map(function($x) {
+    return $x * 2;
+}, array_filter($array, function($x) {
+    return $x % 2 === 0;
+}));
+
+print_r($result);
+?>
+```
+
+Answer: Array ( [1] => 4 [3] => 8 ) - array_filter keeps even numbers (2, 4), array_map doubles them (4, 8). Keys are preserved from original array positions.
+
+#@@@@@@@@@@
+
+12. How do you implement caching in Laravel?
+
+Answer: Use Cache facade with drivers (file, database, Redis, Memcached). Methods: Cache::put(), Cache::get(), Cache::remember(), Cache::forget(). Configure in config/cache.php. Use cache tags for grouping, cache:clear command for clearing.
+
+#@@@@@@@@@@
+
+13. Which of the following are Twig features? (Multiple correct)
+A) Template inheritance
+B) Filters
+C) Functions
+D) Macros
+E) Auto-escaping
+F) Sandboxing
+
+Answer: A, B, C, D, E, F - All are Twig features. Template inheritance (extends/blocks), Filters (data transformation), Functions (utility functions), Macros (reusable snippets), Auto-escaping (XSS protection), Sandboxing (security restrictions).
+
+#@@@@@@@@@@
+
+14. Complete this Symfony controller:
+```php
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class UserController extends AbstractController
+{
+    #[Route('/users/{id}', name: 'user_show', methods: ['GET'])]
+    public function show(int $id): Response
+    {
+        $user = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->find($id);
+
+        if (!$user) {
+            throw $this->_______________();
+        }
+
+        return $this->render('user/show.html.twig', [
+            'user' => $user,
+        ]);
+    }
+}
+```
+
+Answer: `createNotFoundException` - Throws a 404 Not Found exception when the user is not found. This is the standard Symfony way to handle missing resources.
+
+#@@@@@@@@@@
+
+15. What is the difference between abstract classes and interfaces in PHP?
+
+Answer: Abstract classes can have properties, concrete methods, and abstract methods. Interfaces only define method signatures, no implementation. Classes extend one abstract class but implement multiple interfaces. Use interfaces for contracts, abstract classes for shared functionality.
+
+#@@@@@@@@@@
+
+16. Which of the following are Composer commands? (Multiple correct)
+A) composer install
+B) composer update
+C) composer require
+D) composer dump-autoload
+E) composer show
+F) All of the above
+
+Answer: F - All are Composer commands. install (install dependencies), update (update dependencies), require (add package), dump-autoload (regenerate autoloader), show (list packages). Essential PHP dependency management.
+
+#@@@@@@@@@@
+
+17. Find the bug in this PHP code:
+```php
+<?php
+class User {
+    private $name;
+
+    public function __construct($name) {
+        $this->name = $name;
+    }
+}
+
+$user = new User("John");
+echo $user->name; // Bug: accessing private property
+```
+
+Answer: Cannot access private property from outside class. Fix: make property public, or add getter method. Use public/protected/private visibility modifiers correctly.
+
+#@@@@@@@@@@
+
+18. What is the output of this code?
+```php
+<?php
+$x = "10";
+$y = 20;
+echo $x + $y;
+```
+
+Answer: 30 - PHP performs type juggling, converts string "10" to integer 10, then adds. Loose typing can cause unexpected behavior. Use strict_types=1 for type safety.
+
+#@@@@@@@@@@
+
+19. Which of the following are Laravel middleware types? (Multiple correct)
+A) Global middleware
+B) Route middleware
+C) Middleware groups
+D) Terminable middleware
+E) All of the above
+
+Answer: E - All are Laravel middleware types. Global (runs on every request), Route (assigned to specific routes), Groups (web, api), Terminable (after response sent). Powerful request/response filtering.
+
+#@@@@@@@@@@
+
+20. Complete this Symfony service configuration:
+```php
+# config/services.yaml
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Service\EmailService:
+        arguments:
+            $mailer: '@_______________'
+```
+
+Answer: `mailer` or `Symfony\Component\Mailer\MailerInterface` - Inject mailer service. Symfony's dependency injection container autowires services. Use @ for service references.
+
+#@@@@@@@@@@
+
+21. How do you implement dependency injection in PHP?
+
+Answer: Pass dependencies through constructor or setter methods. Use type hints for automatic injection. Example: `public function __construct(UserRepository $repo) { $this->repo = $repo; }`. Laravel/Symfony containers resolve dependencies automatically. Promotes testability, loose coupling.
+
+#@@@@@@@@@@
+
+22. Which of the following are PHPUnit assertion methods? (Multiple correct)
+A) assertEquals
+B) assertTrue
+C) assertCount
+D) assertInstanceOf
+E) assertArrayHasKey
+F) All of the above
+
+Answer: F - All are PHPUnit assertions. assertEquals (value equality), assertTrue (boolean), assertCount (array/collection size), assertInstanceOf (type check), assertArrayHasKey (array key exists). Comprehensive testing assertions.
+
+#@@@@@@@@@@
+
+23. Find the bug:
+```php
+<?php
+function divide($a, $b) {
+    return $a / $b; // Bug: no zero division check
+}
+
+echo divide(10, 0);
+```
+
+Answer: Division by zero causes warning and returns INF. Fix: check if $b is zero before dividing. Add error handling: `if ($b === 0) throw new InvalidArgumentException();`.
+
+#@@@@@@@@@@
+
+24. What is the difference between include and require in PHP?
+
+Answer: include produces warning if file not found, continues execution. require produces fatal error, stops execution. include_once/require_once prevent multiple inclusions. Use require for critical files, include for optional files.
+
+#@@@@@@@@@@
+
+25. Which of the following are Laravel Eloquent relationship types? (Multiple correct)
+A) hasOne
+B) hasMany
+C) belongsTo
+D) belongsToMany
+E) morphMany
+F) All of the above
+
+Answer: F - All are Eloquent relationships. hasOne (one-to-one), hasMany (one-to-many), belongsTo (inverse), belongsToMany (many-to-many), morphMany (polymorphic). Powerful ORM relationships.
+
+#@@@@@@@@@@
+
+26. Complete this Doctrine entity:
+```php
+<?php
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
+class User
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private int $id;
+
+    #[ORM\Column(type: 'string', length: _______________)]
+    private string $email;
+}
+```
+
+Answer: `255` or appropriate length - Define column length for string fields. Doctrine uses PHP 8 attributes for mapping. ORM for database abstraction.
+
+#@@@@@@@@@@
+
+27. How do you implement traits in PHP?
+
+Answer: Define trait with `trait TraitName { }`. Use in class with `use TraitName;`. Traits enable horizontal code reuse. Example: `trait Loggable { public function log($msg) { } }`. Resolve conflicts with insteadof/as. Multiple inheritance alternative.
+
+#@@@@@@@@@@
+
+28. Which of the following are Twig template features? (Multiple correct)
+A) Template inheritance
+B) Filters
+C) Functions
+D) Control structures
+E) Auto-escaping
+F) All of the above
+
+Answer: F - All are Twig features. Inheritance (extends, blocks), Filters (|upper, |date), Functions (range, cycle), Control (if, for), Auto-escaping (XSS prevention). Secure, flexible templating.
+
+#@@@@@@@@@@
+
+29. Find the bug:
+```php
+<?php
+$array = [1, 2, 3];
+foreach ($array as $value) {
+    $value = $value * 2; // Bug: doesn't modify array
+}
+print_r($array);
+```
+
+Answer: $value is copy, not reference. Array unchanged. Fix: use reference `foreach ($array as &$value)`. Or use array_map. Understand value vs reference semantics.
+
+#@@@@@@@@@@
+
+30. What is the difference between == and === in PHP?
+
+Answer: == compares values with type juggling (loose comparison). === compares values and types (strict comparison). Example: "10" == 10 is true, "10" === 10 is false. Always prefer === for predictable behavior.
+
+#@@@@@@@@@@
+
+31. Which of the following are Laravel validation rules? (Multiple correct)
+A) required
+B) email
+C) unique
+D) min/max
+E) regex
+F) All of the above
+
+Answer: F - All are validation rules. required (not empty), email (valid email), unique (database uniqueness), min/max (length/value), regex (pattern matching). Comprehensive validation system.
+
+#@@@@@@@@@@
+
+32. Complete this Symfony controller:
+```php
+<?php
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ApiController extends AbstractController
+{
+    #[Route('/api/users', methods: ['GET'])]
+    public function list(): _______________
+    {
+        $users = $this->userRepository->findAll();
+        return $this->json($users);
+    }
+}
+```
+
+Answer: `JsonResponse` - Return type for JSON responses. Symfony's json() method returns JsonResponse. Type hints improve code clarity and IDE support.
+
+#@@@@@@@@@@
+
+33. How do you implement namespaces in PHP?
+
+Answer: Declare with `namespace App\Service;` at top of file. Use classes with `use App\Service\EmailService;`. Organize code, prevent naming conflicts. PSR-4 autoloading standard. Example: `namespace App\Controllers;`.
+
+#@@@@@@@@@@
+
+34. Which of the following are PHP magic methods? (Multiple correct)
+A) __construct
+B) __destruct
+C) __get/__set
+D) __call
+E) __toString
+F) All of the above
+
+Answer: F - All are magic methods. __construct (constructor), __destruct (destructor), __get/__set (property overloading), __call (method overloading), __toString (string conversion). Special methods with __ prefix.
+
+#@@@@@@@@@@
+
+35. Find the bug:
+```php
+<?php
+class Counter {
+    public $count = 0;
+
+    public function increment() {
+        $count++; // Bug: missing $this->
+    }
+}
+```
+
+Answer: Missing $this-> to access property. $count is undefined variable. Fix: `$this->count++`. Always use $this-> for instance properties.
+
+#@@@@@@@@@@
+
+36. What is the difference between public, protected, and private in PHP?
+
+Answer: public accessible everywhere. protected accessible in class and subclasses. private accessible only in defining class. Use public for API, protected for inheritance, private for encapsulation. Visibility modifiers control access.
+
+#@@@@@@@@@@
+
+37. Which of the following are Laravel Blade directives? (Multiple correct)
+A) @if/@else
+B) @foreach
+C) @csrf
+D) @auth
+E) @component
+F) All of the above
+
+Answer: F - All are Blade directives. @if/@else (conditionals), @foreach (loops), @csrf (CSRF token), @auth (authentication check), @component (components). Powerful templating syntax.
+
+#@@@@@@@@@@
+
+38. Complete this Laravel migration:
+```php
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->_______________;
+            $table->timestamps();
+        });
+    }
+}
+```
+
+Answer: `unique()` - Make email column unique. Laravel's fluent schema builder. Chain methods for column modifiers. Database migrations for version control.
+
+#@@@@@@@@@@
+
+39. How do you implement interfaces in PHP?
+
+Answer: Define with `interface InterfaceName { }`. Implement with `class MyClass implements InterfaceName { }`. Interfaces define contracts, no implementation. Example: `interface Loggable { public function log(string $msg); }`. Multiple interfaces allowed.
+
+#@@@@@@@@@@
+
+40. Which of the following are Symfony console component features? (Multiple correct)
+A) Command creation
+B) Input/output handling
+C) Progress bars
+D) Tables
+E) Questions/prompts
+F) All of the above
+
+Answer: F - All are console features. Commands (custom CLI), Input/output (arguments, options), Progress bars (visual feedback), Tables (formatted output), Questions (interactive). Rich CLI toolkit.
+
+#@@@@@@@@@@
+
+41. Find the bug:
+```php
+<?php
+function getUser() {
+    return null;
+}
+
+$user = getUser();
+echo $user->name; // Bug: null pointer
+```
+
+Answer: Attempting to access property on null causes error. Fix: check if $user is not null. Use null coalescing: `$user?->name` (PHP 8) or `if ($user !== null)`. Null safety.
+
+#@@@@@@@@@@
+
+42. What is the difference between array() and [] in PHP?
+
+Answer: Both create arrays. [] is short syntax (PHP 5.4+). array() is traditional syntax. Functionally identical. Prefer [] for brevity. Example: `$arr = [1, 2, 3]` vs `$arr = array(1, 2, 3)`.
+
+#@@@@@@@@@@
+
+43. Which of the following are Laravel queue drivers? (Multiple correct)
+A) database
+B) redis
+C) sqs
+D) sync
+E) beanstalkd
+F) All of the above
+
+Answer: F - All are queue drivers. database (DB table), redis (Redis), sqs (AWS SQS), sync (synchronous, testing), beanstalkd (Beanstalkd). Flexible job queue system.
+
+#@@@@@@@@@@
+
+44. Complete this PHPUnit test:
+```php
+<?php
+use PHPUnit\Framework\TestCase;
+
+class UserTest extends TestCase
+{
+    public function testUserCreation()
+    {
+        $user = new User('John', 'john@example.com');
+
+        $this->_______________('John', $user->getName());
+        $this->assertEquals('john@example.com', $user->getEmail());
+    }
+}
+```
+
+Answer: `assertEquals` - Assert values are equal. PHPUnit provides comprehensive assertion methods. Test-driven development best practice.
+
+#@@@@@@@@@@
+
+45. How do you implement static methods in PHP?
+
+Answer: Define with `static` keyword. Call with `ClassName::methodName()`. Example: `public static function create() { return new static(); }`. Access with self:: or static::. Use for utility functions, factory methods.
+
+#@@@@@@@@@@
+
+46. Which of the following are Laravel service container features? (Multiple correct)
+A) Dependency injection
+B) Automatic resolution
+C) Binding
+D) Singletons
+E) Contextual binding
+F) All of the above
+
+Answer: F - All are container features. DI (automatic injection), Resolution (type-hinting), Binding (interface to implementation), Singletons (shared instances), Contextual (different implementations per context). Powerful IoC container.
+
+#@@@@@@@@@@
+
+47. Find the bug:
+```php
+<?php
+$numbers = [1, 2, 3, 4, 5];
+$sum = 0;
+
+foreach ($numbers as $num) {
+    $sum += $num;
+}
+
+echo $sum; // No bug
+```
+
+Answer: No bug - correctly sums array elements. Output: 15. Proper foreach usage with accumulator pattern.
+
+#@@@@@@@@@@
+
+48. What is the difference between abstract and final classes in PHP?
+
+Answer: abstract classes cannot be instantiated, must be extended, can have abstract methods. final classes cannot be extended. Use abstract for base classes, final to prevent inheritance. Opposite purposes.
+
+#@@@@@@@@@@
+
+49. Which of the following are Doctrine query methods? (Multiple correct)
+A) find
+B) findAll
+C) findBy
+D) findOneBy
+E) createQueryBuilder
+F) All of the above
+
+Answer: F - All are Doctrine methods. find (by ID), findAll (all records), findBy (criteria), findOneBy (single record), createQueryBuilder (DQL builder). Flexible querying.
+
+#@@@@@@@@@@
+
+50. Complete this Laravel route:
+```php
+<?php
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/users/{id}', [UserController::class, '_______________'])
+    ->name('users.show');
+```
+
+Answer: `show` - Controller method name. Laravel route-controller binding. RESTful naming convention. Route names for URL generation.
+
+#@@@@@@@@@@
+
+51. How do you implement anonymous classes in PHP?
+
+Answer: Use `new class { }` syntax. Example: `$obj = new class implements Logger { public function log($msg) { echo $msg; } };`. PHP 7+ feature. Useful for one-off implementations, testing, callbacks.
+
+#@@@@@@@@@@
+
+52. Which of the following are Laravel Eloquent scopes? (Multiple correct)
+A) Global scopes
+B) Local scopes
+C) Dynamic scopes
+D) All of the above
+
+Answer: D - All are Eloquent scopes. Global (apply to all queries), Local (reusable query logic, scope prefix), Dynamic (method-based). Example: `public function scopeActive($query) { return $query->where('active', 1); }`.
+
+#@@@@@@@@@@
+
+53. Find the bug:
+```php
+<?php
+class Product {
+    private $price;
+
+    public function setPrice($price) {
+        $price = $price; // Bug: should be $this->price
+    }
+}
+```
+
+Answer: Missing $this-> to set property. Local variable $price assigned to itself. Fix: `$this->price = $price`. Common mistake in setters.
+
+#@@@@@@@@@@
+
+54. What is the output of this code?
+```php
+<?php
+$a = [1, 2, 3];
+$b = $a;
+$b[] = 4;
+echo count($a);
+```
+
+Answer: 3 - Arrays are copied by value in PHP. $b is separate copy. Modifying $b doesn't affect $a. Use & for reference: `$b = &$a`.
+
+#@@@@@@@@@@
+
+55. Which of the following are Symfony form types? (Multiple correct)
+A) TextType
+B) EmailType
+C) ChoiceType
+D) EntityType
+E) FileType
+F) All of the above
+
+Answer: F - All are Symfony form types. TextType (text input), EmailType (email validation), ChoiceType (select/radio), EntityType (database entities), FileType (file upload). Rich form component.
+
+#@@@@@@@@@@
+
+56. Complete this Laravel event listener:
+```php
+<?php
+namespace App\Listeners;
+
+use App\Events\UserRegistered;
+
+class SendWelcomeEmail
+{
+    public function handle(UserRegistered $event)
+    {
+        $user = $event->_______________;
+        // Send email logic
+    }
+}
+```
+
+Answer: `user` - Access event property. Laravel event-listener pattern for decoupled architecture. Events carry data to listeners.
+
+#@@@@@@@@@@
+
+57. How do you implement generators in PHP?
+
+Answer: Use `yield` keyword instead of return. Example: `function gen() { yield 1; yield 2; }`. Generators are iterators, memory efficient for large datasets. Lazy evaluation. Use for streaming data.
+
+#@@@@@@@@@@
+
+58. Which of the following are PHP array functions? (Multiple correct)
+A) array_map
+B) array_filter
+C) array_reduce
+D) array_merge
+E) array_keys
+F) All of the above
+
+Answer: F - All are array functions. array_map (transform), array_filter (select), array_reduce (accumulate), array_merge (combine), array_keys (get keys). Functional programming tools.
+
+#@@@@@@@@@@
+
+59. Find the bug:
+```php
+<?php
+function factorial($n) {
+    if ($n == 0) return 1;
+    return $n * factorial($n - 1);
+}
+
+echo factorial(-5); // Bug: infinite recursion
+```
+
+Answer: Negative input causes infinite recursion. Fix: add validation `if ($n < 0) throw new InvalidArgumentException()`. Always validate recursive function inputs.
+
+#@@@@@@@@@@
+
+60. What is the difference between session and cookies in PHP?
+
+Answer: Sessions store data server-side, more secure, larger capacity. Cookies store data client-side, less secure, 4KB limit. Sessions use cookie for session ID. Use sessions for sensitive data, cookies for preferences.
+
+#@@@@@@@@@@
+
+61. Which of the following are Laravel authentication features? (Multiple correct)
+A) Guards
+B) Providers
+C) Middleware
+D) Password reset
+E) Email verification
+F) All of the above
+
+Answer: F - All are auth features. Guards (authentication methods), Providers (user retrieval), Middleware (route protection), Password reset (built-in), Email verification (optional). Comprehensive auth system.
+
+#@@@@@@@@@@
+
+62. Complete this Doctrine repository:
+```php
+<?php
+use Doctrine\ORM\EntityRepository;
+
+class UserRepository extends EntityRepository
+{
+    public function findActiveUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.active = :active')
+            ->setParameter('active', _______________)
+            ->getQuery()
+            ->getResult();
+    }
+}
+```
+
+Answer: `true` or `1` - Parameter value for active users. Doctrine QueryBuilder for complex queries. Named parameters prevent SQL injection.
+
+#@@@@@@@@@@
+
+63. How do you implement type declarations in PHP?
+
+Answer: Use type hints for parameters and return types. Example: `function add(int $a, int $b): int { return $a + $b; }`. PHP 7+ supports scalar types. Use `declare(strict_types=1)` for strict mode. Improves type safety.
+
+#@@@@@@@@@@
+
+64. Which of the following are Composer package types? (Multiple correct)
+A) library
+B) project
+C) metapackage
+D) composer-plugin
+E) All of the above
+
+Answer: E - All are package types. library (reusable code), project (application), metapackage (dependencies only), composer-plugin (extends Composer). Define in composer.json type field.
+
+#@@@@@@@@@@
+
+65. Find the bug:
+```php
+<?php
+$users = ['Alice', 'Bob', 'Charlie'];
+
+foreach ($users as $key => $user) {
+    echo "$key: $user\n"; // No bug
+}
+```
+
+Answer: No bug - correctly iterates with keys. Output: "0: Alice", "1: Bob", "2: Charlie". Proper foreach with key-value pairs.
+
+#@@@@@@@@@@
+
+66. What is the difference between PDO and MySQLi?
+
+Answer: PDO supports multiple databases (MySQL, PostgreSQL, SQLite), object-oriented. MySQLi MySQL-only, procedural and OO. PDO has named parameters, better abstraction. Use PDO for portability, MySQLi for MySQL-specific features.
+
+#@@@@@@@@@@
+
+67. Which of the following are Laravel collection methods? (Multiple correct)
+A) map
+B) filter
+C) reduce
+D) pluck
+E) groupBy
+F) All of the above
+
+Answer: F - All are collection methods. map (transform), filter (select), reduce (accumulate), pluck (extract column), groupBy (organize). Powerful fluent API for arrays.
+
+#@@@@@@@@@@
+
+68. Complete this Symfony validator:
+```php
+<?php
+use Symfony\Component\Validator\Constraints as Assert;
+
+class User
+{
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private string $email;
+
+    #[Assert\NotBlank]
+    #[Assert\Length(min: _______________, max: 255)]
+    private string $name;
+}
+```
+
+Answer: `1` or `2` - Minimum length for name. Symfony validation constraints using PHP 8 attributes. Declarative validation rules.
+
+#@@@@@@@@@@
+
+69. How do you implement closures in PHP?
+
+Answer: Anonymous functions assigned to variables. Example: `$greet = function($name) { return "Hello, $name"; };`. Use `use` for variable scope: `function() use ($var) { }`. Callbacks, array functions, event handlers.
+
+#@@@@@@@@@@
+
+70. Which of the following are PHP superglobals? (Multiple correct)
+A) $_GET
+B) $_POST
+C) $_SESSION
+D) $_SERVER
+E) $_FILES
+F) All of the above
+
+Answer: F - All are superglobals. $_GET (query params), $_POST (form data), $_SESSION (session data), $_SERVER (server info), $_FILES (uploaded files). Global arrays available everywhere.
+
+#@@@@@@@@@@
+
+71. Find the bug:
+```php
+<?php
+class Calculator {
+    public static function add($a, $b) {
+        return $a + $b;
+    }
+}
+
+$calc = new Calculator();
+echo $calc->add(5, 3); // Bug: calling static method as instance method
+```
+
+Answer: Should call static method with :: not ->. Fix: `Calculator::add(5, 3)`. Though PHP allows instance call to static, it's incorrect style. Use proper static syntax.
+
+#@@@@@@@@@@
+
+72. What is the difference between serialize and json_encode?
+
+Answer: serialize creates PHP-specific format, preserves types, objects. json_encode creates JSON, portable, limited types. serialize for PHP-to-PHP, json_encode for interoperability. JSON safer for untrusted data.
+
+#@@@@@@@@@@
+
+73. Which of the following are Laravel Eloquent query builder methods? (Multiple correct)
+A) where
+B) orderBy
+C) limit
+D) join
+E) select
+F) All of the above
+
+Answer: F - All are query builder methods. where (conditions), orderBy (sorting), limit (pagination), join (table joins), select (columns). Fluent query interface.
+
+#@@@@@@@@@@
+
+74. Complete this Twig template:
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+    <h1>{{ user._______________ }}</h1>
+    <p>Email: {{ user.email }}</p>
+{% endblock %}
+```
+
+Answer: `name` - Access object property. Twig uses dot notation for properties/methods. Auto-escaping prevents XSS. Template inheritance with blocks.
+
+#@@@@@@@@@@
+
+75. How do you implement error handling in PHP?
+
+Answer: Use try-catch blocks. Example: `try { /* code */ } catch (Exception $e) { /* handle */ }`. Throw exceptions with `throw new Exception()`. Set error handler with set_error_handler(). Use finally for cleanup.
+
+#@@@@@@@@@@
+
+76. Which of the following are Symfony security features? (Multiple correct)
+A) Authentication
+B) Authorization
+C) Firewalls
+D) Voters
+E) Password encoding
+F) All of the above
+
+Answer: F - All are security features. Authentication (user identity), Authorization (permissions), Firewalls (access control), Voters (custom logic), Password encoding (bcrypt, argon2). Comprehensive security component.
+
+#@@@@@@@@@@
+
+77. Find the bug:
+```php
+<?php
+$data = ['name' => 'John', 'age' => 30];
+
+echo $data['email']; // Bug: undefined index
+```
+
+Answer: Accessing non-existent array key causes notice. Fix: check with isset() or use null coalescing: `$data['email'] ?? 'N/A'`. Always validate array keys.
+
+#@@@@@@@@@@
+
+78. What is the difference between require_once and include_once?
+
+Answer: Both prevent multiple inclusions. require_once fatal error if file missing, include_once warning. Use require_once for critical files, include_once for optional. _once variants check if already included.
+
+#@@@@@@@@@@
+
+79. Which of the following are Laravel caching drivers? (Multiple correct)
+A) file
+B) database
+C) redis
+D) memcached
+E) array
+F) All of the above
+
+Answer: F - All are cache drivers. file (filesystem), database (DB table), redis (Redis), memcached (Memcached), array (in-memory, testing). Flexible caching system.
+
+#@@@@@@@@@@
+
+80. Complete this Laravel resource controller:
+```php
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostController extends Controller
+{
+    public function index()
+    {
+        return Post::_______________();
+    }
+
+    public function store(Request $request)
+    {
+        return Post::create($request->validated());
+    }
+}
+```
+
+Answer: `all()` or `paginate()` - Retrieve all posts or paginated results. Resource controllers follow RESTful conventions. Laravel Eloquent ORM methods.
+
+#@@@@@@@@@@
+
+81. How do you implement method chaining in PHP?
+
+Answer: Return $this from methods. Example: `public function setName($name) { $this->name = $name; return $this; }`. Enables fluent interface: `$obj->setName('John')->setAge(30)`. Improves readability.
+
+#@@@@@@@@@@
+
+82. Which of the following are PHP date/time functions? (Multiple correct)
+A) date
+B) strtotime
+C) DateTime class
+D) Carbon library
+E) All of the above
+
+Answer: E - All are date/time tools. date (format), strtotime (parse), DateTime (OO interface), Carbon (Laravel's date library). Use Carbon for expressive date manipulation.
+
+#@@@@@@@@@@
+
+83. Find the bug:
+```php
+<?php
+function getConfig() {
+    return [
+        'db' => 'mysql',
+        'host' => 'localhost'
+    ];
+}
+
+$config = getConfig();
+echo $config->db; // Bug: array not object
+```
+
+Answer: Trying to access array as object. Fix: use array syntax `$config['db']`. Or cast to object: `(object)$config`. Understand array vs object access.
+
+#@@@@@@@@@@
+
+84. What is the difference between empty() and isset()?
+
+Answer: isset() checks if variable exists and not null. empty() checks if variable is empty (false, 0, "", null, [], undefined). isset($var) can be true while empty($var) is true. Use isset() for existence, empty() for truthiness.
+
+#@@@@@@@@@@
+
+85. Which of the following are Doctrine mapping types? (Multiple correct)
+A) Annotations
+B) XML
+C) YAML
+D) PHP attributes
+E) All of the above
+
+Answer: E - All are mapping types. Annotations (legacy), XML (configuration), YAML (configuration), Attributes (PHP 8+, modern). Choose based on preference and PHP version.
+
+#@@@@@@@@@@
+
+86. Complete this Laravel form request:
+```php
+<?php
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreUserRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|_______________',
+            'password' => 'required|min:8|confirmed',
+        ];
+    }
+}
+```
+
+Answer: `unique:users` or `unique:users,email` - Validate email uniqueness in users table. Form requests encapsulate validation logic. Clean controller code.
+
+#@@@@@@@@@@
+
+87. How do you implement autoloading in PHP?
+
+Answer: Use Composer's PSR-4 autoloading. Define in composer.json: `"autoload": { "psr-4": { "App\\": "src/" } }`. Run `composer dump-autoload`. Or use spl_autoload_register(). Automatic class loading.
+
+#@@@@@@@@@@
+
+88. Which of the following are Symfony event dispatcher features? (Multiple correct)
+A) Event classes
+B) Event listeners
+C) Event subscribers
+D) Event priorities
+E) All of the above
+
+Answer: E - All are event features. Events (data carriers), Listeners (single event), Subscribers (multiple events), Priorities (execution order). Decoupled architecture pattern.
+
+#@@@@@@@@@@
+
+89. Find the bug:
+```php
+<?php
+class User {
+    public function __construct(
+        public string $name,
+        public string $email
+    ) {} // No bug - PHP 8 constructor property promotion
+}
+
+$user = new User('John', 'john@example.com');
+echo $user->name;
+```
+
+Answer: No bug - PHP 8 constructor property promotion. Declares and assigns properties in constructor. Concise syntax. Output: "John".
+
+#@@@@@@@@@@
+
+90. What is the difference between var_dump and print_r?
+
+Answer: var_dump shows type and value, more detailed, no return value. print_r human-readable, less detail, can return string. var_dump for debugging, print_r for display. Use var_dump for type inspection.
+
+#@@@@@@@@@@
+
+91. Which of the following are Laravel Artisan make commands? (Multiple correct)
+A) make:model
+B) make:migration
+C) make:controller
+D) make:middleware
+E) make:request
+F) All of the above
+
+Answer: F - All are make commands. model (Eloquent model), migration (database migration), controller (HTTP controller), middleware (request filter), request (form request). Code generation tools.
+
+#@@@@@@@@@@
+
+92. Complete this Symfony route annotation:
+```php
+<?php
+use Symfony\Component\Routing\Annotation\Route;
+
+class ProductController extends AbstractController
+{
+    #[Route('/products/{id}', name: 'product_show', methods: ['_______________'])]
+    public function show(int $id): Response
+    {
+        // Show product
+    }
+}
+```
+
+Answer: `GET` - HTTP method for route. Symfony routing with PHP 8 attributes. RESTful conventions. Method constraints.
+
+#@@@@@@@@@@
+
+93. How do you implement late static binding in PHP?
+
+Answer: Use `static::` instead of `self::`. Example: `return new static();` in factory method. static:: resolves at runtime, self:: at compile time. Enables proper inheritance in static contexts.
+
+#@@@@@@@@@@
+
+94. Which of the following are PHP string functions? (Multiple correct)
+A) strlen
+B) substr
+C) str_replace
+D) explode
+E) trim
+F) All of the above
+
+Answer: F - All are string functions. strlen (length), substr (substring), str_replace (replace), explode (split to array), trim (remove whitespace). Essential string manipulation.
+
+#@@@@@@@@@@
+
+95. Find the bug:
+```php
+<?php
+$numbers = [1, 2, 3, 4, 5];
+$doubled = array_map(function($n) {
+    return $n * 2;
+}, $numbers);
+
+print_r($doubled); // No bug
+```
+
+Answer: No bug - correctly doubles array values. Output: [2, 4, 6, 8, 10]. Proper array_map usage with anonymous function.
+
+#@@@@@@@@@@
+
+96. What is the difference between final methods and final classes?
+
+Answer: final methods cannot be overridden in subclasses. final classes cannot be extended. Use final methods to prevent override, final classes to prevent inheritance. Design decision for API stability.
+
+#@@@@@@@@@@
+
+97. Which of the following are Laravel database seeding features? (Multiple correct)
+A) Seeders
+B) Factories
+C) Faker integration
+D) Model factories
+E) All of the above
+
+Answer: E - All are seeding features. Seeders (populate database), Factories (model instances), Faker (fake data), Model factories (Eloquent integration). Testing and development data.
+
+#@@@@@@@@@@
+
+98. Complete this Doctrine query:
+```php
+<?php
+$qb = $entityManager->createQueryBuilder();
+$qb->select('u')
+   ->from('App\Entity\User', 'u')
+   ->where('u.age > :age')
+   ->setParameter('age', _______________)
+   ->orderBy('u.name', 'ASC');
+
+$users = $qb->getQuery()->getResult();
+```
+
+Answer: `18` or any integer - Parameter value for age filter. Doctrine QueryBuilder for DQL queries. Named parameters for security.
+
+#@@@@@@@@@@
+
+99. How do you implement variadic functions in PHP?
+
+Answer: Use ... operator for variable arguments. Example: `function sum(...$numbers) { return array_sum($numbers); }`. Call: `sum(1, 2, 3, 4)`. PHP 5.6+ feature. Flexible parameter lists.
+
+#@@@@@@@@@@
+
+100. Which of the following are PHP best practices? (Multiple correct)
+A) Use type declarations
+B) Follow PSR standards
+C) Use dependency injection
+D) Write tests
+E) Use Composer
+F) All of the above
+
+Answer: F - All are best practices. Type declarations (safety), PSR (coding standards), DI (loose coupling), Tests (quality), Composer (dependency management). Professional PHP development standards.
+
+#@@@@@@@@@@
+
+101. How do you implement readonly properties in PHP?
+
+Answer: Use readonly keyword (PHP 8.1+). Example: `public readonly string $name;`. Can only be initialized once, in constructor. Immutable properties. Use for value objects, DTOs.
+
+#@@@@@@@@@@
+
+102. Which of the following are Laravel broadcasting drivers? (Multiple correct)
+A) pusher
+B) redis
+C) log
+D) null
+E) All of the above
+
+Answer: E - All are broadcasting drivers. pusher (Pusher service), redis (Redis pub/sub), log (logging), null (disable). Real-time event broadcasting to frontend.
+
+#@@@@@@@@@@
+
+103. Find the bug:
+```php
+<?php
+class Product {
+    private float $price;
+
+    public function __construct(float $price) {
+        $this->price = $price;
+    }
+
+    public function getPrice(): float {
+        return $this->price;
+    }
+}
+
+$product = new Product("19.99"); // Bug: string instead of float
+```
+
+Answer: Passing string to float parameter. In strict_types mode, causes TypeError. Without strict mode, auto-converts. Use `declare(strict_types=1)` for type safety.
+
+#@@@@@@@@@@
+
+104. What is the output of this code?
+```php
+<?php
+$x = 10;
+$y = "10";
+var_dump($x === $y);
+```
+
+Answer: bool(false) - Strict comparison checks type and value. Integer 10 !== string "10". Use === for type-safe comparisons.
+
+#@@@@@@@@@@
+
+105. Which of the following are Symfony Messenger features? (Multiple correct)
+A) Message buses
+B) Handlers
+C) Middleware
+D) Transports
+E) Async processing
+F) All of the above
+
+Answer: F - All are Messenger features. Buses (dispatch), Handlers (process), Middleware (pipeline), Transports (queues), Async (background jobs). CQRS and message-driven architecture.
+
+#@@@@@@@@@@
+
+106. Complete this Laravel policy:
+```php
+<?php
+namespace App\Policies;
+
+use App\Models\User;
+use App\Models\Post;
+
+class PostPolicy
+{
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->_______________;
+    }
+}
+```
+
+Answer: `user_id` - Check if user owns the post. Laravel policies for authorization logic. Gate and policy system.
+
+#@@@@@@@@@@
+
+107. How do you implement enums in PHP?
+
+Answer: Use enum keyword (PHP 8.1+). Example: `enum Status { case Pending; case Approved; case Rejected; }`. Backed enums: `enum Status: string { case Pending = 'pending'; }`. Type-safe constants.
+
+#@@@@@@@@@@
+
+108. Which of the following are Doctrine lifecycle events? (Multiple correct)
+A) prePersist
+B) postPersist
+C) preUpdate
+D) postLoad
+E) preRemove
+F) All of the above
+
+Answer: F - All are lifecycle events. prePersist (before insert), postPersist (after insert), preUpdate (before update), postLoad (after load), preRemove (before delete). Entity lifecycle hooks.
+
+#@@@@@@@@@@
+
+109. Find the bug:
+```php
+<?php
+function divide(int $a, int $b): int {
+    return $a / $b; // Bug: division returns float
+}
+
+echo divide(10, 3);
+```
+
+Answer: Division returns float, but function declares int return. Fix: change return type to float, or use intdiv() for integer division. Type mismatch.
+
+#@@@@@@@@@@
+
+110. What is the difference between __sleep and __wakeup?
+
+Answer: __sleep called before serialize(), returns array of properties to serialize. __wakeup called after unserialize(), reinitialize resources. Use for custom serialization logic, resource cleanup/restoration.
+
+#@@@@@@@@@@
+
+111. Which of the following are Laravel notification channels? (Multiple correct)
+A) mail
+B) database
+C) broadcast
+D) slack
+E) sms (via Nexmo/Vonage)
+F) All of the above
+
+Answer: F - All are notification channels. mail (email), database (store in DB), broadcast (real-time), slack (Slack messages), sms (text messages). Multi-channel notifications.
+
+#@@@@@@@@@@
+
+112. Complete this Symfony service:
+```php
+<?php
+namespace App\Service;
+
+use Psr\Log\LoggerInterface;
+
+class OrderService
+{
+    public function __construct(
+        private LoggerInterface $logger,
+        private _______________Interface $mailer
+    ) {}
+}
+```
+
+Answer: `Mailer` or `Symfony\Component\Mailer\Mailer` - Inject mailer service. Constructor property promotion with dependency injection. Type-hinted dependencies.
+
+#@@@@@@@@@@
+
+113. How do you implement first-class callables in PHP?
+
+Answer: Use ... syntax (PHP 8.1+). Example: `$fn = strlen(...);`. Creates Closure from callable. Before: `$fn = 'strlen'` or `Closure::fromCallable('strlen')`. Cleaner syntax.
+
+#@@@@@@@@@@
+
+114. Which of the following are PHPStan/Psalm features? (Multiple correct)
+A) Static analysis
+B) Type inference
+C) Error detection
+D) PHPDoc validation
+E) Custom rules
+F) All of the above
+
+Answer: F - All are static analysis features. Analysis (code inspection), Inference (deduce types), Errors (find bugs), PHPDoc (validate annotations), Custom rules (extensible). Improve code quality.
+
+#@@@@@@@@@@
+
+115. Find the bug:
+```php
+<?php
+$users = [
+    ['name' => 'Alice', 'age' => 25],
+    ['name' => 'Bob', 'age' => 30]
+];
+
+foreach ($users as &$user) {
+    $user['age']++;
+}
+
+foreach ($users as $user) { // Bug: reference still active
+    echo $user['name'];
+}
+```
+
+Answer: First loop leaves reference active. Second loop overwrites last element. Fix: unset($user) after first loop. Reference persists after foreach.
+
+#@@@@@@@@@@
+
+116. What is the difference between array_merge and array_combine?
+
+Answer: array_merge combines arrays, preserves values, reindexes numeric keys. array_combine creates array using one array for keys, another for values. Different purposes. array_merge for combining, array_combine for key-value pairing.
+
+#@@@@@@@@@@
+
+117. Which of the following are Laravel Horizon features? (Multiple correct)
+A) Queue monitoring
+B) Metrics
+C) Job retries
+D) Failed job management
+E) Dashboard
+F) All of the above
+
+Answer: F - All are Horizon features. Monitoring (real-time), Metrics (throughput, runtime), Retries (automatic), Failed jobs (management), Dashboard (UI). Redis queue management for Laravel.
+
+#@@@@@@@@@@
+
+118. Complete this Doctrine association:
+```php
+<?php
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
+class Post
+{
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: '_______________')]
+    private User $author;
+}
+```
+
+Answer: `id` - Referenced column in User table. Doctrine associations with foreign keys. ManyToOne relationship mapping.
+
+#@@@@@@@@@@
+
+119. How do you implement named arguments in PHP?
+
+Answer: Use parameter names in function calls (PHP 8+). Example: `function greet(string $name, string $title) { }` called as `greet(title: 'Dr.', name: 'Smith')`. Order independent. Improves readability.
+
+#@@@@@@@@@@
+
+120. Which of the following are Symfony HttpFoundation components? (Multiple correct)
+A) Request
+B) Response
+C) Session
+D) Cookie
+E) File upload
+F) All of the above
+
+Answer: F - All are HttpFoundation components. Request (HTTP request), Response (HTTP response), Session (session management), Cookie (cookie handling), File upload (uploaded files). HTTP abstraction layer.
+
+#@@@@@@@@@@
+
+121. Find the bug:
+```php
+<?php
+class Config {
+    private static $instance;
+
+    private function __construct() {}
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+}
+
+$config = new Config(); // Bug: constructor is private
+```
+
+Answer: Cannot instantiate class with private constructor. Singleton pattern. Fix: use `Config::getInstance()`. Private constructor prevents direct instantiation.
+
+#@@@@@@@@@@
+
+122. What is the difference between count and sizeof?
+
+Answer: sizeof is alias for count. Functionally identical. count is preferred, more common. Both count array elements or Countable objects. Use count for clarity.
+
+#@@@@@@@@@@
+
+123. Which of the following are Laravel Telescope features? (Multiple correct)
+A) Request monitoring
+B) Exception tracking
+C) Database queries
+D) Cache operations
+E) Mail preview
+F) All of the above
+
+Answer: F - All are Telescope features. Requests (HTTP), Exceptions (errors), Queries (SQL), Cache (operations), Mail (preview). Debug assistant for Laravel applications.
+
+#@@@@@@@@@@
+
+124. Complete this Symfony command:
+```php
+<?php
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class ImportCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $output->writeln('Import started');
+        // Import logic
+        return Command::_______________;
+    }
+}
+```
+
+Answer: `SUCCESS` - Return success status code. Symfony console commands return status. SUCCESS (0), FAILURE (1), INVALID (2).
+
+#@@@@@@@@@@
+
+125. How do you implement union types in PHP?
+
+Answer: Use | operator (PHP 8+). Example: `function process(int|float $number): string|bool { }`. Multiple possible types. Improves type flexibility while maintaining safety.
+
+#@@@@@@@@@@
+
+126. Which of the following are Twig filters? (Multiple correct)
+A) |upper
+B) |lower
+C) |date
+D) |length
+E) |default
+F) All of the above
+
+Answer: F - All are Twig filters. upper (uppercase), lower (lowercase), date (format date), length (count), default (fallback value). Transform output in templates.
+
+#@@@@@@@@@@
+
+127. Find the bug:
+```php
+<?php
+$callback = function() {
+    echo $this->name; // Bug: $this not available in closure
+};
+
+class User {
+    public $name = 'John';
+
+    public function greet() {
+        $callback();
+    }
+}
+```
+
+Answer: Closures don't automatically bind $this. Fix: use arrow function `fn() => $this->name` or bind: `$callback->bindTo($this)`. Scope binding issue.
+
+#@@@@@@@@@@
+
+128. What is the difference between array_push and $array[] = ?
+
+Answer: array_push adds multiple elements, function call overhead. $array[] = adds single element, faster, direct assignment. Functionally similar for single element. Use [] for performance.
+
+#@@@@@@@@@@
+
+129. Which of the following are Laravel Sanctum features? (Multiple correct)
+A) API token authentication
+B) SPA authentication
+C) Mobile app authentication
+D) Token abilities
+E) All of the above
+
+Answer: E - All are Sanctum features. API tokens (simple auth), SPA (cookie-based), Mobile (token-based), Abilities (permissions). Lightweight authentication for APIs.
+
+#@@@@@@@@@@
+
+130. Complete this Doctrine migration:
+```php
+<?php
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+class Version20230101000000 extends AbstractMigration
+{
+    public function up(Schema $schema): void
+    {
+        $this->addSql('CREATE TABLE users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL _______________
+        )');
+    }
+}
+```
+
+Answer: `UNIQUE` - Make email unique. Doctrine migrations for database versioning. SQL DDL statements.
+
+#@@@@@@@@@@
+
+131. How do you implement intersection types in PHP?
+
+Answer: Use & operator (PHP 8.1+). Example: `function process(Countable&Iterator $collection) { }`. Object must implement all types. Stricter than union types.
+
+#@@@@@@@@@@
+
+132. Which of the following are Symfony Workflow component features? (Multiple correct)
+A) State machines
+B) Workflows
+C) Transitions
+D) Guards
+E) Event listeners
+F) All of the above
+
+Answer: F - All are Workflow features. State machines (single state), Workflows (multiple states), Transitions (state changes), Guards (conditions), Events (hooks). Model business processes.
+
+#@@@@@@@@@@
+
+133. Find the bug:
+```php
+<?php
+function getUsers(): array {
+    return null; // Bug: null not array
+}
+
+$users = getUsers();
+foreach ($users as $user) {
+    echo $user;
+}
+```
+
+Answer: Function returns null but declares array return type. Causes TypeError in strict mode. Fix: return empty array [] or make return type nullable: `?array`.
+
+#@@@@@@@@@@
+
+134. What is the difference between is_null and === null?
+
+Answer: is_null is function call, checks if variable is null. === null is comparison operator, same check. === null is faster (no function call). Both check for null value. Prefer === null.
+
+#@@@@@@@@@@
+
+135. Which of the following are Laravel Valet features? (Multiple correct)
+A) Local development environment
+B) Automatic site serving
+C) Database management
+D) SSL certificates
+E) All of the above
+
+Answer: E - All are Valet features. Development (macOS/Linux), Auto-serving (*.test domains), Database (MySQL), SSL (secure local). Minimalist dev environment.
+
+#@@@@@@@@@@
+
+136. Complete this PHPUnit data provider:
+```php
+<?php
+use PHPUnit\Framework\TestCase;
+
+class CalculatorTest extends TestCase
+{
+    /**
+     * @dataProvider additionProvider
+     */
+    public function testAddition($a, $b, $expected)
+    {
+        $this->assertEquals($expected, $a + $b);
+    }
+
+    public function _______________(): array
+    {
+        return [
+            [1, 2, 3],
+            [5, 5, 10],
+        ];
+    }
+}
+```
+
+Answer: `additionProvider` - Data provider method name. Provides test data sets. Parameterized testing.
+
+#@@@@@@@@@@
+
+137. How do you implement mixed type in PHP?
+
+Answer: Use mixed type hint (PHP 8+). Example: `function process(mixed $value): mixed { }`. Accepts any type. Equivalent to no type hint but explicit. Use when type truly varies.
+
+#@@@@@@@@@@
+
+138. Which of the following are Symfony Mailer features? (Multiple correct)
+A) Email sending
+B) Multiple transports
+C) HTML/text emails
+D) Attachments
+E) Inline images
+F) All of the above
+
+Answer: F - All are Mailer features. Sending (SMTP, API), Transports (multiple providers), HTML/text (both formats), Attachments (files), Inline images (embedded). Modern email component.
+
+#@@@@@@@@@@
+
+139. Find the bug:
+```php
+<?php
+class User {
+    public function __construct(
+        public string $name,
+        public int $age
+    ) {}
+}
+
+$user = new User(name: 'John'); // Bug: missing required parameter
+```
+
+Answer: Missing required $age parameter. Constructor requires both parameters. Fix: provide age: `new User(name: 'John', age: 30)`. All required parameters must be provided.
+
+#@@@@@@@@@@
+
+140. What is the difference between array_key_exists and isset?
+
+Answer: array_key_exists checks if key exists, even if value is null. isset checks if key exists AND value is not null. array_key_exists(['key' => null], 'key') is true, isset is false. Different null handling.
+
+#@@@@@@@@@@
+
+141. Which of the following are Laravel Octane features? (Multiple correct)
+A) Swoole support
+B) RoadRunner support
+C) Performance boost
+D) Concurrent requests
+E) All of the above
+
+Answer: E - All are Octane features. Swoole (async server), RoadRunner (Go server), Performance (faster), Concurrent (parallel requests). Supercharge Laravel performance.
+
+#@@@@@@@@@@
+
+142. Complete this Symfony entity listener:
+```php
+<?php
+use Doctrine\ORM\Event\PrePersistEventArgs;
+
+class UserListener
+{
+    public function prePersist(User $user, PrePersistEventArgs $event): void
+    {
+        $user->setCreatedAt(new \_______________());
+    }
+}
+```
+
+Answer: `DateTime` or `DateTimeImmutable` - Create timestamp. Doctrine entity listeners for lifecycle events. Automatic timestamp management.
+
+#@@@@@@@@@@
+
+143. How do you implement never type in PHP?
+
+Answer: Use never return type (PHP 8.1+). Example: `function terminate(): never { exit; }`. Function never returns (throws exception or exits). Stricter than void. Use for functions that always terminate.
+
+#@@@@@@@@@@
+
+144. Which of the following are Composer scripts? (Multiple correct)
+A) post-install-cmd
+B) post-update-cmd
+C) pre-autoload-dump
+D) post-autoload-dump
+E) All of the above
+
+Answer: E - All are Composer scripts. Hooks for automation. Run commands after install, update, autoload generation. Automate build tasks, asset compilation.
+
+#@@@@@@@@@@
+
+145. Find the bug:
+```php
+<?php
+$numbers = [1, 2, 3, 4, 5];
+$result = array_map(function($n) {
+    if ($n % 2 === 0) {
+        return $n * 2;
+    }
+    // Bug: no return for odd numbers
+}, $numbers);
+```
+
+Answer: Function doesn't return value for odd numbers, returns null. Fix: add else clause or return $n. array_map expects return value for all elements.
+
+#@@@@@@@@@@
+
+146. What is the difference between __invoke and regular methods?
+
+Answer: __invoke makes object callable as function. Example: `$obj()` calls __invoke(). Regular methods called with ->method(). Use __invoke for single-purpose objects, strategy pattern.
+
+#@@@@@@@@@@
+
+147. Which of the following are Laravel Socialite providers? (Multiple correct)
+A) Facebook
+B) Google
+C) GitHub
+D) Twitter
+E) LinkedIn
+F) All of the above
+
+Answer: F - All are Socialite providers (with additional packages). OAuth authentication with social platforms. Simplifies social login integration.
+
+#@@@@@@@@@@
+
+148. Complete this Symfony validator constraint:
+```php
+<?php
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
+#[Assert\Callback]
+public function validate(ExecutionContextInterface $context): void
+{
+    if ($this->startDate > $this->endDate) {
+        $context->buildViolation('Start date must be before end date')
+            ->atPath('_______________')
+            ->addViolation();
+    }
+}
+```
+
+Answer: `startDate` or `endDate` - Property path for error. Custom validation logic with callbacks. Complex validation rules.
+
+#@@@@@@@@@@
+
+149. How do you implement fibers in PHP?
+
+Answer: Use Fiber class (PHP 8.1+). Example: `$fiber = new Fiber(function() { Fiber::suspend($value); }); $fiber->start(); $fiber->resume($value);`. Low-level concurrency primitive. Foundation for async frameworks.
+
+#@@@@@@@@@@
+
+150. Which of the following represent PHP modern features? (Multiple correct)
+A) Type declarations
+B) Attributes
+C) Enums
+D) Readonly properties
+E) Constructor property promotion
+F) All of the above
+
+Answer: F - All are modern PHP features. Types (7.0+), Attributes (8.0), Enums (8.1), Readonly (8.1), Promotion (8.0). PHP evolving toward type safety and expressiveness. Modern PHP is powerful, type-safe, and developer-friendly with features rivaling statically-typed languages.
+
+#@@@@@@@@@@
+
+151. How do you implement attribute classes in PHP?
+
+Answer: Create class with #[Attribute] attribute. Example: `#[Attribute] class Route { public function __construct(public string $path) {} }`. Use on classes, methods, properties. Metadata for reflection. Replace annotations.
+
+#@@@@@@@@@@
+
+152. Which of the following are Laravel Passport features? (Multiple correct)
+A) OAuth2 server
+B) Personal access tokens
+C) Password grant
+D) Client credentials
+E) Scopes
+F) All of the above
+
+Answer: F - All are Passport features. OAuth2 (full server), Personal tokens (simple auth), Password grant (first-party), Client credentials (machine-to-machine), Scopes (permissions). Complete OAuth2 implementation.
+
+#@@@@@@@@@@
+
+153. Find the bug:
+```php
+<?php
+interface Logger {
+    public function log(string $message): void;
+}
+
+class FileLogger implements Logger {
+    public function log(string $message, string $level = 'info'): void { // Bug: incompatible signature
+        // Log to file
+    }
+}
+```
+
+Answer: Method signature doesn't match interface. Added parameter not in interface. Fix: remove $level or make interface compatible. Interface implementation must match exactly.
+
+#@@@@@@@@@@
+
+154. What is the output of this code?
+```php
+<?php
+$a = [1, 2, 3];
+$b = [4, 5, 6];
+$c = $a + $b;
+print_r($c);
+```
+
+Answer: Array([0] => 1 [1] => 2 [2] => 3) - Array union operator keeps keys from first array. Doesn't append. Use array_merge for combining. + operator preserves keys.
+
+#@@@@@@@@@@
+
+155. Which of the following are Symfony Cache adapters? (Multiple correct)
+A) APCu
+B) Redis
+C) Memcached
+D) Filesystem
+E) PDO/Doctrine
+F) All of the above
+
+Answer: F - All are cache adapters. APCu (in-memory), Redis (remote), Memcached (distributed), Filesystem (files), PDO/Doctrine (database). Flexible caching backends.
+
+#@@@@@@@@@@
+
+156. Complete this Laravel job:
+```php
+<?php
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+
+class ProcessOrder implements _______________
+{
+    use Dispatchable, Queueable;
+
+    public function handle()
+    {
+        // Process order
+    }
+}
+```
+
+Answer: `ShouldQueue` - Interface for queued jobs. Laravel queue system for background processing. Async job execution.
+
+#@@@@@@@@@@
+
+157. How do you implement match expressions in PHP?
+
+Answer: Use match keyword (PHP 8+). Example: `$result = match($value) { 1 => 'one', 2 => 'two', default => 'other' };`. Strict comparison, returns value, exhaustive. Better than switch for expressions.
+
+#@@@@@@@@@@
+
+158. Which of the following are Doctrine query types? (Multiple correct)
+A) DQL (Doctrine Query Language)
+B) Query Builder
+C) Native SQL
+D) Criteria API
+E) All of the above
+
+Answer: E - All are query types. DQL (object-oriented SQL), Query Builder (fluent API), Native SQL (raw queries), Criteria (collection filtering). Multiple query approaches.
+
+#@@@@@@@@@@
+
+159. Find the bug:
+```php
+<?php
+class User {
+    private string $name;
+
+    public function setName(string $name): void {
+        $name = trim($name);
+        // Bug: not assigning to property
+    }
+}
+```
+
+Answer: Missing $this-> to assign to property. Local variable modified, property unchanged. Fix: `$this->name = trim($name)`. Common setter mistake.
+
+#@@@@@@@@@@
+
+160. What is the difference between clone and new?
+
+Answer: clone creates copy of existing object, calls __clone if defined. new creates fresh instance, calls __construct. clone for duplicating, new for creating. Shallow copy by default.
+
+#@@@@@@@@@@
+
+161. Which of the following are Laravel Dusk features? (Multiple correct)
+A) Browser testing
+B) Chrome automation
+C) Screenshots
+D) Page objects
+E) Waiting/assertions
+F) All of the above
+
+Answer: F - All are Dusk features. Browser testing (E2E), Chrome (ChromeDriver), Screenshots (debugging), Page objects (organization), Waiting (dynamic content). Browser automation for Laravel.
+
+#@@@@@@@@@@
+
+162. Complete this Symfony security voter:
+```php
+<?php
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+class PostVoter extends Voter
+{
+    protected function supports(string $attribute, $subject): bool
+    {
+        return in_array($attribute, ['EDIT', 'DELETE'])
+            && $subject instanceof _______________;
+    }
+}
+```
+
+Answer: `Post` - Entity class being voted on. Symfony voters for complex authorization. Custom permission logic.
+
+#@@@@@@@@@@
+
+163. How do you implement null coalescing assignment in PHP?
+
+Answer: Use ??= operator (PHP 7.4+). Example: `$var ??= 'default';`. Assigns if variable is null or undefined. Shorthand for `$var = $var ?? 'default'`. Convenient default assignment.
+
+#@@@@@@@@@@
+
+164. Which of the following are Twig tests? (Multiple correct)
+A) is defined
+B) is null
+C) is even
+D) is odd
+E) is empty
+F) All of the above
+
+Answer: F - All are Twig tests. Use in conditionals: `{% if var is defined %}`. defined (exists), null (is null), even/odd (number tests), empty (empty check). Template logic.
+
+#@@@@@@@@@@
+
+165. Find the bug:
+```php
+<?php
+function processData(array $data): void {
+    foreach ($data as $item) {
+        if ($item < 0) {
+            continue;
+        }
+        echo $item;
+    }
+}
+
+processData([1, -2, 3]); // No bug
+```
+
+Answer: No bug - correctly skips negative numbers. Output: 13. Proper continue usage in loop.
+
+#@@@@@@@@@@
+
+166. What is the difference between strpos and str_contains?
+
+Answer: strpos returns position (int or false), requires !== false check. str_contains returns bool (PHP 8+). str_contains clearer for existence check. strpos for position, str_contains for presence.
+
+#@@@@@@@@@@
+
+167. Which of the following are Laravel Mix features? (Multiple correct)
+A) Asset compilation
+B) Webpack wrapper
+C) CSS preprocessing
+D) JavaScript bundling
+E) Versioning
+F) All of the above
+
+Answer: F - All are Mix features. Compilation (assets), Webpack (wrapper), CSS (Sass, Less), JavaScript (bundling), Versioning (cache busting). Frontend build tool for Laravel.
+
+#@@@@@@@@@@
+
+168. Complete this Doctrine embeddable:
+```php
+<?php
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Embeddable]
+class Address
+{
+    #[ORM\Column(type: 'string')]
+    private string $street;
+
+    #[ORM\Column(type: 'string')]
+    private string $city;
+}
+
+#[ORM\Entity]
+class User
+{
+    #[ORM\_______________]
+    private Address $address;
+}
+```
+
+Answer: `Embedded` - Embed value object in entity. Doctrine embeddables for value objects. Composition without separate table.
+
+#@@@@@@@@@@
+
+169. How do you implement arrow functions in PHP?
+
+Answer: Use fn keyword (PHP 7.4+). Example: `$fn = fn($x) => $x * 2;`. Single expression, implicit return, auto-capture variables. Shorter than closures. Use for simple callbacks.
+
+#@@@@@@@@@@
+
+170. Which of the following are Symfony Serializer features? (Multiple correct)
+A) Object to array
+B) Object to JSON/XML
+C) Normalization
+D) Denormalization
+E) Custom normalizers
+F) All of the above
+
+Answer: F - All are Serializer features. To array (normalize), To JSON/XML (encode), Normalization (object to array), Denormalization (array to object), Custom (extensible). Data transformation component.
+
+#@@@@@@@@@@
+
+171. Find the bug:
+```php
+<?php
+class Calculator {
+    public function add(...$numbers): int {
+        return array_sum($numbers);
+    }
+}
+
+$calc = new Calculator();
+echo $calc->add(1, 2, 3.5); // Bug: float in int return
+```
+
+Answer: array_sum returns float when input has float. Return type declares int. Fix: change return type to int|float or cast result. Type mismatch.
+
+#@@@@@@@@@@
+
+172. What is the difference between __get and __set?
+
+Answer: __get called when reading inaccessible property. __set called when writing inaccessible property. Magic methods for property overloading. Example: `public function __get($name) { return $this->data[$name]; }`. Dynamic properties.
+
+#@@@@@@@@@@
+
+173. Which of the following are Laravel Fortify features? (Multiple correct)
+A) Registration
+B) Login
+C) Two-factor authentication
+D) Password reset
+E) Email verification
+F) All of the above
+
+Answer: F - All are Fortify features. Backend authentication without UI. Registration, login, 2FA, password reset, email verification. Headless authentication for Laravel.
+
+#@@@@@@@@@@
+
+174. Complete this Symfony event subscriber:
+```php
+<?php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+
+class RequestSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            RequestEvent::class => '_______________',
+        ];
+    }
+
+    public function onRequest(RequestEvent $event): void
+    {
+        // Handle request
+    }
+}
+```
+
+Answer: `onRequest` - Method name to handle event. Event subscribers listen to multiple events. Self-configuring listeners.
+
+#@@@@@@@@@@
+
+175. How do you implement spread operator in arrays in PHP?
+
+Answer: Use ... operator (PHP 7.4+). Example: `$merged = [...$array1, ...$array2];`. Unpacks arrays. Works in array literals. Cleaner than array_merge for simple cases.
+
+#@@@@@@@@@@
+
+176. Which of the following are PHPUnit test doubles? (Multiple correct)
+A) Mocks
+B) Stubs
+C) Spies
+D) Fakes
+E) Dummies
+F) All of the above
+
+Answer: F - All are test doubles. Mocks (verify interactions), Stubs (provide responses), Spies (record calls), Fakes (working implementations), Dummies (fill parameters). Testing patterns.
+
+#@@@@@@@@@@
+
+177. Find the bug:
+```php
+<?php
+$data = json_decode('{"name": "John", "age": 30}');
+echo $data->email; // Bug: undefined property
+```
+
+Answer: Accessing non-existent property causes notice. JSON doesn't have email field. Fix: check property exists or use null coalescing: `$data->email ?? 'N/A'`. Validate JSON structure.
+
+#@@@@@@@@@@
+
+178. What is the difference between require and use?
+
+Answer: require includes file, executes code. use imports namespace/class, no execution. require for files, use for namespaces. Different purposes. require is include statement, use is namespace import.
+
+#@@@@@@@@@@
+
+179. Which of the following are Laravel Breeze features? (Multiple correct)
+A) Authentication scaffolding
+B) Blade templates
+C) Tailwind CSS
+D) Inertia.js support
+E) All of the above
+
+Answer: E - All are Breeze features. Scaffolding (auth UI), Blade (default), Tailwind (styling), Inertia (SPA option). Minimal authentication starter kit.
+
+#@@@@@@@@@@
+
+180. Complete this Doctrine custom type:
+```php
+<?php
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
+class UuidType extends Type
+{
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getGuidTypeDeclarationSQL(_______________);
+    }
+}
+```
+
+Answer: `$column` - Column definition array. Custom Doctrine types for domain-specific data. Type mapping between PHP and database.
+
+#@@@@@@@@@@
+
+181. How do you implement trailing comma in function calls in PHP?
+
+Answer: Allowed in PHP 8+. Example: `function foo($a, $b, $c,) { }` and `foo(1, 2, 3,)`. Trailing commas in parameters and arguments. Improves version control diffs.
+
+#@@@@@@@@@@
+
+182. Which of the following are Symfony Validator constraints? (Multiple correct)
+A) NotBlank
+B) Email
+C) Length
+D) Regex
+E) Choice
+F) All of the above
+
+Answer: F - All are validation constraints. NotBlank (required), Email (valid email), Length (min/max), Regex (pattern), Choice (allowed values). Comprehensive validation.
+
+#@@@@@@@@@@
+
+183. Find the bug:
+```php
+<?php
+class User {
+    public readonly string $name;
+
+    public function __construct(string $name) {
+        $this->name = $name;
+        $this->name = strtoupper($name); // Bug: readonly property
+    }
+}
+```
+
+Answer: Readonly property can only be initialized once. Second assignment fails. Fix: assign final value directly: `$this->name = strtoupper($name)`. Readonly enforcement.
+
+#@@@@@@@@@@
+
+184. What is the difference between in_array and array_search?
+
+Answer: in_array returns bool (exists or not). array_search returns key if found, false otherwise. in_array for existence, array_search for position. Both support strict comparison.
+
+#@@@@@@@@@@
+
+185. Which of the following are Laravel Jetstream features? (Multiple correct)
+A) Team management
+B) Two-factor authentication
+C) Session management
+D) API tokens
+E) Profile management
+F) All of the above
+
+Answer: F - All are Jetstream features. Teams (multi-tenancy), 2FA (security), Sessions (device management), API tokens (Sanctum), Profile (user settings). Full-featured authentication scaffolding.
+
+#@@@@@@@@@@
+
+186. Complete this Symfony Doctrine fixture:
+```php
+<?php
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+
+class UserFixtures extends Fixture
+{
+    public function load(ObjectManager $manager): void
+    {
+        $user = new User();
+        $user->setName('John');
+
+        $manager->_______________($user);
+        $manager->flush();
+    }
+}
+```
+
+Answer: `persist` - Mark entity for insertion. Doctrine fixtures for test data. Load sample data into database.
+
+#@@@@@@@@@@
+
+187. How do you implement nullsafe operator in PHP?
+
+Answer: Use ?-> operator (PHP 8+). Example: `$country = $user?->getAddress()?->getCountry();`. Short-circuits on null. Prevents null pointer errors. Cleaner than nested null checks.
+
+#@@@@@@@@@@
+
+188. Which of the following are Composer optimization techniques? (Multiple correct)
+A) --optimize-autoloader
+B) --classmap-authoritative
+C) --apcu-autoloader
+D) --no-dev
+E) All of the above
+
+Answer: E - All are optimizations. optimize-autoloader (class map), classmap-authoritative (no file checks), apcu-autoloader (APCu cache), no-dev (skip dev dependencies). Production performance.
+
+#@@@@@@@@@@
+
+189. Find the bug:
+```php
+<?php
+enum Status: string {
+    case Pending = 'pending';
+    case Approved = 'approved';
+}
+
+$status = Status::Pending;
+echo $status; // Bug: enum not string
+```
+
+Answer: Cannot echo enum directly. Fix: access value: `echo $status->value;`. Or implement __toString. Enums are objects, not strings.
+
+#@@@@@@@@@@
+
+190. What is the difference between abstract methods and interface methods?
+
+Answer: Abstract methods in abstract classes, can have implementation in class. Interface methods have no implementation, pure contract. Abstract classes can mix concrete and abstract. Interfaces only signatures.
+
+#@@@@@@@@@@
+
+191. Which of the following are Laravel Nova features? (Multiple correct)
+A) Admin panel
+B) Resource management
+C) Metrics
+D) Actions
+E) Filters
+F) All of the above
+
+Answer: F - All are Nova features. Admin panel (UI), Resources (CRUD), Metrics (dashboards), Actions (bulk operations), Filters (data filtering). Premium admin panel for Laravel.
+
+#@@@@@@@@@@
+
+192. Complete this Symfony parameter:
+```yaml
+# config/services.yaml
+parameters:
+    app.admin_email: 'admin@example.com'
+
+services:
+    App\Service\NotificationService:
+        arguments:
+            $adminEmail: '%_______________'
+```
+
+Answer: `app.admin_email%` - Reference parameter. Symfony parameter injection. Configuration management.
+
+#@@@@@@@@@@
+
+193. How do you implement constructor property promotion with readonly in PHP?
+
+Answer: Combine readonly with constructor parameters (PHP 8.1+). Example: `public function __construct(public readonly string $name) {}`. Declares readonly property and assigns in one line. Concise immutable objects.
+
+#@@@@@@@@@@
+
+194. Which of the following are Doctrine inheritance strategies? (Multiple correct)
+A) Single table inheritance
+B) Class table inheritance
+C) Mapped superclass
+D) All of the above
+
+Answer: D - All are inheritance strategies. Single table (one table, discriminator), Class table (table per class), Mapped superclass (no table for parent). Different trade-offs.
+
+#@@@@@@@@@@
+
+195. Find the bug:
+```php
+<?php
+function getConfig(): array {
+    return [
+        'db' => 'mysql',
+        'host' => 'localhost',
+    ];
+}
+
+['db' => $database, 'port' => $port] = getConfig(); // Bug: undefined key
+```
+
+Answer: Destructuring non-existent key 'port' causes notice. Fix: provide default or check key exists. Array destructuring requires matching keys.
+
+#@@@@@@@@@@
+
+196. What is the difference between static and self?
+
+Answer: static uses late static binding, resolves at runtime. self resolves at compile time, refers to defining class. static for inheritance, self for current class. Example: `return new static()` vs `return new self()`.
+
+#@@@@@@@@@@
+
+197. Which of the following are Laravel Livewire features? (Multiple correct)
+A) Reactive components
+B) Real-time validation
+C) File uploads
+D) Pagination
+E) No JavaScript required
+F) All of the above
+
+Answer: F - All are Livewire features. Reactive (dynamic UI), Validation (real-time), Uploads (wire:model), Pagination (built-in), No JS (server-side). Full-stack framework without writing JavaScript.
+
+#@@@@@@@@@@
+
+198. Complete this comprehensive PHP application structure:
+```php
+// Modern PHP application structure
+// src/ - Application code (PSR-4)
+// tests/ - PHPUnit tests
+// config/ - Configuration files
+// public/ - Web root (index.php)
+// vendor/ - Composer dependencies
+// var/ - Cache, logs (Symfony)
+// storage/ - Files, cache (Laravel)
+
+// composer.json - Dependencies and autoloading
+// phpunit.xml - Test configuration
+```
+
+Answer: Standard PHP project structure. Separation of concerns. PSR-4 autoloading. Framework-specific conventions. Best practices for organization.
+
+#@@@@@@@@@@
+
+199. How do you implement deprecation notices in PHP?
+
+Answer: Use trigger_error with E_USER_DEPRECATED. Example: `trigger_error('Method deprecated, use newMethod()', E_USER_DEPRECATED);`. Or #[Deprecated] attribute (PHP 8.4+). Communicate API changes.
+
+#@@@@@@@@@@
+
+200. Which of the following represent PHP ecosystem best practices? (Multiple correct)
+A) Use Composer for dependencies
+B) Follow PSR standards
+C) Write tests (PHPUnit)
+D) Use static analysis (PHPStan/Psalm)
+E) Type declarations everywhere
+F) All of the above
+
+Answer: F - All are best practices. Composer (dependency management), PSR (coding standards, autoloading), Tests (quality assurance), Static analysis (catch bugs early), Types (safety and documentation). Modern PHP development emphasizes type safety, testing, and standards compliance. The ecosystem has matured significantly with powerful frameworks (Laravel, Symfony), robust tooling (Composer, PHPStan), and modern language features. Professional PHP development rivals any modern language in terms of developer experience, performance, and maintainability.
+
+#@@@@@@@@@@

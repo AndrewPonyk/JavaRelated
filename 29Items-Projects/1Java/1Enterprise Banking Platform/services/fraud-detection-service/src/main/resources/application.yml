@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: fraud-detection-service
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # Redis for feature caching
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: fraud-detection-service
+      auto-offset-reset: earliest
+
+server:
+  port: ${SERVER_PORT:8083}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Fraud Detection Configuration
+fraud:
+  model:
+    path: ${MODEL_PATH:models/fraud_model.cbm}
+    version: ${MODEL_VERSION:1.0.0}
+  thresholds:
+    review: 0.5
+    block: 0.9
+    require-2fa: 0.7
+
+logging:
+  level:
+    com.bank.fraud: DEBUG

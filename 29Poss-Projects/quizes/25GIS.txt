@@ -1,0 +1,197 @@
+GIS Quiz - 200 Questions
+Tech Stack: ArcGIS, QGIS, PostGIS, Mapbox, Leaflet, GeoServer, GDAL, OpenLayers, Cesium, Coordinate systems, GeoJSON, spatial indexing, Shapefile
+
+1. Which of the following are coordinate reference systems? (Multiple correct)
+A) WGS84 (EPSG:4326)
+B) Web Mercator (EPSG:3857)
+C) UTM
+D) State Plane
+E) NAD83
+F) British National Grid
+
+Answer: A, B, C, D, E, F - All are coordinate reference systems. WGS84 (GPS standard), Web Mercator (web maps), UTM (Universal Transverse Mercator), State Plane (US states), NAD83 (North American Datum), British National Grid (UK). Each suited for different regions and purposes.
+
+#@@@@@@@@@@
+
+2. Complete this PostGIS spatial query:
+```sql
+-- Find all points within 1000 meters of a location
+SELECT
+    id,
+    name,
+    ST_Distance(
+        geom,
+        ST_SetSRID(ST_MakePoint(-122.4194, 37.7749), 4326)::geography
+    ) as distance
+FROM locations
+WHERE ST_DWithin(
+    geom::geography,
+    ST_SetSRID(ST_MakePoint(-122.4194, 37.7749), 4326)::geography,
+    _______________
+)
+ORDER BY distance;
+```
+
+Answer: `1000` - Distance in meters for geography type. PostGIS extends PostgreSQL with spatial data types and functions for geographic queries.
+
+#@@@@@@@@@@
+
+3. What is the difference between raster and vector data in GIS?
+
+Answer: Vector data uses points, lines, polygons, precise boundaries, smaller file size, scalable, suitable for discrete features (roads, buildings). Raster data uses grid cells/pixels, continuous data, larger files, resolution-dependent, suitable for continuous phenomena (elevation, temperature). Choose based on data type and analysis needs.
+
+#@@@@@@@@@@
+
+4. Which of the following are GeoJSON geometry types? (Multiple correct)
+A) Point
+B) LineString
+C) Polygon
+D) MultiPoint
+E) MultiLineString
+F) GeometryCollection
+
+Answer: A, B, C, D, E, F - All are GeoJSON geometry types. Point (single location), LineString (connected points), Polygon (closed area), MultiPoint (multiple points), MultiLineString (multiple lines), GeometryCollection (mixed geometries). GeoJSON is standard format for geographic data in JSON.
+
+#@@@@@@@@@@
+
+5. Find the issue in this Leaflet map code:
+```javascript
+// Initialize map
+var map = L.map('map').setView([51.505, -0.09], 13);
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Add marker - Issue: coordinates reversed
+var marker = L.marker([-0.09, 51.505]).addTo(map);
+marker.bindPopup("London");
+```
+
+Answer: Leaflet uses [latitude, longitude] order, but marker has [longitude, latitude]. Correct: `L.marker([51.505, -0.09])`. Common mistake mixing coordinate order conventions (GeoJSON uses [lon, lat], Leaflet uses [lat, lon]).
+
+#@@@@@@@@@@
+
+6. How do you implement spatial indexing in PostGIS?
+
+Answer: Create spatial index with `CREATE INDEX idx_geom ON table USING GIST(geom)`. GIST (Generalized Search Tree) enables fast spatial queries. Use `ANALYZE` to update statistics, `VACUUM` to optimize. Spatial indexes dramatically improve query performance for large datasets.
+
+#@@@@@@@@@@
+
+7. Which of the following are GDAL/OGR capabilities? (Multiple correct)
+A) Format conversion
+B) Reprojection
+C) Raster processing
+D) Vector processing
+E) Coordinate transformation
+F) Data validation
+
+Answer: A, B, C, D, E, F - All are GDAL/OGR capabilities. Format conversion (translate formats), Reprojection (change CRS), Raster processing (gdalwarp, gdal_calc), Vector processing (ogr2ogr), Coordinate transformation (proj), Data validation (ogrinfo). GDAL is essential geospatial data abstraction library.
+
+#@@@@@@@@@@
+
+8. Complete this QGIS Python script:
+```python
+from qgis.core import QgsVectorLayer, QgsProject
+
+# Load shapefile
+layer = QgsVectorLayer('/path/to/data.shp', 'My Layer', 'ogr')
+
+if not layer.isValid():
+    print("Layer failed to load!")
+else:
+    # Add layer to project
+    QgsProject.instance()._______________([layer])
+
+    # Get feature count
+    count = layer.featureCount()
+    print(f"Feature count: {count}")
+```
+
+Answer: `addMapLayers` - Add layers to QGIS project. QGIS Python API (PyQGIS) enables automation, custom processing, and plugin development.
+
+#@@@@@@@@@@
+
+9. What is the difference between geographic and projected coordinate systems?
+
+Answer: Geographic coordinates use latitude/longitude on ellipsoid, angular units (degrees), global coverage, distorted distances/areas. Projected coordinates use x/y on flat plane, linear units (meters), regional coverage, preserves specific properties (area, distance, shape). Project geographic data for accurate measurements.
+
+#@@@@@@@@@@
+
+10. Which of the following are Mapbox features? (Multiple correct)
+A) Vector tiles
+B) Custom map styles
+C) Geocoding API
+D) Directions API
+E) Static maps
+F) GL JS library
+
+Answer: A, B, C, D, E, F - All are Mapbox features. Vector tiles (efficient rendering), Custom styles (Mapbox Studio), Geocoding (address to coordinates), Directions (routing), Static maps (image API), GL JS (WebGL rendering). Mapbox provides modern mapping platform.
+
+#@@@@@@@@@@
+
+11. Predict the output of this spatial query:
+```sql
+SELECT
+    ST_AsText(
+        ST_Intersection(
+            ST_GeomFromText('POLYGON((0 0, 4 0, 4 4, 0 4, 0 0))'),
+            ST_GeomFromText('POLYGON((2 2, 6 2, 6 6, 2 6, 2 2))')
+        )
+    );
+```
+
+Answer: POLYGON((2 2, 4 2, 4 4, 2 4, 2 2)) - The intersection of two overlapping squares creates a smaller square where they overlap. ST_Intersection returns the geometric intersection of two geometries.
+
+#@@@@@@@@@@
+
+12. How do you implement web map tiling?
+
+Answer: Generate tiles at multiple zoom levels (0-18+), organize in z/x/y directory structure, use tile servers (GeoServer, MapServer), implement caching, use vector tiles for modern maps, optimize tile size (256x256 or 512x512), use CDN for distribution.
+
+#@@@@@@@@@@
+
+13. Which of the following are ArcGIS components? (Multiple correct)
+A) ArcGIS Pro
+B) ArcGIS Online
+C) ArcGIS Server
+D) ArcGIS Enterprise
+E) ArcGIS StoryMaps
+F) ArcGIS API for JavaScript
+
+Answer: A, B, C, D, E, F - All are ArcGIS components. ArcGIS Pro (desktop GIS), ArcGIS Online (cloud platform), ArcGIS Server (enterprise GIS), ArcGIS Enterprise (on-premise platform), StoryMaps (narrative maps), API for JavaScript (web development). Esri's comprehensive GIS ecosystem.
+
+#@@@@@@@@@@
+
+14. Complete this OpenLayers map initialization:
+```javascript
+import Map from 'ol/Map';
+import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+import {fromLonLat} from 'ol/proj';
+
+const map = new Map({
+    target: 'map',
+    layers: [
+        new TileLayer({
+            source: new OSM()
+        })
+    ],
+    view: new View({
+        center: fromLonLat([-0.09, 51.505]),
+        zoom: _______________
+    })
+});
+```
+
+Answer: `13` or any reasonable zoom level (1-18) - Set initial zoom level. OpenLayers is powerful open-source web mapping library with extensive features.
+
+#@@@@@@@@@@
+
+15. What is the difference between Shapefile and GeoPackage?
+
+Answer: Shapefile is older format, multiple files (.shp, .shx, .dbf), 2GB limit, limited data types, no topology. GeoPackage is modern SQLite-based, single file, no size limit, rich data types, supports raster/vector, topology, better performance. GeoPackage is recommended for new projects.
+
+#@@@@@@@@@@
