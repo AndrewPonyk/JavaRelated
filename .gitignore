@@ -30,3 +30,6 @@ target/
 .gradle
 .nb-gradle
 .aider*
+
+#visual studio
+.vs
