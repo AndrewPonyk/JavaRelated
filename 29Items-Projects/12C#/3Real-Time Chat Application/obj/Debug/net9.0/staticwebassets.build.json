@@ -1,0 +1,1042 @@
+{
+  "Version": 1,
+  "Hash": "ZnzoIigxxSzAQd6x2+rvgEZGhw03YGjyhbPlt55vZYE=",
+  "Source": "real-time-chat-application",
+  "BasePath": "_content/real-time-chat-application",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "real-time-chat-application\\wwwroot",
+      "Source": "real-time-chat-application",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\",
+      "BasePath": "_content/real-time-chat-application",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\83ttystzeu-juxf98vl1f.gz",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "index#[.{fingerprint=juxf98vl1f}]?.html.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "poqgg9eioe",
+      "Integrity": "GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html"
+    },
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\nwcn6h0dy8-v27kyt3qt0.gz",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "js/signalr#[.{fingerprint=v27kyt3qt0}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "95mmj70va3",
+      "Integrity": "nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js"
+    },
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\pfvyhcg57m-1o65mzfqps.gz",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "js/site#[.{fingerprint=1o65mzfqps}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "d43elus9y3",
+      "Integrity": "TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js"
+    },
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "index#[.{fingerprint}]?.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "juxf98vl1f",
+      "Integrity": "5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    },
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "js/signalr#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "v27kyt3qt0",
+      "Integrity": "1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\signalr.js"
+    },
+    {
+      "Identity": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js",
+      "SourceId": "real-time-chat-application",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\",
+      "BasePath": "_content/real-time-chat-application",
+      "RelativePath": "js/site#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "1o65mzfqps",
+      "Integrity": "AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\site.js"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "index.html",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\83ttystzeu-juxf98vl1f.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.004366812227"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "228"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="
+        }
+      ]
+    },
+    {
+      "Route": "index.html",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "385"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="
+        }
+      ]
+    },
+    {
+      "Route": "index.html.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\83ttystzeu-juxf98vl1f.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "228"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA="
+        }
+      ]
+    },
+    {
+      "Route": "index.juxf98vl1f.html",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\83ttystzeu-juxf98vl1f.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.004366812227"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "228"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "juxf98vl1f"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="
+        }
+      ]
+    },
+    {
+      "Route": "index.juxf98vl1f.html",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "385"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "juxf98vl1f"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="
+        }
+      ]
+    },
+    {
+      "Route": "index.juxf98vl1f.html.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\83ttystzeu-juxf98vl1f.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "228"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/html"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:20:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "juxf98vl1f"
+        },
+        {
+          "Name": "label",
+          "Value": "index.html.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-GR8JeUmUrLhmBKDKcHgbfnQxgovdZJw1EYFwd1MfIYA="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\nwcn6h0dy8-v27kyt3qt0.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000032433835"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "30831"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "156694"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.js.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\nwcn6h0dy8-v27kyt3qt0.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "30831"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.v27kyt3qt0.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\nwcn6h0dy8-v27kyt3qt0.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000032433835"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "30831"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "v27kyt3qt0"
+        },
+        {
+          "Name": "label",
+          "Value": "js/signalr.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.v27kyt3qt0.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "156694"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "v27kyt3qt0"
+        },
+        {
+          "Name": "label",
+          "Value": "js/signalr.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="
+        }
+      ]
+    },
+    {
+      "Route": "js/signalr.v27kyt3qt0.js.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\nwcn6h0dy8-v27kyt3qt0.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "30831"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "v27kyt3qt0"
+        },
+        {
+          "Name": "label",
+          "Value": "js/signalr.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-nUiBLlSZRvYYhBsJZybbb0Cab9rRGq3j9EEDeLhnzqs="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.1o65mzfqps.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\pfvyhcg57m-1o65mzfqps.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.002409638554"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "414"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "1o65mzfqps"
+        },
+        {
+          "Name": "label",
+          "Value": "js/site.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.1o65mzfqps.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "843"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "1o65mzfqps"
+        },
+        {
+          "Name": "label",
+          "Value": "js/site.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.1o65mzfqps.js.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\pfvyhcg57m-1o65mzfqps.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "414"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "1o65mzfqps"
+        },
+        {
+          "Name": "label",
+          "Value": "js/site.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\pfvyhcg57m-1o65mzfqps.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.002409638554"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "414"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "843"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-AWPJx+g5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.js.gz",
+      "AssetFile": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\obj\\Debug\\net9.0\\compressed\\pfvyhcg57m-1o65mzfqps.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "414"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 18 Jan 2026 23:21:02 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-TXS3jmE/IKE/PdrOmiXensonoZq/bkVOOVcmeorYGck="
+        }
+      ]
+    }
+  ]
+}

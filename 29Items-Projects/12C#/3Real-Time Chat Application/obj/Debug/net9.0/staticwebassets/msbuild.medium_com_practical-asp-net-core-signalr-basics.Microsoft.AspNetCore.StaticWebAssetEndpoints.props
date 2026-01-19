@@ -1,0 +1,40 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/index.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\index.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"385"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u00225a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:20:52 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/index.juxf98vl1f.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\index.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"juxf98vl1f"},{"Name":"integrity","Value":"sha256-5a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU="},{"Name":"label","Value":"_content/medium_com_practical-asp-net-core-signalr-basics/index.html"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"385"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u00225a2tFyNHq9O9JEPfYc33Rz7y9jrvuNAiBe3ycpVCwyU=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:20:52 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/js/signalr.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\signalr.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"156694"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u00221wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:19:36 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/js/signalr.v27kyt3qt0.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\signalr.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"v27kyt3qt0"},{"Name":"integrity","Value":"sha256-1wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI="},{"Name":"label","Value":"_content/medium_com_practical-asp-net-core-signalr-basics/js/signalr.js"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"156694"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u00221wY3t7o9VH1kRJslks1JbDlPjjQqSOEXuUTm93fC/MI=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:19:36 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/js/site.1o65mzfqps.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"1o65mzfqps"},{"Name":"integrity","Value":"sha256-AWPJx\u002Bg5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="},{"Name":"label","Value":"_content/medium_com_practical-asp-net-core-signalr-basics/js/site.js"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"843"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022AWPJx\u002Bg5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:21:02 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/medium_com_practical-asp-net-core-signalr-basics/js/site.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-AWPJx\u002Bg5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"843"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022AWPJx\u002Bg5vq0Wi1FiNDHCqoVn4VmsfOQ99/2YN9rtB1Q=\u0022"},{"Name":"Last-Modified","Value":"Sun, 18 Jan 2026 23:21:02 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>

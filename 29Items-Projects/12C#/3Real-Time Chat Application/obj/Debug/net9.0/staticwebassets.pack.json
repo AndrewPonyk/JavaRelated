@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\signalr.js",
+      "PackagePath": "staticwebassets\\js\\signalr.js"
+    },
+    {
+      "Id": "C:\\mygit\\JavaRelated\\29Items-Projects\\12C#\\3Real-Time Chat Application\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.real-time-chat-application.props",
+      "PackagePath": "build\\real-time-chat-application.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.real-time-chat-application.props",
+      "PackagePath": "buildMultiTargeting\\real-time-chat-application.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.real-time-chat-application.props",
+      "PackagePath": "buildTransitive\\real-time-chat-application.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.real-time-chat-application.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.real-time-chat-application.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
