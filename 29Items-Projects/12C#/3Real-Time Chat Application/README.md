@@ -2,6 +2,8 @@
 
 A production-ready real-time team chat application built with ASP.NET Core 9.0, SignalR, MongoDB, Redis, Blazor WebAssembly, and ML.NET sentiment analysis.
 
+![TeamChat Demo - Real-time messaging with typing indicators](./Chat-Bob-Alica.jpg)
+
 ## Features
 
 - Real-time messaging with SignalR WebSockets
@@ -53,6 +55,41 @@ dotnet run
 
 # Access: https://localhost:5001 (API) or http://localhost:5173 (Client)
 ```
+
+### Option 3: Hybrid Debugging (Recommended for Development)
+
+Run infrastructure (MongoDB, Redis) in Docker while debugging .NET projects in Visual Studio with full breakpoint support.
+
+**Step 1: Start infrastructure services**
+```bash
+docker compose up mongodb redis -d
+```
+
+**Step 2: Open solution in Visual Studio**
+1. Open `TeamChat.sln`
+2. Right-click Solution → **Set Startup Projects**
+3. Select **Multiple startup projects**
+4. Set both **TeamChat.API** and **TeamChat.Client** to **Start**
+5. Press **F5** to debug
+
+**Ports:**
+| Service | URL |
+|---------|-----|
+| Client | https://localhost:7278 |
+| API | https://localhost:7076 |
+| MongoDB | localhost:27017 |
+| Redis | localhost:6379 |
+
+**Debug features:**
+- Set breakpoints in API controllers and SignalR hubs
+- Step through message handling in `ChatHub.cs`
+- Inspect real-time events (typing indicators, presence)
+- Hot reload for Blazor components
+
+**Key files for breakpoints:**
+- `src/TeamChat.API/Hubs/ChatHub.cs:90` - Message sending
+- `src/TeamChat.API/Hubs/ChatHub.cs:238` - Typing indicators
+- `src/TeamChat.API/Controllers/AuthController.cs` - Authentication
 
 ## Configuration
 

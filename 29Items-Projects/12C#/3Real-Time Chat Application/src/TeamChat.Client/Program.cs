@@ -9,12 +9,15 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Configure HttpClient for API calls (nginx proxies /api/ to backend)
-builder.Services.AddScoped(sp =>
+// Configure HttpClient for API calls
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    var navigationManager = sp.GetRequiredService<NavigationManager>();
-    return new HttpClient { BaseAddress = new Uri(navigationManager.BaseUri) };
-});
+    // Fallback to same origin (works with nginx proxy)
+    var navigationManager = builder.Services.BuildServiceProvider().GetRequiredService<NavigationManager>();
+    apiBaseUrl = navigationManager.BaseUri;
+}
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 // Register local storage service
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
