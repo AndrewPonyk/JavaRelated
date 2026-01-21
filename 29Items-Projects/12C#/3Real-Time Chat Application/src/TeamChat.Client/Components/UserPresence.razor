@@ -1,0 +1,49 @@
+@using TeamChat.Core.Enums
+
+<div class="user-presence">
+    <span class="status-dot @GetStatusClass(Status)"></span>
+    <span class="user-name">@UserName</span>
+    @if (ShowLastSeen && Status == UserStatus.Offline && LastSeenAt.HasValue)
+    {
+        <span class="last-seen">Last seen @FormatLastSeen(LastSeenAt.Value)</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string UserName { get; set; } = string.Empty;
+
+    [Parameter]
+    public UserStatus Status { get; set; } = UserStatus.Offline;
+
+    [Parameter]
+    public DateTime? LastSeenAt { get; set; }
+
+    [Parameter]
+    public bool ShowLastSeen { get; set; } = true;
+
+    private string GetStatusClass(UserStatus status) => status switch
+    {
+        UserStatus.Online => "online",
+        UserStatus.Away => "away",
+        UserStatus.DoNotDisturb => "dnd",
+        UserStatus.Offline => "offline",
+        _ => "offline"
+    };
+
+    private string FormatLastSeen(DateTime lastSeen)
+    {
+        var diff = DateTime.UtcNow - lastSeen;
+
+        if (diff.TotalMinutes < 1)
+            return "just now";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays}d ago";
+
+        return lastSeen.ToString("MMM d");
+    }
+}

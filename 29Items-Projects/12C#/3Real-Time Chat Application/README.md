@@ -1,346 +1,252 @@
-# ASP.NET Core SignalR Chat Demo
+# TeamChat - Real-Time Chat Application
 
-This project is a simple real-time chat application built with ASP.NET Core SignalR. It demonstrates how to set up a SignalR hub on the backend and a basic HTML/JavaScript client on the frontend.
+A production-ready real-time team chat application built with ASP.NET Core 9.0, SignalR, MongoDB, Redis, Blazor WebAssembly, and ML.NET sentiment analysis.
 
-## A Note on `Startup.cs` vs. `Program.cs`
+## Features
 
-This guide uses the modern .NET "minimal hosting model," where all application configuration is done in the `Program.cs` file.
+- Real-time messaging with SignalR WebSockets
+- Channel-based conversations with threading
+- Message reactions with real-time updates
+- AI-powered sentiment analysis (ML.NET)
+- User presence tracking (online/away/offline)
+- File attachments and sharing
+- JWT-based authentication
+- Redis backplane for horizontal scaling
+- Docker support for easy deployment
 
-If you are using an older version of .NET (.NET 5 or earlier), your project will have a `Startup.cs` file. The logic for configuring services (e.g., `services.AddSignalR()`) and the middleware pipeline (e.g., `app.UseStaticFiles()` and `app.MapHub<MessageHub>()`) would go into the `ConfigureServices` and `Configure` methods in `Startup.cs`, respectively.
+## Quick Start
 
-## Application Diagram
-
-The following diagram illustrates the communication flow between the clients and the server.
-
-```mermaid
-sequenceDiagram
-    participant Client1 as Browser 1
-    participant Client2 as Browser 2
-    participant Server as ASP.NET Core Server
-
-    Note over Client1, Server: Initial HTTP Connection
-    Client1->>Server: GET /
-    Server-->>Client1: Serves index.html and JS files
-
-    Note over Client1, Server: SignalR Connection
-    Client1->>Server: Establishes WebSocket connection to /messages
-    Server-->>Client1: Connection Acknowledged
-
-    Client2->>Server: Establishes WebSocket connection to /messages
-    Server-->>Client2: Connection Acknowledged
-
-    Note over Client1, Server: Client sends a message
-    Client1->>Server: invoke('SendMessageToAll', "Hello World!")
-
-    Note over Server, Client2: Server broadcasts the message
-    Server->>Client1: invoke('ReceiveMessage', "Hello World!")
-    Server->>Client2: invoke('ReceiveMessage', "Hello World!")
-
-    Note over Client1, Client2: Clients update their UI
-    Client1-->>Client1: Add "Hello World!" to message list
-    Client2-->>Client2: Add "Hello World!" to message list
-```
-
-## How to Create This Project From Scratch
-
-These instructions will guide you through creating this project from a blank template.
-
-### 1. Initialize the Project
-
-First, create a new ASP.NET Core web application. This command also sets the project's default namespace.
+### Option 1: Docker Compose (Recommended)
 
 ```bash
-dotnet new web -n Practical.AspNetCore.SignalR
-cd Practical.AspNetCore.SignalR
+# Clone the repository
+git clone <repository-url>
+cd TeamChat
+
+# Start all services
+docker-compose up -d
+
+# Access the application
+# - Web UI: http://localhost:5173
+# - API: http://localhost:5000
+# - Swagger: http://localhost:5000/swagger
 ```
 
-### 2. Add the SignalR Hub
+### Option 2: Local Development
 
-A "hub" is the central component of SignalR that receives and sends messages.
-
-1.  Create a new folder named `Hubs`:
-    ```bash
-    mkdir Hubs
-    ```
-
-2.  Create a new file inside the `Hubs` folder named `MessageHub.cs` and add the following C# code. This hub has a single method, `SendMessageToAll`, which takes a message and broadcasts it to every connected client.
-
-    ```csharp
-    // Hubs/MessageHub.cs
-    using Microsoft.AspNetCore.SignalR;
-
-    namespace Practical.AspNetCore.SignalR.Hubs
-    {
-        public class MessageHub : Hub
-        {
-            public Task SendMessageToAll(string message)
-            {
-                return Clients.All.SendAsync("ReceiveMessage", message);
-            }
-        }
-    }
-    ```
-
-### 3. Configure the Application
-
-Now, you need to configure your application to use SignalR and map your new hub to an endpoint. Modify your `Program.cs` file to look like this.
-
-> **Note:** We are adding the SignalR service (`AddSignalR`), enabling static files (`UseDefaultFiles` and `UseStaticFiles`) for our client, and mapping the hub to the `/messages` URL (`MapHub`).
-
-```csharp
-// Program.cs
-using Practical.AspNetCore.SignalR.Hubs;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddSignalR();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-app.UseDefaultFiles(); // Enables serving index.html
-app.UseStaticFiles();  // Enables serving files from wwwroot
-
-// Map the SignalR hub to the "/messages" endpoint
-app.MapHub<MessageHub>("/messages");
-
-app.Run();
-```
-
-### 4. Create the Client-Side Frontend
-
-We will create a simple HTML page with JavaScript to act as the chat client.
-
-1.  **Create the Web Root Folder**
-    ASP.NET Core serves static files from the `wwwroot` directory by default.
-
-    ```bash
-    mkdir wwwroot
-    ```
-
-2.  **Initialize npm and Install SignalR Client**
-    Navigate to your project's root directory and run npm to download the SignalR client library.
-
-    ```bash
-    npm init -y
-    npm install @microsoft/signalr
-    ```
-
-3.  **Create the HTML Page**
-    Create a new file `wwwroot/index.html` with the following content:
-
-    ```html
-    <!-- wwwroot/index.html -->
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>SignalR Client</title>
-    </head>
-    <body>
-        <h1>SignalR Client</h1>
-        <textarea id="message" rows="3" placeholder="Enter a message..."></textarea>
-        <br />
-        <button id="sendButton">Send Message</button>
-        <hr />
-        <h3>Messages</h3>
-        <ul id="messagesList"></ul>
-
-        <script src="js/signalr.js"></script>
-        <script src="js/site.js"></script>
-    </body>
-    </html>
-    ```
-
-4.  **Add the SignalR and Site JavaScript Files**
-    First, create a `js` sub-folder in `wwwroot`.
-
-    ```bash
-    mkdir wwwroot/js
-    ```
-
-    Next, copy the SignalR client library from the `node_modules` folder into your `wwwroot/js` folder.
-
-    ```bash
-    cp node_modules/@microsoft/signalr/dist/browser/signalr.js wwwroot/js/
-    ```
-
-    Finally, create your site's custom JavaScript file `wwwroot/js/site.js` with the code to connect to the hub and handle messages.
-
-    ```javascript
-    // wwwroot/js/site.js
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/messages")
-        .build();
-
-    // This function is called by the server to send a message
-    connection.on("ReceiveMessage", (message) => {
-        const li = document.createElement("li");
-        li.textContent = message;
-        document.getElementById("messagesList").appendChild(li);
-    });
-
-    // Add a click listener to the send button
-    document.getElementById("sendButton").addEventListener("click", (event) => {
-        const message = document.getElementById("message").value;
-        // This calls the "SendMessageToAll" method on the C# hub
-        connection.invoke("SendMessageToAll", message).catch((err) => {
-            return console.error(err.toString());
-        });
-        event.preventDefault();
-    });
-
-    // Start the connection
-    async function start() {
-        try {
-            await connection.start();
-            console.log("SignalR Connected.");
-        } catch (err) {
-            console.log(err);
-            setTimeout(start, 5000); // Retry connection after 5 seconds
-        }
-    };
-
-    connection.onclose(async () => {
-        await start();
-    });
-
-    start();
-    ```
-
-### 5. Run the Application
-
-You are all set! Run the application from your terminal:
+**Prerequisites:**
+- .NET 9.0 SDK
+- MongoDB (running on localhost:27017)
+- Redis (running on localhost:6379)
 
 ```bash
+# Build the solution
+dotnet build
+
+# Start the API (Terminal 1)
+cd src/TeamChat.API
 dotnet run
+
+# Start the Client (Terminal 2)
+cd src/TeamChat.Client
+dotnet run
+
+# Access: https://localhost:5001 (API) or http://localhost:5173 (Client)
 ```
 
-Open your web browser and navigate to the URL provided in the output (e.g., `http://localhost:5000`). You can open multiple browser tabs to simulate multiple users and see messages appear in real-time.pplication.CreateBuilder(args);
+## Configuration
 
-// Add services to the container.
-builder.Services.AddSignalR();
+### Environment Variables
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-app.UseDefaultFiles(); // Enables serving index.html
-app.UseStaticFiles();  // Enables serving files from wwwroot
-
-// Map the SignalR hub to the "/messages" endpoint
-app.MapHub<MessageHub>("/messages");
-
-app.Run();
-```
-
-### 4. Create the Client-Side Frontend
-
-We will create a simple HTML page with JavaScript to act as the chat client.
-
-1.  **Create the Web Root Folder**
-    ASP.NET Core serves static files from the `wwwroot` directory by default.
-
-    ```bash
-    mkdir wwwroot
-    ```
-
-2.  **Initialize npm and Install SignalR Client**
-    Navigate to your project's root directory and run npm to download the SignalR client library.
-
-    ```bash
-    npm init -y
-    npm install @microsoft/signalr
-    ```
-
-3.  **Create the HTML Page**
-    Create a new file `wwwroot/index.html` with the following content:
-
-    ```html
-    <!-- wwwroot/index.html -->
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>SignalR Client</title>
-    </head>
-    <body>
-        <h1>SignalR Client</h1>
-        <textarea id="message" rows="3" placeholder="Enter a message..."></textarea>
-        <br />
-        <button id="sendButton">Send Message</button>
-        <hr />
-        <h3>Messages</h3>
-        <ul id="messagesList"></ul>
-
-        <script src="js/signalr.js"></script>
-        <script src="js/site.js"></script>
-    </body>
-    </html>
-    ```
-
-4.  **Add the SignalR and Site JavaScript Files**
-    First, create a `js` sub-folder in `wwwroot`.
-
-    ```bash
-    mkdir wwwroot/js
-    ```
-
-    Next, copy the SignalR client library from the `node_modules` folder into your `wwwroot/js` folder.
-
-    ```bash
-    cp node_modules/@microsoft/signalr/dist/browser/signalr.js wwwroot/js/
-    ```
-
-    Finally, create your site's custom JavaScript file `wwwroot/js/site.js` with the code to connect to the hub and handle messages.
-
-    ```javascript
-    // wwwroot/js/site.js
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/messages")
-        .build();
-
-    // This function is called by the server to send a message
-    connection.on("ReceiveMessage", (message) => {
-        const li = document.createElement("li");
-        li.textContent = message;
-        document.getElementById("messagesList").appendChild(li);
-    });
-
-    // Add a click listener to the send button
-    document.getElementById("sendButton").addEventListener("click", (event) => {
-        const message = document.getElementById("message").value;
-        // This calls the "SendMessageToAll" method on the C# hub
-        connection.invoke("SendMessageToAll", message).catch((err) => {
-            return console.error(err.toString());
-        });
-        event.preventDefault();
-    });
-
-    // Start the connection
-    async function start() {
-        try {
-            await connection.start();
-            console.log("SignalR Connected.");
-        } catch (err) {
-            console.log(err);
-            setTimeout(start, 5000); // Retry connection after 5 seconds
-        }
-    };
-
-    connection.onclose(async () => {
-        await start();
-    });
-
-    start();
-    ```
-
-### 5. Run the Application
-
-You are all set! Run the application from your terminal:
+Copy `.env.example` to `.env` and configure:
 
 ```bash
-dotnet run
+# Required - Generate a secure secret (min 32 chars)
+Jwt__Secret=your-secure-jwt-secret-key-at-least-32-characters
+
+# Database connections
+MongoDB__ConnectionString=mongodb://localhost:27017
+Redis__ConnectionString=localhost:6379
+
+# CORS (add your frontend URLs)
+Cors__AllowedOrigins__0=http://localhost:5173
 ```
 
-Open your web browser and navigate to the URL provided in the output (e.g., `http://localhost:5000`). You can open multiple browser tabs to simulate multiple users and see messages appear in real-time.
+### appsettings.json
+
+For local development, settings are in `src/TeamChat.API/appsettings.Development.json`.
+For production, use environment variables.
+
+## API Documentation
+
+### Authentication
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register` | POST | Register new user |
+| `/api/auth/login` | POST | Login and get JWT token |
+| `/api/auth/me` | GET | Get current user profile |
+| `/api/auth/refresh` | POST | Refresh JWT token |
+
+**Register Example:**
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"john","email":"john@example.com","password":"password123"}'
+```
+
+**Login Example:**
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"john","password":"password123"}'
+```
+
+### Channels
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/channels` | GET | List all public channels |
+| `/api/channels/{id}` | GET | Get channel details |
+| `/api/channels` | POST | Create new channel |
+| `/api/channels/{id}/join` | POST | Join a channel |
+| `/api/channels/{id}/leave` | POST | Leave a channel |
+
+### Messages
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/messages/channel/{channelId}` | GET | Get channel messages (paginated) |
+| `/api/messages/thread/{threadId}` | GET | Get thread messages |
+| `/api/messages/{id}` | GET | Get single message |
+
+### Users
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/users/{id}` | GET | Get user by ID |
+| `/api/users/username/{username}` | GET | Get user by username |
+| `/api/users` | POST | Create user |
+
+### SignalR Hubs
+
+**Chat Hub** (`/hubs/chat`):
+- `JoinChannel(channelId)` - Join a channel
+- `LeaveChannel(channelId)` - Leave a channel
+- `SendMessage(channelId, content, threadId?)` - Send message
+- `EditMessage(messageId, newContent)` - Edit message
+- `DeleteMessage(messageId)` - Delete message
+- `AddReaction(messageId, reactionType)` - Add reaction
+- `RemoveReaction(messageId, reactionType)` - Remove reaction
+- `StartTyping(channelId)` - Start typing indicator
+- `StopTyping(channelId)` - Stop typing indicator
+
+**Presence Hub** (`/hubs/presence`):
+- `UpdateStatus(status)` - Update user status
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Blazor WebAssembly Client                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  Pages      │  │ Components  │  │     Services        │  │
+│  │  Login.razor│  │ MessageList │  │ AuthService         │  │
+│  │  Chat.razor │  │ MessageInput│  │ ChatHubService      │  │
+│  │  Index.razor│  │ NavMenu     │  │ ApiService          │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              │ HTTP/REST     │ WebSocket     │
+              ▼               ▼               │
+┌─────────────────────────────────────────────────────────────┐
+│                    ASP.NET Core API                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │ Controllers │  │  SignalR    │  │    Middleware       │  │
+│  │ Auth        │  │  ChatHub    │  │ JWT Auth            │  │
+│  │ Channels    │  │  Presence   │  │ Error Handling      │  │
+│  │ Messages    │  │  Hub        │  │ Security Headers    │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   MongoDB   │    │    Redis    │    │   ML.NET    │
+│  Users      │    │  PubSub     │    │  Sentiment  │
+│  Channels   │    │  Presence   │    │  Analysis   │
+│  Messages   │    │  Cache      │    │             │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run unit tests only
+dotnet test --filter "FullyQualifiedName~Unit"
+
+# Run integration tests (requires Docker)
+dotnet test --filter "FullyQualifiedName~Integration"
+
+# Run with coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**MongoDB Connection Failed**
+- Ensure MongoDB is running: `mongod --dbpath /data/db`
+- Check connection string in config matches your MongoDB instance
+
+**Redis Connection Failed**
+- Ensure Redis is running: `redis-server`
+- Verify connection string: `localhost:6379`
+
+**JWT Token Invalid**
+- Ensure `Jwt:Secret` is set (min 32 characters)
+- Check token hasn't expired (default: 60 minutes)
+- Verify the token is included in Authorization header: `Bearer <token>`
+
+**SignalR Connection Issues**
+- Check CORS settings include your client URL
+- For WebSocket issues, try long-polling fallback
+- Ensure the Hub URL is correct: `/hubs/chat` or `/hubs/presence`
+
+**Build Errors**
+```bash
+# Clean and rebuild
+dotnet clean
+dotnet restore
+dotnet build
+```
+
+### Health Check
+
+```bash
+curl http://localhost:5000/health
+# Response: Healthy
+```
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | Blazor WebAssembly |
+| Backend | ASP.NET Core 9.0 |
+| Real-time | SignalR |
+| Database | MongoDB 7 |
+| Cache/PubSub | Redis 7 |
+| ML | ML.NET |
+| Auth | JWT Bearer |
+| Testing | xUnit, FluentAssertions, Testcontainers |
+| Container | Docker, docker-compose |
+
+## License
+
+MIT License

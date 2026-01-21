@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/TeamChat.API/Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - MongoDB__ConnectionString=mongodb://mongodb:27017
+      - MongoDB__DatabaseName=TeamChat
+      - Redis__ConnectionString=redis:6379
+      - Jwt__Secret=DevSecretKey_MustBeAtLeast32Characters_ChangeInProd!
+      - Jwt__Issuer=TeamChat
+      - Jwt__Audience=TeamChat
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - teamchat-network
+
+  client:
+    build:
+      context: .
+      dockerfile: src/TeamChat.Client/Dockerfile
+    ports:
+      - "5173:80"
+    environment:
+      - ApiBaseUrl=http://api:80
+    depends_on:
+      - api
+    networks:
+      - teamchat-network
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - teamchat-network
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - teamchat-network
+
+  # Optional: MongoDB admin UI
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - teamchat-network
+
+  # Optional: Redis admin UI
+  redis-commander:
+    image: rediscommander/redis-commander
+    ports:
+      - "8082:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - teamchat-network
+
+networks:
+  teamchat-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  redis-data:

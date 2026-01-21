@@ -1,0 +1,334 @@
+@page "/chat/{ChannelId}"
+@attribute [Authorize]
+@inject AuthService AuthService
+@inject ApiService ApiService
+@inject ChatHubService ChatHub
+@implements IAsyncDisposable
+
+<PageTitle>@(_channel?.Name ?? "Chat") - TeamChat</PageTitle>
+
+<div class="chat-page">
+    @if (_isLoading)
+    {
+        <div class="loading">Loading channel...</div>
+    }
+    else if (_channel == null)
+    {
+        <div class="alert alert-error">@(_errorMessage ?? "Channel not found")</div>
+    }
+    else if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-error">@_errorMessage</div>
+    }
+    else
+    {
+        <div class="chat-header">
+            <h2># @_channel.Name</h2>
+            @if (!string.IsNullOrEmpty(_channel.Description))
+            {
+                <p class="channel-description">@_channel.Description</p>
+            }
+            <div class="channel-info">
+                <span class="member-count">@_channel.MemberCount members</span>
+                @if (!ChatHub.IsConnected)
+                {
+                    <span class="connection-status disconnected">Disconnected</span>
+                }
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages-wrapper">
+                <MessageList Messages="_messages" CurrentUserId="@_currentUserId" OnReactionClick="HandleReactionClick" />
+            </div>
+
+            @if (_typingUsers.Any())
+            {
+                <div class="typing-indicator">
+                    @if (_typingUsers.Count == 1)
+                    {
+                        <span>@_typingUsers.Values.First() is typing...</span>
+                    }
+                    else if (_typingUsers.Count <= 3)
+                    {
+                        <span>@string.Join(", ", _typingUsers.Values) are typing...</span>
+                    }
+                    else
+                    {
+                        <span>Several people are typing...</span>
+                    }
+                </div>
+            }
+
+            <MessageInput OnSend="SendMessageAsync"
+                         OnTyping="HandleTypingAsync"
+                         IsDisabled="!ChatHub.IsConnected" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string ChannelId { get; set; } = string.Empty;
+
+    private ChannelDto? _channel;
+    private List<MessageDto> _messages = new();
+    private Dictionary<string, string> _typingUsers = new();
+    private string _currentUserId = string.Empty;
+    private string _currentUserName = string.Empty;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private System.Timers.Timer? _typingTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get current user from auth service
+        _currentUserId = AuthService.UserId ?? string.Empty;
+        _currentUserName = AuthService.DisplayName ?? AuthService.Username ?? "Anonymous";
+
+        // Subscribe to hub events
+        ChatHub.OnMessageReceived += HandleMessageReceived;
+        ChatHub.OnMessageEdited += HandleMessageEdited;
+        ChatHub.OnMessageDeleted += HandleMessageDeleted;
+        ChatHub.OnReactionAdded += HandleReactionAdded;
+        ChatHub.OnReactionRemoved += HandleReactionRemoved;
+        ChatHub.OnUserTyping += HandleUserTyping;
+        ChatHub.OnConnectionClosed += HandleConnectionClosed;
+
+        // Connect to hub with auth token
+        if (!string.IsNullOrEmpty(AuthService.Token))
+        {
+            await ChatHub.ConnectAsync(_currentUserId, _currentUserName, AuthService.Token);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(ChannelId))
+        {
+            await LoadChannelAsync();
+        }
+    }
+
+    private async Task LoadChannelAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            _channel = await ApiService.GetChannelAsync(ChannelId);
+            var messages = await ApiService.GetChannelMessagesAsync(ChannelId);
+            _messages = messages.Reverse().ToList();
+            await ChatHub.JoinChannelAsync(ChannelId);
+        }
+        catch (Exception)
+        {
+            _channel = null;
+            _errorMessage = "Failed to load channel. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task SendMessageAsync(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return;
+
+        try
+        {
+            await ChatHub.SendMessageAsync(ChannelId, content);
+            await ChatHub.StopTypingAsync(ChannelId);
+            _typingTimer?.Stop();
+        }
+        catch (Exception)
+        {
+            _errorMessage = "Failed to send message. Please try again.";
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleTypingAsync()
+    {
+        try
+        {
+            await ChatHub.StartTypingAsync(ChannelId);
+
+            // Reset typing timer
+            _typingTimer?.Stop();
+            _typingTimer?.Dispose();
+            _typingTimer = new System.Timers.Timer(3000);
+            _typingTimer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    await ChatHub.StopTypingAsync(ChannelId);
+                }
+                catch { }
+                _typingTimer?.Stop();
+            };
+            _typingTimer.AutoReset = false;
+            _typingTimer.Start();
+        }
+        catch { }
+    }
+
+    private void HandleMessageReceived(MessageDto message)
+    {
+        if (message.ChannelId == ChannelId)
+        {
+            _messages.Add(message);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleMessageEdited(string messageId, string newContent, DateTime editedAt)
+    {
+        var message = _messages.FirstOrDefault(m => m.Id == messageId);
+        if (message != null)
+        {
+            var index = _messages.IndexOf(message);
+            _messages[index] = message with { Content = newContent, IsEdited = true, EditedAt = editedAt };
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleMessageDeleted(string messageId)
+    {
+        var message = _messages.FirstOrDefault(m => m.Id == messageId);
+        if (message != null)
+        {
+            _messages.Remove(message);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleReactionAdded(string messageId, ReactionType reactionType, string userId)
+    {
+        var message = _messages.FirstOrDefault(m => m.Id == messageId);
+        if (message != null)
+        {
+            var index = _messages.IndexOf(message);
+            var reactions = message.Reactions.ToList();
+
+            var existingReaction = reactions.FirstOrDefault(r => r.Type == reactionType);
+            if (existingReaction != null)
+            {
+                // Update existing reaction count
+                var reactionIndex = reactions.IndexOf(existingReaction);
+                var userReacted = userId == _currentUserId || existingReaction.UserReacted;
+                reactions[reactionIndex] = existingReaction with
+                {
+                    Count = existingReaction.Count + 1,
+                    UserReacted = userReacted
+                };
+            }
+            else
+            {
+                // Add new reaction
+                reactions.Add(new ReactionDto(reactionType, 1, userId == _currentUserId));
+            }
+
+            _messages[index] = message with { Reactions = reactions };
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleReactionRemoved(string messageId, ReactionType reactionType, string userId)
+    {
+        var message = _messages.FirstOrDefault(m => m.Id == messageId);
+        if (message != null)
+        {
+            var index = _messages.IndexOf(message);
+            var reactions = message.Reactions.ToList();
+
+            var existingReaction = reactions.FirstOrDefault(r => r.Type == reactionType);
+            if (existingReaction != null)
+            {
+                if (existingReaction.Count <= 1)
+                {
+                    reactions.Remove(existingReaction);
+                }
+                else
+                {
+                    var reactionIndex = reactions.IndexOf(existingReaction);
+                    var userReacted = userId != _currentUserId && existingReaction.UserReacted;
+                    reactions[reactionIndex] = existingReaction with
+                    {
+                        Count = existingReaction.Count - 1,
+                        UserReacted = userReacted
+                    };
+                }
+            }
+
+            _messages[index] = message with { Reactions = reactions };
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleUserTyping(string userId, string userName, bool isTyping)
+    {
+        if (userId == _currentUserId) return; // Don't show own typing
+
+        if (isTyping)
+        {
+            _typingUsers[userId] = userName;
+        }
+        else
+        {
+            _typingUsers.Remove(userId);
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleConnectionClosed(Exception? ex)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleReactionClick((string MessageId, ReactionType Type) args)
+    {
+        try
+        {
+            // Check if user already reacted - if so, remove reaction
+            var message = _messages.FirstOrDefault(m => m.Id == args.MessageId);
+            var existingReaction = message?.Reactions.FirstOrDefault(r => r.Type == args.Type);
+
+            if (existingReaction?.UserReacted == true)
+            {
+                await ChatHub.RemoveReactionAsync(args.MessageId, args.Type);
+            }
+            else
+            {
+                await ChatHub.AddReactionAsync(args.MessageId, args.Type);
+            }
+        }
+        catch (Exception)
+        {
+            // Silently fail for reactions - not critical
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ChatHub.OnMessageReceived -= HandleMessageReceived;
+        ChatHub.OnMessageEdited -= HandleMessageEdited;
+        ChatHub.OnMessageDeleted -= HandleMessageDeleted;
+        ChatHub.OnReactionAdded -= HandleReactionAdded;
+        ChatHub.OnReactionRemoved -= HandleReactionRemoved;
+        ChatHub.OnUserTyping -= HandleUserTyping;
+        ChatHub.OnConnectionClosed -= HandleConnectionClosed;
+
+        if (!string.IsNullOrEmpty(ChannelId))
+        {
+            try
+            {
+                await ChatHub.LeaveChannelAsync(ChannelId);
+            }
+            catch { }
+        }
+
+        _typingTimer?.Stop();
+        _typingTimer?.Dispose();
+    }
+}

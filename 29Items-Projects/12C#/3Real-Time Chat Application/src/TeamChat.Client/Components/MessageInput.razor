@@ -1,0 +1,101 @@
+@inject IJSRuntime JSRuntime
+
+<div class="message-input-container">
+    @if (_selectedFile != null)
+    {
+        <div class="file-preview">
+            <span>@_selectedFile.Name (@FormatFileSize(_selectedFile.Size))</span>
+            <button @onclick="ClearFile" title="Remove file">&times;</button>
+        </div>
+    }
+
+    <textarea @bind="_messageContent"
+              @bind:event="oninput"
+              @onkeydown="HandleKeyDown"
+              @onfocus="HandleFocus"
+              placeholder="Type a message..."
+              disabled="@IsDisabled"
+              rows="1"
+              class="message-input"></textarea>
+
+    <div class="input-actions">
+        <label class="attach-btn" title="Attach file">
+            📎
+            <InputFile OnChange="HandleFileSelected" style="display: none;" disabled="@IsDisabled" accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.zip" />
+        </label>
+        <button class="send-btn" @onclick="SendMessage" disabled="@(IsDisabled || string.IsNullOrWhiteSpace(_messageContent))">
+            Send
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnSend { get; set; }
+
+    [Parameter]
+    public EventCallback OnTyping { get; set; }
+
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    private string _messageContent = string.Empty;
+    private DateTime _lastTypingSignal = DateTime.MinValue;
+    private IBrowserFile? _selectedFile;
+    private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        // Send on Enter (without Shift)
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+        else
+        {
+            // Signal typing (throttled)
+            if (DateTime.UtcNow - _lastTypingSignal > TimeSpan.FromSeconds(2))
+            {
+                _lastTypingSignal = DateTime.UtcNow;
+                await OnTyping.InvokeAsync();
+            }
+        }
+    }
+
+    private void HandleFocus()
+    {
+        // Could be used to signal user is active
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(_messageContent)) return;
+
+        await OnSend.InvokeAsync(_messageContent);
+        _messageContent = string.Empty;
+        _selectedFile = null;
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file.Size > MaxFileSize)
+        {
+            // File too large - silently ignore
+            return;
+        }
+        _selectedFile = file;
+    }
+
+    private void ClearFile()
+    {
+        _selectedFile = null;
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024.0):F1} MB";
+    }
+}

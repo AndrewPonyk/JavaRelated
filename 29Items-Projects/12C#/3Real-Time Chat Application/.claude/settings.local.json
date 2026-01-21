@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(dotnet build:*)",
+      "Bash(DOCKER_HOST=\"unix:///var/run/docker.sock\" dotnet test:*)"
+    ]
+  }
+}

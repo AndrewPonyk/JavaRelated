@@ -1,0 +1,37 @@
+@using TeamChat.Core.Enums
+
+<div class="reaction-picker @(IsVisible ? "visible" : "")">
+    @foreach (var reaction in _reactions)
+    {
+        <button class="reaction-option" @onclick="() => SelectReaction(reaction.Type)">
+            @reaction.Emoji
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<ReactionType> OnReactionSelected { get; set; }
+
+    private readonly List<(ReactionType Type, string Emoji)> _reactions = new()
+    {
+        (ReactionType.ThumbsUp, "👍"),
+        (ReactionType.ThumbsDown, "👎"),
+        (ReactionType.Heart, "❤️"),
+        (ReactionType.Laugh, "😂"),
+        (ReactionType.Surprised, "😮"),
+        (ReactionType.Sad, "😢"),
+        (ReactionType.Angry, "😠"),
+        (ReactionType.Fire, "🔥"),
+        (ReactionType.Celebrate, "🎉"),
+        (ReactionType.Think, "🤔")
+    };
+
+    private async Task SelectReaction(ReactionType type)
+    {
+        await OnReactionSelected.InvokeAsync(type);
+    }
+}

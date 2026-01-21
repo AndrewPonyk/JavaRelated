@@ -1,0 +1,128 @@
+@inject ApiService ApiService
+@inject NavigationManager NavigationManager
+
+<div class="nav-menu">
+    <div class="nav-section">
+        <h4>Channels</h4>
+        <ul class="channel-list">
+            @foreach (var channel in _channels)
+            {
+                <li class="channel-item @(IsChannelActive(channel.Id) ? "active" : "")">
+                    <a href="/chat/@channel.Id">
+                        <span class="channel-icon">#</span>
+                        <span class="channel-name">@channel.Name</span>
+                    </a>
+                </li>
+            }
+        </ul>
+        <button class="add-channel-btn" @onclick="ShowCreateChannelDialog">
+            + Add Channel
+        </button>
+    </div>
+
+    <div class="nav-section">
+        <h4>Direct Messages</h4>
+        <p class="coming-soon">Coming soon...</p>
+    </div>
+</div>
+
+@if (_showCreateDialog)
+{
+    <div class="modal-overlay" @onclick="HideCreateChannelDialog">
+        <div class="modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Create Channel</h3>
+                <button class="modal-close" @onclick="HideCreateChannelDialog">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="channelName">Channel Name</label>
+                <input type="text" id="channelName" @bind="_newChannelName" @bind:event="oninput" placeholder="e.g., general" />
+            </div>
+            <div class="form-group">
+                <label for="channelDesc">Description (optional)</label>
+                <input type="text" id="channelDesc" @bind="_newChannelDescription" placeholder="What's this channel about?" />
+            </div>
+            @if (!string.IsNullOrEmpty(_createError))
+            {
+                <div class="error-message">@_createError</div>
+            }
+            <div class="modal-footer">
+                <button class="btn-secondary" @onclick="HideCreateChannelDialog">Cancel</button>
+                <button class="login-btn" @onclick="CreateChannelAsync" disabled="@(string.IsNullOrWhiteSpace(_newChannelName) || _isCreating)">
+                    @(_isCreating ? "Creating..." : "Create")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ChannelDto> _channels = new();
+    private bool _showCreateDialog;
+    private string _newChannelName = string.Empty;
+    private string _newChannelDescription = string.Empty;
+    private string? _createError;
+    private bool _isCreating;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadChannelsAsync();
+    }
+
+    private async Task LoadChannelsAsync()
+    {
+        try
+        {
+            var channels = await ApiService.GetChannelsAsync();
+            _channels = channels.ToList();
+        }
+        catch (Exception)
+        {
+            // Silently fail - channels will appear empty
+            _channels = new();
+        }
+    }
+
+    private void ShowCreateChannelDialog()
+    {
+        _showCreateDialog = true;
+        _newChannelName = string.Empty;
+        _newChannelDescription = string.Empty;
+        _createError = null;
+    }
+
+    private void HideCreateChannelDialog()
+    {
+        _showCreateDialog = false;
+    }
+
+    private async Task CreateChannelAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newChannelName)) return;
+
+        _isCreating = true;
+        _createError = null;
+
+        try
+        {
+            var channel = await ApiService.CreateChannelAsync(_newChannelName.Trim(), _newChannelDescription?.Trim());
+            _channels.Add(channel);
+            _showCreateDialog = false;
+            NavigationManager.NavigateTo($"/chat/{channel.Id}");
+        }
+        catch (Exception)
+        {
+            _createError = "Failed to create channel. Please try again.";
+        }
+        finally
+        {
+            _isCreating = false;
+        }
+    }
+
+    private bool IsChannelActive(string channelId)
+    {
+        var currentUri = NavigationManager.Uri;
+        return currentUri.Contains($"/chat/{channelId}");
+    }
+}

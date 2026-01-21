@@ -1,0 +1,123 @@
+@using TeamChat.Core.DTOs
+@using TeamChat.Core.Enums
+
+<div class="message-list">
+    @if (!Messages.Any())
+    {
+        <div class="no-messages">
+            <p>No messages yet. Start the conversation!</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var message in Messages)
+        {
+            <div class="message @(message.SenderId == CurrentUserId ? "own-message" : "")">
+                <div class="message-header">
+                    <span class="sender-name">@message.SenderName</span>
+                    <span class="message-time">@message.CreatedAt.ToString("HH:mm")</span>
+                    @if (message.IsEdited)
+                    {
+                        <span class="edited-label">(edited)</span>
+                    }
+                    @if (message.Sentiment.HasValue)
+                    {
+                        <span class="sentiment-indicator @GetSentimentClass(message.Sentiment.Value)"
+                              title="@GetSentimentLabel(message.Sentiment.Value)">
+                            @GetSentimentEmoji(message.Sentiment.Value)
+                        </span>
+                    }
+                </div>
+
+                <div class="message-content">
+                    @message.Content
+                </div>
+
+                @if (message.Attachment != null)
+                {
+                    <div class="message-attachment">
+                        <a href="@message.Attachment.Url" target="_blank">
+                            📎 @message.Attachment.FileName
+                        </a>
+                    </div>
+                }
+
+                <div class="message-reactions">
+                    @foreach (var reaction in message.Reactions)
+                    {
+                        <button class="reaction-btn @(reaction.UserReacted ? "active" : "")"
+                                @onclick="() => OnReactionClick.InvokeAsync((message.Id, reaction.Type))">
+                            @GetReactionEmoji(reaction.Type) @reaction.Count
+                        </button>
+                    }
+                    <button class="add-reaction-btn" @onclick="() => ShowReactionPicker(message.Id)">
+                        +
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<MessageDto> Messages { get; set; } = new();
+
+    [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<(string MessageId, ReactionType Type)> OnReactionClick { get; set; }
+
+    private string? _showReactionPickerForMessage;
+
+    private void ShowReactionPicker(string messageId)
+    {
+        _showReactionPickerForMessage = _showReactionPickerForMessage == messageId ? null : messageId;
+    }
+
+    private string GetSentimentClass(Sentiment sentiment) => sentiment switch
+    {
+        Sentiment.VeryNegative => "very-negative",
+        Sentiment.Negative => "negative",
+        Sentiment.Neutral => "neutral",
+        Sentiment.Positive => "positive",
+        Sentiment.VeryPositive => "very-positive",
+        _ => "neutral"
+    };
+
+    private string GetSentimentLabel(Sentiment sentiment) => sentiment switch
+    {
+        Sentiment.VeryNegative => "Very Negative",
+        Sentiment.Negative => "Negative",
+        Sentiment.Neutral => "Neutral",
+        Sentiment.Positive => "Positive",
+        Sentiment.VeryPositive => "Very Positive",
+        _ => "Unknown"
+    };
+
+    private string GetSentimentEmoji(Sentiment sentiment) => sentiment switch
+    {
+        Sentiment.VeryNegative => "😢",
+        Sentiment.Negative => "😕",
+        Sentiment.Neutral => "😐",
+        Sentiment.Positive => "🙂",
+        Sentiment.VeryPositive => "😄",
+        _ => "😐"
+    };
+
+    private string GetReactionEmoji(ReactionType type) => type switch
+    {
+        ReactionType.ThumbsUp => "👍",
+        ReactionType.ThumbsDown => "👎",
+        ReactionType.Heart => "❤️",
+        ReactionType.Laugh => "😂",
+        ReactionType.Surprised => "😮",
+        ReactionType.Sad => "😢",
+        ReactionType.Angry => "😠",
+        ReactionType.Fire => "🔥",
+        ReactionType.Celebrate => "🎉",
+        ReactionType.Think => "🤔",
+        _ => "👍"
+    };
+}

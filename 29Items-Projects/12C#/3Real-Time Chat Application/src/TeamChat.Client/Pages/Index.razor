@@ -1,0 +1,177 @@
+@page "/"
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject ApiService ApiService
+
+<PageTitle>TeamChat</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="home-page">
+            <div class="welcome-section">
+                <h1>Welcome to TeamChat, @AuthService.DisplayName!</h1>
+                <p>Select a channel from the sidebar to start chatting.</p>
+            </div>
+
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="btn-action" @onclick="ShowCreateChannel">
+                        Create Channel
+                    </button>
+                </div>
+            </div>
+
+            @if (_showCreateChannel)
+            {
+                <div class="create-channel-form">
+                    <h3>Create New Channel</h3>
+                    <div class="form-group">
+                        <label>Channel Name</label>
+                        <input type="text" @bind="_newChannelName" placeholder="general" />
+                    </div>
+                    <div class="form-group">
+                        <label>Description (optional)</label>
+                        <input type="text" @bind="_newChannelDescription" placeholder="Channel description" />
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-primary" @onclick="CreateChannelAsync" disabled="@_isCreating">Create</button>
+                        <button class="btn-secondary" @onclick="() => _showCreateChannel = false">Cancel</button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(_createError))
+                    {
+                        <div class="error-message">@_createError</div>
+                    }
+                </div>
+            }
+
+            @if (_channels.Any())
+            {
+                <div class="recent-channels">
+                    <h3>Your Channels</h3>
+                    <ul class="channel-grid">
+                        @foreach (var channel in _channels.Take(6))
+                        {
+                            <li class="channel-card" @onclick="() => OpenChannel(channel.Id)">
+                                <span class="channel-icon">#</span>
+                                <span class="channel-name">@channel.Name</span>
+                                @if (!string.IsNullOrEmpty(channel.Description))
+                                {
+                                    <span class="channel-desc">@channel.Description</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="no-channels">
+                    <p>You haven't joined any channels yet. Create one to get started!</p>
+                </div>
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="landing-page">
+            <div class="hero">
+                <h1>TeamChat</h1>
+                <p class="tagline">Real-time team communication with sentiment analysis</p>
+                <div class="cta-buttons">
+                    <a href="/login" class="btn-primary">Get Started</a>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <h3>Real-time Messaging</h3>
+                    <p>Instant communication with your team using SignalR</p>
+                </div>
+                <div class="feature">
+                    <h3>Channels & Threads</h3>
+                    <p>Organize conversations with channels and threaded replies</p>
+                </div>
+                <div class="feature">
+                    <h3>Sentiment Analysis</h3>
+                    <p>AI-powered mood indicators for message sentiment</p>
+                </div>
+                <div class="feature">
+                    <h3>File Sharing</h3>
+                    <p>Share files and documents with your team</p>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private List<ChannelDto> _channels = new();
+    private bool _showCreateChannel;
+    private string _newChannelName = "";
+    private string _newChannelDescription = "";
+    private string? _createError;
+    private bool _isCreating;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthService.IsAuthenticated)
+        {
+            await LoadChannelsAsync();
+        }
+    }
+
+    private async Task LoadChannelsAsync()
+    {
+        try
+        {
+            var channels = await ApiService.GetChannelsAsync();
+            _channels = channels.ToList();
+        }
+        catch (Exception)
+        {
+            // Silently fail - user can still create channels
+            _channels = new();
+        }
+    }
+
+    private void OpenChannel(string channelId)
+    {
+        Navigation.NavigateTo($"/chat/{channelId}");
+    }
+
+    private void ShowCreateChannel()
+    {
+        _showCreateChannel = true;
+        _newChannelName = "";
+        _newChannelDescription = "";
+        _createError = null;
+    }
+
+    private async Task CreateChannelAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newChannelName))
+        {
+            _createError = "Channel name is required";
+            return;
+        }
+
+        _isCreating = true;
+        _createError = null;
+
+        try
+        {
+            var channel = await ApiService.CreateChannelAsync(_newChannelName, _newChannelDescription);
+            _channels.Insert(0, channel);
+            _showCreateChannel = false;
+            Navigation.NavigateTo($"/chat/{channel.Id}");
+        }
+        catch (Exception ex)
+        {
+            _createError = ex.Message;
+        }
+        finally
+        {
+            _isCreating = false;
+        }
+    }
+}
