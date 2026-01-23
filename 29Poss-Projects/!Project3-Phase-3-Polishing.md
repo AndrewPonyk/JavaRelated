@@ -1,11 +1,9 @@
 Phase 3: Production Polish ✨
-
 Audit your Phase 2 implementation and make it production-ready.
 
 **Note:** Apply checks that are relevant to YOUR project structure and tech stack.
 
 ---
-
 ## 1. Code Quality
 - [ ] Clean code: no debug statements, commented blocks, unused imports
 - [ ] No hardcoded secrets or credentials
