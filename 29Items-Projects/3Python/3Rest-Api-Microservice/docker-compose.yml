@@ -15,6 +15,7 @@ services:
       - HF_CACHE_DIR=/app/models
     volumes:
       - ./app:/app/app:ro
+      - ./migrations:/app/migrations
       - model_cache:/app/models
     depends_on:
       db:

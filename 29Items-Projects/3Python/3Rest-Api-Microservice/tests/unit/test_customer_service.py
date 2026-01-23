@@ -23,10 +23,14 @@ class TestCustomerServiceCreate:
 
             customer = service.create(data)
 
+            # Access the values we need to test before any session changes
             assert customer.id is not None
-            assert customer.name == 'Test User'
+            assert customer.name == data['name']
             assert customer.email == 'test@example.com'
             assert customer.status == 'lead'
+
+            # Clean up the session after assertions
+            db.session.rollback()
 
     def test_create_customer_with_all_fields(self, app):
         """Test creating customer with all optional fields."""

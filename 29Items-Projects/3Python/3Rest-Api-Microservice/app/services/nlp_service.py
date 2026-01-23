@@ -3,10 +3,18 @@ NLP Service - Hugging Face Transformers Integration
 """
 from typing import Dict, Any, List, Optional
 import logging
+import os
 from flask import current_app
 from app.utils.exceptions import NotFoundError, ExternalServiceError
 
 logger = logging.getLogger(__name__)
+
+
+def _setup_cache_dir():
+    """Set up HuggingFace cache directory via environment variable."""
+    cache_dir = current_app.config.get('HF_CACHE_DIR', './models')
+    os.environ['HF_HOME'] = cache_dir
+    os.environ['TRANSFORMERS_CACHE'] = cache_dir
 
 # Lazy-loaded model cache
 _sentiment_model = None
@@ -31,17 +39,16 @@ class NLPService:
         if _sentiment_model is None:
             try:
                 from transformers import pipeline
+                _setup_cache_dir()
                 model_name = current_app.config.get(
                     'HF_MODEL_NAME',
                     'distilbert-base-uncased-finetuned-sst-2-english'
                 )
-                cache_dir = current_app.config.get('HF_CACHE_DIR', './models')
 
                 logger.info(f'Loading sentiment model: {model_name}')
                 _sentiment_model = pipeline(
                     'sentiment-analysis',
                     model=model_name,
-                    cache_dir=cache_dir,
                     device=-1  # Force CPU
                 )
                 logger.info('Sentiment model loaded successfully')
@@ -61,13 +68,12 @@ class NLPService:
         if _classifier_model is None:
             try:
                 from transformers import pipeline
-                cache_dir = current_app.config.get('HF_CACHE_DIR', './models')
+                _setup_cache_dir()
 
                 logger.info('Loading zero-shot classifier')
                 _classifier_model = pipeline(
                     'zero-shot-classification',
                     model='facebook/bart-large-mnli',
-                    cache_dir=cache_dir,
                     device=-1
                 )
                 logger.info('Classifier model loaded successfully')

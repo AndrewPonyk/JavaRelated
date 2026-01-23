@@ -43,7 +43,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application code
 COPY --chown=appuser:appuser app/ ./app/
 COPY --chown=appuser:appuser run.py .
-COPY --chown=appuser:appuser migrations/ ./migrations/
+
+# Create migrations directory (will be initialized on first run)
+RUN mkdir -p /app/migrations && chown appuser:appuser /app/migrations
 
 # Create directories for models cache
 RUN mkdir -p /app/models && chown appuser:appuser /app/models

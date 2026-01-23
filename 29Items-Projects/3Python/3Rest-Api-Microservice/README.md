@@ -69,13 +69,39 @@ A Flask-based REST API for customer management with CRUD operations, search, ana
 
 ### Docker Development
 
-```bash
-docker-compose up -d
-```
+1. **Create migrations folder** (first time only)
+   ```bash
+   mkdir migrations
+   ```
+
+2. **Build and start database**
+   ```bash
+   docker-compose build
+   docker-compose up db -d
+   ```
+
+3. **Initialize database migrations**
+   ```bash
+   docker-compose run --rm api flask db init
+   docker-compose run --rm api flask db migrate -m "Initial migration"
+   docker-compose run --rm api flask db upgrade
+   ```
+
+4. **Start all services**
+   ```bash
+   docker-compose up
+   ```
+
+5. **(Optional) Seed sample data**
+   ```bash
+   docker-compose exec api python scripts/seed_db.py
+   ```
 
 Access:
-- API: http://localhost:5000
-- phpMyAdmin: http://localhost:8080 (with `--profile tools`)
+- Dashboard: http://localhost:5000
+- API: http://localhost:5000/api
+- Swagger UI: http://localhost:5000/apidocs
+- phpMyAdmin: http://localhost:9090 (with `--profile tools`)
 
 ## API Endpoints
 
@@ -93,6 +119,54 @@ Access:
 | GET | `/api/analytics/summary` | Get statistics |
 | POST | `/api/nlp/sentiment` | Analyze text sentiment |
 | POST | `/api/nlp/customer/{id}/analyze` | Analyze customer notes |
+
+## Sentiment Analysis
+
+The API includes NLP-powered sentiment analysis using Hugging Face's DistilBERT model.
+
+### How It Works
+
+Customer notes are analyzed and assigned a sentiment score:
+
+| Score | Meaning |
+|-------|---------|
+| 0-30% | Negative sentiment |
+| 30-70% | Neutral sentiment |
+| 70-100% | Positive sentiment |
+
+### Usage
+
+**Analyze a customer's notes:**
+```bash
+curl -X POST http://localhost:5000/api/nlp/customer/1/analyze
+```
+
+**Analyze arbitrary text:**
+```bash
+curl -X POST http://localhost:5000/api/nlp/sentiment \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Great service, very satisfied!"}'
+```
+
+### Example Notes
+
+**Positive (70-100%):**
+> Excellent customer! Always pays on time and refers new clients. Very satisfied with our services.
+
+**Neutral (30-70%):**
+> Standard account, regular monthly orders. No special requirements noted.
+
+**Negative (0-30%):**
+> Multiple complaints about delivery delays. Threatened to cancel subscription.
+
+### Dashboard Usage
+
+Each customer row in the dashboard has an **Analyze Sentiment** button (chat bubble icon). Click it to:
+
+1. Send the customer's notes to the NLP service
+2. Analyze sentiment using DistilBERT model
+3. Automatically update the customer's sentiment score
+4. Display the result as a color-coded progress bar (red → yellow → green)
 
 ## Testing
 
