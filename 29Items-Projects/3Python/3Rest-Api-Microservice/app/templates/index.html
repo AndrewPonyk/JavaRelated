@@ -1,5 +1,7 @@
+{# |su:81) CHILD TEMPLATE - Extends base.html and overrides specific blocks #}
 {% extends "base.html" %}
 
+{# |su:82) OVERRIDE BLOCK - Replace parent's title block with dashboard-specific title #}
 {% block title %}Dashboard - Customer Management API{% endblock %}
 
 {% block content %}
@@ -12,8 +14,10 @@
     </div>
 </div>
 
+{# |su:83) BOOTSTRAP GRID - row/col system for responsive layout. col-md-3 = 4 cards per row on medium+ screens #}
 <!-- Stats Cards -->
 <div class="row mb-4">
+    {# |su:84) DATA BINDING BY ID - JavaScript updates elements by ID (e.g., getElementById) #}
     <div class="col-md-3">
         <div class="card bg-primary text-white">
             <div class="card-body">
@@ -104,6 +108,7 @@
         </button>
     </div>
     <div class="card-body">
+        {# |su:87) RESPONSIVE TABLE - table-responsive adds horizontal scroll on small screens #}
         <div class="table-responsive">
             <table class="table table-hover" id="customers-table">
                 <thead>
@@ -116,6 +121,7 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
+                {# |su:88) DYNAMIC TBODY - JavaScript replaces innerHTML with API data (see renderCustomers in main.js) #}
                 <tbody id="customers-tbody">
                     <tr>
                         <td colspan="6" class="text-center">Loading...</td>
@@ -131,6 +137,7 @@
     </div>
 </div>
 
+{# |su:85) BOOTSTRAP MODAL - Popup dialog triggered by data-bs-toggle="modal" data-bs-target="#addCustomerModal" #}
 <!-- Add Customer Modal -->
 <div class="modal fade" id="addCustomerModal" tabindex="-1">
     <div class="modal-dialog">
@@ -139,6 +146,7 @@
                 <h5 class="modal-title">Add New Customer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            {# |su:86) FORM WITH JS HANDLER - Form submit handled by JavaScript (preventDefault + fetch API) #}
             <form id="add-customer-form">
                 <div class="modal-body">
                     <div class="mb-3">

@@ -1,18 +1,24 @@
 """
 Customer CRUD API Endpoints
+
+|su:36) REST API LAYER - HTTP endpoints that receive requests, validate input, call services,
+        and return JSON responses. Keeps HTTP concerns separate from business logic.
 """
 from flask import Blueprint, request, jsonify
 from app.services.customer_service import CustomerService
 from app.schemas.customer_schema import CustomerSchema, CustomerCreateSchema
 from app.utils.exceptions import ValidationError, NotFoundError
 
+# |su:37) BLUEPRINT - Modular route grouping. Registered in app factory with url_prefix='/api/customers'
 customers_bp = Blueprint('customers', __name__)
+# |su:38) DEPENDENCY SETUP - Instantiate service and schemas used by route handlers
 customer_service = CustomerService()
 customer_schema = CustomerSchema()
-customers_schema = CustomerSchema(many=True)
+customers_schema = CustomerSchema(many=True)  # many=True for lists
 customer_create_schema = CustomerCreateSchema()
 
 
+# |su:39) GET ENDPOINT - List resources with optional filtering and pagination
 @customers_bp.route('/', methods=['GET'])
 def get_customers():
     """
@@ -37,13 +43,15 @@ def get_customers():
       200:
         description: List of customers
     """
+    # |su:40) QUERY PARAMS - request.args.get() with type conversion and defaults
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     status = request.args.get('status')
 
     result = customer_service.get_all(page=page, per_page=per_page, status=status)
+    # |su:41) RESPONSE FORMAT - Consistent structure: {data: [...], pagination: {...}}
     return jsonify({
-        'data': customers_schema.dump(result['items']),
+        'data': customers_schema.dump(result['items']),  # Schema serializes models to dicts
         'pagination': {
             'page': result['page'],
             'per_page': result['per_page'],
@@ -77,6 +85,7 @@ def get_customer(customer_id: int):
     return jsonify({'data': customer_schema.dump(customer)})
 
 
+# |su:42) POST ENDPOINT - Create new resource, returns 201 Created with the new object
 @customers_bp.route('/', methods=['POST'])
 def create_customer():
     """
@@ -110,13 +119,16 @@ def create_customer():
       400:
         description: Validation error
     """
+    # |su:43) REQUEST BODY - request.get_json() parses JSON body into Python dict
     data = request.get_json()
+    # |su:44) SCHEMA VALIDATION - Validate input data, get dict of field errors if invalid
     errors = customer_create_schema.validate(data)
     if errors:
         raise ValidationError('Invalid customer data', details=errors)
 
+    # |su:45) SERVICE CALL - Delegate business logic to service layer
     customer = customer_service.create(data)
-    return jsonify({'data': customer_schema.dump(customer)}), 201
+    return jsonify({'data': customer_schema.dump(customer)}), 201  # 201 = Created
 
 
 @customers_bp.route('/<int:customer_id>', methods=['PUT'])

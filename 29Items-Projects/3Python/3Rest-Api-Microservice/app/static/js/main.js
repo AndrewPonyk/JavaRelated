@@ -1,6 +1,9 @@
 /**
  * Customer Management Dashboard - Main JavaScript
  *
+ * |su:57) FRONTEND JAVASCRIPT - Vanilla JS dashboard that calls REST API endpoints.
+ *         Demonstrates fetch API, DOM manipulation, and async/await patterns.
+ *
  * Provides complete functionality for:
  * - Loading and displaying statistics
  * - Customer CRUD operations
@@ -9,7 +12,7 @@
  * - Sentiment analysis
  */
 
-// API Configuration
+// |su:58) API BASE URL - All API calls go through this prefix
 const API_BASE = '/api';
 
 // Application State
@@ -85,14 +88,17 @@ function setupEventListeners() {
 /**
  * Load dashboard statistics from the API
  */
+// |su:59) FETCH API PATTERN - async/await for clean HTTP calls, try/catch for error handling
 async function loadStats() {
     try {
+        // |su:60) API CALL - fetch() returns Promise, await waits for response
         const response = await fetch(`${API_BASE}/analytics/summary`);
 
         if (!response.ok) {
             throw new Error('Failed to load stats');
         }
 
+        // |su:61) JSON PARSING - response.json() also returns Promise, needs await
         const result = await response.json();
 
         if (result.data) {

@@ -1,11 +1,15 @@
 """
 API Blueprint Registration
+
+|su:54) ROOT API BLUEPRINT - Base /api endpoint with welcome message and health check.
+        Every API should have a health endpoint for monitoring/load balancers.
 """
 from flask import Blueprint
 
 api_bp = Blueprint('api', __name__)
 
 
+# |su:55) API ROOT - Returns available endpoints, useful for API discovery
 @api_bp.route('/', methods=['GET'])
 def index():
     """
@@ -37,6 +41,7 @@ def index():
     }
 
 
+# |su:56) HEALTH CHECK - Essential for Docker/K8s health probes and load balancer checks
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     """

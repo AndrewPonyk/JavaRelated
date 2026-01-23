@@ -1,5 +1,8 @@
 """
 Custom Exception Classes
+
+|su:25) EXCEPTION HIERARCHY - Custom exceptions with HTTP status codes for clean error handling.
+        Raising these anywhere automatically returns proper JSON error response.
 """
 from typing import Optional, Dict, Any
 
@@ -10,6 +13,7 @@ class AppException(Exception):
 
     Provides consistent error response format.
     """
+    # |su:26) DEFAULT ERROR ATTRIBUTES - Child classes override these for specific error types
     status_code: int = 500
     error_code: str = 'INTERNAL_ERROR'
     message: str = 'An unexpected error occurred'
@@ -27,6 +31,7 @@ class AppException(Exception):
             self.status_code = status_code
         self.details = details or {}
 
+    # |su:27) TO_DICT METHOD - Converts exception to JSON-serializable dict for API response
     def to_dict(self) -> Dict[str, Any]:
         """Convert exception to dictionary for JSON response."""
         response = {
@@ -40,6 +45,7 @@ class AppException(Exception):
         return response
 
 
+# |su:28) SPECIFIC EXCEPTIONS - Each maps to HTTP status code. Just raise ValidationError("msg")!
 class ValidationError(AppException):
     """Raised when input validation fails."""
     status_code = 400

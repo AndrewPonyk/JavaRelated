@@ -1,4 +1,5 @@
-# Multi-stage build for optimized image size
+# |su:68) MULTI-STAGE DOCKERFILE - First stage builds/installs, second stage runs.
+#         Keeps final image small by excluding build tools.
 
 # Stage 1: Builder
 FROM python:3.12-slim as builder
@@ -66,5 +67,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Run with gunicorn
+# |su:69) GUNICORN - Production WSGI server. Workers handle concurrent requests, threads handle I/O
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", "run:app"]

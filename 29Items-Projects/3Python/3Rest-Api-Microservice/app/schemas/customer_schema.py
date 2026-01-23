@@ -1,5 +1,8 @@
 """
 Customer Serialization Schemas
+
+|su:29) MARSHMALLOW SCHEMAS - Define how data is serialized (model->JSON) and deserialized
+        (JSON->model). Also provides validation with helpful error messages.
 """
 from marshmallow import Schema, fields, validate, validates, ValidationError
 
@@ -7,7 +10,9 @@ from marshmallow import Schema, fields, validate, validates, ValidationError
 class CustomerSchema(Schema):
     """Schema for customer serialization/deserialization."""
 
+    # |su:30) DUMP_ONLY FIELDS - Only included in output (serialization), not accepted in input
     id = fields.Integer(dump_only=True)
+    # |su:31) VALIDATION RULES - Built-in validators for length, format (Email), allowed values (OneOf)
     name = fields.String(required=True, validate=validate.Length(min=1, max=255))
     email = fields.Email(required=True)
     phone = fields.String(validate=validate.Length(max=50), allow_none=True)
@@ -15,7 +20,7 @@ class CustomerSchema(Schema):
     notes = fields.String(allow_none=True)
     status = fields.String(
         validate=validate.OneOf(['active', 'inactive', 'lead']),
-        load_default='lead'
+        load_default='lead'  # Default value if not provided
     )
     sentiment_score = fields.Float(dump_only=True)
     created_at = fields.DateTime(dump_only=True)

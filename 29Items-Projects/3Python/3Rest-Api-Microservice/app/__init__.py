@@ -1,5 +1,8 @@
 """
 Flask Application Factory
+
+|su:4) APPLICATION FACTORY - This pattern allows creating multiple app instances with different
+       configs (useful for testing). It's the recommended way to structure Flask apps.
 """
 import logging
 import sys
@@ -19,16 +22,18 @@ def create_app(config_name: str = 'development') -> Flask:
     Returns:
         Configured Flask application
     """
+    # |su:5) CREATE FLASK INSTANCE - __name__ helps Flask find templates and static files
     app = Flask(__name__)
+    # |su:6) LOAD CONFIG - Load settings from config class based on environment
     app.config.from_object(config[config_name])
 
     # Configure logging
     _configure_logging(app)
 
-    # Initialize extensions
+    # |su:7) INIT EXTENSIONS - Bind Flask extensions (SQLAlchemy, Migrate, Swagger) to app
     _init_extensions(app)
 
-    # Configure CORS
+    # |su:8) CORS SETUP - Enable Cross-Origin requests so frontend can call API from different domain
     CORS(app, resources={
         r"/api/*": {
             "origins": app.config.get('CORS_ORIGINS', '*'),
@@ -37,13 +42,13 @@ def create_app(config_name: str = 'development') -> Flask:
         }
     })
 
-    # Register blueprints
+    # |su:9) REGISTER BLUEPRINTS - Blueprints organize routes into modules (customers, search, etc.)
     _register_blueprints(app)
 
     # Register web routes
     _register_web_routes(app)
 
-    # Register error handlers
+    # |su:10) ERROR HANDLERS - Global exception handling for consistent API error responses
     _register_error_handlers(app)
 
     app.logger.info(f'Application created with config: {config_name}')

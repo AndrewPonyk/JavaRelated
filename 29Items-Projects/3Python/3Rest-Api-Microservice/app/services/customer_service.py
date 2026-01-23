@@ -1,5 +1,8 @@
 """
 Customer Service - Business Logic Layer
+
+|su:32) SERVICE LAYER PATTERN - Services contain business logic, separate from API routes
+        and models. This keeps code organized and testable.
 """
 from typing import Optional, Dict, Any, List
 from app.models.customer import Customer
@@ -12,6 +15,7 @@ class CustomerService:
     Service class for customer-related business logic.
     """
 
+    # |su:33) PAGINATION PATTERN - Never return all records! Use page/per_page for large datasets
     def get_all(
         self,
         page: int = 1,
@@ -31,10 +35,12 @@ class CustomerService:
         """
         query = Customer.query
 
+        # |su:34) QUERY BUILDING - Chain filters and ordering before executing
         if status:
             query = query.filter(Customer.status == status)
 
         query = query.order_by(Customer.created_at.desc())
+        # |su:35) FLASK-SQLALCHEMY PAGINATION - Built-in pagination with total count
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
         return {

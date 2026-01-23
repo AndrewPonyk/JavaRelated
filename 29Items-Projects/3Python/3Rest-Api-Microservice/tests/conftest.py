@@ -1,6 +1,9 @@
 """
 Pytest Configuration and Fixtures
 
+|su:62) TEST FIXTURES - Shared setup code for tests. conftest.py is auto-discovered by pytest.
+        Fixtures provide clean app/db/client for each test.
+
 Provides shared fixtures for all tests including:
 - Flask app with test configuration
 - Database session with automatic cleanup
@@ -13,6 +16,7 @@ from app.extensions import db
 from app.models.customer import Customer
 
 
+# |su:63) APP FIXTURE - Creates Flask app with 'testing' config (uses SQLite in-memory)
 @pytest.fixture(scope='function')
 def app():
     """
@@ -22,6 +26,7 @@ def app():
     """
     app = create_app('testing')
 
+    # |su:64) CONTEXT & CLEANUP - Create tables before test, drop after. yield = test runs here
     with app.app_context():
         db.create_all()
         yield app
@@ -29,6 +34,7 @@ def app():
         db.drop_all()
 
 
+# |su:65) TEST CLIENT - Flask's test client for making HTTP requests without running server
 @pytest.fixture(scope='function')
 def client(app):
     """
@@ -137,6 +143,7 @@ def json_headers():
     return {'Content-Type': 'application/json'}
 
 
+# |su:66) FACTORY PATTERN - Creates test data with defaults. Override specific fields as needed.
 class CustomerFactory:
     """Factory for creating customer test data."""
 
@@ -151,6 +158,7 @@ class CustomerFactory:
     def create(cls, **kwargs):
         """Create a customer with optional overrides."""
         cls._counter += 1
+        # |su:67) DEFAULT VALUES - Provide sensible defaults, allow overrides via **kwargs
         defaults = {
             'name': f'Test Customer {cls._counter}',
             'email': f'test{cls._counter}@example.com',

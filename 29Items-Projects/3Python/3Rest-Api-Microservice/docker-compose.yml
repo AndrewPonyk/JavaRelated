@@ -1,6 +1,8 @@
+# |su:70) DOCKER COMPOSE - Orchestrate multiple containers (api, db, phpmyadmin) with one command
 version: '3.8'
 
 services:
+  # |su:71) API SERVICE - Flask app container, depends on db being healthy first
   api:
     build:
       context: .
@@ -24,6 +26,7 @@ services:
       - app-network
     restart: unless-stopped
 
+  # |su:72) DATABASE SERVICE - MySQL container with health check so API waits until ready
   db:
     image: mysql:8.0
     container_name: customer-db
@@ -34,9 +37,11 @@ services:
       MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     ports:
       - "3306:3306"
+    # |su:73) VOLUMES - Persist data outside container. Named volume mysql_data survives restarts
     volumes:
       - mysql_data:/var/lib/mysql
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # |su:74) HEALTHCHECK - Docker checks if service is ready. API uses 'condition: service_healthy'
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s

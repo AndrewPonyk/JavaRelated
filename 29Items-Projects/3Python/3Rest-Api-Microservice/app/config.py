@@ -1,14 +1,19 @@
 """
 Application Configuration Classes
+
+|su:11) CONFIGURATION PATTERN - Use classes for config with inheritance. Base class has shared
+        settings, child classes override for specific environments (dev/test/prod).
 """
 import os
 from dotenv import load_dotenv
 
+# |su:12) LOAD .ENV FILE - python-dotenv reads .env file into environment variables
 load_dotenv()
 
 
 class Config:
     """Base configuration."""
+    # |su:13) SECRET_KEY - Used by Flask for session signing, CSRF tokens. MUST be secret in prod!
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False

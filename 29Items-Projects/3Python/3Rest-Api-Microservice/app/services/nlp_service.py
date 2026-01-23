@@ -1,5 +1,8 @@
 """
 NLP Service - Hugging Face Transformers Integration
+
+|su:46) ML/AI INTEGRATION - Service that wraps Hugging Face transformers for sentiment analysis.
+        Demonstrates how to integrate machine learning models into a REST API.
 """
 from typing import Dict, Any, List, Optional
 import logging
@@ -16,7 +19,7 @@ def _setup_cache_dir():
     os.environ['HF_HOME'] = cache_dir
     os.environ['TRANSFORMERS_CACHE'] = cache_dir
 
-# Lazy-loaded model cache
+# |su:47) LAZY LOADING PATTERN - Models are large! Load only when first needed, not at startup
 _sentiment_model = None
 _classifier_model = None
 
@@ -28,6 +31,7 @@ class NLPService:
     Uses lazy loading for models to minimize memory usage and startup time.
     """
 
+    # |su:48) MODEL INITIALIZATION - Load pretrained model from Hugging Face Hub on first use
     def _get_sentiment_model(self):
         """
         Get or initialize the sentiment analysis model.
@@ -82,6 +86,7 @@ class NLPService:
                 raise ExternalServiceError(f'NLP classification service unavailable: {str(e)}')
         return _classifier_model
 
+    # |su:49) SENTIMENT ANALYSIS - Core NLP method that classifies text as POSITIVE/NEGATIVE
     def analyze_sentiment(self, text: str) -> Dict[str, Any]:
         """
         Analyze sentiment of a single text.
@@ -93,7 +98,8 @@ class NLPService:
             Sentiment result with label and score
         """
         model = self._get_sentiment_model()
-        result = model(text[:512])[0]  # Truncate to model max length
+        # |su:50) MODEL INFERENCE - Call the model. [:512] truncates to max token length
+        result = model(text[:512])[0]
 
         return {
             'label': result['label'],
@@ -140,6 +146,7 @@ class NLPService:
         else:
             return round(0.5 - (score * 0.5), 4)
 
+    # |su:51) SERVICE INTEGRATION - Combines NLP analysis with database update in one operation
     def analyze_customer_sentiment(self, customer_id: int) -> Dict[str, Any]:
         """
         Analyze a customer's notes and update their sentiment score.
@@ -150,6 +157,7 @@ class NLPService:
         Returns:
             Analysis result with updated customer data
         """
+        # |su:52) CROSS-SERVICE CALL - Services can call other services for complex operations
         from app.services.customer_service import CustomerService
 
         customer_service = CustomerService()
@@ -168,7 +176,7 @@ class NLPService:
         # Analyze sentiment
         result = self.analyze_sentiment(customer.notes)
 
-        # Update customer
+        # |su:53) UPDATE COMPUTED FIELD - Store ML result in database for future queries/filtering
         customer_service.update_sentiment(customer_id, result['normalized_score'])
 
         return {
