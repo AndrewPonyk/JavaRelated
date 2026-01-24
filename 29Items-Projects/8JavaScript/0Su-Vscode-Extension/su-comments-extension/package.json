@@ -1,0 +1,77 @@
+{
+  "name": "su-comments",
+  "displayName": "SU Comments",
+  "description": "View and navigate SU comments in your codebase",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.108.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "suComments.explorer",
+          "name": "SU Comments",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "suComments.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "suComments.collapseAll",
+        "title": "Collapse All",
+        "icon": "$(chevron-up)"
+      },
+      {
+        "command": "suComments.expandAll",
+        "title": "Expand All",
+        "icon": "$(chevron-down)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "suComments.refresh",
+          "when": "view == suComments.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "suComments.collapseAll",
+          "when": "view == suComments.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "suComments.expandAll",
+          "when": "view == suComments.explorer",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.108.1",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.5"
+  }
+}
