@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// |su:10) Data model for a single SU comment
 interface SuComment {
     id: string;
     number: number;
@@ -12,7 +13,9 @@ interface SuComment {
     statusSymbol: string;
 }
 
+// |su:11) TreeDataProvider - VS Code interface for tree views
 export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem> {
+    // |su:12) Event emitter - fires when tree needs refresh
     private _onDidChangeTreeData: vscode.EventEmitter<SuCommentItem | undefined | void> = new vscode.EventEmitter<SuCommentItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<SuCommentItem | undefined | void> = this._onDidChangeTreeData.event;
 
@@ -35,24 +38,24 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
         vscode.commands.executeCommand('workbench.actions.treeView.suComments.explorer.expandAll');
     }
 
+    // |su:13) Required by TreeDataProvider - returns tree item for display
     getTreeItem(element: SuCommentItem): vscode.TreeItem {
         return element;
     }
 
+    // |su:14) Required by TreeDataProvider - returns children (flat list here)
     getChildren(element?: SuCommentItem): Thenable<SuCommentItem[]> {
         if (!element) {
-            // Root level: group by number
             return Promise.resolve(this.getGroupedComments());
         } else {
-            // Child level: show individual comments
             return Promise.resolve([]);
         }
     }
 
+    // |su:15) Builds flat list of comment items for tree view
     private getGroupedComments(): SuCommentItem[] {
-        // Group comments by number
         const grouped = new Map<number, SuComment[]>();
-        
+
         this.suComments.forEach(comment => {
             if (!grouped.has(comment.number)) {
                 grouped.set(comment.number, []);
@@ -61,24 +64,20 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
         });
 
         const items: SuCommentItem[] = [];
-
-        // Sort numbers in ascending order
         const sortedNumbers = Array.from(grouped.keys()).sort((a, b) => a - b);
-        
+
         sortedNumbers.forEach(number => {
             const comments = grouped.get(number) || [];
-            
-            // Create parent item for the number group
+
             const parentItem = new SuCommentItem(
                 `|su:${number}`,
                 vscode.TreeItemCollapsibleState.Expanded,
-                comments[0] // Use the first comment to determine status for the group
+                comments[0]
             );
-            
-            // Add child items for each comment under this number
+
             comments.forEach(comment => {
                 const childItem = new SuCommentItem(
-                    `|su:${comment.number}: ${comment.text}`,  // Show number and text
+                    `|su:${comment.number}: ${comment.text}`,
                     vscode.TreeItemCollapsibleState.None,
                     comment
                 );
@@ -95,16 +94,16 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
         return items;
     }
 
+    // |su:20) Main scanning logic - finds all |su:n comments in workspace
     private scanWorkspace(): void {
         this.suComments = [];
-        
+
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders) {
             return;
         }
 
-        // Regular expression to match SU comments
-        // Matches |su:n followed by any text that may contain status symbols anywhere
+        // |su:21) Regex pattern: matches |su:N) or |su:N followed by text
         const suRegex = /\|su:(\d+)(\)|\s)(.*)/gm;
 
         workspaceFolders.forEach(folder => {
@@ -114,18 +113,17 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
                     try {
                         const content = fs.readFileSync(filePath, 'utf-8');
                         const lines = content.split('\n');
-                        
+
                         lines.forEach((line, index) => {
                             const matches = [...line.matchAll(suRegex)];
                             matches.forEach(match => {
                                 const number = parseInt(match[1], 10);
-                                let text = match[3]?.trim() || '';  // The full comment text
+                                let text = match[3]?.trim() || '';
 
-                                // Extract status symbol if present anywhere in the text
-                                let status = 'untouched'; // default status
+                                // |su:22) Status detection - looks for markers like ++, --c, --h
+                                let status = 'untouched';
                                 let statusSymbol = '';
 
-                                // Check for status indicators anywhere in the text
                                 if (text.includes(' ++')) {
                                     status = 'clear';
                                     statusSymbol = '++';
@@ -171,55 +169,56 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
         });
     }
 
+    // |su:23) Recursively gets all files in directory (excludes node_modules, .git)
     private getAllFiles(dirPath: string, fileList: string[] = []): string[] {
+        const excludedDirs = ['node_modules', '.git'];
         const files = fs.readdirSync(dirPath);
-        
+
         files.forEach(file => {
+            if (excludedDirs.includes(file)) {
+                return;
+            }
             const filePath = path.join(dirPath, file);
             const stat = fs.statSync(filePath);
-            
+
             if (stat.isDirectory()) {
                 this.getAllFiles(filePath, fileList);
             } else {
                 fileList.push(filePath);
             }
         });
-        
+
         return fileList;
     }
 
+    // |su:24) File filter - only scan text-based files
     private isTextFile(filePath: string): boolean {
         const textExtensions = ['.txt', '.js', '.ts', '.jsx', '.tsx', '.html', '.css', '.scss', '.json', '.md', '.py', '.java', '.cpp', '.c', '.h', '.cs', '.go', '.rb', '.php', '.xml', '.yaml', '.yml'];
         const ext = path.extname(filePath).toLowerCase();
         return textExtensions.includes(ext);
     }
 
+    // |su:30) Modifies source file to update status marker (context menu action)
     async updateCommentStatus(comment: SuComment, newStatus: string, statusSymbol: string): Promise<void> {
         try {
-            // Read the file
             const fileContent = await vscode.workspace.fs.readFile(comment.uri);
             const textContent = new TextDecoder().decode(fileContent);
             const lines = textContent.split('\n');
 
-            // Get the target line
             let targetLine = lines[comment.lineNumber];
 
-            // Remove any existing status indicators from the line
+            // Remove existing status, add new one
             let updatedLine = targetLine.replace(/\s*(\+\+|--n|--c|--h|--b|--u)\s*$/, '');
 
-            // Add the new status indicator
             if (statusSymbol) {
                 updatedLine = updatedLine.trimEnd() + ' ' + statusSymbol;
             }
 
-            // Update the line in the array
             lines[comment.lineNumber] = updatedLine;
 
-            // Write the updated content back to the file
             const newContent = lines.join('\n');
             await vscode.workspace.fs.writeFile(comment.uri, new TextEncoder().encode(newContent));
 
-            // Refresh the view
             this.refresh();
 
             vscode.window.showInformationMessage(`Updated SU comment status to ${newStatus}`);
@@ -230,6 +229,7 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
     }
 }
 
+// |su:40) Tree item class - how each comment appears in sidebar
 class SuCommentItem extends vscode.TreeItem {
     constructor(
         public readonly label: string,
@@ -238,21 +238,15 @@ class SuCommentItem extends vscode.TreeItem {
     ) {
         super(label, collapsibleState);
 
-        // Set tooltip with file path and line number
         this.tooltip = `${this.comment.uri.fsPath}:${this.comment.lineNumber + 1}\nStatus: ${this.comment.status}`;
-
-        // Set description to show status
         this.description = `[${this.comment.status}] Line ${this.comment.lineNumber + 1} • ${path.basename(this.comment.uri.fsPath)} ${this.comment.statusSymbol}`;
 
-        // Set icon based on status with different colors
         this.setIconByStatus();
-
-        // Set context value for different actions based on status
         this.contextValue = `suComment`;
     }
 
+    // |su:41) Icon assignment based on status - uses VS Code theme icons
     private setIconByStatus(): void {
-        // Different icons based on status
         switch(this.comment.status) {
             case 'clear':
                 this.iconPath = new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'));

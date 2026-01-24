@@ -1,33 +1,31 @@
 import * as vscode from 'vscode';
 import { SuCommentsProvider } from './SuCommentsProvider';
 
-
-// |su:1 Entry point for the extension
+// |su:1) VS Code calls this when extension activates (entry point)
 export function activate(context: vscode.ExtensionContext) {
     console.log('SU Comments extension is now active!');
 
+    // |su:2) Create data provider and tree view for sidebar panel
     const provider = new SuCommentsProvider();
     const treeView = vscode.window.createTreeView('suComments.explorer', {
         treeDataProvider: provider,
         showCollapseAll: true
     });
 
-    // Register the refresh command
+    // |su:3) Register commands - these map to package.json "commands" section
     const refreshCommand = vscode.commands.registerCommand('suComments.refresh', () => {
         provider.refresh();
     });
 
-    // Register the collapse all command
     const collapseAllCommand = vscode.commands.registerCommand('suComments.collapseAll', () => {
         provider.collapseAll();
     });
 
-    // Register the expand all command
     const expandAllCommand = vscode.commands.registerCommand('suComments.expandAll', () => {
         provider.expandAll();
     });
 
-    // Register the navigation command
+    // |su:4) Navigation - opens file and highlights the comment line
     const navigateCommand = vscode.commands.registerCommand('suComments.navigateTo', (element) => {
         if (element && element.uri) {
             vscode.workspace.openTextDocument(element.uri).then(doc => {
@@ -45,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Register status change commands
+    // |su:5) Context menu commands - change status markers in source files
     const setStatusClearCommand = vscode.commands.registerCommand('suComments.setStatusClear', (element) => {
         if (element && element.comment && element.comment.uri) {
             provider.updateCommentStatus(element.comment, 'clear', '++');
@@ -82,6 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    // |su:6) Register all disposables - VS Code cleans these up on deactivate
     context.subscriptions.push(
         treeView,
         refreshCommand,
@@ -96,7 +95,6 @@ export function activate(context: vscode.ExtensionContext) {
         setStatusUntouchedCommand
     );
 
-    // Refresh initially
     provider.refresh();
 }
 

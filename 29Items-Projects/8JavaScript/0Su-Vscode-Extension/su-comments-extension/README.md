@@ -42,3 +42,38 @@ The extension looks for comments in the format:
 - `suComments.collapseAll` - Collapse all comment groups
 - `suComments.expandAll` - Expand all comment groups
 - `suComments.navigateTo` - Navigate to a specific comment location
+
+## Key Code Files
+
+| File | Description |
+|------|-------------|
+| `src/SuCommentsProvider.ts` | Core logic: file scanning, regex parsing, tree data provider, status detection |
+| `src/extension.ts` | Entry point: registers commands, creates tree view, handles navigation |
+| `package.json` | Extension manifest: commands, views, menus, activation events |
+
+## Build Instructions
+
+### Prerequisites
+- Node.js (v16+)
+- npm
+
+### One-time global installs
+```bash
+npm install -g typescript
+npm install -g @vscode/vsce
+```
+
+### Build steps
+```bash
+npm install         # install dependencies
+npm run compile     # compile TypeScript → out/
+vsce package        # create .vsix file
+```
+
+### Install extension
+- In VS Code: Extensions → `...` menu → "Install from VSIX..."
+- Or: `code --install-extension su-comments-0.0.1.vsix`
+
+### Development
+- Run `npm run watch` for auto-compilation during development
+- Press `F5` in VS Code to launch Extension Development Host

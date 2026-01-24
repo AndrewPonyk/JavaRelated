@@ -4,7 +4,7 @@
   "description": "View and navigate SU comments in your codebase",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.108.1"
+    "vscode": "^1.104.0"
   },
   "categories": [
     "Other"
@@ -130,7 +130,7 @@
   },
   "devDependencies": {
     "@types/node": "16.x",
-    "@types/vscode": "^1.108.1",
+    "@types/vscode": "^1.104.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",

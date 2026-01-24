@@ -26,27 +26,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
 const SuCommentsProvider_1 = require("./SuCommentsProvider");
-// |su:1 Entry point for the extension
+// |su:1) VS Code calls this when extension activates (entry point)
 function activate(context) {
     console.log('SU Comments extension is now active!');
+    // |su:2) Create data provider and tree view for sidebar panel
     const provider = new SuCommentsProvider_1.SuCommentsProvider();
     const treeView = vscode.window.createTreeView('suComments.explorer', {
         treeDataProvider: provider,
         showCollapseAll: true
     });
-    // Register the refresh command
+    // |su:3) Register commands - these map to package.json "commands" section
     const refreshCommand = vscode.commands.registerCommand('suComments.refresh', () => {
         provider.refresh();
     });
-    // Register the collapse all command
     const collapseAllCommand = vscode.commands.registerCommand('suComments.collapseAll', () => {
         provider.collapseAll();
     });
-    // Register the expand all command
     const expandAllCommand = vscode.commands.registerCommand('suComments.expandAll', () => {
         provider.expandAll();
     });
-    // Register the navigation command
+    // |su:4) Navigation - opens file and highlights the comment line
     const navigateCommand = vscode.commands.registerCommand('suComments.navigateTo', (element) => {
         if (element && element.uri) {
             vscode.workspace.openTextDocument(element.uri).then(doc => {
@@ -58,7 +57,7 @@ function activate(context) {
             });
         }
     });
-    // Register status change commands
+    // |su:5) Context menu commands - change status markers in source files
     const setStatusClearCommand = vscode.commands.registerCommand('suComments.setStatusClear', (element) => {
         if (element && element.comment && element.comment.uri) {
             provider.updateCommentStatus(element.comment, 'clear', '++');
@@ -89,8 +88,8 @@ function activate(context) {
             provider.updateCommentStatus(element.comment, 'untouched', '--u');
         }
     });
+    // |su:6) Register all disposables - VS Code cleans these up on deactivate
     context.subscriptions.push(treeView, refreshCommand, collapseAllCommand, expandAllCommand, navigateCommand, setStatusClearCommand, setStatusNotClearCommand, setStatusComplexCommand, setStatusHackCommand, setStatusBadCodeCommand, setStatusUntouchedCommand);
-    // Refresh initially
     provider.refresh();
 }
 exports.activate = activate;
