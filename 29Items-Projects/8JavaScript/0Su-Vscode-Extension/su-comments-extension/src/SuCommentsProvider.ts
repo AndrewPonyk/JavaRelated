@@ -193,6 +193,41 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
         const ext = path.extname(filePath).toLowerCase();
         return textExtensions.includes(ext);
     }
+
+    async updateCommentStatus(comment: SuComment, newStatus: string, statusSymbol: string): Promise<void> {
+        try {
+            // Read the file
+            const fileContent = await vscode.workspace.fs.readFile(comment.uri);
+            const textContent = new TextDecoder().decode(fileContent);
+            const lines = textContent.split('\n');
+
+            // Get the target line
+            let targetLine = lines[comment.lineNumber];
+
+            // Remove any existing status indicators from the line
+            let updatedLine = targetLine.replace(/\s*(\+\+|--n|--c|--h|--b|--u)\s*$/, '');
+
+            // Add the new status indicator
+            if (statusSymbol) {
+                updatedLine = updatedLine.trimEnd() + ' ' + statusSymbol;
+            }
+
+            // Update the line in the array
+            lines[comment.lineNumber] = updatedLine;
+
+            // Write the updated content back to the file
+            const newContent = lines.join('\n');
+            await vscode.workspace.fs.writeFile(comment.uri, new TextEncoder().encode(newContent));
+
+            // Refresh the view
+            this.refresh();
+
+            vscode.window.showInformationMessage(`Updated SU comment status to ${newStatus}`);
+        } catch (error) {
+            console.error('Error updating comment status:', error);
+            vscode.window.showErrorMessage(`Failed to update comment status: ${error}`);
+        }
+    }
 }
 
 class SuCommentItem extends vscode.TreeItem {
@@ -202,20 +237,20 @@ class SuCommentItem extends vscode.TreeItem {
         public readonly comment: SuComment
     ) {
         super(label, collapsibleState);
-        
+
         // Set tooltip with file path and line number
         this.tooltip = `${this.comment.uri.fsPath}:${this.comment.lineNumber + 1}\nStatus: ${this.comment.status}`;
-        
+
         // Set description to show status
         this.description = `[${this.comment.status}] Line ${this.comment.lineNumber + 1} • ${path.basename(this.comment.uri.fsPath)} ${this.comment.statusSymbol}`;
-        
+
         // Set icon based on status with different colors
         this.setIconByStatus();
-        
+
         // Set context value for different actions based on status
-        this.contextValue = `suComment_${this.comment.status}`;
+        this.contextValue = `suComment`;
     }
-    
+
     private setIconByStatus(): void {
         // Different icons based on status
         switch(this.comment.status) {

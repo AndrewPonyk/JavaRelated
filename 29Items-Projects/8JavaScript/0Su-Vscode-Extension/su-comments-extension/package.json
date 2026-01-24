@@ -38,6 +38,36 @@
         "command": "suComments.expandAll",
         "title": "Expand All",
         "icon": "$(chevron-down)"
+      },
+      {
+        "command": "suComments.setStatusClear",
+        "title": "Set as Clear",
+        "icon": "$(pass)"
+      },
+      {
+        "command": "suComments.setStatusNotClear",
+        "title": "Set as Not Clear",
+        "icon": "$(question)"
+      },
+      {
+        "command": "suComments.setStatusComplex",
+        "title": "Set as Complex",
+        "icon": "$(warning)"
+      },
+      {
+        "command": "suComments.setStatusHack",
+        "title": "Set as Hack",
+        "icon": "$(zap)"
+      },
+      {
+        "command": "suComments.setStatusBadCode",
+        "title": "Set as Bad Code",
+        "icon": "$(stop)"
+      },
+      {
+        "command": "suComments.setStatusUntouched",
+        "title": "Set as Untouched",
+        "icon": "$(circle-outline)"
       }
     ],
     "menus": {
@@ -56,6 +86,38 @@
           "command": "suComments.expandAll",
           "when": "view == suComments.explorer",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "suComments.setStatusClear",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
+        },
+        {
+          "command": "suComments.setStatusNotClear",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
+        },
+        {
+          "command": "suComments.setStatusComplex",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
+        },
+        {
+          "command": "suComments.setStatusHack",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
+        },
+        {
+          "command": "suComments.setStatusBadCode",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
+        },
+        {
+          "command": "suComments.setStatusUntouched",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "1_modification"
         }
       ]
     }

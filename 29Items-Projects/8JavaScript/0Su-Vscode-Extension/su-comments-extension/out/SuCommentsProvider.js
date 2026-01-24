@@ -181,6 +181,34 @@ class SuCommentsProvider {
         const ext = path.extname(filePath).toLowerCase();
         return textExtensions.includes(ext);
     }
+    async updateCommentStatus(comment, newStatus, statusSymbol) {
+        try {
+            // Read the file
+            const fileContent = await vscode.workspace.fs.readFile(comment.uri);
+            const textContent = new TextDecoder().decode(fileContent);
+            const lines = textContent.split('\n');
+            // Get the target line
+            let targetLine = lines[comment.lineNumber];
+            // Remove any existing status indicators from the line
+            let updatedLine = targetLine.replace(/\s*(\+\+|--n|--c|--h|--b|--u)\s*$/, '');
+            // Add the new status indicator
+            if (statusSymbol) {
+                updatedLine = updatedLine.trimEnd() + ' ' + statusSymbol;
+            }
+            // Update the line in the array
+            lines[comment.lineNumber] = updatedLine;
+            // Write the updated content back to the file
+            const newContent = lines.join('\n');
+            await vscode.workspace.fs.writeFile(comment.uri, new TextEncoder().encode(newContent));
+            // Refresh the view
+            this.refresh();
+            vscode.window.showInformationMessage(`Updated SU comment status to ${newStatus}`);
+        }
+        catch (error) {
+            console.error('Error updating comment status:', error);
+            vscode.window.showErrorMessage(`Failed to update comment status: ${error}`);
+        }
+    }
 }
 exports.SuCommentsProvider = SuCommentsProvider;
 class SuCommentItem extends vscode.TreeItem {
@@ -196,7 +224,7 @@ class SuCommentItem extends vscode.TreeItem {
         // Set icon based on status with different colors
         this.setIconByStatus();
         // Set context value for different actions based on status
-        this.contextValue = `suComment_${this.comment.status}`;
+        this.contextValue = `suComment`;
     }
     setIconByStatus() {
         // Different icons based on status

@@ -58,7 +58,38 @@ function activate(context) {
             });
         }
     });
-    context.subscriptions.push(treeView, refreshCommand, collapseAllCommand, expandAllCommand, navigateCommand);
+    // Register status change commands
+    const setStatusClearCommand = vscode.commands.registerCommand('suComments.setStatusClear', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'clear', '++');
+        }
+    });
+    const setStatusNotClearCommand = vscode.commands.registerCommand('suComments.setStatusNotClear', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'not-clear', '--n');
+        }
+    });
+    const setStatusComplexCommand = vscode.commands.registerCommand('suComments.setStatusComplex', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'complex', '--c');
+        }
+    });
+    const setStatusHackCommand = vscode.commands.registerCommand('suComments.setStatusHack', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'hack', '--h');
+        }
+    });
+    const setStatusBadCodeCommand = vscode.commands.registerCommand('suComments.setStatusBadCode', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'bad-code', '--b');
+        }
+    });
+    const setStatusUntouchedCommand = vscode.commands.registerCommand('suComments.setStatusUntouched', (element) => {
+        if (element && element.comment && element.comment.uri) {
+            provider.updateCommentStatus(element.comment, 'untouched', '--u');
+        }
+    });
+    context.subscriptions.push(treeView, refreshCommand, collapseAllCommand, expandAllCommand, navigateCommand, setStatusClearCommand, setStatusNotClearCommand, setStatusComplexCommand, setStatusHackCommand, setStatusBadCodeCommand, setStatusUntouchedCommand);
     // Refresh initially
     provider.refresh();
 }
