@@ -1,9 +1,7 @@
 You just created the project structure, documentation, and stubs.
-
 Now analyze EVERYTHING you created and implement the COMPLETE working application.
 
 ## Task
-
 1. **Read your own documentation:**
     - `/docs/PROJECT-PLAN.md` - your implementation roadmap
     - `/docs/ARCHITECTURE.md` - your architecture decisions
@@ -98,6 +96,5 @@ Before finishing, verify:
 - [ ] No placeholder/stub code remains
 
 ## Start Implementation
-
 Analyze your Phase 1 output and implement everything.
 Begin with the most critical components from your own plan.
