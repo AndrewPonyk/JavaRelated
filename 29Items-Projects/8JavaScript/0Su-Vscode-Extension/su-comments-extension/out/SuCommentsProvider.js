@@ -216,7 +216,7 @@ class SuCommentItem extends vscode.TreeItem {
         this.collapsibleState = collapsibleState;
         this.comment = comment;
         this.tooltip = `${this.comment.uri.fsPath}:${this.comment.lineNumber + 1}\nStatus: ${this.comment.status}`;
-        this.description = `[${this.comment.status}] Line ${this.comment.lineNumber + 1} • ${path.basename(this.comment.uri.fsPath)} ${this.comment.statusSymbol}`;
+        this.description = `${path.basename(this.comment.uri.fsPath)} [L${this.comment.lineNumber + 1}]`;
         this.setIconByStatus();
         this.contextValue = `suComment`;
     }
