@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Cache for robots.txt rules with automatic fetching and expiration.
  */
-public class RobotsTxtCache {
+public class RobotsTxtCache { // |su:131 Caches robots.txt per domain - avoids re-fetching on every URL check
 
     private static final Logger logger = LoggerFactory.getLogger(RobotsTxtCache.class);
 
-    private final ConcurrentHashMap<String, CacheEntry> cache;
+    private final ConcurrentHashMap<String, CacheEntry> cache; // |su:132 domain → parsed rules, with TTL expiration
     private final RobotsTxtParser parser;
     private final CrawlerConfig config;
 
@@ -101,7 +101,7 @@ public class RobotsTxtCache {
      * @param domain Domain name
      * @return Parsed RobotsTxt (empty rules if not found)
      */
-    private RobotsTxtParser.RobotsTxt fetchRobotsTxt(String domain) {
+    private RobotsTxtParser.RobotsTxt fetchRobotsTxt(String domain) { // |su:133 Fetch robots.txt - try HTTPS first, fallback to HTTP
         String robotsUrl = "https://" + domain + "/robots.txt";
 
         try {

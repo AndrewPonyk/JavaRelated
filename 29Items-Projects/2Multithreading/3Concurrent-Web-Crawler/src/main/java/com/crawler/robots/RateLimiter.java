@@ -17,11 +17,11 @@ import java.util.concurrent.locks.ReentrantLock;
  *   <li>Dynamic delay adjustment based on robots.txt</li>
  * </ul>
  */
-public class RateLimiter {
+public class RateLimiter { // |su:59 Per-domain rate limiter - prevents hammering any single server
 
     private static final Logger logger = LoggerFactory.getLogger(RateLimiter.class);
 
-    private final ConcurrentHashMap<String, DomainLimiter> limiters;
+    private final ConcurrentHashMap<String, DomainLimiter> limiters; // |su:60 One limiter per domain
     private final long defaultDelayMs;
 
     public RateLimiter(long defaultDelayMs) {
@@ -105,17 +105,17 @@ public class RateLimiter {
     /**
      * Per-domain rate limiter implementation.
      */
-    private static class DomainLimiter {
-        private final ReentrantLock lock = new ReentrantLock(true); // Fair lock
-        private volatile long delayMs;
+    private static class DomainLimiter { // |su:61 Inner class: handles rate limiting for single domain
+        private final ReentrantLock lock = new ReentrantLock(true); // |su:62 Fair lock: FIFO ordering, no starvation
+        private volatile long delayMs; // |su:63 volatile: visibility across threads without locking
         private volatile long lastRequestTime = 0;
 
         DomainLimiter(long delayMs) {
             this.delayMs = delayMs;
         }
 
-        void acquire() throws InterruptedException {
-            lock.lock();
+        void acquire() throws InterruptedException { // |su:64 Block until enough time has passed since last request
+            lock.lock(); // |su:65 lock() blocks until acquired - ensures serialized access
             try {
                 long now = System.currentTimeMillis();
                 long timeSinceLastRequest = now - lastRequestTime;
@@ -123,12 +123,12 @@ public class RateLimiter {
 
                 if (waitTime > 0) {
                     logger.trace("Rate limiting: waiting {}ms", waitTime);
-                    TimeUnit.MILLISECONDS.sleep(waitTime);
+                    TimeUnit.MILLISECONDS.sleep(waitTime); // |su:66 Sleep to enforce delay between requests
                 }
 
                 lastRequestTime = System.currentTimeMillis();
             } finally {
-                lock.unlock();
+                lock.unlock(); // |su:67 ALWAYS unlock in finally - prevents deadlock on exception
             }
         }
 

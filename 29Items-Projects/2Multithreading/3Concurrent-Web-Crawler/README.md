@@ -138,6 +138,42 @@ concurrent-web-crawler/
 - [Architecture](docs/ARCHITECTURE.md) - System design and diagrams
 - [Tech Notes](docs/TECH-NOTES.md) - Technical guidance and pitfalls
 
+## Learning the Codebase
+
+The code contains **140 educational comments** marked with `|su:n` tags (where n=1-140) to guide you through the codebase in logical learning order. Search for `|su:` to find them.
+
+### Learning Sequence
+
+| Range | File | Topic |
+|-------|------|-------|
+| 1-6 | `CrawlerApplication.java` | Entry point, CLI parsing, bootstrap |
+| 7-11 | `CrawlerConfig.java` | Configuration settings and defaults |
+| 12-43 | `CrawlerEngine.java` | **Core orchestrator** - ThreadPool, Semaphore, Phaser, crawl loop |
+| 44-47 | `UrlFrontier.java` | Thread-safe URL queue, deduplication with ConcurrentHashMap |
+| 48-54 | `PageFetcher.java` | HTTP fetching, retry with exponential backoff |
+| 55-58 | `RobotsTxtParser.java` | robots.txt rule parsing and evaluation |
+| 59-67 | `RateLimiter.java` | Per-domain throttling with ReentrantLock |
+| 68-76 | `TfIdfCalculator.java` | TF-IDF term weighting, cosine similarity |
+| 77-82 | `RelevanceScorer.java` | Multi-signal ML relevance model |
+| 83-91 | `DatabaseManager.java` | SQLite connection, WAL mode, transactions |
+| 92-98 | `CrawlMetrics.java` | Thread-safe metrics with AtomicLong |
+| 99-103 | `HealthServer.java` | REST API endpoints |
+| 104-107 | `UrlNormalizer.java` | URL canonicalization for deduplication |
+| 108-112 | `TextPreprocessor.java` | ML text preprocessing, stemming, stop words |
+| 113-118 | `ContentProcessor.java` | HTML text extraction, SHA-256 hashing |
+| 119-126 | `ContentIndexer.java` | ML pipeline coordination |
+| 127-130 | `LinkExtractor.java` | Link discovery from HTML |
+| 131-133 | `RobotsTxtCache.java` | robots.txt caching with TTL |
+| 134-137 | `CrawlTask.java` | Work unit (Runnable) for thread pool |
+| 138-140 | `ConfigLoader.java` | Config loading hierarchy |
+
+### Key Concepts Covered
+
+- **Concurrency**: `ExecutorService`, `Semaphore`, `Phaser`, `ReentrantLock`, `ConcurrentHashMap`, `AtomicLong`
+- **ML/NLP**: TF-IDF, stemming, stop words, cosine similarity, relevance scoring
+- **Database**: SQLite WAL mode, transactions, ACID properties
+- **Web Crawling**: HTTP fetching, retry logic, robots.txt compliance, rate limiting
+
 ## Development
 
 ### Running Tests

@@ -4,16 +4,16 @@ package com.crawler.config;
  * Configuration POJO holding all crawler settings.
  * Values can be loaded from properties files, environment variables, or CLI args.
  */
-public class CrawlerConfig {
+public class CrawlerConfig { // |su:7 Configuration POJO - all crawler settings with sensible defaults
 
-    // Thread pool settings
+    // |su:8 Thread pool: threadCount workers execute crawl tasks concurrently
     private int threadCount = 10;
-    private int maxConnections = 20;
+    private int maxConnections = 20; // |su:9 Semaphore permits - limits simultaneous HTTP connections
 
-    // Crawl behavior
-    private int maxPages = 10000;
-    private int maxDepth = 10;
-    private long defaultDelayMs = 1000;
+    // |su:10 Crawl limits - prevent infinite crawling
+    private int maxPages = 10000; // Stop after N pages
+    private int maxDepth = 10; // How far from seed URL to follow links
+    private long defaultDelayMs = 1000; // |su:11 Politeness delay - wait between requests to same domain
     private int requestTimeoutMs = 30000;
     private int maxBodySizeBytes = 10 * 1024 * 1024; // 10MB
 

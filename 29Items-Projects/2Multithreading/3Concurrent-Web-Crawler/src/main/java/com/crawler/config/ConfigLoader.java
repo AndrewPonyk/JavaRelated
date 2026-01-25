@@ -15,11 +15,11 @@ import java.util.Properties;
  * 3. External config file (if specified)
  * 4. Environment variables (highest priority)
  */
-public class ConfigLoader {
+public class ConfigLoader { // |su:138 Loads config from multiple sources with priority ordering
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigLoader.class);
 
-    private static final String DEFAULT_CONFIG_FILE = "application.properties";
+    private static final String DEFAULT_CONFIG_FILE = "application.properties"; // |su:139 Default config in src/main/resources
 
     /**
      * Load configuration with default settings.
@@ -114,7 +114,7 @@ public class ConfigLoader {
         }
     }
 
-    private static void applyEnvironmentVariables(CrawlerConfig config) {
+    private static void applyEnvironmentVariables(CrawlerConfig config) { // |su:140 Env vars override file config (12-factor app pattern)
         String threads = System.getenv("CRAWLER_THREADS");
         if (threads != null) {
             config.setThreadCount(Integer.parseInt(threads));

@@ -16,15 +16,15 @@ import java.util.*;
  *   <li>Link popularity (incoming links)</li>
  * </ul>
  */
-public class RelevanceScorer {
+public class RelevanceScorer { // |su:77 Multi-signal relevance model - combines 4 features into single score
 
     private static final Logger logger = LoggerFactory.getLogger(RelevanceScorer.class);
 
-    // Feature weights for the scoring model
-    private static final double WEIGHT_TFIDF = 0.4;
-    private static final double WEIGHT_TITLE = 0.25;
-    private static final double WEIGHT_LENGTH = 0.15;
-    private static final double WEIGHT_LINKS = 0.2;
+    // |su:78 Feature weights - tune these to prioritize different signals
+    private static final double WEIGHT_TFIDF = 0.4; // 40% - keyword match via TF-IDF
+    private static final double WEIGHT_TITLE = 0.25; // 25% - title quality/keyword presence
+    private static final double WEIGHT_LENGTH = 0.15; // 15% - content depth
+    private static final double WEIGHT_LINKS = 0.2; // 20% - link popularity (PageRank-lite)
 
     // Reference to TF-IDF calculator
     private final TfIdfCalculator tfidfCalculator;
@@ -72,12 +72,13 @@ public class RelevanceScorer {
      * @param terms      List of terms from content
      * @return Relevance score between 0.0 and 1.0
      */
-    public double score(String documentId, String title, String content, List<String> terms) {
+    public double score(String documentId, String title, String content, List<String> terms) { // |su:79 Main scoring: weighted sum of features
         double tfidfScore = calculateTfIdfScore(documentId, terms);
         double titleScore = calculateTitleScore(title);
         double lengthScore = calculateLengthScore(content);
         double linkScore = calculateLinkScore(documentId);
 
+        // |su:80 Linear combination: totalScore = w1*f1 + w2*f2 + w3*f3 + w4*f4
         double totalScore = (WEIGHT_TFIDF * tfidfScore) +
                            (WEIGHT_TITLE * titleScore) +
                            (WEIGHT_LENGTH * lengthScore) +
@@ -189,13 +190,13 @@ public class RelevanceScorer {
     /**
      * Calculate link popularity score.
      */
-    private double calculateLinkScore(String url) {
+    private double calculateLinkScore(String url) { // |su:81 Link popularity - pages linked by others are more important
         Integer linkCount = incomingLinks.get(url);
         if (linkCount == null || linkCount == 0) {
             return 0.0;
         }
 
-        // Logarithmic scaling for link counts
+        // |su:82 Logarithmic scaling: diminishing returns - 10→100 links adds less than 1→10
         // 1 link = 0.3, 10 links = 0.6, 100 links = 0.9
         return Math.min(1.0, Math.log10(linkCount + 1) / 3);
     }

@@ -21,7 +21,7 @@ import java.util.List;
  *   <li>Handles malformed URLs gracefully</li>
  * </ul>
  */
-public class LinkExtractor {
+public class LinkExtractor { // |su:127 Discovers new URLs from HTML - extracts <a href="..."> links
 
     private static final Logger logger = LoggerFactory.getLogger(LinkExtractor.class);
 
@@ -32,19 +32,19 @@ public class LinkExtractor {
      * @param baseUrl  The URL of the document (for resolving relative links)
      * @return List of extracted absolute URLs
      */
-    public List<String> extract(Document document, String baseUrl) {
+    public List<String> extract(Document document, String baseUrl) { // |su:128 Extract all valid links from HTML page
         List<String> links = new ArrayList<>();
 
         if (document == null) {
             return links;
         }
 
-        // Select all anchor tags with href attribute
+        // |su:129 CSS selector: a[href] = all anchor tags with href attribute
         Elements anchors = document.select("a[href]");
 
         for (Element anchor : anchors) {
             try {
-                // Get absolute URL (Jsoup handles relative URL resolution)
+                // |su:130 absUrl() converts relative URLs: "/page" → "https://example.com/page"
                 String href = anchor.absUrl("href");
 
                 if (href.isEmpty()) {

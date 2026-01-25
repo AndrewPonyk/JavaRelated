@@ -30,11 +30,11 @@ import java.util.concurrent.Executors;
  *   <li>GET /search?q=query - Search indexed content</li>
  * </ul>
  */
-public class HealthServer {
+public class HealthServer { // |su:99 HTTP API: health checks, status, metrics, search endpoints
 
     private static final Logger logger = LoggerFactory.getLogger(HealthServer.class);
 
-    private final HttpServer server;
+    private final HttpServer server; // |su:100 JDK built-in HTTP server - no external dependencies
     private final CrawlerEngine engine;
     private final int port;
 
@@ -43,13 +43,13 @@ public class HealthServer {
         this.port = port;
         this.server = HttpServer.create(new InetSocketAddress(port), 0);
 
-        // Register endpoints
-        server.createContext("/health", new HealthHandler());
-        server.createContext("/status", new StatusHandler());
-        server.createContext("/metrics", new MetricsHandler());
-        server.createContext("/search", new SearchHandler());
+        // |su:101 REST endpoints - each path maps to a handler class
+        server.createContext("/health", new HealthHandler()); // Simple health check
+        server.createContext("/status", new StatusHandler()); // Detailed crawler status
+        server.createContext("/metrics", new MetricsHandler()); // Raw JSON metrics
+        server.createContext("/search", new SearchHandler()); // |su:102 Search: GET /search?q=java&limit=10
 
-        // Use a thread pool for handling requests
+        // |su:103 Thread pool for HTTP requests - handles 4 concurrent API calls
         server.setExecutor(Executors.newFixedThreadPool(4));
     }
 

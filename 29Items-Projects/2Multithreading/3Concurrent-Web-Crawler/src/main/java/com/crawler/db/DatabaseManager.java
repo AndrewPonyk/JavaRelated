@@ -17,12 +17,12 @@ import java.sql.*;
  *   <li>Graceful shutdown</li>
  * </ul>
  */
-public class DatabaseManager {
+public class DatabaseManager { // |su:83 SQLite persistence - manages connection, schema, transactions
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 
     private final String databasePath;
-    private Connection connection;
+    private Connection connection; // |su:84 Single connection - SQLite handles concurrency via WAL mode
 
     public DatabaseManager(String databasePath) {
         this.databasePath = databasePath;
@@ -43,10 +43,10 @@ public class DatabaseManager {
         String jdbcUrl = "jdbc:sqlite:" + databasePath;
         connection = DriverManager.getConnection(jdbcUrl);
 
-        // Enable WAL mode for better concurrency
+        // |su:85 WAL mode: Write-Ahead Logging - allows concurrent reads while writing
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("PRAGMA journal_mode=WAL");
-            stmt.execute("PRAGMA synchronous=NORMAL");
+            stmt.execute("PRAGMA journal_mode=WAL"); // |su:86 WAL: readers don't block writers
+            stmt.execute("PRAGMA synchronous=NORMAL"); // |su:87 NORMAL: balance between safety & speed
             stmt.execute("PRAGMA foreign_keys=ON");
         }
 
@@ -145,14 +145,14 @@ public class DatabaseManager {
      *
      * @param action The action to execute within the transaction
      */
-    public void executeInTransaction(TransactionAction action) throws SQLException {
+    public void executeInTransaction(TransactionAction action) throws SQLException { // |su:88 Transaction wrapper with auto-rollback on error
         boolean autoCommit = connection.getAutoCommit();
         try {
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(false); // |su:89 Disable autocommit = start transaction
             action.execute(connection);
-            connection.commit();
+            connection.commit(); // |su:90 Commit: make all changes permanent
         } catch (SQLException e) {
-            connection.rollback();
+            connection.rollback(); // |su:91 Rollback: undo all changes on error (ACID)
             throw e;
         } finally {
             connection.setAutoCommit(autoCommit);

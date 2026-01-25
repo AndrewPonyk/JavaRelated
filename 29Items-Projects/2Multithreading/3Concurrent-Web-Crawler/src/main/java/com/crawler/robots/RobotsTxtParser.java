@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  *   <li>Wildcard patterns (* and $)</li>
  * </ul>
  */
-public class RobotsTxtParser {
+public class RobotsTxtParser { // |su:55 Parses robots.txt - website crawling rules (Allow/Disallow paths)
 
     private static final Logger logger = LoggerFactory.getLogger(RobotsTxtParser.class);
 
@@ -192,13 +192,13 @@ public class RobotsTxtParser {
          * @param path URL path to check
          * @return true if allowed, false if disallowed
          */
-        public boolean isAllowed(String path) {
+        public boolean isAllowed(String path) { // |su:56 Check if path is allowed - longest matching rule wins
             Rule matchedRule = null;
             int longestMatch = -1;
 
             for (Rule rule : rules) {
                 if (rule.pattern().matcher(path).find()) {
-                    // Longer path patterns take precedence
+                    // |su:57 Longest match precedence: /images/cats more specific than /images
                     if (rule.path().length() > longestMatch) {
                         longestMatch = rule.path().length();
                         matchedRule = rule;
@@ -206,7 +206,7 @@ public class RobotsTxtParser {
                 }
             }
 
-            // If no rule matched, default to allow
+            // |su:58 No rule matched = allowed (permissive default)
             if (matchedRule == null) {
                 return true;
             }

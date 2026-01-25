@@ -19,12 +19,12 @@ import java.util.concurrent.atomic.AtomicLong;
  *   <li>URL normalization before storage</li>
  * </ul>
  */
-public class UrlFrontier {
+public class UrlFrontier { // |su:44 Thread-safe URL queue - the "to-do list" of URLs to crawl
 
     private static final Logger logger = LoggerFactory.getLogger(UrlFrontier.class);
 
-    private final BlockingQueue<CrawlUrl> queue;
-    private final ConcurrentHashMap<String, Boolean> seen;
+    private final BlockingQueue<CrawlUrl> queue; // |su:45 LinkedBlockingQueue: thread-safe, bounded capacity
+    private final ConcurrentHashMap<String, Boolean> seen; // |su:46 ConcurrentHashMap: O(1) thread-safe deduplication
     private final int maxSize;
     private final AtomicLong totalAdded = new AtomicLong(0);
     private final AtomicLong duplicatesSkipped = new AtomicLong(0);
@@ -59,10 +59,10 @@ public class UrlFrontier {
             return false;
         }
 
-        // Atomic check-and-add for deduplication
+        // |su:47 putIfAbsent: atomic check-and-set, returns null if key was absent (thread-safe dedup)
         if (seen.putIfAbsent(normalizedUrl, Boolean.TRUE) != null) {
             duplicatesSkipped.incrementAndGet();
-            return false;
+            return false; // Already seen - skip
         }
 
         // Try to add to queue

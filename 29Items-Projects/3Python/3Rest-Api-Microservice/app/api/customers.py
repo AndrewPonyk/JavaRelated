@@ -126,7 +126,7 @@ def create_customer():
     if errors:
         raise ValidationError('Invalid customer data', details=errors)
 
-    # |su:45) SERVICE CALL - Delegate business logic to service layer
+    # |su:45) SERVICE CALL - Delegate business logic to service layer ++  
     customer = customer_service.create(data)
     return jsonify({'data': customer_schema.dump(customer)}), 201  # 201 = Created
 

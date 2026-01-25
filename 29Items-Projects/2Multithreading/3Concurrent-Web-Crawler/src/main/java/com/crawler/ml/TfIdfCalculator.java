@@ -17,14 +17,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li>TF-IDF(t,d) = TF(t,d) * IDF(t)</li>
  * </ul>
  */
-public class TfIdfCalculator {
+public class TfIdfCalculator { // |su:68 TF-IDF: Term Frequency × Inverse Document Frequency scoring
 
     private static final Logger logger = LoggerFactory.getLogger(TfIdfCalculator.class);
 
-    // Document frequency: term -> number of documents containing term
+    // |su:69 Document frequency: how many docs contain each term (for IDF calculation)
     private final ConcurrentHashMap<String, AtomicInteger> documentFrequency;
 
-    // Total number of documents
+    // |su:70 Total docs in corpus - used to calculate IDF = log(N / df)
     private final AtomicInteger documentCount;
 
     // Cache of computed TF vectors per document
@@ -96,7 +96,7 @@ public class TfIdfCalculator {
      * @param term The term to calculate IDF for
      * @return IDF score
      */
-    public double calculateIdf(String term) {
+    public double calculateIdf(String term) { // |su:71 IDF: rare terms get higher scores (more discriminative)
         int totalDocs = documentCount.get();
         if (totalDocs == 0) {
             return 0.0;
@@ -107,7 +107,7 @@ public class TfIdfCalculator {
             return 0.0;
         }
 
-        // IDF = log(N / df(t))
+        // |su:72 IDF formula: log(N/df) - term in 1 doc: high IDF, term in all docs: low IDF
         return Math.log((double) totalDocs / docFreq.get());
     }
 
@@ -174,7 +174,7 @@ public class TfIdfCalculator {
      * @param docId2 Second document ID
      * @return Cosine similarity score (0 to 1)
      */
-    public double cosineSimilarity(String docId1, String docId2) {
+    public double cosineSimilarity(String docId1, String docId2) { // |su:73 Cosine similarity: how similar are two documents?
         Map<String, Double> vec1 = getTfIdfVector(docId1);
         Map<String, Double> vec2 = getTfIdfVector(docId2);
 
@@ -182,7 +182,7 @@ public class TfIdfCalculator {
             return 0.0;
         }
 
-        // Calculate dot product
+        // |su:74 Dot product: sum of (term1 * term2) for matching terms
         double dotProduct = 0.0;
         for (Map.Entry<String, Double> entry : vec1.entrySet()) {
             Double val2 = vec2.get(entry.getKey());
@@ -191,7 +191,7 @@ public class TfIdfCalculator {
             }
         }
 
-        // Calculate magnitudes
+        // |su:75 Magnitude: sqrt(sum of squares) - normalizes for document length
         double mag1 = Math.sqrt(vec1.values().stream().mapToDouble(v -> v * v).sum());
         double mag2 = Math.sqrt(vec2.values().stream().mapToDouble(v -> v * v).sum());
 
@@ -199,7 +199,7 @@ public class TfIdfCalculator {
             return 0.0;
         }
 
-        return dotProduct / (mag1 * mag2);
+        return dotProduct / (mag1 * mag2); // |su:76 Result: 0=no similarity, 1=identical
     }
 
     /**

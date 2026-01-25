@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
  * Represents a single crawl task for processing one URL.
  * Executed by the thread pool managed by CrawlerEngine.
  */
-public class CrawlTask implements Runnable {
+public class CrawlTask implements Runnable { // |su:134 Work unit: represents one URL to crawl, submitted to thread pool
 
     private static final Logger logger = LoggerFactory.getLogger(CrawlTask.class);
 
     private final String url;
-    private final int depth;
+    private final int depth; // |su:135 Depth: how many links from seed URL (seed=0, links on seed=1, etc.)
     private final CrawlerEngine engine;
 
     /**
@@ -29,12 +29,12 @@ public class CrawlTask implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run() { // |su:136 Runnable.run(): called by thread pool worker - this is where work happens
         Thread.currentThread().setName("crawler-" + Thread.currentThread().getId());
         logger.debug("Processing URL at depth {}: {}", depth, url);
 
         try {
-            engine.processUrl(url, depth);
+            engine.processUrl(url, depth); // |su:137 Delegates to engine which handles robots, fetch, parse, index
         } catch (Exception e) {
             logger.error("Unexpected error in crawl task for URL: {}", url, e);
         }

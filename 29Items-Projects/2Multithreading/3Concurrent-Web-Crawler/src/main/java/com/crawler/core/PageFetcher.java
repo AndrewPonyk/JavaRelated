@@ -23,12 +23,12 @@ import java.nio.charset.StandardCharsets;
  *   <li>Retry support with exponential backoff</li>
  * </ul>
  */
-public class PageFetcher {
+public class PageFetcher { // |su:48 HTTP client - fetches pages with Jsoup, handles retries
 
     private static final Logger logger = LoggerFactory.getLogger(PageFetcher.class);
 
     private final CrawlerConfig config;
-    private final int maxRetries;
+    private final int maxRetries; // |su:49 Retry count for transient failures (timeouts, 5xx errors)
 
     public PageFetcher(CrawlerConfig config) {
         this.config = config;
@@ -42,21 +42,22 @@ public class PageFetcher {
      * @return FetchResult containing the document and metadata
      * @throws IOException if the fetch fails after all retries
      */
-    public FetchResult fetch(String url) throws IOException {
+    public FetchResult fetch(String url) throws IOException { // |su:50 Main fetch method with retry loop
         IOException lastException = null;
 
         for (int attempt = 0; attempt < maxRetries; attempt++) {
             try {
                 return doFetch(url, attempt);
-            } catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException e) { // |su:51 Timeout = retryable (network issue)
                 lastException = e;
                 logger.warn("Timeout fetching URL (attempt {}): {}", attempt + 1, url);
                 sleepBeforeRetry(attempt);
             } catch (org.jsoup.HttpStatusException e) {
-                // Don't retry client errors (4xx)
+                // |su:52 4xx = client error (bad URL) - don't retry, it won't succeed
                 if (e.getStatusCode() >= 400 && e.getStatusCode() < 500) {
                     return new FetchResult(null, e.getStatusCode(), 0, false);
                 }
+                // |su:53 5xx = server error - retryable (server might recover)
                 lastException = e;
                 logger.warn("HTTP error {} fetching URL (attempt {}): {}",
                         e.getStatusCode(), attempt + 1, url);
@@ -104,8 +105,8 @@ public class PageFetcher {
         return new FetchResult(document, statusCode, contentLength, true);
     }
 
-    private void sleepBeforeRetry(int attempt) {
-        long delay = config.getRetryBaseDelayMs() * (long) Math.pow(2, attempt);
+    private void sleepBeforeRetry(int attempt) { // |su:54 Exponential backoff: 1s, 2s, 4s delays
+        long delay = config.getRetryBaseDelayMs() * (long) Math.pow(2, attempt); // 2^attempt
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {

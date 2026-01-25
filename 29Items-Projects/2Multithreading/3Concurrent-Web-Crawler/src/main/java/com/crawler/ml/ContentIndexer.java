@@ -19,14 +19,14 @@ import java.util.Map;
  *   <li>Index persistence to database</li>
  * </ul>
  */
-public class ContentIndexer {
+public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess → TF-IDF → score → persist
 
     private static final Logger logger = LoggerFactory.getLogger(ContentIndexer.class);
 
-    private final TextPreprocessor preprocessor;
-    private final TfIdfCalculator tfidfCalculator;
-    private final RelevanceScorer relevanceScorer;
-    private final IndexRepository indexRepository;
+    private final TextPreprocessor preprocessor; // |su:120 Step 1: clean text, tokenize, stem
+    private final TfIdfCalculator tfidfCalculator; // |su:121 Step 2: calculate term importance
+    private final RelevanceScorer relevanceScorer; // |su:122 Step 3: compute overall relevance
+    private final IndexRepository indexRepository; // |su:123 Step 4: persist to database
 
     public ContentIndexer(DatabaseManager dbManager) {
         this.preprocessor = new TextPreprocessor();
@@ -96,8 +96,8 @@ public class ContentIndexer {
      * @param limit Maximum number of results
      * @return List of matching document URLs with scores
      */
-    public List<SearchResult> search(String query, int limit) {
-        // Preprocess and tokenize the query
+    public List<SearchResult> search(String query, int limit) { // |su:124 Search: query → preprocess → find matching docs → rank by TF-IDF
+        // |su:125 Apply same preprocessing to query as we did to documents
         String preprocessedQuery = preprocessor.preprocess(query);
         List<String> queryTerms = preprocessor.tokenize(preprocessedQuery);
 
@@ -108,10 +108,7 @@ public class ContentIndexer {
 
         logger.debug("Searching for query '{}' with {} terms", query, queryTerms.size());
 
-        // Search using IndexRepository which:
-        // 1. Finds documents containing query terms
-        // 2. Scores by summed TF-IDF values
-        // 3. Returns results ranked by score
+        // |su:126 DB search: find docs with query terms, sum TF-IDF scores, return top results
         return indexRepository.search(queryTerms, limit);
     }
 

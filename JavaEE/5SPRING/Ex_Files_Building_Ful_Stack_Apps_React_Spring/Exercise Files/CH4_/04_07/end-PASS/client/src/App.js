@@ -1,8 +1,8 @@
 import React from 'react';
-import Contacts from './components/Contacts';
+import Contacts from './components/Contacts'; // |su:23 Imports container component that manages contacts state and data fetching
 import './App.css';
 
-function App() {
+function App() { // |su:24 Functional component - root of React component tree, renders navigation and child components
   return (
     <div className="container-fluid">
       <nav>

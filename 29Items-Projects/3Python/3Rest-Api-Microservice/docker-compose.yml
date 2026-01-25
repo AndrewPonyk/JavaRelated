@@ -2,7 +2,7 @@
 version: '3.8'
 
 services:
-  # |su:71) API SERVICE - Flask app container, depends on db being healthy first
+  #  |su:71) API SERVICE - Flask app container, depends on db being healthy first
   api:
     build:
       context: .
@@ -37,7 +37,7 @@ services:
       MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     ports:
       - "3306:3306"
-    # |su:73) VOLUMES - Persist data outside container. Named volume mysql_data survives restarts
+    # |su:73) VOLUMES - Persist data outside container. Named volume mysql_data survives restarts --c
     volumes:
       - mysql_data:/var/lib/mysql
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
