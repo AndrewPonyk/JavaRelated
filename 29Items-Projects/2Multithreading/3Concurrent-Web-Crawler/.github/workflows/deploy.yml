@@ -1,0 +1,81 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway Staging
+        id: deploy
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --environment staging
+          echo "url=$(railway status --json | jq -r '.url')" >> $GITHUB_OUTPUT
+
+      - name: Health Check
+        run: |
+          sleep 30
+          curl --fail --retry 5 --retry-delay 10 ${{ steps.deploy.outputs.url }}/health || exit 1
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'production'
+    needs: [deploy-staging]
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway Production
+        id: deploy
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --environment production
+
+      - name: Health Check
+        run: |
+          sleep 30
+          curl --fail --retry 5 --retry-delay 10 ${{ steps.deploy.outputs.url }}/health || exit 1
+
+      - name: Notify on Success
+        if: success()
+        run: echo "Successfully deployed to production!"
+
+      - name: Notify on Failure
+        if: failure()
+        run: echo "Production deployment failed!"

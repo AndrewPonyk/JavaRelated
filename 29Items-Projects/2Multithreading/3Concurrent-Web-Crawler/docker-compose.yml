@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Production-like container
+  crawler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: concurrent-crawler
+    volumes:
+      - crawler-data:/app/data
+      - crawler-logs:/app/logs
+    environment:
+      - CRAWLER_THREADS=10
+      - CRAWLER_MAX_CONNECTIONS=20
+      - CRAWLER_MAX_PAGES=1000
+      - DB_PATH=/app/data/crawler.db
+      - LOG_LEVEL=INFO
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Development container with hot-reload
+  crawler-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: crawler-dev
+    volumes:
+      - .:/app
+      - maven-repo:/root/.m2
+      - dev-data:/app/data
+    environment:
+      - CRAWLER_THREADS=5
+      - CRAWLER_MAX_PAGES=100
+      - DB_PATH=/app/data/crawler-dev.db
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Debug port
+    stdin_open: true
+    tty: true
+
+volumes:
+  crawler-data:
+    driver: local
+  crawler-logs:
+    driver: local
+  maven-repo:
+    driver: local
+  dev-data:
+    driver: local

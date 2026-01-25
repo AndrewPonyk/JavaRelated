@@ -1,0 +1,44 @@
+# Development Dockerfile with hot-reload support
+
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+# Install development tools
+RUN apt-get update && apt-get install -y \
+    vim \
+    curl \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 developer
+
+# Create directories
+RUN mkdir -p /app/data /app/logs && \
+    chown -R developer:developer /app
+
+# Switch to non-root user
+USER developer
+
+# Copy POM for dependency resolution
+COPY --chown=developer:developer pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy source (will be overridden by volume mount in dev)
+COPY --chown=developer:developer src ./src
+
+# Default environment
+ENV MAVEN_OPTS="-Xmx1g"
+ENV LOG_LEVEL="DEBUG"
+ENV DB_PATH="/app/data/crawler-dev.db"
+
+# Expose debug port
+EXPOSE 5005
+
+# Development entry point with debug enabled
+ENTRYPOINT ["mvn", "exec:java", "-Dexec.mainClass=com.crawler.CrawlerApplication", \
+    "-Dexec.args=", \
+    "-Dagentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
