@@ -74,7 +74,7 @@ public class UrlFrontier { // |su:44 Thread-safe URL queue - the "to-do list" of
         } else {
             // Queue is full, remove from seen set
             seen.remove(normalizedUrl);
-            logger.warn("Frontier queue full, URL not added: {}", normalizedUrl);
+            logger.debug("Frontier full (size={}), skipped: {}", maxSize, normalizedUrl);
             return false;
         }
     }

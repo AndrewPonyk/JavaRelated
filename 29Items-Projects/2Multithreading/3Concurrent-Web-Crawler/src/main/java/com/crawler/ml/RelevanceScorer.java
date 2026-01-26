@@ -84,10 +84,28 @@ public class RelevanceScorer { // |su:77 Multi-signal relevance model - combines
                            (WEIGHT_LENGTH * lengthScore) +
                            (WEIGHT_LINKS * linkScore);
 
-        logger.trace("Scored {}: tfidf={:.3f}, title={:.3f}, length={:.3f}, links={:.3f}, total={:.3f}",
-                documentId, tfidfScore, titleScore, lengthScore, linkScore, totalScore);
+        double finalScore = Math.min(1.0, Math.max(0.0, totalScore));
 
-        return Math.min(1.0, Math.max(0.0, totalScore));
+        // Log score breakdown for debugging
+        int contentSize = content != null ? content.length() : 0;
+        String sizeStr = contentSize > 1000 ? (contentSize / 1000) + "KB" : contentSize + "B";
+        logger.info("SCORE {} [tfidf:{} title:{} len:{} links:{}] size={} | {}",
+                String.format("%.2f", finalScore),
+                String.format("%.2f", tfidfScore),
+                String.format("%.2f", titleScore),
+                String.format("%.2f", lengthScore),
+                String.format("%.2f", linkScore),
+                sizeStr,
+                truncateUrl(documentId));
+
+        return finalScore;
+    }
+
+    private String truncateUrl(String url) {
+        if (url == null) return "";
+        // Remove protocol and show last 60 chars
+        String clean = url.replaceFirst("https?://", "");
+        return clean.length() > 60 ? "..." + clean.substring(clean.length() - 57) : clean;
     }
 
     /**

@@ -75,7 +75,7 @@ public class PageFetcher { // |su:48 HTTP client - fetches pages with Jsoup, han
     }
 
     private FetchResult doFetch(String url, int attempt) throws IOException {
-        logger.debug("Fetching URL (attempt {}): {}", attempt + 1, url);
+        logger.trace("Fetching URL (attempt {}): {}", attempt + 1, url);
 
         Connection connection = Jsoup.connect(url)
                 .userAgent(config.getUserAgent())
@@ -100,7 +100,7 @@ public class PageFetcher { // |su:48 HTTP client - fetches pages with Jsoup, han
 
         int statusCode = response.statusCode();
 
-        logger.debug("Fetched URL: {} (status={}, size={})", url, statusCode, contentLength);
+        logger.trace("Fetched URL: {} (status={}, size={})", url, statusCode, contentLength);
 
         return new FetchResult(document, statusCode, contentLength, true);
     }

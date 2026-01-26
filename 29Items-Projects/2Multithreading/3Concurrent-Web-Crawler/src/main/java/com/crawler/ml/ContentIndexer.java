@@ -2,6 +2,7 @@ package com.crawler.ml;
 
 import com.crawler.db.DatabaseManager;
 import com.crawler.db.IndexRepository;
+import com.crawler.db.PageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,12 +12,10 @@ import java.util.Map;
 /**
  * Indexes crawled content for search and relevance scoring.
  *
- * <p>Coordinates:
+ * <p>Uses two-pass approach:
  * <ul>
- *   <li>Text preprocessing</li>
- *   <li>TF-IDF calculation</li>
- *   <li>Relevance scoring</li>
- *   <li>Index persistence to database</li>
+ *   <li>Pass 1 (during crawl): Store terms without scoring</li>
+ *   <li>Pass 2 (after crawl): Recalculate all scores with full corpus</li>
  * </ul>
  */
 public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess → TF-IDF → score → persist
@@ -27,8 +26,10 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
     private final TfIdfCalculator tfidfCalculator; // |su:121 Step 2: calculate term importance
     private final RelevanceScorer relevanceScorer; // |su:122 Step 3: compute overall relevance
     private final IndexRepository indexRepository; // |su:123 Step 4: persist to database
+    private final DatabaseManager dbManager;
 
     public ContentIndexer(DatabaseManager dbManager) {
+        this.dbManager = dbManager;
         this.preprocessor = new TextPreprocessor();
         this.tfidfCalculator = new TfIdfCalculator();
         this.relevanceScorer = new RelevanceScorer(tfidfCalculator);
@@ -36,12 +37,12 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
     }
 
     /**
-     * Index a document.
+     * Index a document (Pass 1 - no scoring, just store terms).
      *
      * @param url              Document URL (unique identifier)
      * @param title            Page title
      * @param preprocessedText Already preprocessed text content
-     * @return Relevance score for the document
+     * @return 0.0 (scoring happens in pass 2)
      */
     public double index(String url, String title, String preprocessedText) {
         try {
@@ -53,26 +54,102 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
                 return 0.0;
             }
 
-            // Add document to TF-IDF calculator
+            // Add document to TF-IDF calculator (builds corpus)
             tfidfCalculator.addDocument(url, terms);
 
-            // Calculate relevance score
-            double relevanceScore = relevanceScorer.score(url, title, preprocessedText, terms);
-
-            // Get TF-IDF vector for storage
+            // Get TF-IDF vector for storage (score=0 for now, will recalculate later)
             Map<String, Double> tfidfVector = tfidfCalculator.getTfIdfVector(url);
 
-            // Persist to database
-            indexRepository.saveIndex(url, tfidfVector, relevanceScore);
+            // Persist terms to database with score=0 (pass 1)
+            indexRepository.saveIndex(url, tfidfVector, 0.0);
 
-            logger.debug("Indexed URL: {} with {} terms, score={:.3f}",
-                    url, terms.size(), relevanceScore);
+            logger.trace("Indexed URL: {} with {} terms (score pending)", url, terms.size());
 
-            return relevanceScore;
+            return 0.0; // Actual scoring in pass 2
 
         } catch (Exception e) {
             logger.error("Error indexing URL: {}", url, e);
             return 0.0;
+        }
+    }
+
+    /**
+     * Recalculate all scores after crawl completes (Pass 2).
+     * Uses full corpus for accurate TF-IDF scoring.
+     */
+    public void recalculateAllScores() {
+        logger.info("=== PASS 2: Recalculating scores with full corpus ({} docs) ===",
+                tfidfCalculator.getDocumentCount());
+
+        PageRepository pageRepo = new PageRepository(dbManager);
+        List<PageRepository.PageData> allPages = pageRepo.findTopByRelevance(Integer.MAX_VALUE);
+
+        int processed = 0;
+        int skipped = 0;
+
+        // Collect all updates first
+        Map<String, Double> scoreUpdates = new java.util.LinkedHashMap<>();
+
+        for (PageRepository.PageData page : allPages) {
+            try {
+                // Get terms for this page from TF-IDF cache
+                Map<String, Double> tfidfVector = tfidfCalculator.getTfIdfVector(page.url());
+
+                // Create content string with actual length for length scoring
+                int contentLen = page.contentLength();
+                String contentProxy = contentLen > 0 ? "x".repeat(contentLen) : "";
+
+                // Calculate score - even if no TF-IDF terms, we still score title/length
+                List<String> terms = tfidfVector.isEmpty()
+                        ? List.of()
+                        : tfidfVector.keySet().stream().toList();
+
+                double score = relevanceScorer.score(
+                        page.url(),
+                        page.title(),
+                        contentProxy,
+                        terms
+                );
+
+                scoreUpdates.put(page.url(), score);
+                processed++;
+
+                if (tfidfVector.isEmpty()) {
+                    skipped++;
+                }
+
+            } catch (Exception e) {
+                logger.error("Error recalculating score for: {}", page.url(), e);
+            }
+        }
+
+        // Batch update all scores in a single transaction
+        try {
+            dbManager.executeInTransaction(conn -> {
+                String sql = "UPDATE pages SET relevance_score = ? WHERE url = ?";
+                try (var ps = conn.prepareStatement(sql)) {
+                    for (var entry : scoreUpdates.entrySet()) {
+                        ps.setDouble(1, entry.getValue());
+                        ps.setString(2, entry.getKey());
+                        ps.addBatch();
+                    }
+                    int[] results = ps.executeBatch();
+                    logger.info("=== Batch updated {} rows ===", results.length);
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Failed to batch update scores", e);
+        }
+
+        logger.info("=== Recalculated scores for {} pages ({} without TF-IDF terms) ===",
+                processed, skipped);
+
+        // Verify scores were persisted
+        List<PageRepository.PageData> topPages = pageRepo.findTopByRelevance(5);
+        if (!topPages.isEmpty()) {
+            double topScore = topPages.get(0).relevanceScore();
+            logger.info("=== Verification: Top page score in DB = {} (URL: {}) ===",
+                    topScore, topPages.get(0).url());
         }
     }
 

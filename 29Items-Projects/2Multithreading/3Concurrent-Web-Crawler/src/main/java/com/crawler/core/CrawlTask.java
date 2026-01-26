@@ -31,7 +31,7 @@ public class CrawlTask implements Runnable { // |su:134 Work unit: represents on
     @Override
     public void run() { // |su:136 Runnable.run(): called by thread pool worker - this is where work happens
         Thread.currentThread().setName("crawler-" + Thread.currentThread().getId());
-        logger.debug("Processing URL at depth {}: {}", depth, url);
+        logger.trace("Processing URL at depth {}: {}", depth, url);
 
         try {
             engine.processUrl(url, depth); // |su:137 Delegates to engine which handles robots, fetch, parse, index

@@ -66,7 +66,7 @@ public class LinkExtractor { // |su:127 Discovers new URLs from HTML - extracts 
             }
         }
 
-        logger.debug("Extracted {} links from {}", links.size(), baseUrl);
+        logger.trace("Extracted {} raw links from {}", links.size(), baseUrl);
         return links;
     }
 

@@ -33,11 +33,12 @@ public class PageRepository {
      */
     public long save(String url, Document document, int statusCode) {
         String sql = """
-            INSERT INTO pages (url, domain, title, content_hash, status_code, crawled_at)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            INSERT INTO pages (url, domain, title, content_hash, content_length, status_code, crawled_at)
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(url) DO UPDATE SET
                 title = excluded.title,
                 content_hash = excluded.content_hash,
+                content_length = excluded.content_length,
                 status_code = excluded.status_code,
                 crawled_at = CURRENT_TIMESTAMP
             """;
@@ -47,20 +48,23 @@ public class PageRepository {
 
             String domain = extractDomain(url);
             String title = document != null ? document.title() : null;
-            String contentHash = document != null ? calculateHash(document.text()) : null;
+            String text = document != null ? document.text() : "";
+            String contentHash = document != null ? calculateHash(text) : null;
+            int contentLength = text.length();
 
             ps.setString(1, url);
             ps.setString(2, domain);
             ps.setString(3, title);
             ps.setString(4, contentHash);
-            ps.setInt(5, statusCode);
+            ps.setInt(5, contentLength);
+            ps.setInt(6, statusCode);
 
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     long id = rs.getLong(1);
-                    logger.debug("Saved page: id={}, url={}", id, url);
+                    logger.trace("Saved page: id={}, url={}", id, url);
                     return id;
                 }
             }
@@ -85,7 +89,12 @@ public class PageRepository {
         try (PreparedStatement ps = dbManager.getConnection().prepareStatement(sql)) {
             ps.setDouble(1, score);
             ps.setString(2, url);
-            ps.executeUpdate();
+            int updated = ps.executeUpdate();
+            if (updated == 0) {
+                logger.warn("No rows updated for URL (not found?): {}", url);
+            } else {
+                logger.trace("Updated relevance_score={} for: {}", score, url);
+            }
         } catch (SQLException e) {
             logger.error("Error updating relevance score for: {}", url, e);
         }
@@ -229,6 +238,7 @@ public class PageRepository {
                 rs.getString("domain"),
                 rs.getString("title"),
                 rs.getString("content_hash"),
+                rs.getInt("content_length"),
                 rs.getInt("status_code"),
                 rs.getDouble("relevance_score"),
                 rs.getTimestamp("crawled_at"),
@@ -263,6 +273,7 @@ public class PageRepository {
             String domain,
             String title,
             String contentHash,
+            int contentLength,
             int statusCode,
             double relevanceScore,
             Timestamp crawledAt,

@@ -64,8 +64,8 @@ public class ContentProcessor { // |su:113 Processes HTML: extracts text, hashes
                     url, title, textContent, contentHash, relevanceScore
             );
 
-            logger.debug("Processed content: url={}, title={}, hash={}, score={}",
-                    url, title, contentHash.substring(0, 8), relevanceScore);
+            logger.trace("Processed content: url={}, title={}, hash={}",
+                    url, title, contentHash.substring(0, 8));
 
             return result;
 

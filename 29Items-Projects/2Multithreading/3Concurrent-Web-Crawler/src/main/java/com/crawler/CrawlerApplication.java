@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Main entry point for the Concurrent Web Crawler application.
@@ -75,7 +76,13 @@ public class CrawlerApplication { // |su:1 START HERE - Main entry point. Run: j
 
             // |su:6 Shutdown hook - ensures clean termination on Ctrl+C, saves state, closes DB
             final HealthServer serverRef = healthServer;
+            final AtomicBoolean cleanedUp = new AtomicBoolean(false);
+
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (cleanedUp.get()) {
+                    logger.debug("Already cleaned up, skipping shutdown hook");
+                    return;
+                }
                 logger.info("Shutdown signal received, stopping crawler...");
                 engine.stop();
                 if (serverRef != null) {
@@ -124,6 +131,13 @@ public class CrawlerApplication { // |su:1 START HERE - Main entry point. Run: j
                 if (cliArgs.startServer) {
                     logger.info("Crawl finished. Server still running. Use Ctrl+C to stop.");
                     Thread.currentThread().join();
+                } else {
+                    // Clean shutdown - stop engine and close DB
+                    cleanedUp.set(true);
+                    saveState(dbManager, engine);
+                    engine.stop();
+                    dbManager.close();
+                    logger.info("Clean shutdown completed");
                 }
             }
 

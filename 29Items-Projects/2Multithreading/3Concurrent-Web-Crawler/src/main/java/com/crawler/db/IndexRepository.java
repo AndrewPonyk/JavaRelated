@@ -60,7 +60,7 @@ public class IndexRepository {
                 }
             });
 
-            logger.debug("Saved index for URL: {} with {} terms", url, tfidfVector.size());
+            logger.trace("Saved index for URL: {} with {} terms", url, tfidfVector.size());
 
         } catch (SQLException e) {
             logger.error("Error saving index for URL: {}", url, e);
@@ -176,9 +176,8 @@ public class IndexRepository {
             }
         }
 
-        // Page doesn't exist - this shouldn't happen normally as pages are
-        // saved before indexing, but handle it gracefully
-        logger.warn("Page not found for indexing: {}", url);
+        // Page doesn't exist - shouldn't happen as pages are saved before indexing
+        logger.error("BUG: Page not found for indexing (save page first): {}", url);
         return -1;
     }
 

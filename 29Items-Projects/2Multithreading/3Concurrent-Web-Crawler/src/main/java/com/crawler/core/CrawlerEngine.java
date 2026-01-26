@@ -113,10 +113,14 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
     private void crawlLoop() { // |su:28 Main loop: runs in separate thread, processes URLs in phases
         try {
             int phase = 0;
-            while (!stopped.get() && metrics.getPagesProcessed() < config.getMaxPages()) {
-                logger.info("Starting phase {}", phase);
+            int batchSize = 100; // Submit tasks in smaller batches for better control
 
-                // |su:29 Inner loop: drain frontier, submit tasks to thread pool
+            while (!stopped.get() && metrics.getPagesProcessed() < config.getMaxPages()) {
+                logger.info("Starting phase {} (processed: {}/{})",
+                        phase, metrics.getPagesProcessed(), config.getMaxPages());
+
+                // |su:29 Inner loop: drain frontier, submit tasks in batches
+                int submittedInPhase = 0;
                 while (!stopped.get() && !frontier.isEmpty() &&
                         metrics.getPagesProcessed() < config.getMaxPages()) {
 
@@ -137,10 +141,37 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                             crawlUrl.depth(),
                             this
                     ));
+                    submittedInPhase++;
+
+                    // Process in batches - wait for batch to complete, then check stop condition
+                    if (submittedInPhase >= batchSize) {
+                        break;
+                    }
                 }
 
-                // |su:33 arriveAndAwaitAdvance(): block until ALL registered parties arrive (phase barrier)
-                phaser.arriveAndAwaitAdvance();
+                if (submittedInPhase == 0) {
+                    logger.info("No tasks submitted, frontier may be empty");
+                    break;
+                }
+
+                // |su:33 Wait with timeout so we can check stop condition periodically
+                try {
+                    int currentPhase = phaser.getPhase();
+                    while (!phaser.isTerminated()) {
+                        // Wait max 5 seconds, then check stop condition
+                        phaser.awaitAdvanceInterruptibly(currentPhase, 5, TimeUnit.SECONDS);
+                        break; // Phase completed
+                    }
+                } catch (TimeoutException e) {
+                    // Check if we should stop (max pages reached)
+                    if (metrics.getPagesProcessed() >= config.getMaxPages()) {
+                        logger.info("Max pages reached during phase wait, stopping...");
+                        break;
+                    }
+                    // Otherwise continue waiting
+                    phaser.arriveAndAwaitAdvance();
+                }
+
                 phase++;
 
                 // Check if more URLs were discovered
@@ -152,6 +183,24 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
         } catch (Exception e) {
             logger.error("Error in crawl loop", e);
         } finally {
+            // Wait for all worker threads to complete before scoring
+            logger.info("Waiting for worker threads to complete...");
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    logger.warn("Some workers didn't complete in time");
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+            logger.info("All workers completed. Pages in DB: {}", metrics.getPagesProcessed());
+
+            // Pass 2: Recalculate all scores with full corpus (all pages now saved)
+            if (!stopped.get() && metrics.getPagesProcessed() > 0) {
+                contentIndexer.recalculateAllScores();
+            }
             running.set(false);
             completionLatch.countDown();
             logger.info("Crawl finished. {}", metrics);
@@ -185,15 +234,21 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                 if (result.isSuccess()) {
                     // |su:39 STEP 5: Extract links from HTML, add to frontier for future crawling
                     List<String> links = linkExtractor.extract(result.document(), url);
+                    int newLinks = 0;
                     for (String link : links) {
-                        frontier.add(link, depth + 1); // depth+1 tracks distance from seed
+                        if (frontier.add(link, depth + 1)) { // depth+1 tracks distance from seed
+                            newLinks++;
+                        }
+                    }
+                    if (newLinks > 0) {
+                        logger.debug("Added {} new links (of {} found) from {}", newLinks, links.size(), url);
                     }
 
-                    // |su:40 STEP 6: ML processing - text extraction, TF-IDF, relevance scoring
-                    contentProcessor.process(result.document(), url);
-
-                    // |su:41 STEP 7: Persist to SQLite database
+                    // |su:40 STEP 6: Persist to SQLite database FIRST (so indexer can update score)
                     pageRepository.save(url, result.document(), result.statusCode());
+
+                    // |su:41 STEP 7: ML processing - text extraction, TF-IDF, relevance scoring
+                    contentProcessor.process(result.document(), url);
                 }
             } finally {
                 connectionSemaphore.release(); // |su:42 ALWAYS release permit in finally block
@@ -215,15 +270,18 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
     public void stop() {
         logger.info("Stopping crawler...");
         stopped.set(true);
-        executorService.shutdown();
 
-        try {
-            if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+        // Executor may already be shut down from crawlLoop finally block
+        if (!executorService.isShutdown()) {
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
                 executorService.shutdownNow();
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 

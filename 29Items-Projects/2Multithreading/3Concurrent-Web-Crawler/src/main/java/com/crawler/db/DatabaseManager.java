@@ -68,6 +68,7 @@ public class DatabaseManager { // |su:83 SQLite persistence - manages connection
                 domain TEXT NOT NULL,
                 title TEXT,
                 content_hash TEXT,
+                content_length INTEGER DEFAULT 0,
                 status_code INTEGER,
                 relevance_score REAL DEFAULT 0.0,
                 crawled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -165,6 +166,14 @@ public class DatabaseManager { // |su:83 SQLite persistence - manages connection
     public void close() {
         if (connection != null) {
             try {
+                // Checkpoint WAL - use PASSIVE to avoid blocking if other operations hold locks
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.setQueryTimeout(2);
+                    stmt.execute("PRAGMA wal_checkpoint(PASSIVE)");
+                    logger.debug("WAL checkpoint completed");
+                } catch (SQLException e) {
+                    logger.warn("WAL checkpoint skipped (database busy) - will recover on next open");
+                }
                 connection.close();
                 logger.info("Database connection closed");
             } catch (SQLException e) {
