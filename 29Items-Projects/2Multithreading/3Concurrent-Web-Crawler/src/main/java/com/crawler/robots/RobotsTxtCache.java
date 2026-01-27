@@ -16,7 +16,7 @@ public class RobotsTxtCache { // |su:131 Caches robots.txt per domain - avoids r
 
     private static final Logger logger = LoggerFactory.getLogger(RobotsTxtCache.class);
 
-    private final ConcurrentHashMap<String, CacheEntry> cache; // |su:132 domain → parsed rules, with TTL expiration
+    private final ConcurrentHashMap<String, CacheEntry> cache;
     private final RobotsTxtParser parser;
     private final CrawlerConfig config;
 
@@ -101,7 +101,7 @@ public class RobotsTxtCache { // |su:131 Caches robots.txt per domain - avoids r
      * @param domain Domain name
      * @return Parsed RobotsTxt (empty rules if not found)
      */
-    private RobotsTxtParser.RobotsTxt fetchRobotsTxt(String domain) { // |su:133 Fetch robots.txt - try HTTPS first, fallback to HTTP
+    private RobotsTxtParser.RobotsTxt fetchRobotsTxt(String domain) {
         String robotsUrl = "https://" + domain + "/robots.txt";
 
         try {

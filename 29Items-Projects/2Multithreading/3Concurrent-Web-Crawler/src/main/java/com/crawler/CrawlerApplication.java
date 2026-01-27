@@ -35,7 +35,7 @@ public class CrawlerApplication { // |su:1 START HERE - Main entry point. Run: j
 
     private static final int DEFAULT_PORT = 8080;
 
-    public static void main(String[] args) { // |su:2 Application bootstrap - parses CLI args, loads config, starts crawl
+    public static void main(String[] args) {
         logger.info("Starting Concurrent Web Crawler v1.0.0");
 
         try {
@@ -47,17 +47,14 @@ public class CrawlerApplication { // |su:1 START HERE - Main entry point. Run: j
                 return;
             }
 
-            // |su:3 Config loading - priority: defaults → application.properties → external file → env vars
             CrawlerConfig config = ConfigLoader.load(cliArgs.configPath);
 
             // Apply CLI overrides
             applyCliOverrides(config, cliArgs);
 
-            // |su:4 Database init - SQLite with WAL mode for concurrent read/write access
             DatabaseManager dbManager = new DatabaseManager(config.getDatabasePath());
             dbManager.initialize();
 
-            // |su:5 CrawlerEngine is the orchestrator - manages threads, semaphores, phasers, all components
             CrawlerEngine engine = new CrawlerEngine(config, dbManager);
 
             // Set target keywords if provided
@@ -74,7 +71,7 @@ public class CrawlerApplication { // |su:1 START HERE - Main entry point. Run: j
                 healthServer.start();
             }
 
-            // |su:6 Shutdown hook - ensures clean termination on Ctrl+C, saves state, closes DB
+            // Shutdown hook - ensures clean termination on Ctrl+C
             final HealthServer serverRef = healthServer;
             final AtomicBoolean cleanedUp = new AtomicBoolean(false);
 

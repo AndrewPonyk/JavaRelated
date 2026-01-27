@@ -22,10 +22,10 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
 
     private static final Logger logger = LoggerFactory.getLogger(ContentIndexer.class);
 
-    private final TextPreprocessor preprocessor; // |su:120 Step 1: clean text, tokenize, stem
-    private final TfIdfCalculator tfidfCalculator; // |su:121 Step 2: calculate term importance
-    private final RelevanceScorer relevanceScorer; // |su:122 Step 3: compute overall relevance
-    private final IndexRepository indexRepository; // |su:123 Step 4: persist to database
+    private final TextPreprocessor preprocessor;
+    private final TfIdfCalculator tfidfCalculator;
+    private final RelevanceScorer relevanceScorer;
+    private final IndexRepository indexRepository;
     private final DatabaseManager dbManager;
 
     public ContentIndexer(DatabaseManager dbManager) {
@@ -173,8 +173,7 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
      * @param limit Maximum number of results
      * @return List of matching document URLs with scores
      */
-    public List<SearchResult> search(String query, int limit) { // |su:124 Search: query → preprocess → find matching docs → rank by TF-IDF
-        // |su:125 Apply same preprocessing to query as we did to documents
+    public List<SearchResult> search(String query, int limit) {
         String preprocessedQuery = preprocessor.preprocess(query);
         List<String> queryTerms = preprocessor.tokenize(preprocessedQuery);
 
@@ -185,7 +184,6 @@ public class ContentIndexer { // |su:119 ML pipeline coordinator: preprocess →
 
         logger.debug("Searching for query '{}' with {} terms", query, queryTerms.size());
 
-        // |su:126 DB search: find docs with query terms, sum TF-IDF scores, return top results
         return indexRepository.search(queryTerms, limit);
     }
 

@@ -29,7 +29,6 @@ public class UrlNormalizer { // |su:104 URL canonicalization - ensures consisten
 
     private static final Logger logger = LoggerFactory.getLogger(UrlNormalizer.class);
 
-    // |su:105 Tracking params removed for dedup - utm_*, fbclid, gclid are ads/analytics
     private static final Set<String> TRACKING_PARAMS = Set.of(
             "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
             "fbclid", "gclid", "ref", "source", "mc_cid", "mc_eid",
@@ -45,7 +44,7 @@ public class UrlNormalizer { // |su:104 URL canonicalization - ensures consisten
      * @param urlString URL to normalize
      * @return Normalized URL string, or null if invalid
      */
-    public static String normalize(String urlString) { // |su:106 Main normalization: lowercase, remove ports, sort params, strip fragments
+    public static String normalize(String urlString) {
         if (urlString == null || urlString.isBlank()) {
             return null;
         }
@@ -60,7 +59,6 @@ public class UrlNormalizer { // |su:104 URL canonicalization - ensures consisten
             // Build normalized URL
             StringBuilder normalized = new StringBuilder();
 
-            // |su:107 Lowercase scheme: HTTP → http (URLs are case-insensitive for scheme/host)
             String scheme = url.getProtocol().toLowerCase();
             if (!scheme.equals("http") && !scheme.equals("https")) {
                 return null; // Only support HTTP/HTTPS

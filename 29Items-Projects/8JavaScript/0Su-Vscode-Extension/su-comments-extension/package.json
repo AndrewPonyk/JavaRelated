@@ -68,6 +68,11 @@
         "command": "suComments.setStatusUntouched",
         "title": "Set as Untouched",
         "icon": "$(circle-outline)"
+      },
+      {
+        "command": "suComments.copyAllAsMarkdown",
+        "title": "Copy All as Markdown",
+        "icon": "$(copy)"
       }
     ],
     "menus": {
@@ -118,6 +123,11 @@
           "command": "suComments.setStatusUntouched",
           "when": "view == suComments.explorer && viewItem == suComment",
           "group": "1_modification"
+        },
+        {
+          "command": "suComments.copyAllAsMarkdown",
+          "when": "view == suComments.explorer && viewItem == suComment",
+          "group": "2_copy"
         }
       ]
     }

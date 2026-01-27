@@ -24,7 +24,7 @@ public class ContentProcessor { // |su:113 Processes HTML: extracts text, hashes
 
     private static final Logger logger = LoggerFactory.getLogger(ContentProcessor.class);
 
-    private final ContentIndexer indexer; // |su:114 Handles TF-IDF calculation and relevance scoring
+    private final ContentIndexer indexer;
     private final TextPreprocessor preprocessor;
 
     public ContentProcessor(ContentIndexer indexer) {
@@ -78,8 +78,7 @@ public class ContentProcessor { // |su:113 Processes HTML: extracts text, hashes
     /**
      * Extract readable text content from HTML document.
      */
-    private String extractText(Document document) { // |su:115 Extract readable content only - remove boilerplate
-        // |su:116 Remove non-content elements: scripts, styles, navigation, footers
+    private String extractText(Document document) {
         document.select("script, style, nav, footer, header, aside").remove();
 
         // Get text from body, or whole document if no body
@@ -92,11 +91,11 @@ public class ContentProcessor { // |su:113 Processes HTML: extracts text, hashes
     /**
      * Calculate SHA-256 hash of content for deduplication.
      */
-    private String calculateHash(String content) { // |su:117 SHA-256 hash: detect duplicate content even at different URLs
+    private String calculateHash(String content) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(content.getBytes());
-            return HexFormat.of().formatHex(hash); // |su:118 Hex string: 64 chars representing 256 bits
+            return HexFormat.of().formatHex(hash);
         } catch (NoSuchAlgorithmException e) {
             // SHA-256 is always available
             throw new RuntimeException("SHA-256 not available", e);

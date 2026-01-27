@@ -19,7 +19,7 @@ public class ConfigLoader { // |su:138 Loads config from multiple sources with p
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigLoader.class);
 
-    private static final String DEFAULT_CONFIG_FILE = "application.properties"; // |su:139 Default config in src/main/resources
+    private static final String DEFAULT_CONFIG_FILE = "application.properties";
 
     /**
      * Load configuration with default settings.
@@ -114,7 +114,7 @@ public class ConfigLoader { // |su:138 Loads config from multiple sources with p
         }
     }
 
-    private static void applyEnvironmentVariables(CrawlerConfig config) { // |su:140 Env vars override file config (12-factor app pattern)
+    private static void applyEnvironmentVariables(CrawlerConfig config) {
         String threads = System.getenv("CRAWLER_THREADS");
         if (threads != null) {
             config.setThreadCount(Integer.parseInt(threads));

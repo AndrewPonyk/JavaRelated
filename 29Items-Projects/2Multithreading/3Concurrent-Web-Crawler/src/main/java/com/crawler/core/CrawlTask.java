@@ -12,7 +12,7 @@ public class CrawlTask implements Runnable { // |su:134 Work unit: represents on
     private static final Logger logger = LoggerFactory.getLogger(CrawlTask.class);
 
     private final String url;
-    private final int depth; // |su:135 Depth: how many links from seed URL (seed=0, links on seed=1, etc.)
+    private final int depth;
     private final CrawlerEngine engine;
 
     /**
@@ -29,12 +29,12 @@ public class CrawlTask implements Runnable { // |su:134 Work unit: represents on
     }
 
     @Override
-    public void run() { // |su:136 Runnable.run(): called by thread pool worker - this is where work happens
+    public void run() {
         Thread.currentThread().setName("crawler-" + Thread.currentThread().getId());
         logger.trace("Processing URL at depth {}: {}", depth, url);
 
         try {
-            engine.processUrl(url, depth); // |su:137 Delegates to engine which handles robots, fetch, parse, index
+            engine.processUrl(url, depth);
         } catch (Exception e) {
             logger.error("Unexpected error in crawl task for URL: {}", url, e);
         }

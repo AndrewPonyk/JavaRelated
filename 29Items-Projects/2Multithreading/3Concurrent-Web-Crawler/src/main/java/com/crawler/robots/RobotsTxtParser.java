@@ -192,13 +192,12 @@ public class RobotsTxtParser { // |su:55 Parses robots.txt - website crawling ru
          * @param path URL path to check
          * @return true if allowed, false if disallowed
          */
-        public boolean isAllowed(String path) { // |su:56 Check if path is allowed - longest matching rule wins
+        public boolean isAllowed(String path) {
             Rule matchedRule = null;
             int longestMatch = -1;
 
             for (Rule rule : rules) {
                 if (rule.pattern().matcher(path).find()) {
-                    // |su:57 Longest match precedence: /images/cats more specific than /images
                     if (rule.path().length() > longestMatch) {
                         longestMatch = rule.path().length();
                         matchedRule = rule;
@@ -206,7 +205,6 @@ public class RobotsTxtParser { // |su:55 Parses robots.txt - website crawling ru
                 }
             }
 
-            // |su:58 No rule matched = allowed (permissive default)
             if (matchedRule == null) {
                 return true;
             }

@@ -39,13 +39,13 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
     private final Semaphore connectionSemaphore; // |su:15 Semaphore - limits concurrent HTTP connections (prevents server overload)
     private final Phaser phaser; // |su:16 Phaser - synchronizes crawl phases (all workers finish before next phase)
 
-    // |su:17 CORE COMPONENTS - each handles a specific crawling responsibility
-    private final UrlFrontier frontier; // |su:18 URL queue with deduplication (ConcurrentHashMap)
-    private final PageFetcher pageFetcher; // |su:19 HTTP client with retry logic
-    private final LinkExtractor linkExtractor; // |su:20 Discovers new URLs from HTML
-    private final ContentProcessor contentProcessor; // |su:21 Extracts text, computes hashes, indexes
-    private final RobotsTxtCache robotsCache; // |su:22 Caches robots.txt rules per domain
-    private final RateLimiter rateLimiter; // |su:23 Per-domain throttling with ReentrantLock
+    // Core components
+    private final UrlFrontier frontier;
+    private final PageFetcher pageFetcher;
+    private final LinkExtractor linkExtractor;
+    private final ContentProcessor contentProcessor;
+    private final RobotsTxtCache robotsCache;
+    private final RateLimiter rateLimiter;
     private final PageRepository pageRepository;
     private final ContentIndexer contentIndexer;
     private final CrawlMetrics metrics;
@@ -59,20 +59,17 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
         this.config = config;
         this.dbManager = dbManager;
 
-        // |su:24 ThreadPoolExecutor: fixed thread pool with bounded queue prevents memory exhaustion
         this.executorService = new ThreadPoolExecutor(
-                config.getThreadCount(), // core pool size
-                config.getThreadCount(), // max pool size (same = fixed)
-                60L, TimeUnit.SECONDS, // idle thread timeout
-                new LinkedBlockingQueue<>(config.getMaxPages()), // bounded work queue
-                new ThreadPoolExecutor.CallerRunsPolicy() // |su:25 CallerRunsPolicy: backpressure - if queue full, caller thread runs task
+                config.getThreadCount(),
+                config.getThreadCount(),
+                60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(config.getMaxPages()),
+                new ThreadPoolExecutor.CallerRunsPolicy()
         );
 
-        // |su:26 Semaphore(permits, fair): fair=true ensures FIFO ordering of waiting threads
         this.connectionSemaphore = new Semaphore(config.getMaxConnections(), true);
 
-        // |su:27 Phaser: advanced sync barrier - threads register, arrive, wait for others
-        this.phaser = new Phaser(1); // Main thread is initial party (participant)
+        this.phaser = new Phaser(1);
 
         // Initialize components
         this.frontier = new UrlFrontier(config.getMaxPages());
@@ -110,7 +107,7 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
         crawlThread.start();
     }
 
-    private void crawlLoop() { // |su:28 Main loop: runs in separate thread, processes URLs in phases
+    private void crawlLoop() {
         try {
             int phase = 0;
             int batchSize = 100; // Submit tasks in smaller batches for better control
@@ -119,12 +116,11 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                 logger.info("Starting phase {} (processed: {}/{})",
                         phase, metrics.getPagesProcessed(), config.getMaxPages());
 
-                // |su:29 Inner loop: drain frontier, submit tasks in batches
                 int submittedInPhase = 0;
                 while (!stopped.get() && !frontier.isEmpty() &&
                         metrics.getPagesProcessed() < config.getMaxPages()) {
 
-                    UrlFrontier.CrawlUrl crawlUrl = frontier.poll(); // |su:30 poll() with timeout - non-blocking dequeue
+                    UrlFrontier.CrawlUrl crawlUrl = frontier.poll();
                     if (crawlUrl == null) {
                         break;
                     }
@@ -134,9 +130,8 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                         continue;
                     }
 
-                    // |su:31 Phaser register: each task becomes a party that must arrive before phase ends
                     phaser.register();
-                    executorService.submit(new CrawlTask( // |su:32 Submit task to thread pool for async execution
+                    executorService.submit(new CrawlTask(
                             crawlUrl.url(),
                             crawlUrl.depth(),
                             this
@@ -154,7 +149,6 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                     break;
                 }
 
-                // |su:33 Wait with timeout so we can check stop condition periodically
                 try {
                     int currentPhase = phaser.getPhase();
                     while (!phaser.isTerminated()) {
@@ -210,33 +204,28 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
     /**
      * Process a single URL. Called by CrawlTask.
      */
-    void processUrl(String url, int depth) { // |su:34 Single URL processing - called by CrawlTask on worker thread
+    void processUrl(String url, int depth) { // |su:17 Single URL processing - called by worker threads
         String domain = extractDomain(url);
 
         try {
-            // |su:35 STEP 1: Check robots.txt rules BEFORE fetching
             if (config.isRespectRobotsTxt() && !robotsCache.isAllowed(url)) {
                 logger.debug("URL blocked by robots.txt: {}", url);
                 metrics.recordRobotsBlocked();
                 return;
             }
 
-            // |su:36 STEP 2: Acquire semaphore permit - blocks if at max connections
-            connectionSemaphore.acquire(); // blocks until permit available
+            connectionSemaphore.acquire(); // |su:18 Acquire permit - blocks if at max connections
             try {
-                // |su:37 STEP 3: Rate limit - wait if too soon since last request to this domain
                 rateLimiter.waitForPermit(domain);
 
-                // |su:38 STEP 4: HTTP fetch with auto-retry on 5xx/timeout
                 PageFetcher.FetchResult result = pageFetcher.fetch(url);
                 metrics.recordPage(domain, result.statusCode(), result.contentLength());
 
                 if (result.isSuccess()) {
-                    // |su:39 STEP 5: Extract links from HTML, add to frontier for future crawling
                     List<String> links = linkExtractor.extract(result.document(), url);
                     int newLinks = 0;
                     for (String link : links) {
-                        if (frontier.add(link, depth + 1)) { // depth+1 tracks distance from seed
+                        if (frontier.add(link, depth + 1)) {
                             newLinks++;
                         }
                     }
@@ -244,14 +233,12 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
                         logger.debug("Added {} new links (of {} found) from {}", newLinks, links.size(), url);
                     }
 
-                    // |su:40 STEP 6: Persist to SQLite database FIRST (so indexer can update score)
                     pageRepository.save(url, result.document(), result.statusCode());
 
-                    // |su:41 STEP 7: ML processing - text extraction, TF-IDF, relevance scoring
                     contentProcessor.process(result.document(), url);
                 }
             } finally {
-                connectionSemaphore.release(); // |su:42 ALWAYS release permit in finally block
+                connectionSemaphore.release(); // |su:19 ALWAYS release in finally - prevents deadlock
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -260,7 +247,7 @@ public class CrawlerEngine { // |su:12 CORE: Main orchestrator coordinating all 
             logger.error("Error processing URL: {}", url, e);
             metrics.recordError();
         } finally {
-            phaser.arriveAndDeregister(); // |su:43 Phaser: signal task done + unregister from phase
+            phaser.arriveAndDeregister(); // |su:20 Signal task done + unregister from phase
         }
     }
 

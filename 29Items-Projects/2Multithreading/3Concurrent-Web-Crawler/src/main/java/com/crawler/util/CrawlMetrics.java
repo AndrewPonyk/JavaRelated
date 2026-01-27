@@ -7,19 +7,14 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Thread-safe metrics collection for crawl statistics.
  */
-public class CrawlMetrics { // |su:92 Thread-safe statistics - all counters use atomics for lock-free updates
+public class CrawlMetrics { // |su:28 Thread-safe stats using AtomicLong (lock-free CAS) and ConcurrentHashMap
 
-    // |su:93 AtomicLong: lock-free thread-safe counter, uses CAS (Compare-And-Swap) internally
     private final AtomicLong pagesProcessed = new AtomicLong(0);
     private final AtomicLong bytesDownloaded = new AtomicLong(0);
     private final AtomicLong errors = new AtomicLong(0);
     private final AtomicLong robotsBlocked = new AtomicLong(0);
     private final AtomicLong duplicatesSkipped = new AtomicLong(0);
-
-    // |su:94 ConcurrentHashMap: thread-safe map, no locking for reads, fine-grained locking for writes
     private final ConcurrentHashMap<Integer, AtomicLong> statusCodes = new ConcurrentHashMap<>();
-
-    // |su:95 Per-domain stats: tracks how many pages crawled from each domain
     private final ConcurrentHashMap<String, AtomicLong> domainCounts = new ConcurrentHashMap<>();
 
     // Timing
@@ -32,10 +27,10 @@ public class CrawlMetrics { // |su:92 Thread-safe statistics - all counters use 
      * @param statusCode  HTTP status code
      * @param bytes       Size of the page in bytes
      */
-    public void recordPage(String domain, int statusCode, long bytes) { // |su:96 Thread-safe recording - called from multiple worker threads
-        pagesProcessed.incrementAndGet(); // |su:97 incrementAndGet: atomic i++ equivalent
+    public void recordPage(String domain, int statusCode, long bytes) {
+        pagesProcessed.incrementAndGet();
         bytesDownloaded.addAndGet(bytes);
-        statusCodes.computeIfAbsent(statusCode, k -> new AtomicLong()).incrementAndGet(); // |su:98 computeIfAbsent: atomic get-or-create
+        statusCodes.computeIfAbsent(statusCode, k -> new AtomicLong()).incrementAndGet();
         domainCounts.computeIfAbsent(domain, k -> new AtomicLong()).incrementAndGet();
     }
 

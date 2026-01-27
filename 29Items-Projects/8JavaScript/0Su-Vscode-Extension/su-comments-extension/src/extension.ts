@@ -80,6 +80,17 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    // |su:7) Copy all comments as markdown to clipboard
+    const copyAllAsMarkdownCommand = vscode.commands.registerCommand('suComments.copyAllAsMarkdown', () => {
+        const markdown = provider.getAllCommentsAsMarkdown();
+        if (markdown) {
+            vscode.env.clipboard.writeText(markdown);
+            vscode.window.showInformationMessage('All SU comments copied as markdown!');
+        } else {
+            vscode.window.showInformationMessage('No SU comments found to copy.');
+        }
+    });
+
     // |su:6) Register all disposables - VS Code cleans these up on deactivate
     context.subscriptions.push(
         treeView,
@@ -92,7 +103,8 @@ export function activate(context: vscode.ExtensionContext) {
         setStatusComplexCommand,
         setStatusHackCommand,
         setStatusBadCodeCommand,
-        setStatusUntouchedCommand
+        setStatusUntouchedCommand,
+        copyAllAsMarkdownCommand
     );
 
     provider.refresh();

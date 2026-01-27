@@ -18,20 +18,15 @@ import java.util.regex.Pattern;
  *   <li>Minimum length filtering</li>
  * </ul>
  */
-public class TextPreprocessor { // |su:108 ML text prep: lowercase, remove noise, tokenize, stem, remove stopwords
+public class TextPreprocessor { // |su:35 ML text prep: lowercase → tokenize → stem → remove stopwords
 
     private static final Logger logger = LoggerFactory.getLogger(TextPreprocessor.class);
 
-    // |su:109 Short words often noise (a, an, to) - 3+ chars more meaningful
     private static final int MIN_WORD_LENGTH = 3;
-
-    // Pattern for splitting text into tokens
     private static final Pattern TOKENIZE_PATTERN = Pattern.compile("[\\s\\p{Punct}]+");
-
-    // Pattern for non-alphabetic characters
     private static final Pattern NON_ALPHA_PATTERN = Pattern.compile("[^a-z]");
 
-    // |su:110 Stop words: common words with no semantic value - "the", "is", "at" etc.
+    // Stop words: common words filtered out (the, is, at, etc.)
     private static final Set<String> STOP_WORDS = Set.of(
             "a", "an", "and", "are", "as", "at", "be", "by", "for", "from",
             "has", "he", "in", "is", "it", "its", "of", "on", "that", "the",
@@ -124,9 +119,9 @@ public class TextPreprocessor { // |su:108 ML text prep: lowercase, remove noise
      * @param word Word to stem
      * @return Stemmed word
      */
-    public String stem(String word) { // |su:111 Simple stemmer: running→runn, played→play (normalizes word forms)
+    public String stem(String word) {
         if (word.length() <= 5) {
-            return word; // |su:112 Don't stem short words - risk losing meaning
+            return word;
         }
 
         for (String suffix : SUFFIXES) {

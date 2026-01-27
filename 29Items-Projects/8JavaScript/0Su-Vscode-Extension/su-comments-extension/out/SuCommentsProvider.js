@@ -206,6 +206,16 @@ class SuCommentsProvider {
             vscode.window.showErrorMessage(`Failed to update comment status: ${error}`);
         }
     }
+    // |su:31) Generates markdown representation of all comments sorted by number
+    getAllCommentsAsMarkdown() {
+        const sorted = [...this.suComments].sort((a, b) => a.number - b.number);
+        const lines = sorted.map(comment => {
+            const filename = path.basename(comment.uri.fsPath);
+            const statusSuffix = comment.statusSymbol ? ` ${comment.statusSymbol}` : '';
+            return `- |su:${comment.number}: ${comment.text}${statusSuffix} - **${filename} [L${comment.lineNumber + 1}]**`;
+        });
+        return lines.join('\n');
+    }
 }
 exports.SuCommentsProvider = SuCommentsProvider;
 // |su:40) Tree item class - how each comment appears in sidebar

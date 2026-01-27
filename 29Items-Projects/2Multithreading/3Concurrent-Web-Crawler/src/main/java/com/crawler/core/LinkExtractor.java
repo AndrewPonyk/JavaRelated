@@ -32,19 +32,17 @@ public class LinkExtractor { // |su:127 Discovers new URLs from HTML - extracts 
      * @param baseUrl  The URL of the document (for resolving relative links)
      * @return List of extracted absolute URLs
      */
-    public List<String> extract(Document document, String baseUrl) { // |su:128 Extract all valid links from HTML page
+    public List<String> extract(Document document, String baseUrl) {
         List<String> links = new ArrayList<>();
 
         if (document == null) {
             return links;
         }
 
-        // |su:129 CSS selector: a[href] = all anchor tags with href attribute
         Elements anchors = document.select("a[href]");
 
         for (Element anchor : anchors) {
             try {
-                // |su:130 absUrl() converts relative URLs: "/page" → "https://example.com/page"
                 String href = anchor.absUrl("href");
 
                 if (href.isEmpty()) {
