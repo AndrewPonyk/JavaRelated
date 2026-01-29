@@ -1,5 +1,9 @@
 #!/bin/bash
-set -e
+# |su:49 Container entrypoint: runs BEFORE the main application starts
+# Handles: waiting for dependencies, running migrations, creating admin user
+# This script runs every time container starts (not just on first build)
+
+set -e  # Exit immediately if any command fails
 
 # Function to wait for a service
 wait_for_service() {
@@ -49,8 +53,10 @@ wait_for_service "$DB_HOST" "$DB_PORT" "PostgreSQL" 60
 # Wait for Redis
 wait_for_service "$REDIS_HOST" "$REDIS_PORT" "Redis" 30
 
-# Run migrations only for the main backend service (not celery workers)
-# Check if the command starts with "celery"
+# |su:50 Migration race condition prevention:
+# Problem: backend, celery-worker, celery-beat all start simultaneously
+# If all run migrations, they conflict (duplicate table creation)
+# Solution: only backend runs migrations; celery workers wait 30s
 if [[ ! "$1" =~ ^celery ]]; then
     # Ensure migration directories exist
     for app in users products cart checkout inventory vendors recommendations; do
@@ -96,5 +102,8 @@ if [ "$DJANGO_SETTINGS_MODULE" = "core.settings.production" ]; then
 fi
 
 echo "Starting application..."
-# Execute the main command
+# |su:51 exec replaces shell process with the application process
+# Without exec: shell stays as PID 1, app is child process
+# With exec: app becomes PID 1, receives signals (SIGTERM) directly
+# Critical for proper container shutdown (docker stop sends SIGTERM to PID 1)
 exec "$@"

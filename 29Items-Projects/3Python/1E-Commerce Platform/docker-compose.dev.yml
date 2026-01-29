@@ -1,21 +1,27 @@
 # Docker Compose for E-Commerce Platform - Development
+# |su:52 Docker Compose: orchestrates multiple containers as one application
+# Each service = one container; they share a network and can reference each other by name
 version: '3.8'
 
 services:
   backend:
     build:
-      context: .
+      context: .  # Build context: where Dockerfile can access files from
       dockerfile: docker/backend/Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000  # Override Dockerfile CMD
     restart: unless-stopped
     environment:
       - DJANGO_SETTINGS_MODULE=core.settings.development
+      # |su:53 Container networking: 'db' hostname resolves to database container
+      # Docker's internal DNS maps service names to container IPs
       - DATABASE_URL=postgres://postgres:postgres@db:5432/ecommerce
       - REDIS_URL=redis://redis:6379/0
       - DJANGO_SUPERUSER_EMAIL=admin@example.com
       - DJANGO_SUPERUSER_PASSWORD=admin123
     env_file:
-      - .env
+      - .env  # Additional env vars from file (secrets, API keys)
+    # |su:54 depends_on with condition: wait for dependency to be HEALTHY, not just started
+    # Without health check condition, backend might start before DB accepts connections
     depends_on:
       db:
         condition: service_healthy
@@ -24,15 +30,17 @@ services:
       elasticsearch:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "8000:8000"  # host:container - expose container port to host
+    # |su:55 Volume mount: ./backend:/app syncs local files into container
+    # Changes to local files instantly appear in container (hot reload)
     volumes:
       - ./backend:/app
-      - /app/__pycache__
+      - /app/__pycache__  # Anonymous volume: prevents pycache sync issues
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
-      start_period: 60s
+      start_period: 60s  # Grace period before health checks start
       retries: 3
 
   celery-worker:

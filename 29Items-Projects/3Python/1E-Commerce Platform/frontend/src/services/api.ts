@@ -19,7 +19,9 @@ const api: AxiosInstance = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - add auth token
+// |su:46 Axios Interceptors: middleware that runs before every request/after every response
+// Request interceptor: inject auth token into every API call automatically
+// Without this, you'd have to add Authorization header to every single request
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -31,13 +33,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle token refresh
+// |su:47 Response interceptor for automatic token refresh (silent re-auth)
+// Flow: request fails with 401 → refresh token → retry original request
+// User never sees the 401; the refresh happens transparently
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retrying, attempt token refresh
+    // |su:48 _retry flag prevents infinite loop:
+    // without it, failed refresh would trigger another refresh attempt forever
     if (
       error.response?.status === 401 &&
       originalRequest &&

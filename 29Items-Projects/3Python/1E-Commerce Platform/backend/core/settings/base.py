@@ -3,12 +3,15 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+# |su:56 python-decouple: reads config from .env file or environment variables
+# config('KEY', default='val') checks: env var → .env file → default
 from decouple import Csv, config
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# |su:57 SECRET_KEY: used for cryptographic signing (sessions, tokens, CSRF)
+# MUST be unique and secret in production; leaked key = security breach
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -50,16 +53,18 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+# |su:58 Middleware ORDER MATTERS! Requests flow top→bottom, responses bottom→top
+# CorsMiddleware must be first to add CORS headers before other middleware rejects request
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS headers (must be first)
+    'django.middleware.security.SecurityMiddleware',  # HTTPS redirect, HSTS
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Enable sessions
+    'django.middleware.common.CommonMiddleware',  # URL normalization
+    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF protection
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Set request.user
+    'django.contrib.messages.middleware.MessageMiddleware',  # Flash messages
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # X-Frame-Options header
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -98,7 +103,8 @@ DATABASES = {
     }
 }
 
-# Custom User Model
+# |su:59 AUTH_USER_MODEL: tells Django to use our custom User instead of default
+# MUST be set before first migration; changing later requires DB reset
 AUTH_USER_MODEL = 'users.User'
 
 # Password validation
@@ -127,11 +133,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST Framework
+# |su:60 REST_FRAMEWORK: global settings for all DRF views
+# These are DEFAULTS; individual views can override with class attributes
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Validates JWT tokens
     ),
+    # |su:61 DEFAULT_PERMISSION_CLASSES: IsAuthenticated means ALL endpoints require login
+    # Override per-view with permission_classes = [AllowAny] for public endpoints
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -153,7 +162,11 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
 }
 
-# JWT Settings
+# |su:62 JWT Token Strategy:
+# - Access token: short-lived (15min), used for API calls
+# - Refresh token: long-lived (7 days), used to get new access tokens
+# - ROTATE_REFRESH_TOKENS: issue new refresh token on each refresh (more secure)
+# - BLACKLIST_AFTER_ROTATION: old refresh tokens can't be reused (prevents theft)
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),

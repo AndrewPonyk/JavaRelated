@@ -23,23 +23,32 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'slug'
 
 
+# |su:67 ModelViewSet provides full CRUD; ReadOnlyModelViewSet only provides list/retrieve
 class ProductViewSet(viewsets.ModelViewSet):
     """ViewSet for product operations."""
 
     permission_classes = [permissions.AllowAny]
+    # |su:68 Filter backends enable URL query params:
+    # - DjangoFilterBackend: ?category__slug=phones (exact match)
+    # - SearchFilter: ?search=iphone (searches across search_fields)
+    # - OrderingFilter: ?ordering=-price (sort by price descending)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category__slug', 'status', 'is_featured']
     search_fields = ['name', 'description', 'sku']
     ordering_fields = ['price', 'created_at', 'name']
     ordering = ['-created_at']
+    # |su:69 lookup_field='slug': use /products/iphone-15/ instead of /products/uuid/
     lookup_field = 'slug'
 
     def get_queryset(self):
         """Return active products for public, all for vendors."""
+        # |su:70 select_related vs prefetch_related:
+        # - select_related: JOIN for ForeignKey/OneToOne (single query)
+        # - prefetch_related: separate query for ManyToMany/reverse FK
         queryset = Product.objects.select_related(
-            'category', 'vendor'
+            'category', 'vendor'  # FK fields: one JOIN query
         ).prefetch_related(
-            'images', 'variants', 'reviews'
+            'images', 'variants', 'reviews'  # Reverse FK: separate queries
         )
 
         if self.request.user.is_authenticated and hasattr(self.request.user, 'vendor'):
@@ -49,6 +58,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         # Public users only see active products
         return queryset.filter(status=Product.Status.ACTIVE)
 
+    # |su:71 Different serializers for different actions:
+    # - List: lightweight (name, price, thumbnail) - fast for browsing
+    # - Detail: full data (all images, reviews, variants) - single product page
+    # - Create/Update: write-focused (accepts input, validates)
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
         if self.action == 'list':

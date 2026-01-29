@@ -7,6 +7,10 @@ import { authService } from '../services/auth';
 import { cartService } from '../services/cart';
 import type { User, LoginCredentials, RegisterData } from '../types';
 
+// |su:39 Zustand: lightweight state management (alternative to Redux)
+// create() returns a hook; the store is a single function with state + actions
+// Unlike Redux: no reducers, no action types, no dispatch - just direct mutations
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -21,6 +25,8 @@ interface AuthState {
   clearError: () => void;
 }
 
+// |su:40 persist() middleware: saves state to localStorage, survives page refresh
+// partialize: only persist user & isAuthenticated (not isLoading, error)
 export const useAuth = create<AuthState>()(
   persist(
     (set, get) => ({

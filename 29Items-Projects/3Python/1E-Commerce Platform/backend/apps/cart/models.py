@@ -7,12 +7,16 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 
+# |su:16 Cart uses dual identification: user (authenticated) OR session_key (guest)
+# This pattern allows cart persistence before login, then merge after login
 class Cart(models.Model):
     """Shopping cart model supporting both authenticated and guest users."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # User association (null for guest carts)
+    # |su:17 OneToOneField = ForeignKey with unique=True
+    # Each user has exactly ONE cart (not multiple like addresses)
+    # settings.AUTH_USER_MODEL instead of 'users.User' for swappable user model
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -21,7 +25,8 @@ class Cart(models.Model):
         related_name='cart'
     )
 
-    # Session key for guest carts
+    # |su:18 db_index=True creates index on this column for faster lookups
+    # Critical for guest cart retrieval by session_key
     session_key = models.CharField(max_length=40, null=True, blank=True, db_index=True)
 
     # Timestamps
@@ -76,7 +81,9 @@ class CartItem(models.Model):
         validators=[MinValueValidator(1)]
     )
 
-    # Price snapshot at time of adding to cart
+    # |su:19 Price SNAPSHOT pattern: store price when added, not reference to current price
+    # Why: if product price changes, cart should keep the price user saw
+    # Alternative: always use current price (simpler but can surprise users)
     unit_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,

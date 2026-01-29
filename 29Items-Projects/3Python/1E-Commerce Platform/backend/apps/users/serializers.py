@@ -9,21 +9,28 @@ from .models import Address, WishlistItem
 User = get_user_model()
 
 
+# |su:29 Customizing JWT token payload by extending TokenObtainPairSerializer
+# Default JWT only contains user_id; we add email and is_vendor for frontend use
+# These "claims" are encoded in the token itself (no DB lookup needed to read them)
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Custom JWT token serializer that includes user data."""
 
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Add custom claims
+        # Add custom claims (stored in JWT payload, readable by frontend)
         token['email'] = user.email
         token['is_vendor'] = user.is_vendor
         return token
 
 
+# |su:30 ModelSerializer auto-generates fields from model
+# But we override password fields for security (write_only, validation)
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration."""
 
+    # |su:31 write_only=True: field accepted in input but NOT in output (never expose password)
+    # validators=[validate_password]: Django's built-in strength checker
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -98,15 +105,19 @@ class PasswordChangeSerializer(serializers.Serializer):
         return value
 
 
+# |su:32 Serializer can transform data shape: model has FK, API returns nested object
 class WishlistItemSerializer(serializers.ModelSerializer):
     """Serializer for wishlist items."""
 
+    # |su:33 source='product.name': follows FK relationship to get nested field
+    # write_only vs read_only: product_id for input, product_name for output
     product_id = serializers.UUIDField(write_only=True)
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_slug = serializers.CharField(source='product.slug', read_only=True)
     product_price = serializers.DecimalField(
         source='product.price', max_digits=10, decimal_places=2, read_only=True
     )
+    # |su:34 SerializerMethodField: calls get_<fieldname>() for custom logic
     product_image = serializers.SerializerMethodField()
 
     class Meta:

@@ -62,17 +62,26 @@ class PasswordChangeView(generics.UpdateAPIView):
         )
 
 
+# |su:35 ModelViewSet provides ALL CRUD operations automatically:
+# list (GET /), create (POST /), retrieve (GET /{id}/),
+# update (PUT /{id}/), partial_update (PATCH /{id}/), destroy (DELETE /{id}/)
 class AddressViewSet(ModelViewSet):
     """ViewSet for managing user addresses."""
     serializer_class = AddressSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # |su:36 Override get_queryset() to filter by current user (multi-tenant pattern)
+    # Without this, users could see/edit OTHER users' addresses!
     def get_queryset(self):
         return Address.objects.filter(user=self.request.user)
 
+    # |su:37 perform_create() hook: inject current user before save
+    # Serializer doesn't know about request.user; we add it here
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    # |su:38 @action creates custom endpoint: POST /addresses/{id}/set_default/
+    # detail=True means it operates on single object (needs pk)
     @action(detail=True, methods=['post'])
     def set_default(self, request, pk=None):
         """Set an address as the default for its type."""

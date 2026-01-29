@@ -12,6 +12,9 @@ from apps.products.models import Product, ProductVariant
 from .models import Cart, CartItem
 
 
+# |su:20 Service Layer Pattern: business logic lives here, not in views or models
+# Why: keeps views thin (just HTTP handling), models thin (just data structure)
+# Services can be reused across views, management commands, Celery tasks
 class CartService:
     """Service class for cart-related business logic."""
 
@@ -19,8 +22,11 @@ class CartService:
     def get_or_create_cart(request) -> Cart:
         """Get existing cart or create new one for user/session."""
         if request.user.is_authenticated:
+            # |su:21 prefetch_related() solves N+1 query problem for reverse FKs
+            # Without it: 1 query for cart + N queries for each item's product
+            # With it: 1 query for cart + 1 query for ALL related items
             cart, created = Cart.objects.prefetch_related(
-                'items__product__images',
+                'items__product__images',  # items → product → images (3 levels deep)
                 'items__product__category',
                 'items__variant'
             ).get_or_create(user=request.user)
@@ -39,6 +45,9 @@ class CartService:
         return cart
 
     @staticmethod
+    # |su:22 @transaction.atomic: ALL DB operations succeed or ALL rollback
+    # Without it: crash mid-function could leave DB in inconsistent state
+    # (e.g., quantity updated but price not updated)
     @transaction.atomic
     def add_item(
         cart: Cart,
@@ -146,8 +155,13 @@ class CartService:
     @staticmethod
     @transaction.atomic
     def merge_guest_cart(user, session_key: str) -> Cart:
+        # |su:23 Cart merge pattern: when guest logs in, merge their anonymous cart
+        # Scenarios: (1) guest has items, user has none → move items
+        # (2) both have same product → combine quantities (respect stock limit)
+        # (3) guest cart empty → just return user cart
         """Merge guest cart into user cart after login."""
         try:
+            # user__isnull=True ensures we only get anonymous carts
             guest_cart = Cart.objects.get(session_key=session_key, user__isnull=True)
         except Cart.DoesNotExist:
             return Cart.objects.get_or_create(user=user)[0]

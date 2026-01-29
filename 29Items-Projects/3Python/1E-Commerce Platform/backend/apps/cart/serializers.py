@@ -6,9 +6,14 @@ from apps.products.serializers import ProductListSerializer, ProductVariantSeria
 from .models import Cart, CartItem
 
 
+# |su:72 Nested serializers: CartItem contains full Product object, not just ID
+# Output: {"product": {"name": "iPhone", "price": 999}, ...}
+# vs simple FK: {"product_id": "uuid-here"}
 class CartItemSerializer(serializers.ModelSerializer):
     """Serializer for cart items."""
 
+    # |su:73 read_only=True: these nested objects come from DB, not from user input
+    # For writes (adding to cart), we use CartItemCreateSerializer with just IDs
     product = ProductListSerializer(read_only=True)
     variant = ProductVariantSerializer(read_only=True)
     line_total = serializers.DecimalField(
@@ -26,6 +31,10 @@ class CartItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['unit_price', 'added_at']
 
 
+# |su:74 Separate READ vs WRITE serializers pattern:
+# - CartItemSerializer: for OUTPUT (includes nested product, computed fields)
+# - CartItemCreateSerializer: for INPUT (just IDs, validated in service layer)
+# Why: nested objects can't be easily "written" through serializer
 class CartItemCreateSerializer(serializers.Serializer):
     """Serializer for adding items to cart."""
 
@@ -44,6 +53,9 @@ class CartSerializer(serializers.ModelSerializer):
     """Serializer for shopping cart."""
 
     items = CartItemSerializer(many=True, read_only=True)
+    # |su:75 Model @property fields can be serialized directly
+    # item_count, subtotal, is_empty are defined as @property on Cart model
+    # DRF automatically calls them when serializing
     item_count = serializers.IntegerField(read_only=True)
     subtotal = serializers.DecimalField(
         max_digits=10,

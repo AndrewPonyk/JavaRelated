@@ -7,12 +7,16 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 
+# |su:11 Self-referential FK creates a tree structure (parent-child)
+# Common pattern for categories, comments, org charts
 class Category(models.Model):
     """Product category model with hierarchical support."""
 
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
+    # |su:12 ForeignKey('self') creates parent-child relationship within same table
+    # null=True allows root categories (no parent), related_name='children' for reverse access
     parent = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
@@ -52,13 +56,21 @@ class Product(models.Model):
         ACTIVE = 'active', 'Active'
         INACTIVE = 'inactive', 'Inactive'
 
-    # Identification
+    # |su:13 UUID primary key instead of auto-increment integer:
+    # - Globally unique (safe for distributed systems, merging DBs)
+    # - Non-guessable (can't enumerate /products/1, /products/2...)
+    # - Downside: larger, slower joins than integers
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sku = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
 
     # Relationships
+    # |su:14 on_delete options:
+    # - CASCADE: delete products when category deleted (dangerous here!)
+    # - PROTECT: prevent category deletion if products exist (safe)
+    # - SET_NULL: set to null (requires null=True)
+    # - SET_DEFAULT: set to default value
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
@@ -119,11 +131,14 @@ class Product(models.Model):
         verbose_name = 'product'
         verbose_name_plural = 'products'
         ordering = ['-created_at']
+        # |su:15 Database indexes speed up queries but slow down writes
+        # Add indexes for fields used in WHERE, ORDER BY, JOIN clauses
+        # Composite indexes (multiple fields) optimize queries filtering by both
         indexes = [
             models.Index(fields=['slug']),
             models.Index(fields=['sku']),
-            models.Index(fields=['status', 'is_featured']),
-            models.Index(fields=['category', 'status']),
+            models.Index(fields=['status', 'is_featured']),  # For "featured active products" query
+            models.Index(fields=['category', 'status']),     # For "products in category" query
         ]
 
     def __str__(self):

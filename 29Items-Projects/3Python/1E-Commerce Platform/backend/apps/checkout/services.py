@@ -21,6 +21,10 @@ class CheckoutService:
     @staticmethod
     @transaction.atomic
     def initiate_checkout(user, checkout_data: dict) -> dict:
+        # |su:24 Two-phase checkout pattern:
+        # Phase 1 (initiate): validate cart, calculate totals, create payment intent
+        # Phase 2 (confirm): verify payment, create order, deduct inventory
+        # Why: allows Stripe to handle payment UI/3DS while we hold cart state
         """Initialize checkout process and create payment intent."""
         # Get user's cart
         cart = Cart.objects.filter(user=user).first()
@@ -123,7 +127,9 @@ class CheckoutService:
             'total': str(final_total),
         }
 
-        # Store in cache for later retrieval
+        # |su:25 Cache stores checkout session between initiate and confirm phases
+        # Why not DB: temporary data, auto-expires, faster than DB queries
+        # Redis backend in production handles this (see settings.CACHES)
         from django.core.cache import cache
         cache_key = f"checkout_session:{user.id}"
         cache.set(cache_key, checkout_session, timeout=3600)  # 1 hour
@@ -142,11 +148,13 @@ class CheckoutService:
 
     @staticmethod
     def _sanitize_address_field(value: str, max_length: int = 200) -> str:
+        # |su:26 SECURITY: Always sanitize user input before storing/displaying
+        # html.escape() converts <script> to &lt;script&gt; preventing XSS
+        # Truncation prevents DB overflow and potential buffer attacks
         """Sanitize address field to prevent injection attacks."""
         import html
         if not value:
             return ''
-        # Strip HTML tags, escape remaining HTML entities, and limit length
         sanitized = html.escape(str(value).strip())
         return sanitized[:max_length]
 
@@ -226,7 +234,11 @@ class CheckoutService:
         if not checkout_session:
             raise ValueError("Checkout session expired. Please start checkout again.")
 
-        # Reserve inventory for all items
+        # |su:27 Inventory Reservation Pattern:
+        # 1. RESERVE stock (decrement available, but keep record)
+        # 2. Create order
+        # 3. DEDUCT stock (finalize the reservation)
+        # If step 2 fails, @transaction.atomic rolls back reservation
         for cart_item in cart.items.select_related('product', 'variant').all():
             reserved = InventoryService.reserve_stock(
                 product=cart_item.product,
@@ -310,7 +322,9 @@ class CheckoutService:
         # Clear checkout session
         cache.delete(cache_key)
 
-        # Trigger async tasks
+        # |su:28 Celery async tasks: .delay() queues task to Redis, returns immediately
+        # Why async: email sending is slow (1-3s), don't block HTTP response
+        # Task runs in separate celery-worker container, retries on failure
         from celery_tasks.email_tasks import send_order_confirmation_email
         from celery_tasks.inventory_tasks import update_inventory_after_order
         send_order_confirmation_email.delay(str(order.id))
