@@ -1,0 +1,115 @@
+# CD Pipeline for Production Environment
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to confirm production deployment'
+        required: true
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY_BACKEND: ecommerce-backend
+  ECR_REPOSITORY_FRONTEND: ecommerce-frontend
+  ECS_CLUSTER: ecommerce-prod
+  ECS_SERVICE_BACKEND: backend
+  ECS_SERVICE_FRONTEND: frontend
+
+jobs:
+  confirm:
+    name: Confirm Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Verify confirmation
+        if: github.event.inputs.confirm != 'deploy'
+        run: |
+          echo "Deployment not confirmed. Please type 'deploy' to confirm."
+          exit 1
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [confirm]
+    if: always() && (needs.confirm.result == 'success' || needs.confirm.result == 'skipped')
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG \
+            -f docker/backend/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG \
+            $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
+
+      - name: Build and push frontend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG \
+            -f docker/frontend/Dockerfile \
+            --build-arg VITE_API_URL=${{ secrets.PROD_API_URL }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG \
+            $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
+
+      - name: Create deployment record
+        run: |
+          echo "Recording deployment: ${{ github.sha }} at $(date -u)"
+          # TODO: Record in deployment tracking system
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE_BACKEND --force-new-deployment
+          aws ecs update-service --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE_FRONTEND --force-new-deployment
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE_BACKEND $ECS_SERVICE_FRONTEND
+        timeout-minutes: 15
+
+      - name: Run database migrations
+        run: |
+          # TODO: Run migrations via ECS run-task
+          echo "Database migrations would run here"
+
+      - name: Health check
+        run: |
+          # TODO: Add health check curl commands
+          echo "Health checks would run here"
+
+      - name: Notify on success
+        if: success()
+        run: echo "Production deployment successful!"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Consider rolling back."
+          # TODO: Implement automatic rollback

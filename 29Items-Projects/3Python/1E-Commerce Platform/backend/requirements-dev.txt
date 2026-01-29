@@ -1,0 +1,30 @@
+# Include production dependencies
+-r requirements.txt
+
+# Testing
+pytest>=8.2,<9.0
+pytest-django>=4.7,<5.0
+pytest-cov>=4.1,<6.0
+pytest-asyncio>=0.23,<1.0
+pytest-mock>=3.12,<4.0
+factory-boy>=3.3,<4.0
+faker>=22.0,<27.0
+freezegun>=1.2,<2.0
+httpx>=0.26,<1.0
+
+# Code Quality
+ruff>=0.1.9,<1.0
+black>=23.12,<24.0
+isort>=5.13,<6.0
+mypy>=1.8,<2.0
+pre-commit>=3.6,<4.0
+
+# Django Development
+django-debug-toolbar>=4.2,<5.0
+django-extensions>=3.2,<4.0
+ipython>=8.19,<9.0
+
+# Type Stubs
+django-stubs>=5.2.8,<6.0
+djangorestframework-stubs>=3.16,<4.0
+types-redis>=4.6,<5.0
