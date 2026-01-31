@@ -1,4 +1,5 @@
-*****claude-opus-4-1-20250805*****
+claude-opus-4-1-20250805
+
 | Topic | Size | Project Name | Tech Stack | Short Tech Description | Business Logic | IDE | Deployment Platform & CI/CD |
 |-------|------|--------------|------------|------------------------|----------------|-----|----------------------------|
 | **1. Java** | B | Enterprise Healthcare Platform | Spring Boot, JakartaEE, Hibernate, PostgreSQL, React, TypeScript, GraalVM Native, Kafka, Redis, Testcontainers, JUnit5, Liquibase, WebFlux, Grafana, OpenAPI | Microservices architecture using Spring Boot with reactive programming via WebFlux for real-time patient monitoring. GraalVM native compilation reduces memory footprint by 70% for edge deployments in hospitals. | Manages patient records, appointment scheduling, real-time vitals monitoring through IoT devices, and prescription management. Integrates with insurance providers for claim processing and uses ML for predictive health analytics. | IntelliJ IDEA | AWS EKS, Jenkins Pipeline |

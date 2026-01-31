@@ -3,15 +3,18 @@
    Tech Stack: Java 21, Spring Boot 3, Jakarta EE 10 (JAX‑RS), Hibernate ORM, Gradle, JUnit 5, Quarkus (edge), Vert.x (event bus), GraalVM Native Image (batch), SLF4J/Logback, Kafka, Postgres, Redis, Keycloak, React 18 + TypeScript, Next.js, Tailwind CSS
    Short Tech Description: Microservices platform for loan origination, servicing, and risk analytics. Designed for high throughput, regulatory audits, and regional compliance.
    Business Logic: Implements KYC/AML, pricing, underwriting, and credit policy rules. Manages schedules, collections, delinquency workflows, and audit trails.
+
    Big Project 2 — IoT Telematics & Fleet Operations
    Tech Stack: Java 21, Quarkus (native APIs), Vert.x, MQTT, Kafka, TimescaleDB, ClickHouse, Redis, OpenAPI, SLF4J, Micrometer/Prometheus, React + Next.js + Mapbox GL, Tailwind CSS
    Short Tech Description: Real‑time ingestion and analytics for vehicle telemetry, geofencing, and driver safety. Low‑latency APIs provide live dashboards and alerts.
    Business Logic: Rules compute ETA, route optimizations, and anomaly detection. Billing and SLA metrics computed per fleet, vehicle, and route.
-   Medium Project 1 — HR & Payroll Self‑Service Portal
+   
+    Medium Project 1 — HR & Payroll Self‑Service Portal
    Tech Stack: Java 21, Spring Boot 3, Spring Data JPA (Hibernate), Maven, JUnit 5, Liquibase, PostgreSQL, Redis, Thymeleaf + Alpine.js, SLF4J/Logback
    Short Tech Description: Modular monolith with clean boundaries for HR, payroll, and benefits. Offers secure employee self‑service and manager approvals.
    Business Logic: Handles payroll cycles, tax bands, and accrual policies. Implements approval chains, role‑based access, and audit logs.
-   Medium Project 2 — Document Management & E‑Sign
+   
+    Medium Project 2 — Document Management & E‑Sign
    Tech Stack: Java 17, Jakarta EE 10, JAX‑RS, Hibernate, Gradle, JUnit 5, MinIO/S3, PostgreSQL, Keycloak, Vue 3 + Vite, Tailwind CSS
    Short Tech Description: Secure repository with versioning, OCR metadata, and e‑signature flows. REST APIs integrate with ERP and CRM systems.
    Business Logic: Manages templates, signers, routing, and expirations. Tracks legal evidence, timestamps, and compliance retention.
@@ -20,7 +23,8 @@
    Tech Stack: Java 21, LMAX Disruptor, Agrona, Chronicle Queue/Map, Aeron, Netty, JMH, JFR, SLF4J, React + TypeScript dashboards
    Short Tech Description: Lock‑free queues and off‑heap data structures drive microsecond latencies. Provides backtest, paper, and live trading modes.
    Business Logic: Strategy scheduling, portfolio risk, and order routing with throttling. Reconciliation, PnL, and compliance reporting included.
-   Big Project 2 — Real‑Time Video Analytics Pipeline
+   
+    Big Project 2 — Real‑Time Video Analytics Pipeline
    Tech Stack: Java 21, Project Loom/Virtual Threads, OpenCV, FFmpeg, gRPC, Kafka, Redis, ClickHouse, Micrometer/Prometheus, Next.js + WebRTC
    Short Tech Description: Concurrent frame pipelines for detection, tracking, and alerts. Scales across nodes with backpressure and adaptive batching.
    Business Logic: Zone‑based rules, incident tickets, and SLA metrics. Exports evidence clips and audit trails to stakeholders.
