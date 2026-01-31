@@ -1,4 +1,5 @@
 GPT-5 (dial codex) :
+
 | Topic | Size | Project Name | Tech Stack | Short Tech Description (min 3 sentences) | Business Logic (min 3 sentences) | IDE | Deployment Platform and CI/CD Tools |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Java | B | SmartCity Operations Hub | Spring Boot, Jakarta EE, Hibernate, JUnit 5, Kafka, GraalVM Native-Image, TensorFlow Java, React, TypeScript, Redux Toolkit, Oracle 21c, Flyway, Testcontainers, Grafana, Swagger/OpenAPI, Maven, SLF4J | The platform orchestrates Spring Boot microservices ahead-of-time compiled with GraalVM Native-Image for low-latency municipal operations. Kafka streams ingest city telemetry while TensorFlow Java models score anomalies in real time. React dashboards render multi-tenant command centers with Grafana overlays for observability. | City operators monitor energy, mobility, and safety KPIs through configurable control rooms. Predictive maintenance scores trigger automated work orders and contractor alerts. Compliance logs with audit trails fulfill municipal reporting mandates across agencies. | IntelliJ IDEA Ultimate | AWS EKS | Jenkins + Argo CD |

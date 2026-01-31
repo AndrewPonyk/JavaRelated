@@ -1,4 +1,4 @@
-Below is a **comprehensive, structured response** to your request. It includes **4 projects per topic (2 big, 2 medium)** across all **29 listed domains**, adhering strictly to your constraints:
+HZ-SHO
 
 - Full-stack specification (including frontend/backend/infra where applicable)
 - At least **1 ML/DL project per topic** (max 2)
