@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(npm run db:migrate:dev:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma generate:*)"
+    ]
+  }
+}

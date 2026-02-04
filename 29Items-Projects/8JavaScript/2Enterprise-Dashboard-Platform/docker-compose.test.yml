@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  # Test Database
+  postgres-test:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Test Redis
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass testpass
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "testpass", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend for testing
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      NODE_ENV: test
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:test123@postgres-test:5432/test_db
+      REDIS_URL: redis://:testpass@redis-test:6379
+      JWT_SECRET: test-jwt-secret-key-for-testing-only
+      JWT_REFRESH_SECRET: test-refresh-secret-key-for-testing-only
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+    command: >
+      sh -c "
+        npx prisma generate &&
+        npx prisma db push &&
+        npm run dev
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Frontend for testing
+  frontend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      VITE_API_BASE_URL: http://localhost:3001/api
+      VITE_WS_URL: ws://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend-test:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Test data seeder
+  test-seeder:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:test123@postgres-test:5432/test_db
+      REDIS_URL: redis://:testpass@redis-test:6379
+    depends_on:
+      backend-test:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+      - ./backend/scripts:/app/scripts
+    command: >
+      sh -c "
+        echo 'Seeding test data...' &&
+        npm run seed:test || true &&
+        echo 'Test data seeding complete'
+      "
+    restart: "no"
+
+volumes:
+  postgres_test_data:
+
+networks:
+  default:
+    name: enterprise-dashboard-test

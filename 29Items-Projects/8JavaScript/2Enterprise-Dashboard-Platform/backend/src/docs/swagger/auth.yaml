@@ -1,0 +1,787 @@
+# Authentication API Documentation
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user account
+      description: |
+        Create a new user account with email and password. This endpoint includes:
+        - Email format validation
+        - Password strength requirements (minimum 6 characters)
+        - Duplicate email prevention
+        - Rate limiting (10 requests per 15 minutes)
+        - CSRF protection (conditional)
+      operationId: registerUser
+      security: [] # No authentication required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              basic:
+                summary: Basic registration
+                value:
+                  email: "john.doe@example.com"
+                  password: "securePassword123"
+                  name: "John Doe"
+              withCompany:
+                summary: Registration with company
+                value:
+                  email: "jane.smith@acme.com"
+                  password: "strongPassword456"
+                  name: "Jane Smith"
+                  company: "Acme Corporation"
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          accessToken:
+                            type: string
+                            description: JWT access token
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          refreshToken:
+                            type: string
+                            description: JWT refresh token
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          expiresIn:
+                            type: integer
+                            description: Token expiration time in seconds
+                            example: 86400
+              examples:
+                success:
+                  summary: Successful registration
+                  value:
+                    success: true
+                    data:
+                      user:
+                        id: "usr_123456789"
+                        email: "john.doe@example.com"
+                        name: "John Doe"
+                        role: "USER"
+                        isActive: true
+                        createdAt: "2024-01-15T10:00:00.000Z"
+                      accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresIn: 86400
+                    message: "User registered successfully"
+        '400':
+          description: Validation error or invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation:
+                  summary: Validation errors
+                  value:
+                    success: false
+                    error:
+                      code: "VALIDATION_ERROR"
+                      message: "Invalid input data"
+                      statusCode: 400
+                      details:
+                        issues:
+                          - path: "email"
+                            message: "Invalid email format"
+                            code: "invalid_string"
+                          - path: "password"
+                            message: "Password must be at least 6 characters"
+                            code: "too_small"
+                    timestamp: "2024-01-15T10:00:00.000Z"
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflict:
+                  summary: Email already registered
+                  value:
+                    success: false
+                    error:
+                      code: "UNIQUE_CONSTRAINT_VIOLATION"
+                      message: "A record with this data already exists"
+                      statusCode: 409
+                      details:
+                        field: ["email"]
+                    timestamp: "2024-01-15T10:00:00.000Z"
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user and get access token
+      description: |
+        Login with email and password to receive JWT tokens. Features:
+        - Secure password verification with bcrypt
+        - JWT access and refresh token generation
+        - Remember me functionality (optional)
+        - Rate limiting (10 requests per 15 minutes)
+        - CSRF protection (conditional)
+        - Login attempt tracking
+      operationId: loginUser
+      security: [] # No authentication required
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              basic:
+                summary: Basic login
+                value:
+                  email: "john.doe@example.com"
+                  password: "securePassword123"
+              rememberMe:
+                summary: Login with remember me
+                value:
+                  email: "john.doe@example.com"
+                  password: "securePassword123"
+                  rememberMe: true
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                success:
+                  summary: Successful login
+                  value:
+                    success: true
+                    data:
+                      user:
+                        id: "usr_123456789"
+                        email: "john.doe@example.com"
+                        name: "John Doe"
+                        role: "USER"
+                        isActive: true
+                        lastLoginAt: "2024-01-15T10:00:00.000Z"
+                      accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresIn: 86400
+                    message: "Login successful"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid:
+                  summary: Invalid credentials
+                  value:
+                    success: false
+                    error:
+                      code: "AUTHENTICATION_ERROR"
+                      message: "Invalid email or password"
+                      statusCode: 401
+                    timestamp: "2024-01-15T10:00:00.000Z"
+                inactive:
+                  summary: Account deactivated
+                  value:
+                    success: false
+                    error:
+                      code: "AUTHENTICATION_ERROR"
+                      message: "Account is deactivated"
+                      statusCode: 401
+                    timestamp: "2024-01-15T10:00:00.000Z"
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: |
+        Use a valid refresh token to obtain a new access token. The refresh token
+        must be valid and not blacklisted. This endpoint:
+        - Validates the refresh token
+        - Generates a new access token
+        - Optionally issues a new refresh token
+        - Rate limited (10 requests per 15 minutes)
+      operationId: refreshToken
+      security: [] # Uses refresh token instead of access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Valid JWT refresh token
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          accessToken:
+                            type: string
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          refreshToken:
+                            type: string
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          expiresIn:
+                            type: integer
+                            example: 86400
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout and invalidate tokens
+      description: |
+        Logout the current user and blacklist their tokens. This endpoint:
+        - Blacklists the current access token
+        - Blacklists the refresh token (if provided)
+        - Clears user session data
+        - Requires CSRF protection
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Optional refresh token to blacklist
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Logout successful"
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+
+  /api/auth/verify:
+    post:
+      tags:
+        - Authentication
+      summary: Verify token validity
+      description: |
+        Verify if the current access token is valid and not expired.
+        Returns user information if token is valid.
+      operationId: verifyToken
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          valid:
+                            type: boolean
+                            example: true
+                          user:
+                            $ref: '#/components/schemas/User'
+                          expiresAt:
+                            type: string
+                            format: date-time
+                            example: "2024-01-16T10:00:00.000Z"
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+
+  /api/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user profile
+      description: Get the profile information of the currently authenticated user
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+                          stats:
+                            type: object
+                            properties:
+                              dashboardCount:
+                                type: integer
+                                example: 5
+                              totalViews:
+                                type: integer
+                                example: 1250
+                              lastActive:
+                                type: string
+                                format: date-time
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+
+  /api/auth/change-password:
+    post:
+      tags:
+        - Authentication
+      summary: Change user password
+      description: |
+        Change the current user's password. Requires:
+        - Current password verification
+        - New password strength validation
+        - CSRF protection
+        - Strict rate limiting (5 requests per 15 minutes)
+      operationId: changePassword
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password for verification
+                  example: "currentPassword123"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  description: New password (minimum 6 characters)
+                  example: "newSecurePassword456"
+                confirmPassword:
+                  type: string
+                  description: Confirm new password
+                  example: "newSecurePassword456"
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Password changed successfully"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+        '429':
+          $ref: '#/components/responses/StrictRateLimitError'
+
+  /api/auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Initiate password reset process
+      description: |
+        Send a password reset email to the user. This endpoint:
+        - Validates the email address
+        - Generates a secure reset token
+        - Sends reset instructions via email
+        - Rate limited (5 requests per 15 minutes)
+        - CSRF protection
+      operationId: forgotPassword
+      security:
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the account
+                  example: "user@example.com"
+      responses:
+        '200':
+          description: Reset instructions sent (always returns success for security)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "If an account exists with this email, reset instructions have been sent"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+        '429':
+          $ref: '#/components/responses/StrictRateLimitError'
+
+  /api/auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Complete password reset
+      description: |
+        Complete the password reset process using the token from the reset email.
+        This endpoint:
+        - Validates the reset token
+        - Verifies token expiration
+        - Updates the user's password
+        - Invalidates the reset token
+        - Rate limited (5 requests per 15 minutes)
+      operationId: resetPassword
+      security:
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - newPassword
+              properties:
+                token:
+                  type: string
+                  description: Password reset token from email
+                  example: "reset-token-12345"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  description: New password (minimum 6 characters)
+                  example: "newSecurePassword123"
+                confirmPassword:
+                  type: string
+                  description: Confirm new password
+                  example: "newSecurePassword123"
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Password reset successfully"
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+        '429':
+          $ref: '#/components/responses/StrictRateLimitError'
+
+  /api/auth/csrf-token:
+    get:
+      tags:
+        - Authentication
+      summary: Generate CSRF token
+      description: |
+        Generate a new CSRF token for client requests. This token should be
+        included in the X-CSRF-Token header for state-changing operations.
+      operationId: generateCSRFToken
+      security: [] # No authentication required
+      responses:
+        '200':
+          description: CSRF token generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          csrfToken:
+                            type: string
+                            description: CSRF protection token
+                            example: "csrf-token-abcd1234"
+                          expiresIn:
+                            type: integer
+                            description: Token expiration in seconds
+                            example: 3600
+                          sessionId:
+                            type: string
+                            description: Session identifier
+                            example: "session-12345"
+
+  /api/auth/csrf-token/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh CSRF token
+      description: Refresh an existing CSRF token before it expires
+      operationId: refreshCSRFToken
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  description: Current session identifier
+                  example: "session-12345"
+      responses:
+        '200':
+          description: CSRF token refreshed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          csrfToken:
+                            type: string
+                            example: "csrf-token-efgh5678"
+                          expiresIn:
+                            type: integer
+                            example: 3600
+
+  /api/auth/health:
+    get:
+      tags:
+        - System
+      summary: Authentication service health check
+      description: Check the health status of the authentication service
+      operationId: authHealthCheck
+      security: []
+      responses:
+        '200':
+          description: Authentication service is healthy
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          service:
+                            type: string
+                            example: "auth"
+                          status:
+                            type: string
+                            enum: ["healthy", "unhealthy"]
+                            example: "healthy"
+                          timestamp:
+                            type: string
+                            format: date-time
+                          environment:
+                            type: string
+                            example: "development"
+
+components:
+  responses:
+    AuthenticationError:
+      description: Authentication required or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing:
+              summary: Missing authorization header
+              value:
+                success: false
+                error:
+                  code: "AUTHENTICATION_ERROR"
+                  message: "Authentication required"
+                  statusCode: 401
+            invalid:
+              summary: Invalid token
+              value:
+                success: false
+                error:
+                  code: "INVALID_TOKEN"
+                  message: "Invalid authentication token"
+                  statusCode: 401
+            expired:
+              summary: Expired token
+              value:
+                success: false
+                error:
+                  code: "TOKEN_EXPIRED"
+                  message: "Authentication token has expired"
+                  statusCode: 401
+
+    CSRFError:
+      description: CSRF token missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            missing:
+              summary: CSRF token missing
+              value:
+                success: false
+                error:
+                  code: "CSRF_TOKEN_REQUIRED"
+                  message: "CSRF token is required for this operation"
+                  statusCode: 403
+            invalid:
+              summary: Invalid CSRF token
+              value:
+                success: false
+                error:
+                  code: "CSRF_TOKEN_INVALID"
+                  message: "Invalid or expired CSRF token"
+                  statusCode: 403
+
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            validation:
+              summary: Multiple validation errors
+              value:
+                success: false
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "Invalid input data"
+                  statusCode: 400
+                  details:
+                    issues:
+                      - path: "email"
+                        message: "Invalid email format"
+                        code: "invalid_string"
+                      - path: "password"
+                        message: "String must contain at least 6 character(s)"
+                        code: "too_small"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            exceeded:
+              summary: Rate limit exceeded
+              value:
+                success: false
+                error:
+                  code: "RATE_LIMIT_EXCEEDED"
+                  message: "Too many authentication attempts, please try again later"
+                  statusCode: 429
+
+    StrictRateLimitError:
+      description: Strict rate limit exceeded (sensitive operations)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            exceeded:
+              summary: Strict rate limit exceeded
+              value:
+                success: false
+                error:
+                  code: "RATE_LIMIT_EXCEEDED"
+                  message: "Too many attempts, please try again later"
+                  statusCode: 429

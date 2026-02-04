@@ -1,0 +1,1432 @@
+# Dashboard API Documentation
+
+paths:
+  /api/dashboards/public:
+    get:
+      tags:
+        - Dashboards
+      summary: Get public dashboards
+      description: |
+        Retrieve a paginated list of public dashboards. Optional authentication
+        allows for personalized results and access to shared dashboards.
+      operationId: getPublicDashboards
+      security: [] # Optional authentication
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search query for dashboard title or description
+          schema:
+            type: string
+            maxLength: 100
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, title, viewCount]
+            default: updatedAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Public dashboards retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Dashboard'
+
+  /api/dashboards/templates:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard templates
+      description: |
+        Retrieve a paginated list of dashboard templates that can be used
+        as starting points for new dashboards.
+      operationId: getDashboardTemplates
+      security: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        '200':
+          description: Dashboard templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Dashboard'
+
+  /api/dashboards:
+    get:
+      tags:
+        - Dashboards
+      summary: Get user's dashboards
+      description: |
+        Retrieve a paginated list of dashboards owned by or shared with
+        the authenticated user. Supports filtering and sorting.
+      operationId: getUserDashboards
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search query for dashboard title or description
+          schema:
+            type: string
+            maxLength: 100
+        - name: isPublic
+          in: query
+          description: Filter by public/private status
+          schema:
+            type: boolean
+        - name: isTemplate
+          in: query
+          description: Filter by template status
+          schema:
+            type: boolean
+            default: false
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, title, viewCount]
+            default: updatedAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: User dashboards retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+
+    post:
+      tags:
+        - Dashboards
+      summary: Create a new dashboard
+      description: |
+        Create a new dashboard for the authenticated user. The dashboard
+        will initially be empty and can be configured with widgets later.
+      operationId: createDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDashboardRequest'
+            examples:
+              basic:
+                summary: Basic dashboard
+                value:
+                  title: "Sales Analytics Dashboard"
+                  description: "Monthly sales performance metrics"
+              public:
+                summary: Public dashboard
+                value:
+                  title: "Company KPIs"
+                  description: "Key performance indicators for all staff"
+                  isPublic: true
+                  tags: ["kpi", "public", "performance"]
+              template:
+                summary: Dashboard template
+                value:
+                  title: "E-commerce Template"
+                  description: "Template for e-commerce analytics"
+                  isTemplate: true
+                  isPublic: true
+                  tags: ["template", "ecommerce", "analytics"]
+      responses:
+        '201':
+          description: Dashboard created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dashboard:
+                            $ref: '#/components/schemas/Dashboard'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+
+  /api/dashboards/{id}:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard by ID
+      description: |
+        Retrieve a specific dashboard by ID. Access is granted if:
+        - User owns the dashboard
+        - Dashboard is shared with user
+        - Dashboard is public
+        - User has admin privileges
+      operationId: getDashboardById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+            example: "dash_123456789"
+        - name: includeWidgets
+          in: query
+          description: Include widget data in response
+          schema:
+            type: boolean
+            default: true
+        - name: includeAnalytics
+          in: query
+          description: Include basic analytics data
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Dashboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dashboard:
+                            $ref: '#/components/schemas/Dashboard'
+                          permissions:
+                            type: object
+                            properties:
+                              canEdit:
+                                type: boolean
+                              canShare:
+                                type: boolean
+                              canDelete:
+                                type: boolean
+                          analytics:
+                            type: object
+                            properties:
+                              viewCount:
+                                type: integer
+                              lastViewed:
+                                type: string
+                                format: date-time
+                              topViewers:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    userId:
+                                      type: string
+                                    viewCount:
+                                      type: integer
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Access denied to this dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Dashboard not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Dashboards
+      summary: Update dashboard
+      description: |
+        Update dashboard properties. Only the owner or users with write
+        permissions can update a dashboard.
+      operationId: updateDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  maxLength: 1000
+                isPublic:
+                  type: boolean
+                layout:
+                  type: object
+                  properties:
+                    rows:
+                      type: integer
+                      minimum: 1
+                      maximum: 20
+                    cols:
+                      type: integer
+                      minimum: 1
+                      maximum: 24
+                    gap:
+                      type: integer
+                      minimum: 0
+                      maximum: 32
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+      responses:
+        '200':
+          description: Dashboard updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dashboard:
+                            $ref: '#/components/schemas/Dashboard'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Insufficient permissions to update dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Dashboard not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Dashboards
+      summary: Delete dashboard
+      description: |
+        Delete a dashboard permanently. Only the owner or admin users
+        can delete a dashboard. This action cannot be undone.
+      operationId: deleteDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard deleted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Dashboard deleted successfully"
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Insufficient permissions to delete dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Dashboard not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/dashboards/{id}/share:
+    post:
+      tags:
+        - Dashboards
+      summary: Share dashboard with users
+      description: |
+        Share a dashboard with specific users or groups. Only the owner
+        or users with sharing permissions can share dashboards.
+      operationId: shareDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - shares
+              properties:
+                shares:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - userId
+                      - permission
+                    properties:
+                      userId:
+                        type: string
+                        description: User ID to share with
+                      permission:
+                        type: string
+                        enum: [read, write, admin]
+                        description: Permission level
+                      expiresAt:
+                        type: string
+                        format: date-time
+                        description: Optional expiration date
+                notify:
+                  type: boolean
+                  default: true
+                  description: Send notification to shared users
+                message:
+                  type: string
+                  maxLength: 500
+                  description: Optional message to include
+      responses:
+        '200':
+          description: Dashboard shared successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          shares:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                userId:
+                                  type: string
+                                permission:
+                                  type: string
+                                sharedAt:
+                                  type: string
+                                  format: date-time
+                                expiresAt:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Insufficient permissions to share dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Dashboard not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/dashboards/{id}/shares:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard sharing information
+      description: |
+        Get information about who a dashboard is shared with.
+        Only owners and admin users can access this information.
+
+        **Note: This endpoint is currently returning placeholder data.**
+      operationId: getDashboardShares
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard shares retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            userId:
+                              type: string
+                            user:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                email:
+                                  type: string
+                                avatar:
+                                  type: string
+                            permission:
+                              type: string
+                              enum: [read, write, admin]
+                            sharedAt:
+                              type: string
+                              format: date-time
+                            expiresAt:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            sharedBy:
+                              type: string
+                              description: User ID who shared the dashboard
+
+  /api/dashboards/{id}/shares/{userId}:
+    delete:
+      tags:
+        - Dashboards
+      summary: Remove user access from dashboard
+      description: |
+        Remove a user's access to a dashboard. Only owners and admin
+        users can remove access.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: removeDashboardShare
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          description: User ID to remove access for
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dashboard share removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Dashboard share removed successfully"
+
+  /api/dashboards/{id}/analytics:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard analytics
+      description: |
+        Retrieve analytics data for a dashboard including views, user interactions,
+        and performance metrics over a specified time period.
+      operationId: getDashboardAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Start date for analytics period (ISO 8601)
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: endDate
+          in: query
+          description: End date for analytics period (ISO 8601)
+          schema:
+            type: string
+            format: date
+            example: "2024-01-31"
+        - name: granularity
+          in: query
+          description: Data granularity
+          schema:
+            type: string
+            enum: [hour, day, week, month]
+            default: day
+      responses:
+        '200':
+          description: Dashboard analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          summary:
+                            type: object
+                            properties:
+                              totalViews:
+                                type: integer
+                                example: 1250
+                              uniqueUsers:
+                                type: integer
+                                example: 85
+                              avgViewDuration:
+                                type: number
+                                format: float
+                                example: 180.5
+                              bounceRate:
+                                type: number
+                                format: float
+                                example: 0.25
+                          timeline:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  format: date-time
+                                views:
+                                  type: integer
+                                uniqueUsers:
+                                  type: integer
+                                avgDuration:
+                                  type: number
+                          topUsers:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                userId:
+                                  type: string
+                                name:
+                                  type: string
+                                viewCount:
+                                  type: integer
+                                lastView:
+                                  type: string
+                                  format: date-time
+                          widgets:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                widgetId:
+                                  type: string
+                                title:
+                                  type: string
+                                views:
+                                  type: integer
+                                interactions:
+                                  type: integer
+
+  /api/dashboards/{id}/analytics/track:
+    post:
+      tags:
+        - Dashboards
+      summary: Track dashboard view or interaction
+      description: |
+        Track user interactions with a dashboard for analytics purposes.
+        This includes page views, widget interactions, and time spent.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: trackDashboardAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - event
+              properties:
+                event:
+                  type: string
+                  enum: [view, widget_click, export, share]
+                  description: Type of interaction to track
+                widgetId:
+                  type: string
+                  description: Widget ID (for widget-specific events)
+                duration:
+                  type: integer
+                  description: Time spent on dashboard (in seconds)
+                metadata:
+                  type: object
+                  description: Additional event metadata
+      responses:
+        '200':
+          description: Analytics tracked successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Analytics tracked successfully"
+
+  /api/dashboards/{id}/export:
+    post:
+      tags:
+        - Dashboards
+      summary: Export dashboard in various formats
+      description: |
+        Export a dashboard in the specified format (PDF, PNG, CSV, JSON).
+        Returns an export job ID that can be used to check status and download.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: exportDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum: [pdf, png, csv, json]
+                  default: pdf
+                  description: Export format
+                options:
+                  type: object
+                  properties:
+                    includeData:
+                      type: boolean
+                      default: true
+                      description: Include widget data in export
+                    quality:
+                      type: string
+                      enum: [low, medium, high]
+                      default: medium
+                      description: Export quality (for image formats)
+                    pageSize:
+                      type: string
+                      enum: [A4, A3, Letter, Legal]
+                      default: A4
+                      description: Page size (for PDF exports)
+      responses:
+        '200':
+          description: Export initiated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          exportId:
+                            type: string
+                            example: "export-1705312800000"
+                          format:
+                            type: string
+                            example: "pdf"
+                          status:
+                            type: string
+                            enum: [pending, processing, completed, failed]
+                            example: "pending"
+                          estimatedDuration:
+                            type: integer
+                            description: Estimated completion time in seconds
+                            example: 30
+
+  /api/dashboards/{id}/export/{exportId}:
+    get:
+      tags:
+        - Dashboards
+      summary: Get export status or download file
+      description: |
+        Check the status of an export job or download the completed file.
+        Returns download URL when export is completed.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: getExportStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: exportId
+          in: path
+          required: true
+          description: Export job ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Export status retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          exportId:
+                            type: string
+                          status:
+                            type: string
+                            enum: [pending, processing, completed, failed]
+                          progress:
+                            type: integer
+                            minimum: 0
+                            maximum: 100
+                            description: Completion percentage
+                          downloadUrl:
+                            type: string
+                            nullable: true
+                            description: Download URL (when completed)
+                          error:
+                            type: string
+                            nullable: true
+                            description: Error message (when failed)
+                          completedAt:
+                            type: string
+                            format: date-time
+                            nullable: true
+                          fileSize:
+                            type: integer
+                            nullable: true
+                            description: File size in bytes
+
+  /api/dashboards/{id}/duplicate:
+    post:
+      tags:
+        - Dashboards
+      summary: Duplicate/clone a dashboard
+      description: |
+        Create a copy of an existing dashboard with all its widgets and settings.
+        The new dashboard will be owned by the current user.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: duplicateDashboard
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID to duplicate
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title for the new dashboard
+                  example: "Copy of Sales Dashboard"
+                includeData:
+                  type: boolean
+                  default: false
+                  description: Include widget data in the duplicate
+                makePublic:
+                  type: boolean
+                  default: false
+                  description: Make the duplicate dashboard public
+      responses:
+        '201':
+          description: Dashboard duplicated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: "dash_new123456789"
+                          title:
+                            type: string
+                            example: "Copy of Sales Dashboard"
+                          originalId:
+                            type: string
+                            example: "dash_123456789"
+
+  /api/dashboards/{id}/versions:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard version history
+      description: |
+        Retrieve the version history of a dashboard including changes,
+        timestamps, and user who made the changes.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: getDashboardVersions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of versions to retrieve
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Dashboard versions retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            versionId:
+                              type: string
+                              example: "v_123456789"
+                            version:
+                              type: integer
+                              example: 5
+                            createdAt:
+                              type: string
+                              format: date-time
+                            createdBy:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                name:
+                                  type: string
+                                email:
+                                  type: string
+                            changes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                    example: "widget_added"
+                                  field:
+                                    type: string
+                                    example: "widgets"
+                                  description:
+                                    type: string
+                                    example: "Added chart widget"
+                            size:
+                              type: integer
+                              description: Version size in bytes
+                            isCurrent:
+                              type: boolean
+                              description: Whether this is the current version
+
+  /api/dashboards/{id}/versions/{versionId}/restore:
+    post:
+      tags:
+        - Dashboards
+      summary: Restore dashboard to a specific version
+      description: |
+        Restore a dashboard to a previous version. This will overwrite
+        the current dashboard configuration with the selected version.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: restoreDashboardVersion
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: versionId
+          in: path
+          required: true
+          description: Version ID to restore to
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                createBackup:
+                  type: boolean
+                  default: true
+                  description: Create a backup of current version before restoring
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Reason for restoring this version
+      responses:
+        '200':
+          description: Dashboard restored to previous version successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          restoredToVersion:
+                            type: integer
+                            example: 3
+                          backupVersionId:
+                            type: string
+                            nullable: true
+                            example: "v_backup_123456789"
+                          dashboard:
+                            $ref: '#/components/schemas/Dashboard'
+
+  /api/dashboards/{id}/embed:
+    post:
+      tags:
+        - Dashboards
+      summary: Generate embed token for dashboard
+      description: |
+        Generate a secure embed token that allows embedding the dashboard
+        in external applications or websites.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: generateEmbedToken
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresIn:
+                  type: integer
+                  description: Token expiration time in seconds
+                  default: 86400
+                  example: 86400
+                allowedDomains:
+                  type: array
+                  items:
+                    type: string
+                  description: Domains allowed to embed this dashboard
+                  example: ["example.com", "app.example.com"]
+                permissions:
+                  type: object
+                  properties:
+                    allowExport:
+                      type: boolean
+                      default: false
+                    allowFullscreen:
+                      type: boolean
+                      default: true
+                    hideControls:
+                      type: boolean
+                      default: false
+      responses:
+        '200':
+          description: Embed token generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          embedToken:
+                            type: string
+                            example: "embed-token-1705312800000"
+                          expiresAt:
+                            type: string
+                            format: date-time
+                            example: "2024-01-16T10:00:00.000Z"
+                          embedUrl:
+                            type: string
+                            example: "/embed/dashboard/dash_123456789"
+                          iframeCode:
+                            type: string
+                            description: Ready-to-use iframe HTML code
+                            example: '<iframe src="https://api.example.com/embed/dashboard/dash_123456789?token=embed-token-1705312800000" width="100%" height="600"></iframe>'
+
+  /api/dashboards/{id}/comments:
+    get:
+      tags:
+        - Dashboards
+      summary: Get dashboard comments
+      description: |
+        Retrieve comments and discussions for a dashboard. Available to
+        users with read access to the dashboard.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: getDashboardComments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Dashboard comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "comment_123456789"
+                                content:
+                                  type: string
+                                  example: "Great insights on the Q4 data!"
+                                author:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    name:
+                                      type: string
+                                    avatar:
+                                      type: string
+                                createdAt:
+                                  type: string
+                                  format: date-time
+                                updatedAt:
+                                  type: string
+                                  format: date-time
+                                replies:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      content:
+                                        type: string
+                                      author:
+                                        type: object
+                                      createdAt:
+                                        type: string
+                                        format: date-time
+
+    post:
+      tags:
+        - Dashboards
+      summary: Add comment to dashboard
+      description: |
+        Add a new comment or reply to a dashboard discussion.
+        Available to users with write access to the dashboard.
+
+        **Note: This endpoint is currently returning placeholder responses.**
+      operationId: addDashboardComment
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Dashboard ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                  description: Comment content
+                  example: "This dashboard shows excellent performance trends!"
+                parentId:
+                  type: string
+                  description: Parent comment ID for replies
+                  example: "comment_123456789"
+                widgetId:
+                  type: string
+                  description: Widget ID for widget-specific comments
+                  example: "widget_123456789"
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: "comment_1705312800000"
+                          content:
+                            type: string
+                            example: "This dashboard shows excellent performance trends!"
+                          createdAt:
+                            type: string
+                            format: date-time
+                          author:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string

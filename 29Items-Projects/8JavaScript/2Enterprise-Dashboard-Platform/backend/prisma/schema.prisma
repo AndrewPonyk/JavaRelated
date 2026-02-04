@@ -1,0 +1,504 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  password  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+
+  // Profile settings
+  profile UserProfile?
+
+  // Relationships
+  dashboards       Dashboard[]
+  widgets          Widget[]
+  dashboardShares  DashboardShare[]
+  activityLogs     ActivityLog[]
+  dataConnections  DataConnection[]
+
+  // Performance indexes
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+  @@index([lastLogin])
+  @@map("users")
+}
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Preferences
+  theme         String  @default("light")
+  timezone      String  @default("UTC")
+  language      String  @default("en")
+  notifications Json    @default("{}")
+
+  // Avatar and bio
+  avatar String?
+  bio    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// Dashboard Management
+model Dashboard {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  slug        String? @unique
+
+  // Layout configuration
+  layout      Json    @default("[]")
+  settings    Json    @default("{}")
+
+  // Access control
+  isPublic    Boolean @default(false)
+  isTemplate  Boolean @default(false)
+
+  // Ownership
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  widgets          Widget[]
+  dashboardShares  DashboardShare[]
+  analyticsData    DashboardAnalytics[]
+  activityLogs     ActivityLog[]
+
+  // Performance indexes
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isPublic])
+  @@index([isTemplate])
+  @@index([slug])
+  @@map("dashboards")
+}
+
+model Widget {
+  id           String     @id @default(cuid())
+  title        String
+  description  String?
+  type         WidgetType
+
+  // Widget configuration
+  config       Json       @default("{}")
+  position     Json       @default("{}")
+
+  // Data source
+  query        String?
+  dataSource   String?
+  refreshRate  Int?       // in seconds
+
+  // Relationships
+  dashboardId  String
+  dashboard    Dashboard  @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+
+  // Timestamps
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Cache and data
+  cachedData   Json?
+  lastFetch    DateTime?
+
+  // Performance indexes
+  @@index([dashboardId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([lastFetch])
+  @@map("widgets")
+}
+
+// Sharing and Permissions
+model DashboardShare {
+  id          String           @id @default(cuid())
+  permission  SharePermission
+
+  // Relationships
+  dashboardId String
+  dashboard   Dashboard        @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+
+  // Sharing details
+  sharedBy    String
+  sharedAt    DateTime         @default(now())
+  expiresAt   DateTime?
+
+  // Performance indexes
+  @@index([dashboardId])
+  @@index([userId])
+  @@index([permission])
+  @@index([sharedAt])
+  @@index([expiresAt])
+  @@unique([dashboardId, userId])
+  @@map("dashboard_shares")
+}
+
+// Data Sources and Connections
+model DataConnection {
+  id           String               @id @default(cuid())
+  name         String
+  type         DataConnectionType
+
+  // Connection configuration
+  config       Json                 @default("{}")
+  credentials  Json                 @default("{}") // Encrypted
+
+  // Status
+  isActive     Boolean              @default(true)
+  lastTested   DateTime?
+  status       ConnectionStatus     @default(PENDING)
+
+  // Ownership
+  userId       String
+  user         User                 @relation(fields: [userId], references: [id])
+
+  // Timestamps
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  // Relationships
+  savedQueries SavedQuery[]
+
+  // Performance indexes
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([isActive])
+  @@index([lastTested])
+  @@map("data_connections")
+}
+
+// Saved Queries for Data Connections
+model SavedQuery {
+  id            String         @id @default(cuid())
+  name          String
+  queryType     QueryType      @default(VISUAL)
+
+  // Query definition
+  visualQuery   Json?          // Visual query builder JSON
+  rawQuery      String?        // Raw SQL query
+
+  // Relationships
+  connectionId  String
+  connection    DataConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  userId        String
+
+  // Timestamps
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Performance indexes
+  @@index([connectionId])
+  @@index([userId])
+  @@index([queryType])
+  @@index([createdAt])
+  @@map("saved_queries")
+}
+
+// Analytics and Monitoring
+model DashboardAnalytics {
+  id          String    @id @default(cuid())
+
+  // Analytics data
+  views       Int       @default(0)
+  uniqueViews Int       @default(0)
+  avgLoadTime Float?
+  bounceRate  Float?
+
+  // Time period
+  date        DateTime
+  granularity String    // 'hour', 'day', 'week', 'month'
+
+  // Relationships
+  dashboardId String
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Performance indexes
+  @@index([dashboardId])
+  @@index([date])
+  @@index([granularity])
+  @@index([dashboardId, date])
+  @@index([date, granularity])
+  @@unique([dashboardId, date, granularity])
+  @@map("dashboard_analytics")
+}
+
+model ActivityLog {
+  id          String       @id @default(cuid())
+  action      String
+  entity      String       // 'dashboard', 'widget', 'user'
+  entityId    String
+
+  // Activity details
+  details     Json         @default("{}")
+  ipAddress   String?
+  userAgent   String?
+
+  // Relationships
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id])
+
+  dashboardId String?
+  dashboard   Dashboard?   @relation(fields: [dashboardId], references: [id])
+
+  // Timestamp
+  createdAt   DateTime     @default(now())
+
+  // Performance indexes
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([dashboardId])
+  @@map("activity_logs")
+}
+
+// ML and Analytics Models
+model MLModel {
+  id          String      @id @default(cuid())
+  name        String
+  type        MLModelType
+  version     String      @default("1.0")
+
+  // Model configuration
+  config      Json        @default("{}")
+  parameters  Json        @default("{}")
+
+  // Training data
+  trainingData Json?
+  accuracy     Float?
+
+  // Status
+  isActive     Boolean     @default(false)
+
+  // Timestamps
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relationships
+  predictions  Prediction[]
+
+  // Performance indexes
+  @@index([type])
+  @@index([isActive])
+  @@index([createdAt])
+  @@index([version])
+  @@map("ml_models")
+}
+
+model Prediction {
+  id          String    @id @default(cuid())
+
+  // Prediction data
+  input       Json
+  output      Json
+  confidence  Float?
+
+  // Model reference
+  modelId     String
+  model       MLModel   @relation(fields: [modelId], references: [id])
+
+  // Timestamp
+  createdAt   DateTime  @default(now())
+
+  // Performance indexes
+  @@index([modelId])
+  @@index([createdAt])
+  @@index([confidence])
+  @@map("predictions")
+}
+
+// Enums
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  USER
+  VIEWER
+}
+
+enum WidgetType {
+  CHART_LINE
+  CHART_BAR
+  CHART_PIE
+  CHART_AREA
+  CHART_SCATTER
+  TABLE
+  METRIC
+  TEXT
+  IMAGE
+  MAP
+  HEATMAP
+  GAUGE
+  CUSTOM
+}
+
+enum SharePermission {
+  READ
+  WRITE
+  ADMIN
+}
+
+enum DataConnectionType {
+  MYSQL
+  POSTGRESQL
+  MONGODB
+  REST_API
+  GRAPHQL_API
+  CSV_FILE
+  JSON_FILE
+  GOOGLE_SHEETS
+  SALESFORCE
+  HUBSPOT
+  SLACK
+  CUSTOM
+}
+
+enum ConnectionStatus {
+  PENDING
+  CONNECTED
+  FAILED
+  DISABLED
+}
+
+enum MLModelType {
+  ANOMALY_DETECTION
+  FORECASTING
+  CLASSIFICATION
+  REGRESSION
+  CLUSTERING
+  RECOMMENDATION
+}
+
+enum QueryType {
+  VISUAL
+  RAW
+}
+
+// Calendar Events
+model CalendarEvent {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+
+  // Time
+  startTime   DateTime
+  endTime     DateTime?
+  allDay      Boolean       @default(false)
+
+  // Categorization
+  type        EventType     @default(MEETING)
+  color       String        @default("blue")
+
+  // Location (optional)
+  location    String?
+
+  // Recurrence (optional)
+  recurrence  Json?         // { frequency: 'daily'|'weekly'|'monthly', interval: 1, endDate: Date }
+
+  // Ownership
+  userId      String
+
+  // Timestamps
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([startTime])
+  @@index([type])
+  @@map("calendar_events")
+}
+
+enum EventType {
+  MEETING
+  REVIEW
+  PRESENTATION
+  PLANNING
+  DEADLINE
+  REMINDER
+  OTHER
+}
+
+// Notifications
+model Notification {
+  id          String           @id @default(cuid())
+  title       String
+  message     String
+
+  // Categorization
+  type        NotificationType
+
+  // Status
+  read        Boolean          @default(false)
+
+  // Optional link
+  actionUrl   String?
+  actionLabel String?
+
+  // Related entities (optional)
+  entityType  String?          // 'dashboard', 'widget', 'user', etc.
+  entityId    String?
+
+  // Ownership
+  userId      String
+
+  // Timestamps
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  SHARE
+  REPORT
+  SYSTEM
+  ALERT
+  INVITE
+  COMMENT
+  MENTION
+}
+
+// Database indexes have been added to their respective models above

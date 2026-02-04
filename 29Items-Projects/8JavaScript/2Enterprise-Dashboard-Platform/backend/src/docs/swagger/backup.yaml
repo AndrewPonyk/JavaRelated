@@ -1,0 +1,942 @@
+# Backup API Documentation
+
+paths:
+  /api/backup/list:
+    get:
+      tags:
+        - Backup
+      summary: List all database backups
+      description: |
+        Retrieve a list of all database backups with metadata including
+        size, compression status, checksums, and creation timestamps.
+        Only accessible by admin users.
+      operationId: listBackups
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of backups per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum: [timestamp, size, filename, duration]
+            default: timestamp
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Backup list retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          backups:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/BackupMetadata'
+                          total:
+                            type: integer
+                            description: Total number of backups
+                            example: 25
+                          totalSize:
+                            type: integer
+                            description: Total size of all backups in bytes
+                            example: 1073741824
+                          oldestBackup:
+                            type: string
+                            format: date-time
+                            description: Timestamp of oldest backup
+                          newestBackup:
+                            type: string
+                            format: date-time
+                            description: Timestamp of newest backup
+              examples:
+                success:
+                  summary: Successful backup list
+                  value:
+                    success: true
+                    data:
+                      backups:
+                        - filename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                          timestamp: "2024-01-15T02:00:00.000Z"
+                          size: 52428800
+                          compressed: true
+                          checksum: "sha256:abc123def456..."
+                          databaseSize: 104857600
+                          tables: ["users", "dashboards", "widgets"]
+                          version: "PostgreSQL 15.5"
+                          duration: 45000
+                        - filename: "backup-2024-01-14T02-00-00-000Z-daily.sql.gz"
+                          timestamp: "2024-01-14T02:00:00.000Z"
+                          size: 48234567
+                          compressed: true
+                          checksum: "sha256:def456ghi789..."
+                          databaseSize: 98765432
+                          tables: ["users", "dashboards", "widgets"]
+                          version: "PostgreSQL 15.5"
+                          duration: 42000
+                      total: 25
+                      totalSize: 1073741824
+                      oldestBackup: "2024-01-01T02:00:00.000Z"
+                      newestBackup: "2024-01-15T02:00:00.000Z"
+                    message: "Backups retrieved successfully"
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/backup/create:
+    post:
+      tags:
+        - Backup
+      summary: Create manual database backup
+      description: |
+        Trigger a manual database backup with optional configuration.
+        Supports selective backups (schema-only, data-only, specific tables)
+        and custom naming. Only accessible by admin users.
+      operationId: createBackup
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                includeSchema:
+                  type: boolean
+                  default: true
+                  description: Include database schema in backup
+                includeData:
+                  type: boolean
+                  default: true
+                  description: Include data in backup
+                specificTables:
+                  type: array
+                  items:
+                    type: string
+                  description: Backup only specific tables (optional)
+                  example: ["users", "dashboards"]
+                customSuffix:
+                  type: string
+                  maxLength: 50
+                  pattern: '^[a-zA-Z0-9_-]+$'
+                  description: Custom suffix for backup filename
+                  example: "manual-pre-upgrade"
+                compression:
+                  type: boolean
+                  default: true
+                  description: Enable gzip compression
+                description:
+                  type: string
+                  maxLength: 500
+                  description: Description of the backup purpose
+                  example: "Manual backup before system upgrade"
+            examples:
+              full:
+                summary: Full database backup
+                value:
+                  customSuffix: "manual"
+                  description: "Manual backup requested by admin"
+              schema_only:
+                summary: Schema-only backup
+                value:
+                  includeSchema: true
+                  includeData: false
+                  customSuffix: "schema-only"
+                  description: "Schema backup for development"
+              selective:
+                summary: Selective table backup
+                value:
+                  specificTables: ["users", "user_profiles"]
+                  customSuffix: "user-data"
+                  description: "User data backup for migration"
+      responses:
+        '200':
+          description: Backup created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          backup:
+                            $ref: '#/components/schemas/BackupMetadata'
+                          jobId:
+                            type: string
+                            description: Background job ID for tracking
+                            example: "backup-job-1705312800"
+              examples:
+                success:
+                  summary: Backup creation success
+                  value:
+                    success: true
+                    data:
+                      backup:
+                        filename: "backup-2024-01-15T10-30-15-500Z-manual.sql.gz"
+                        timestamp: "2024-01-15T10:30:15.500Z"
+                        size: 52428800
+                        compressed: true
+                        checksum: "sha256:abc123def456..."
+                        databaseSize: 104857600
+                        tables: ["users", "dashboards", "widgets", "analytics"]
+                        version: "PostgreSQL 15.5"
+                        duration: 47000
+                      jobId: "backup-job-1705312815500"
+                    message: "Database backup created successfully"
+        '400':
+          description: Invalid backup configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_tables:
+                  summary: Invalid table names
+                  value:
+                    success: false
+                    error:
+                      code: "VALIDATION_ERROR"
+                      message: "Invalid table names specified"
+                      statusCode: 400
+                      details:
+                        invalidTables: ["nonexistent_table"]
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '507':
+          description: Insufficient storage space
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/backup/restore:
+    post:
+      tags:
+        - Backup
+      summary: Restore database from backup
+      description: |
+        Restore the database from a backup file. This is a destructive operation
+        that requires super admin privileges. Supports dry-run mode for testing.
+
+        **WARNING: This operation will overwrite the current database if dropExisting is true.**
+      operationId: restoreBackup
+      security:
+        - BearerAuth: [] # Requires SUPER_ADMIN role
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - backupFilename
+              properties:
+                backupFilename:
+                  type: string
+                  description: Name of the backup file to restore
+                  example: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                dropExisting:
+                  type: boolean
+                  default: false
+                  description: Drop existing database before restore (destructive)
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Validate restore without applying changes
+                targetDatabase:
+                  type: string
+                  description: Target database name (optional, defaults to current)
+                  example: "dashboard_restore_test"
+                skipConfirmation:
+                  type: boolean
+                  default: false
+                  description: Skip additional confirmation prompts
+            examples:
+              dry_run:
+                summary: Dry run restore
+                value:
+                  backupFilename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                  dryRun: true
+              full_restore:
+                summary: Full database restore
+                value:
+                  backupFilename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                  dropExisting: true
+                  skipConfirmation: true
+              to_new_db:
+                summary: Restore to new database
+                value:
+                  backupFilename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                  targetDatabase: "dashboard_test"
+      responses:
+        '200':
+          description: Database restored successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          backupFilename:
+                            type: string
+                            example: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                          targetDatabase:
+                            type: string
+                            example: "dashboard_platform"
+                          restoreStartTime:
+                            type: string
+                            format: date-time
+                          restoreEndTime:
+                            type: string
+                            format: date-time
+                          duration:
+                            type: integer
+                            description: Restore duration in milliseconds
+                            example: 120000
+                          dryRun:
+                            type: boolean
+                            example: false
+                          recordsRestored:
+                            type: object
+                            description: Count of restored records by table
+                            example:
+                              users: 1250
+                              dashboards: 345
+                              widgets: 2100
+                          warnings:
+                            type: array
+                            items:
+                              type: string
+                            description: Non-fatal warnings during restore
+        '400':
+          description: Invalid restore request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                file_not_found:
+                  summary: Backup file not found
+                  value:
+                    success: false
+                    error:
+                      code: "BACKUP_FILE_NOT_FOUND"
+                      message: "Specified backup file does not exist"
+                      statusCode: 400
+                checksum_mismatch:
+                  summary: Backup file corrupted
+                  value:
+                    success: false
+                    error:
+                      code: "BACKUP_INTEGRITY_FAILURE"
+                      message: "Backup file integrity check failed"
+                      statusCode: 400
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Super admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Restore operation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/backup/{filename}/verify:
+    post:
+      tags:
+        - Backup
+      summary: Verify backup file integrity
+      description: |
+        Verify the integrity of a backup file by checking its checksum,
+        compression validity, and basic SQL syntax. This is a non-destructive
+        operation that helps ensure backup reliability.
+      operationId: verifyBackup
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: Backup filename to verify
+          schema:
+            type: string
+            example: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+      responses:
+        '200':
+          description: Backup verification completed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          filename:
+                            type: string
+                          valid:
+                            type: boolean
+                            description: Overall backup validity
+                          checks:
+                            type: object
+                            properties:
+                              fileExists:
+                                type: boolean
+                              checksumValid:
+                                type: boolean
+                              compressionValid:
+                                type: boolean
+                              sqlSyntaxValid:
+                                type: boolean
+                              sizeConsistent:
+                                type: boolean
+                          metadata:
+                            $ref: '#/components/schemas/BackupMetadata'
+                          issues:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum: [warning, error]
+                                message:
+                                  type: string
+                                code:
+                                  type: string
+              examples:
+                valid:
+                  summary: Valid backup file
+                  value:
+                    success: true
+                    data:
+                      filename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                      valid: true
+                      checks:
+                        fileExists: true
+                        checksumValid: true
+                        compressionValid: true
+                        sqlSyntaxValid: true
+                        sizeConsistent: true
+                      metadata:
+                        filename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                        timestamp: "2024-01-15T02:00:00.000Z"
+                        size: 52428800
+                        compressed: true
+                        checksum: "sha256:abc123def456..."
+                        databaseSize: 104857600
+                        tables: ["users", "dashboards", "widgets"]
+                        version: "PostgreSQL 15.5"
+                        duration: 45000
+                      issues: []
+                    message: "Backup verification completed successfully"
+                invalid:
+                  summary: Invalid backup file
+                  value:
+                    success: false
+                    data:
+                      filename: "backup-2024-01-15T02-00-00-000Z-daily.sql.gz"
+                      valid: false
+                      checks:
+                        fileExists: true
+                        checksumValid: false
+                        compressionValid: true
+                        sqlSyntaxValid: true
+                        sizeConsistent: false
+                      issues:
+                        - type: "error"
+                          message: "Checksum mismatch detected"
+                          code: "CHECKSUM_MISMATCH"
+                        - type: "warning"
+                          message: "File size differs from metadata"
+                          code: "SIZE_MISMATCH"
+        '404':
+          description: Backup file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/backup/stats:
+    get:
+      tags:
+        - Backup
+      summary: Get backup system statistics
+      description: |
+        Retrieve comprehensive statistics about the backup system including
+        storage usage, success rates, performance metrics, and trends.
+      operationId: getBackupStats
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Backup statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          totalBackups:
+                            type: integer
+                            description: Total number of backups
+                            example: 45
+                          totalSize:
+                            type: integer
+                            description: Total size of all backups in bytes
+                            example: 2147483648
+                          oldestBackup:
+                            type: string
+                            format: date-time
+                            description: Timestamp of oldest backup
+                          newestBackup:
+                            type: string
+                            format: date-time
+                            description: Timestamp of newest backup
+                          averageSize:
+                            type: integer
+                            description: Average backup size in bytes
+                            example: 52428800
+                          backupsLast24Hours:
+                            type: integer
+                            description: Backups created in last 24 hours
+                            example: 1
+                          backupsLast7Days:
+                            type: integer
+                            description: Backups created in last 7 days
+                            example: 7
+                          backupsLast30Days:
+                            type: integer
+                            description: Backups created in last 30 days
+                            example: 30
+                          compressionUsage:
+                            type: number
+                            format: float
+                            description: Percentage of backups using compression
+                            example: 95.5
+                          averageDuration:
+                            type: integer
+                            description: Average backup duration in seconds
+                            example: 45
+                          successRate:
+                            type: number
+                            format: float
+                            description: Backup success rate percentage
+                            example: 98.2
+                          diskSpaceUsed:
+                            type: integer
+                            description: Disk space used by backups in bytes
+                            example: 2147483648
+                          diskSpaceAvailable:
+                            type: integer
+                            description: Available disk space in bytes
+                            example: 10737418240
+                          retentionPolicy:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                                example: true
+                              retentionDays:
+                                type: integer
+                                example: 30
+                              nextCleanup:
+                                type: string
+                                format: date-time
+              examples:
+                success:
+                  summary: Backup statistics
+                  value:
+                    success: true
+                    data:
+                      totalBackups: 45
+                      totalSize: 2147483648
+                      oldestBackup: "2024-01-01T02:00:00.000Z"
+                      newestBackup: "2024-01-15T02:00:00.000Z"
+                      averageSize: 52428800
+                      backupsLast24Hours: 1
+                      backupsLast7Days: 7
+                      backupsLast30Days: 30
+                      compressionUsage: 95.5
+                      averageDuration: 45
+                      successRate: 98.2
+                      diskSpaceUsed: 2147483648
+                      diskSpaceAvailable: 10737418240
+                      retentionPolicy:
+                        enabled: true
+                        retentionDays: 30
+                        nextCleanup: "2024-01-16T05:00:00.000Z"
+                    message: "Backup statistics retrieved successfully"
+
+  /api/backup/schedule/status:
+    get:
+      tags:
+        - Backup
+      summary: Get backup schedule status
+      description: |
+        Retrieve information about scheduled backup jobs including their
+        schedules, last run times, next run times, and execution status.
+      operationId: getBackupScheduleStatus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Backup schedule status retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Whether backup scheduling is enabled
+                            example: true
+                          schedules:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "backup-daily"
+                                type:
+                                  type: string
+                                  enum: [daily, weekly, monthly, cleanup]
+                                  example: "daily"
+                                schedule:
+                                  type: string
+                                  description: Cron expression
+                                  example: "0 2 * * *"
+                                lastRun:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                  description: Last execution time
+                                nextRun:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                  description: Next scheduled execution
+                                status:
+                                  type: string
+                                  enum: [pending, running, completed, failed]
+                                  example: "completed"
+                                lastDuration:
+                                  type: integer
+                                  nullable: true
+                                  description: Duration of last run in milliseconds
+                                  example: 45000
+                                consecutiveFailures:
+                                  type: integer
+                                  description: Number of consecutive failures
+                                  example: 0
+                          runningBackups:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                jobId:
+                                  type: string
+                                type:
+                                  type: string
+                                startTime:
+                                  type: string
+                                  format: date-time
+                                progress:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 100
+                          stats:
+                            type: object
+                            properties:
+                              totalBackups:
+                                type: integer
+                                example: 45
+                              successfulBackups:
+                                type: integer
+                                example: 44
+                              failedBackups:
+                                type: integer
+                                example: 1
+                              averageSuccessDuration:
+                                type: integer
+                                description: Average duration of successful backups in seconds
+                                example: 45
+
+  /api/backup/schedule/trigger:
+    post:
+      tags:
+        - Backup
+      summary: Manually trigger scheduled backup
+      description: |
+        Manually trigger a specific type of scheduled backup (daily, weekly, monthly)
+        outside of its normal schedule. Useful for testing or immediate backup needs.
+      operationId: triggerScheduledBackup
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [daily, weekly, monthly]
+                  description: Type of backup to trigger
+                  example: "daily"
+                reason:
+                  type: string
+                  maxLength: 200
+                  description: Reason for manual trigger
+                  example: "Testing backup system before maintenance"
+      responses:
+        '200':
+          description: Backup triggered successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          jobId:
+                            type: string
+                            description: Background job ID
+                            example: "backup-job-manual-1705312800"
+                          type:
+                            type: string
+                            example: "daily"
+                          triggeredAt:
+                            type: string
+                            format: date-time
+                          estimatedDuration:
+                            type: integer
+                            description: Estimated duration in seconds
+                            example: 45
+
+  /api/backup/cleanup:
+    post:
+      tags:
+        - Backup
+      summary: Manually trigger backup cleanup
+      description: |
+        Manually trigger the cleanup process to remove old backups according
+        to the retention policy. This is normally done automatically.
+      operationId: triggerBackupCleanup
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Preview what would be deleted without actually deleting
+                force:
+                  type: boolean
+                  default: false
+                  description: Force cleanup even if recent cleanup was performed
+                olderThan:
+                  type: integer
+                  description: Override retention policy - delete backups older than N days
+                  minimum: 1
+                  example: 30
+      responses:
+        '200':
+          description: Cleanup completed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          deleted:
+                            type: integer
+                            description: Number of backups deleted
+                            example: 5
+                          freedSpace:
+                            type: integer
+                            description: Disk space freed in bytes
+                            example: 262144000
+                          errors:
+                            type: integer
+                            description: Number of deletion errors
+                            example: 0
+                          dryRun:
+                            type: boolean
+                            example: false
+                          deletedFiles:
+                            type: array
+                            items:
+                              type: string
+                            description: List of deleted backup filenames
+                            example:
+                              - "backup-2023-12-01T02-00-00-000Z-daily.sql.gz"
+                              - "backup-2023-12-02T02-00-00-000Z-daily.sql.gz"
+                          errorDetails:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                filename:
+                                  type: string
+                                error:
+                                  type: string
+                            description: Details of any deletion errors
+
+  /api/backup/health:
+    get:
+      tags:
+        - System
+      summary: Backup system health check
+      description: |
+        Check the health status of the backup system including disk space,
+        recent backup status, scheduler status, and overall system health.
+      operationId: backupHealthCheck
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Backup system health status
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            enum: [healthy, degraded, unhealthy]
+                            example: "healthy"
+                          totalBackups:
+                            type: integer
+                            example: 45
+                          hasRecentBackup:
+                            type: boolean
+                            description: Has backup within last 48 hours
+                            example: true
+                          lastBackup:
+                            type: string
+                            format: date-time
+                            nullable: true
+                          diskSpaceStatus:
+                            type: string
+                            enum: [healthy, warning, critical]
+                            example: "healthy"
+                          diskSpaceUsage:
+                            type: number
+                            format: float
+                            description: Disk space usage percentage
+                            example: 25.5
+                          schedulerStatus:
+                            type: string
+                            enum: [running, stopped, error]
+                            example: "running"
+                          lastCleanup:
+                            type: string
+                            format: date-time
+                            nullable: true
+                          issues:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum: [warning, error, info]
+                                message:
+                                  type: string
+                                code:
+                                  type: string
+                          timestamp:
+                            type: string
+                            format: date-time
+        '503':
+          description: Backup system is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

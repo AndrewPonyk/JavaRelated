@@ -1,0 +1,208 @@
+{
+  "name": "enterprise-dashboard-platform",
+  "version": "1.0.0",
+  "description": "Enterprise Dashboard Platform with React, TypeScript, and D3.js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "vite --config config/vite.config.ts",
+    "dev:backend": "cd backend && npm run dev",
+
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "vite build --config config/vite.config.ts",
+    "build:backend": "cd backend && npm run build",
+
+    "start": "npm run start:backend",
+    "start:frontend": "vite preview --config config/vite.config.ts",
+    "start:backend": "cd backend && npm run start",
+
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "vitest run",
+    "test:backend": "cd backend && npm run test",
+    "test:e2e": "playwright test",
+    "test:coverage": "npm run test:frontend -- --coverage && npm run test:backend -- --coverage",
+
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:fix": "npm run lint:frontend -- --fix && npm run lint:backend -- --fix",
+
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+
+    "type-check": "npm run type-check:frontend && npm run type-check:backend",
+    "type-check:frontend": "tsc --noEmit",
+    "type-check:backend": "cd backend && npm run type-check",
+
+    "db:generate": "cd backend && npx prisma generate",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:migrate:deploy": "cd backend && npx prisma migrate deploy",
+    "db:seed": "cd backend && npx prisma db seed",
+    "db:studio": "cd backend && npx prisma studio",
+    "db:reset": "cd backend && npx prisma migrate reset",
+
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+
+    "deploy:staging": "npm run build && npm run deploy:staging:script",
+    "deploy:production": "npm run build && npm run deploy:production:script",
+    "deploy:staging:script": "./scripts/deploy-staging.sh",
+    "deploy:production:script": "./scripts/deploy-production.sh",
+
+    "clean": "rm -rf node_modules frontend/node_modules backend/node_modules frontend/dist backend/dist",
+    "clean:cache": "npm run clean && rm -rf .npm _tmp",
+    "setup": "npm run setup:backend",
+    "setup:backend": "cd backend && npm install",
+
+    "security:audit": "npm audit --recursive",
+    "security:fix": "npm audit fix --recursive",
+
+    "precommit": "lint-staged",
+    "commit": "git-cz"
+  },
+  "keywords": [
+    "dashboard",
+    "analytics",
+    "react",
+    "typescript",
+    "d3js",
+    "enterprise",
+    "visualization",
+    "data",
+    "business-intelligence"
+  ],
+  "author": "Enterprise Dashboard Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "backend"
+  ],
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/d3": "^7.4.3",
+    "@types/file-saver": "^2.0.7",
+    "@types/papaparse": "^5.3.14",
+    "@types/lodash-es": "^4.17.12",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "vitest": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "@vitest/coverage-v8": "^1.0.4",
+    "jsdom": "^23.0.1",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.1.6",
+    "@testing-library/user-event": "^14.5.1",
+    "tailwindcss": "^3.3.6",
+    "tailwindcss-animate": "^1.0.7",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "msw": "^2.0.11",
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "^20.10.4",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "commitizen": "^4.3.0",
+    "concurrently": "^8.2.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "@tanstack/react-query": "^5.12.2",
+    "@tanstack/react-query-devtools": "^5.13.3",
+    "zustand": "^4.4.7",
+    "axios": "^1.6.2",
+    "zod": "^3.22.4",
+    "react-hook-form": "^7.48.2",
+    "@hookform/resolvers": "^3.3.2",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.1.0",
+    "class-variance-authority": "^0.7.0",
+    "lucide-react": "^0.294.0",
+    "@radix-ui/react-avatar": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-popover": "^1.0.7",
+    "d3": "^7.8.5",
+    "d3-selection": "^3.0.0",
+    "d3-scale": "^4.0.2",
+    "d3-axis": "^3.0.0",
+    "d3-shape": "^3.2.0",
+    "d3-transition": "^3.0.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-grid-layout": "^1.4.4",
+    "react-resizable": "^3.0.5",
+    "date-fns": "^2.30.0",
+    "react-datepicker": "^4.24.0",
+    "recharts": "^2.8.0",
+    "@tensorflow/tfjs": "^4.15.0",
+    "react-window": "^1.8.8",
+    "react-window-infinite-loader": "^1.0.9",
+    "react-dropzone": "^14.2.3",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "papaparse": "^5.4.1",
+    "lodash-es": "^4.17.21",
+    "react-helmet-async": "^2.0.4",
+    "react-hotkeys-hook": "^4.4.1",
+    "dotenv": "^16.3.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/enterprise-dashboard-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/enterprise-dashboard-platform/issues"
+  },
+  "homepage": "https://github.com/your-org/enterprise-dashboard-platform#readme",
+  "private": true
+}

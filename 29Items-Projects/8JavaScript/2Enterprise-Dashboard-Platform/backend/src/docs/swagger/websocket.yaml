@@ -1,0 +1,721 @@
+# WebSocket API Documentation
+
+# Note: WebSocket documentation in OpenAPI 3.0 is limited
+# This section documents the WebSocket endpoints and message formats
+
+paths:
+  /api/websocket/info:
+    get:
+      tags:
+        - WebSocket
+      summary: Get WebSocket connection information
+      description: |
+        Retrieve information about WebSocket server status, connection limits,
+        and available topics for real-time updates.
+      operationId: getWebSocketInfo
+      security: [] # Public endpoint
+      responses:
+        '200':
+          description: WebSocket information retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          server:
+                            type: object
+                            properties:
+                              status:
+                                type: string
+                                enum: [running, stopped, error]
+                                example: "running"
+                              port:
+                                type: integer
+                                example: 3002
+                              secure:
+                                type: boolean
+                                example: false
+                              connectionUrl:
+                                type: string
+                                example: "ws://localhost:3002"
+                              protocolVersion:
+                                type: string
+                                example: "13"
+                          limits:
+                            type: object
+                            properties:
+                              maxConnections:
+                                type: integer
+                                description: Maximum total connections
+                                example: 1000
+                              maxConnectionsPerIP:
+                                type: integer
+                                description: Maximum connections per IP
+                                example: 10
+                              maxConnectionsPerUser:
+                                type: integer
+                                description: Maximum connections per user
+                                example: 5
+                              maxMessagesPerMinute:
+                                type: integer
+                                description: Maximum messages per minute per connection
+                                example: 60
+                              maxMessagesPerHour:
+                                type: integer
+                                description: Maximum messages per hour per connection
+                                example: 1000
+                          topics:
+                            type: array
+                            description: Available subscription topics
+                            items:
+                              type: object
+                              properties:
+                                topic:
+                                  type: string
+                                  example: "dashboard:*"
+                                description:
+                                  type: string
+                                  example: "Dashboard updates and changes"
+                                requiresAuth:
+                                  type: boolean
+                                  example: true
+                                pattern:
+                                  type: string
+                                  example: "dashboard:{dashboardId}"
+                            example:
+                              - topic: "dashboard:*"
+                                description: "Dashboard updates and changes"
+                                requiresAuth: true
+                                pattern: "dashboard:{dashboardId}"
+                              - topic: "widget:*"
+                                description: "Widget data and configuration updates"
+                                requiresAuth: true
+                                pattern: "widget:{widgetId}"
+                              - topic: "user:*"
+                                description: "User activity and notifications"
+                                requiresAuth: true
+                                pattern: "user:{userId}"
+                          currentStats:
+                            type: object
+                            properties:
+                              activeConnections:
+                                type: integer
+                                example: 45
+                              totalMessages:
+                                type: integer
+                                example: 12450
+                              messagesLastHour:
+                                type: integer
+                                example: 234
+
+  /api/websocket/stats:
+    get:
+      tags:
+        - WebSocket
+      summary: Get WebSocket server statistics
+      description: |
+        Retrieve detailed statistics about WebSocket server performance,
+        connection metrics, and message throughput. Admin access required.
+      operationId: getWebSocketStats
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: WebSocket statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          server:
+                            type: object
+                            properties:
+                              uptime:
+                                type: integer
+                                description: Server uptime in seconds
+                                example: 86400
+                              startTime:
+                                type: string
+                                format: date-time
+                              version:
+                                type: string
+                                example: "1.0.0"
+                              memoryUsage:
+                                type: object
+                                properties:
+                                  heapUsed:
+                                    type: integer
+                                    example: 52428800
+                                  heapTotal:
+                                    type: integer
+                                    example: 104857600
+                          connections:
+                            type: object
+                            properties:
+                              current:
+                                type: integer
+                                description: Current active connections
+                                example: 45
+                              peak:
+                                type: integer
+                                description: Peak connections since startup
+                                example: 127
+                              total:
+                                type: integer
+                                description: Total connections since startup
+                                example: 2543
+                              byUser:
+                                type: object
+                                description: Connections grouped by user
+                                example:
+                                  authenticated: 42
+                                  anonymous: 3
+                              byIP:
+                                type: array
+                                description: Top IP addresses by connection count
+                                items:
+                                  type: object
+                                  properties:
+                                    ip:
+                                      type: string
+                                      example: "192.168.1.100"
+                                    connections:
+                                      type: integer
+                                      example: 3
+                          messages:
+                            type: object
+                            properties:
+                              total:
+                                type: integer
+                                description: Total messages processed
+                                example: 125000
+                              lastHour:
+                                type: integer
+                                description: Messages in the last hour
+                                example: 1250
+                              lastMinute:
+                                type: integer
+                                description: Messages in the last minute
+                                example: 25
+                              averagePerSecond:
+                                type: number
+                                format: float
+                                description: Average messages per second
+                                example: 1.4
+                              byType:
+                                type: object
+                                description: Messages grouped by type
+                                example:
+                                  dashboard_update: 45000
+                                  widget_update: 35000
+                                  user_activity: 25000
+                                  heartbeat: 20000
+                          rateLimiting:
+                            type: object
+                            properties:
+                              blockedConnections:
+                                type: integer
+                                description: Connections blocked by rate limiting
+                                example: 12
+                              blockedMessages:
+                                type: integer
+                                description: Messages blocked by rate limiting
+                                example: 245
+                              bannedIPs:
+                                type: integer
+                                description: Currently banned IP addresses
+                                example: 3
+                              activeLimits:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    type:
+                                      type: string
+                                      example: "messages_per_minute"
+                                    count:
+                                      type: integer
+                                      example: 15
+                          topics:
+                            type: object
+                            properties:
+                              totalSubscriptions:
+                                type: integer
+                                description: Total active subscriptions
+                                example: 127
+                              byTopic:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    topic:
+                                      type: string
+                                      example: "dashboard:dash_123456"
+                                    subscribers:
+                                      type: integer
+                                      example: 5
+                                    messagesSent:
+                                      type: integer
+                                      example: 234
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/websocket/health:
+    get:
+      tags:
+        - System
+      summary: WebSocket service health check
+      description: |
+        Check the health status of the WebSocket server including
+        connection limits, memory usage, and error rates.
+      operationId: webSocketHealthCheck
+      security: []
+      responses:
+        '200':
+          description: WebSocket service is healthy
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            enum: [healthy, degraded, unhealthy]
+                            example: "healthy"
+                          server:
+                            type: object
+                            properties:
+                              running:
+                                type: boolean
+                                example: true
+                              uptime:
+                                type: integer
+                                example: 86400
+                              port:
+                                type: integer
+                                example: 3002
+                          connections:
+                            type: object
+                            properties:
+                              current:
+                                type: integer
+                                example: 45
+                              limit:
+                                type: integer
+                                example: 1000
+                              utilization:
+                                type: number
+                                format: float
+                                example: 4.5
+                          performance:
+                            type: object
+                            properties:
+                              averageLatency:
+                                type: number
+                                format: float
+                                description: Average message latency in ms
+                                example: 12.5
+                              messageRate:
+                                type: number
+                                format: float
+                                description: Messages per second
+                                example: 1.4
+                              errorRate:
+                                type: number
+                                format: float
+                                description: Error rate percentage
+                                example: 0.1
+                          timestamp:
+                            type: string
+                            format: date-time
+        '503':
+          description: WebSocket service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+# WebSocket Message Schemas (for documentation purposes)
+components:
+  schemas:
+    WSMessage:
+      type: object
+      description: |
+        WebSocket message format for real-time communication.
+        All messages follow this structure regardless of type.
+      required:
+        - type
+        - data
+        - timestamp
+      properties:
+        type:
+          type: string
+          enum:
+            - subscribe
+            - unsubscribe
+            - dashboard_update
+            - widget_update
+            - user_activity
+            - heartbeat
+            - error
+            - ack
+          description: Message type
+          example: "dashboard_update"
+        topic:
+          type: string
+          description: Topic for pub/sub messages
+          example: "dashboard:dash_123456789"
+        data:
+          type: object
+          description: Message payload (varies by type)
+        timestamp:
+          type: string
+          format: date-time
+          description: Message timestamp
+        userId:
+          type: string
+          description: User ID (for authenticated connections)
+          example: "usr_123456789"
+        messageId:
+          type: string
+          description: Unique message identifier
+          example: "msg_1705312800000"
+
+    WSSubscribeMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [subscribe]
+            data:
+              type: object
+              required:
+                - topics
+              properties:
+                topics:
+                  type: array
+                  items:
+                    type: string
+                  description: Topics to subscribe to
+                  example: ["dashboard:dash_123456", "widget:wgt_789012"]
+                filters:
+                  type: object
+                  description: Optional filters for messages
+                  properties:
+                    userId:
+                      type: string
+                    eventTypes:
+                      type: array
+                      items:
+                        type: string
+
+    WSUnsubscribeMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [unsubscribe]
+            data:
+              type: object
+              required:
+                - topics
+              properties:
+                topics:
+                  type: array
+                  items:
+                    type: string
+                  description: Topics to unsubscribe from
+                  example: ["dashboard:dash_123456"]
+
+    WSDashboardUpdateMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [dashboard_update]
+            topic:
+              type: string
+              pattern: '^dashboard:'
+              example: "dashboard:dash_123456789"
+            data:
+              type: object
+              properties:
+                dashboardId:
+                  type: string
+                  example: "dash_123456789"
+                updateType:
+                  type: string
+                  enum: [created, updated, deleted, shared, permissions_changed]
+                  example: "updated"
+                changes:
+                  type: object
+                  description: Changed fields
+                  example:
+                    title: "Updated Dashboard Title"
+                    description: "New description"
+                updatedBy:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                    name:
+                      type: string
+                    avatar:
+                      type: string
+                dashboard:
+                  $ref: '#/components/schemas/Dashboard'
+                  description: Updated dashboard data (for major changes)
+
+    WSWidgetUpdateMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [widget_update]
+            topic:
+              type: string
+              pattern: '^widget:'
+              example: "widget:wgt_123456789"
+            data:
+              type: object
+              properties:
+                widgetId:
+                  type: string
+                  example: "wgt_123456789"
+                dashboardId:
+                  type: string
+                  example: "dash_123456789"
+                updateType:
+                  type: string
+                  enum: [data_updated, config_changed, moved, resized, deleted]
+                  example: "data_updated"
+                widget:
+                  $ref: '#/components/schemas/Widget'
+                  description: Updated widget data
+                changes:
+                  type: object
+                  description: Specific changes made
+                updatedBy:
+                  type: object
+                  properties:
+                    userId:
+                      type: string
+                    name:
+                      type: string
+
+    WSUserActivityMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [user_activity]
+            topic:
+              type: string
+              pattern: '^user:'
+              example: "user:usr_123456789"
+            data:
+              type: object
+              properties:
+                activityType:
+                  type: string
+                  enum: [login, logout, dashboard_view, dashboard_edit, profile_update]
+                  example: "dashboard_view"
+                description:
+                  type: string
+                  example: "Viewed dashboard 'Sales Analytics'"
+                metadata:
+                  type: object
+                  properties:
+                    dashboardId:
+                      type: string
+                    ipAddress:
+                      type: string
+                    userAgent:
+                      type: string
+
+    WSHeartbeatMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [heartbeat]
+            data:
+              type: object
+              properties:
+                serverTime:
+                  type: string
+                  format: date-time
+                  example: "2024-01-15T10:30:00.000Z"
+                connectionId:
+                  type: string
+                  example: "conn_1705312800000"
+                uptime:
+                  type: integer
+                  description: Connection uptime in seconds
+                  example: 3600
+
+    WSErrorMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [error]
+            data:
+              type: object
+              required:
+                - code
+                - message
+              properties:
+                code:
+                  type: string
+                  enum:
+                    - AUTHENTICATION_REQUIRED
+                    - INVALID_TOPIC
+                    - RATE_LIMIT_EXCEEDED
+                    - SUBSCRIPTION_FAILED
+                    - MESSAGE_TOO_LARGE
+                    - INVALID_FORMAT
+                  example: "RATE_LIMIT_EXCEEDED"
+                message:
+                  type: string
+                  example: "Message rate limit exceeded"
+                details:
+                  type: object
+                  description: Additional error details
+                retryAfter:
+                  type: integer
+                  description: Seconds to wait before retrying
+                  example: 60
+
+    WSAckMessage:
+      allOf:
+        - $ref: '#/components/schemas/WSMessage'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [ack]
+            data:
+              type: object
+              required:
+                - messageId
+                - status
+              properties:
+                messageId:
+                  type: string
+                  description: ID of the message being acknowledged
+                  example: "msg_1705312800000"
+                status:
+                  type: string
+                  enum: [success, error]
+                  example: "success"
+                message:
+                  type: string
+                  example: "Subscription successful"
+
+# WebSocket Connection Flow Documentation
+x-websocket-info:
+  connection:
+    url: "ws://localhost:3002"
+    protocols: ["ws"]
+    authentication:
+      type: "query-parameter"
+      parameter: "token"
+      description: "Pass JWT token as 'token' query parameter"
+      example: "ws://localhost:3002?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+  flow:
+    - step: 1
+      description: "Connect to WebSocket server"
+      example: "new WebSocket('ws://localhost:3002?token=JWT_TOKEN')"
+
+    - step: 2
+      description: "Server sends heartbeat message"
+      message:
+        type: "heartbeat"
+        data:
+          serverTime: "2024-01-15T10:30:00.000Z"
+          connectionId: "conn_1705312800000"
+
+    - step: 3
+      description: "Subscribe to topics"
+      message:
+        type: "subscribe"
+        data:
+          topics: ["dashboard:dash_123456", "user:usr_789012"]
+
+    - step: 4
+      description: "Server acknowledges subscription"
+      message:
+        type: "ack"
+        data:
+          messageId: "msg_subscribe_1705312800"
+          status: "success"
+          message: "Subscribed to 2 topics"
+
+    - step: 5
+      description: "Receive real-time updates"
+      message:
+        type: "dashboard_update"
+        topic: "dashboard:dash_123456"
+        data:
+          dashboardId: "dash_123456"
+          updateType: "updated"
+          changes:
+            title: "New Dashboard Title"
+
+  rate_limits:
+    connection_attempts: "5 per minute per IP"
+    messages: "60 per minute per connection"
+    subscriptions: "100 topics per connection"
+
+  error_handling:
+    connection_failure:
+      - "Check authentication token"
+      - "Verify server is running"
+      - "Check network connectivity"
+
+    rate_limit_exceeded:
+      - "Reduce message frequency"
+      - "Wait for rate limit reset"
+      - "Implement exponential backoff"
+
+    subscription_failed:
+      - "Check topic format"
+      - "Verify permissions"
+      - "Ensure dashboard/widget exists"

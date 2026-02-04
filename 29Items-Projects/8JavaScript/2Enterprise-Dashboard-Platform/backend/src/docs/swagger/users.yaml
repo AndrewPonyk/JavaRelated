@@ -1,0 +1,1067 @@
+# Users API Documentation
+
+paths:
+  /api/users/search:
+    get:
+      tags:
+        - Users
+      summary: Search for users by name or email
+      description: |
+        Search for users by name or email address. Returns a paginated list
+        of matching users with basic profile information.
+      operationId: searchUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query (name or email)
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+            example: "john"
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: includeInactive
+          in: query
+          description: Include inactive users in results
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: User search results
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          users:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "usr_123456789"
+                                name:
+                                  type: string
+                                  example: "John Doe"
+                                email:
+                                  type: string
+                                  example: "john.doe@example.com"
+                                avatar:
+                                  type: string
+                                  nullable: true
+                                  example: "https://example.com/avatars/john.jpg"
+                                role:
+                                  type: string
+                                  enum: [USER, ADMIN, SUPER_ADMIN]
+                                  example: "USER"
+                                isActive:
+                                  type: boolean
+                                  example: true
+                                company:
+                                  type: string
+                                  nullable: true
+                                  example: "Acme Corp"
+                                lastLoginAt:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                          total:
+                            type: integer
+                            description: Total number of matching users
+                            example: 25
+                          hasMore:
+                            type: boolean
+                            description: Whether there are more results
+                            example: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+
+  /api/users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      description: |
+        Retrieve the complete profile of the currently authenticated user
+        including personal information, preferences, and statistics.
+      operationId: getCurrentUserProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+                          stats:
+                            type: object
+                            properties:
+                              dashboardCount:
+                                type: integer
+                                description: Number of owned dashboards
+                                example: 12
+                              sharedDashboards:
+                                type: integer
+                                description: Number of dashboards shared with user
+                                example: 8
+                              totalViews:
+                                type: integer
+                                description: Total dashboard views by user
+                                example: 1250
+                              lastActive:
+                                type: string
+                                format: date-time
+                                description: Last activity timestamp
+                              joinedAt:
+                                type: string
+                                format: date-time
+                                description: Account creation date
+                          preferences:
+                            type: object
+                            properties:
+                              notifications:
+                                type: object
+                                properties:
+                                  email:
+                                    type: boolean
+                                    example: true
+                                  dashboard:
+                                    type: boolean
+                                    example: true
+                                  comments:
+                                    type: boolean
+                                    example: false
+                              privacy:
+                                type: object
+                                properties:
+                                  showEmail:
+                                    type: boolean
+                                    example: false
+                                  showActivity:
+                                    type: boolean
+                                    example: true
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+
+  /api/users/me/change-password:
+    post:
+      tags:
+        - Users
+      summary: Change current user's password
+      description: |
+        Change the password for the currently authenticated user.
+        Requires current password verification and meets password policy.
+      operationId: changeUserPassword
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password for verification
+                  example: "currentPassword123"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  description: New password (minimum 6 characters)
+                  example: "newSecurePassword456"
+                confirmPassword:
+                  type: string
+                  description: Confirm new password (must match newPassword)
+                  example: "newSecurePassword456"
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Password changed successfully"
+        '400':
+          description: Invalid password or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                weak_password:
+                  summary: Password too weak
+                  value:
+                    success: false
+                    error:
+                      code: "VALIDATION_ERROR"
+                      message: "Password does not meet security requirements"
+                      statusCode: 400
+                      details:
+                        requirements:
+                          - "At least 6 characters"
+                          - "Include uppercase and lowercase letters"
+                          - "Include at least one number"
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+
+  /api/users/me/avatar:
+    post:
+      tags:
+        - Users
+      summary: Upload/update user avatar
+      description: |
+        Upload or update the avatar image for the currently authenticated user.
+        Supports JPEG, PNG, and GIF formats up to 5MB.
+      operationId: uploadUserAvatar
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Avatar image file (JPEG, PNG, or GIF, max 5MB)
+      responses:
+        '200':
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          avatarUrl:
+                            type: string
+                            description: URL of the uploaded avatar
+                            example: "https://cdn.example.com/avatars/usr_123456789.jpg"
+                          thumbnailUrl:
+                            type: string
+                            description: URL of avatar thumbnail
+                            example: "https://cdn.example.com/avatars/thumb_usr_123456789.jpg"
+        '400':
+          description: Invalid file or upload error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_format:
+                  summary: Invalid file format
+                  value:
+                    success: false
+                    error:
+                      code: "FILE_UPLOAD_ERROR"
+                      message: "Only JPEG, PNG, and GIF formats are allowed"
+                      statusCode: 400
+                file_too_large:
+                  summary: File too large
+                  value:
+                    success: false
+                    error:
+                      code: "FILE_TOO_LARGE"
+                      message: "File size exceeds 5MB limit"
+                      statusCode: 400
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/CSRFError'
+
+  /api/users/me/activity:
+    get:
+      tags:
+        - Users
+      summary: Get current user's activity log
+      description: |
+        Retrieve the activity log for the currently authenticated user
+        including dashboard views, edits, and other interactions.
+      operationId: getCurrentUserActivity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: type
+          in: query
+          description: Filter by activity type
+          schema:
+            type: string
+            enum: [login, dashboard_view, dashboard_edit, dashboard_share, profile_update]
+        - name: startDate
+          in: query
+          description: Start date for activity range
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for activity range
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: User activity retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: "act_123456789"
+                                type:
+                                  type: string
+                                  example: "dashboard_view"
+                                description:
+                                  type: string
+                                  example: "Viewed dashboard 'Sales Analytics'"
+                                timestamp:
+                                  type: string
+                                  format: date-time
+                                metadata:
+                                  type: object
+                                  properties:
+                                    dashboardId:
+                                      type: string
+                                    dashboardTitle:
+                                      type: string
+                                    ipAddress:
+                                      type: string
+                                    userAgent:
+                                      type: string
+                                severity:
+                                  type: string
+                                  enum: [info, warning, error]
+                                  example: "info"
+
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Get all users (Admin only)
+      description: |
+        Retrieve a paginated list of all users in the system with filtering
+        and sorting options. Only accessible by admin users.
+      operationId: getAllUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search by name or email
+          schema:
+            type: string
+            maxLength: 100
+        - name: role
+          in: query
+          description: Filter by user role
+          schema:
+            type: string
+            enum: [USER, ADMIN, SUPER_ADMIN]
+        - name: isActive
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum: [name, email, createdAt, updatedAt, lastLoginAt]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/User'
+                          summary:
+                            type: object
+                            properties:
+                              totalUsers:
+                                type: integer
+                                example: 150
+                              activeUsers:
+                                type: integer
+                                example: 142
+                              adminUsers:
+                                type: integer
+                                example: 8
+                              newUsersThisMonth:
+                                type: integer
+                                example: 12
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Users
+      summary: Create a new user (Admin only)
+      description: |
+        Create a new user account. Only accessible by admin users.
+        The new user will receive an email with login instructions.
+      operationId: createUser
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - name
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "newuser@example.com"
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  example: "New User"
+                password:
+                  type: string
+                  minLength: 6
+                  example: "temporaryPassword123"
+                role:
+                  type: string
+                  enum: [USER, ADMIN]
+                  default: USER
+                  example: "USER"
+                company:
+                  type: string
+                  maxLength: 100
+                  example: "Acme Corporation"
+                sendWelcomeEmail:
+                  type: boolean
+                  default: true
+                  description: Send welcome email with login instructions
+                requirePasswordChange:
+                  type: boolean
+                  default: true
+                  description: Force password change on first login
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          temporaryPassword:
+                            type: string
+                            description: Temporary password (only if sendWelcomeEmail is false)
+                            example: "temp-password-123"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: |
+        Retrieve a specific user's information by ID. Users can access their
+        own profile, while admin users can access any user's profile.
+      operationId: getUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+            example: "usr_123456789"
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+                          stats:
+                            type: object
+                            properties:
+                              dashboardCount:
+                                type: integer
+                              publicDashboards:
+                                type: integer
+                              totalViews:
+                                type: integer
+                              joinedAt:
+                                type: string
+                                format: date-time
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Access denied to this user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Users
+      summary: Update user information
+      description: |
+        Update user information. Users can update their own profile,
+        while admin users can update any user's information.
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [USER, ADMIN, SUPER_ADMIN]
+                  description: Only admin users can change roles
+                isActive:
+                  type: boolean
+                  description: Only admin users can change active status
+                profile:
+                  $ref: '#/components/schemas/UserProfile'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Insufficient permissions to update user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete/deactivate user (Admin only)
+      description: |
+        Delete or deactivate a user account. Only accessible by admin users.
+        This action may deactivate rather than permanently delete to preserve
+        data integrity.
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: permanent
+          in: query
+          description: Permanently delete instead of deactivating
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: User deleted/deactivated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          userId:
+                            type: string
+                          action:
+                            type: string
+                            enum: [deactivated, deleted]
+                            example: "deactivated"
+                          dashboardsTransferred:
+                            type: integer
+                            description: Number of dashboards transferred to admin
+                            example: 5
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}/profile:
+    put:
+      tags:
+        - Users
+      summary: Update user profile
+      description: |
+        Update the extended profile information for a user including
+        bio, company, location, and preferences.
+      operationId: updateUserProfile
+      security:
+        - BearerAuth: []
+        - CSRFToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UserProfile'
+                - type: object
+                  properties:
+                    notifications:
+                      type: object
+                      properties:
+                        email:
+                          type: boolean
+                        dashboard:
+                          type: boolean
+                        comments:
+                          type: boolean
+                    privacy:
+                      type: object
+                      properties:
+                        showEmail:
+                          type: boolean
+                        showActivity:
+                          type: boolean
+                        allowDirectMessages:
+                          type: boolean
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          profile:
+                            $ref: '#/components/schemas/UserProfile'
+
+  /api/users/{id}/stats:
+    get:
+      tags:
+        - Users
+      summary: Get user statistics
+      description: |
+        Retrieve detailed statistics for a user including dashboard activity,
+        views, and engagement metrics.
+      operationId: getUserStats
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: Time period for statistics
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, 1y, all]
+            default: 30d
+      responses:
+        '200':
+          description: User statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          period:
+                            type: string
+                            example: "30d"
+                          dashboards:
+                            type: object
+                            properties:
+                              total:
+                                type: integer
+                                example: 12
+                              public:
+                                type: integer
+                                example: 3
+                              private:
+                                type: integer
+                                example: 9
+                              shared:
+                                type: integer
+                                example: 5
+                          activity:
+                            type: object
+                            properties:
+                              totalViews:
+                                type: integer
+                                example: 245
+                              uniqueDashboardsViewed:
+                                type: integer
+                                example: 18
+                              avgSessionDuration:
+                                type: number
+                                format: float
+                                example: 420.5
+                              loginCount:
+                                type: integer
+                                example: 28
+                          engagement:
+                            type: object
+                            properties:
+                              dashboardsShared:
+                                type: integer
+                                example: 8
+                              commentsPosted:
+                                type: integer
+                                example: 15
+                              dashboardsExported:
+                                type: integer
+                                example: 3
+                          timeline:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  format: date
+                                views:
+                                  type: integer
+                                logins:
+                                  type: integer
+                                dashboardsCreated:
+                                  type: integer
+
+  /api/users/{id}/activity:
+    get:
+      tags:
+        - Users
+      summary: Get user activity log
+      description: |
+        Retrieve the activity log for a specific user. Users can access their
+        own activity, while admin users can access any user's activity.
+      operationId: getUserActivity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: type
+          in: query
+          description: Filter by activity type
+          schema:
+            type: string
+            enum: [login, dashboard_view, dashboard_edit, dashboard_share, profile_update, password_change]
+        - name: startDate
+          in: query
+          description: Start date for activity range
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for activity range
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: User activity retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  example: "dashboard_view"
+                                description:
+                                  type: string
+                                  example: "Viewed dashboard 'Sales Analytics'"
+                                timestamp:
+                                  type: string
+                                  format: date-time
+                                metadata:
+                                  type: object
+                                  description: Activity-specific metadata
+                                ipAddress:
+                                  type: string
+                                  example: "192.168.1.100"
+                                userAgent:
+                                  type: string
+                                  example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+                                severity:
+                                  type: string
+                                  enum: [info, warning, error]
+                                  example: "info"
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          description: Access denied to this user's activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

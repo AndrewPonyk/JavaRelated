@@ -1,0 +1,82 @@
+# Prometheus configuration for Enterprise Dashboard Platform
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'enterprise-dashboard'
+
+# Rules for alerting and recording
+rule_files:
+  - "rules/recording_rules.yml"
+  - "rules/alert_rules.yml"
+
+# Alert manager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Service discovery and scraping configuration
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Backend API metrics
+  - job_name: 'backend'
+    scrape_interval: 15s
+    metrics_path: '/api/metrics'
+    static_configs:
+      - targets: ['backend:3001']
+    scrape_timeout: 10s
+
+  # Node metrics from backend
+  - job_name: 'backend-node'
+    scrape_interval: 30s
+    metrics_path: '/api/metrics/node'
+    static_configs:
+      - targets: ['backend:3001']
+
+  # Database metrics (disabled - requires postgres_exporter)
+  # - job_name: 'postgres'
+  #   scrape_interval: 30s
+  #   static_configs:
+  #     - targets: ['postgres:5432']
+
+  # Redis metrics (disabled - requires redis_exporter)
+  # - job_name: 'redis'
+  #   scrape_interval: 30s
+  #   static_configs:
+  #     - targets: ['redis:6379']
+
+  # Nginx metrics (disabled - requires nginx stub_status module)
+  # - job_name: 'nginx'
+  #   scrape_interval: 30s
+  #   metrics_path: '/nginx_status'
+  #   static_configs:
+  #     - targets: ['nginx:80']
+
+  # Docker container metrics (disabled - requires cAdvisor)
+  # - job_name: 'cadvisor'
+  #   scrape_interval: 30s
+  #   static_configs:
+  #     - targets: ['cadvisor:8080']
+
+  # Application-specific metrics
+  - job_name: 'dashboard-metrics'
+    scrape_interval: 15s
+    metrics_path: '/api/metrics/dashboard'
+    static_configs:
+      - targets: ['backend:3001']
+
+  # ML/Analytics metrics
+  - job_name: 'ml-metrics'
+    scrape_interval: 30s
+    metrics_path: '/api/metrics/ml'
+    static_configs:
+      - targets: ['backend:3001']
+

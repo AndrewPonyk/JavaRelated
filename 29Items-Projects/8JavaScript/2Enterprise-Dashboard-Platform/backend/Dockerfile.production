@@ -1,0 +1,137 @@
+# =============================================================================
+# ENTERPRISE DASHBOARD PLATFORM - PRODUCTION DOCKERFILE
+# =============================================================================
+#
+# Multi-stage Docker build for production deployment
+# Optimized for security, performance, and minimal image size
+#
+# Build: docker build -f Dockerfile.production -t enterprise-dashboard:latest .
+# Run: docker run -p 3001:3001 --env-file .env.production enterprise-dashboard:latest
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Stage 1: Build Stage
+# -----------------------------------------------------------------------------
+FROM node:20-alpine AS builder
+
+# Set build arguments
+ARG NODE_ENV=production
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+# Add metadata labels
+LABEL maintainer="Enterprise Dashboard Team <team@company.com>" \
+      org.opencontainers.image.title="Enterprise Dashboard Platform" \
+      org.opencontainers.image.description="Production-ready enterprise dashboard backend" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.vendor="Your Company" \
+      org.opencontainers.image.licenses="MIT"
+
+# Install system dependencies required for building
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    musl-dev \
+    giflib-dev \
+    pixman-dev \
+    pangomm-dev \
+    libjpeg-turbo-dev \
+    freetype-dev
+
+# Create app directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY .eslintrc.js ./
+
+# Install dependencies (including devDependencies for building)
+RUN npm ci --include=dev
+
+# Copy source code
+COPY src/ ./src/
+COPY prisma/ ./prisma/
+COPY scripts/ ./scripts/
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Remove development dependencies to reduce image size
+RUN npm prune --omit=dev
+
+# -----------------------------------------------------------------------------
+# Stage 2: Production Runtime Stage
+# -----------------------------------------------------------------------------
+FROM node:20-alpine AS runtime
+
+# Install runtime system dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    ca-certificates \
+    tzdata \
+    && update-ca-certificates
+
+# Create a non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S dashboard -u 1001 -G nodejs
+
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/logs /app/backups /app/uploads /app/tmp && \
+    chown -R dashboard:nodejs /app
+
+# Copy built application from builder stage
+COPY --from=builder --chown=dashboard:nodejs /app/dist ./dist
+COPY --from=builder --chown=dashboard:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=dashboard:nodejs /app/package*.json ./
+COPY --from=builder --chown=dashboard:nodejs /app/prisma ./prisma
+
+# Copy production scripts
+COPY --chown=dashboard:nodejs scripts/docker/ ./scripts/docker/
+COPY --chown=dashboard:nodejs scripts/production/ ./scripts/production/
+
+# Make scripts executable
+RUN chmod +x ./scripts/docker/*.sh ./scripts/production/*.sh
+
+# Set environment variables
+ENV NODE_ENV=production \
+    NODE_OPTIONS="--max-old-space-size=2048 --enable-source-maps" \
+    PORT=3001 \
+    HOST=0.0.0.0 \
+    APP_USER=dashboard \
+    TZ=UTC
+
+# Expose ports
+EXPOSE 3001 3002
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Switch to non-root user
+USER dashboard
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Default command
+CMD ["./scripts/docker/start-production.sh"]
+
+# =============================================================================
+# PRODUCTION DOCKER COMPOSE CONFIGURATION
+# =============================================================================
