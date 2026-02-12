@@ -1,0 +1,44 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>⚠️ Low Stock Alert</h2>
+
+<p>Dear {{ product.vendor.name }},</p>
+
+<p>This is an automated notification that the following product is running low on stock:</p>
+
+<div class="order-details">
+    <h3 style="margin-top: 0;">Product Information</h3>
+    <p><strong>Product:</strong> {{ product.name }}</p>
+    <p><strong>SKU:</strong> {{ product.sku|default:"N/A" }}</p>
+    <p><strong>Current Stock Level:</strong> <span style="color: #d32f2f; font-weight: bold;">{{ stock_level }} units</span></p>
+    {% if warehouse %}
+    <p><strong>Warehouse:</strong> {{ warehouse.name }} ({{ warehouse.code }})</p>
+    {% endif %}
+    <p><strong>Reorder Level:</strong> {{ product.reorder_level|default:10 }} units</p>
+</div>
+
+<div class="alert-box alert-warning">
+    <strong>Action Required:</strong> Please restock this item soon to avoid stockouts and lost sales.
+</div>
+
+<center>
+    <a href="{{ site_url }}/vendor/products/{{ product.id }}" class="btn-primary">View Product Details</a>
+    <a href="{{ site_url }}/vendor/inventory" class="btn-secondary">Manage Inventory</a>
+</center>
+
+<h3>Quick Actions</h3>
+<ul style="line-height: 2;">
+    <li>Review recent sales trends for this product</li>
+    <li>Update stock levels in your inventory management system</li>
+    <li>Consider placing a purchase order with your supplier</li>
+    <li>Temporarily set product to inactive if stock cannot be replenished</li>
+</ul>
+
+<p>You will continue to receive alerts for this product until stock levels are restored.</p>
+
+<p>Questions? Contact our <a href="{{ site_url }}/support">vendor support team</a>.</p>
+
+<p><strong>Best regards,</strong><br>
+The {{ site_name }} Team</p>
+{% endblock %}

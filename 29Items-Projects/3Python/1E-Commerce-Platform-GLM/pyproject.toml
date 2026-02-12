@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "ecommerce-platform"
+version = "1.0.0"
+description = "Full-stack E-commerce Platform with Django and React"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.0"
+djangorestframework = "^3.14"
+celery = "^5.3"
+redis = "^5.0"
+elasticsearch = "^8.11"
+pydantic = "^2.5"
+pydantic-settings = "^2.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+pytest-django = "^4.7"
+pytest-cov = "^4.1"
+ruff = "^0.1"
+black = "^23.12"
+mypy = "^1.8"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "backend.core.config.settings"
+python_files = ["test_*.py", "*_test.py"]
+testpaths = ["tests"]
+addopts = [
+    "--verbose",
+    "--cov=backend",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "F", "I", "N", "W", "B", "C4", "UP"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+plugins = ["mypy_django_plugin.main"]
+exclude = ["migrations/", "frontend/"]
+
+[tool.django-stubs]
+django_settings_module = "backend.core.config.settings"

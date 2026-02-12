@@ -1,0 +1,58 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>Order Confirmed!</h2>
+
+<p>Hi {{ order.user.first_name }},</p>
+
+<p>Great news! Your order has been confirmed and is now being processed.</p>
+
+<div class="order-details">
+    <h3 style="margin-top: 0;">Order Summary</h3>
+    <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+    <p><strong>Order Date:</strong> {% now "F d, Y" %}</p>
+    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+
+    <div style="margin-top: 20px;">
+        {% for item in order.items.all %}
+        <div class="order-item">
+            <span>{{ item.product.name }} × {{ item.quantity }}</span>
+            <span>${{ item.subtotal }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #667eea;">
+        <p style="margin: 5px 0;"><strong>Subtotal:</strong> ${{ order.subtotal }}</p>
+        <p style="margin: 5px 0;"><strong>Shipping:</strong> ${{ order.shipping_cost }}</p>
+        <p style="margin: 5px 0;"><strong>Tax:</strong> ${{ order.tax }}</p>
+        <p style="margin: 10px 0 0 0; font-size: 18px;"><strong>Total:</strong> ${{ order.total_amount }}</p>
+    </div>
+</div>
+
+<h3>Shipping Information</h3>
+<p>
+    {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+    {{ order.shipping_address.street }}<br>
+    {% if order.shipping_address.apartment %}
+    {{ order.shipping_address.apartment }}<br>
+    {% endif %}
+    {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}<br>
+    {{ order.shipping_address.country }}
+</p>
+
+<div class="alert-box alert-success">
+    <strong>What's Next?</strong>
+    <ul style="margin: 10px 0 0 20px; padding: 0;">
+        <li>You'll receive a shipping confirmation email when your order ships</li>
+        <li>You can track your order status in your account</li>
+        <li>Estimated delivery: {% now "F d" %} - {% now "F d" %}
+    </ul>
+</div>
+
+<center>
+    <a href="{{ site_url }}/orders/{{ order.id }}" class="btn-primary">View Order Details</a>
+</center>
+
+<p>Thank you for shopping with {{ site_name }}!</p>
+{% endblock %}

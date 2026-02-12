@@ -1,0 +1,61 @@
+# Deploy to Development Environment
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: https://dev.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_BACKEND_REPOSITORY: ecommerce-backend
+          ECR_FRONTEND_REPOSITORY: ecommerce-frontend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build and push backend
+          docker build -f docker/Dockerfile.backend -t $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+
+          # Build and push frontend
+          docker build -f docker/Dockerfile.frontend -t $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG ./frontend
+          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ecommerce-dev \
+            --service backend \
+            --force-new-deployment \
+            --region us-east-1
+
+      - name: Run database migrations
+        run: |
+          # TODO: Execute migrations via ECS task or Fargate
+          echo "Running database migrations..."
+
+      - name: Smoke tests
+        run: |
+          # TODO: Implement smoke tests against dev environment
+          echo "Running smoke tests..."

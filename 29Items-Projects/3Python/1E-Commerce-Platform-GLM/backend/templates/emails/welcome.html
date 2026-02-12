@@ -1,0 +1,40 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>Welcome to {{ site_name }}! 🎉</h2>
+
+<p>Hi {{ user.first_name }},</p>
+
+<p>Welcome to the {{ site_name }} family! We're thrilled to have you with us.</p>
+
+<p>Discover thousands of products at great prices, with fast shipping and excellent customer service.</p>
+
+<h3>Getting Started</h3>
+<ul style="line-height: 2;">
+    <li><a href="{{ site_url }}/products">Browse our products</a></li>
+    <li><a href="{{ site_url }}/categories">Shop by category</a></li>
+    <li><a href="{{ site_url }}/deals">Check out today's deals</a></li>
+</ul>
+
+<center>
+    <a href="{{ site_url }}/products" class="btn-primary">Start Shopping</a>
+</center>
+
+<div class="alert-box alert-success">
+    <strong>Special Offer:</strong> Enjoy {{ welcome_discount }}% off your first order with code <strong>{{ welcome_code }}</strong>!
+</div>
+
+<h3>Why Shop With Us?</h3>
+<ul style="line-height: 2;">
+    <li>✓ Free shipping on orders over $50</li>
+    <li>✓ 30-day easy returns</li>
+    <li>✓ Secure payment processing</li>
+    <li>✓ 24/7 customer support</li>
+</ul>
+
+<p>If you have any questions, feel free to <a href="{{ site_url }}/contact">reach out to us</a>.</p>
+
+<p>Happy shopping!</p>
+
+<p><strong>The {{ site_name }} Team</strong></p>
+{% endblock %}

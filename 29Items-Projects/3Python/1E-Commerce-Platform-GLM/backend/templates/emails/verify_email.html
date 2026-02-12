@@ -1,0 +1,26 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>Welcome to {{ site_name }}!</h2>
+
+<p>Hi {{ user.first_name }},</p>
+
+<p>Thank you for registering with {{ site_name }}. We're excited to have you on board!</p>
+
+<p>To get started, please verify your email address by clicking the button below:</p>
+
+<center>
+    <a href="{{ verification_url }}" class="btn-primary">Verify Email Address</a>
+</center>
+
+<p>Or copy and paste this link into your browser:</p>
+<p style="word-break: break-all; color: #667eea;">{{ verification_url }}</p>
+
+<div class="alert-box alert-info">
+    <strong>This link will expire in 24 hours.</strong>
+</div>
+
+<p>If you didn't create an account, please disregard this email.</p>
+
+<p>See you soon!</p>
+{% endblock %}

@@ -1,0 +1,84 @@
+# Deploy to Production Environment
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://app.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_BACKEND_REPOSITORY: ecommerce-backend
+          ECR_FRONTEND_REPOSITORY: ecommerce-frontend
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          # Build and push backend
+          docker build -f docker/Dockerfile.backend -t $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPOSITORY:latest
+
+          # Build and push frontend
+          docker build -f docker/Dockerfile.frontend -t $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG ./frontend
+          docker tag $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_FRONTEND_REPOSITORY:latest
+
+      - name: Apply Terraform changes
+        run: |
+          cd infrastructure/terraform/environments/production
+          terraform init
+          terraform apply -auto-approve -var="image_tag=${{ github.ref_name }}"
+
+      - name: Blue-green deployment
+        run: |
+          # Implement blue-green deployment logic
+          aws ecs update-service \
+            --cluster ecommerce-prod \
+            --service backend-blue \
+            --force-new-deployment \
+            --region us-east-1
+
+      - name: Run database migrations
+        run: |
+          # Execute migrations via ECS task
+          echo "Running database migrations..."
+
+      - name: Health check
+        run: |
+          # Wait for health check to pass
+          sleep 60
+          curl -f https://app.example.com/api/v1/health || exit 1
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false

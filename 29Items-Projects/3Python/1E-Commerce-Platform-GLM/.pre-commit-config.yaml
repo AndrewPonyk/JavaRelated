@@ -1,0 +1,94 @@
+# Pre-commit Configuration
+# https://pre-commit.com
+
+repos:
+  # General pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # Python - Ruff (fast linter)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+
+  # Python - Black (code formatter)
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        args: ["--line-length=100"]
+
+  # Python - MyPy (type checker)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - django-stubs
+          - types-redis
+          - types-requests
+        args: ["--ignore-missing-imports"]
+
+  # JavaScript/TypeScript - ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        files: \.(js|ts|tsx|jsx)$
+        types: [javascript]
+        additional_dependencies:
+          - eslint@^8.56.0
+          - typescript@^5.3.3
+          - "@typescript-eslint/parser@^6.15.0"
+          - "@typescript-eslint/eslint-plugin@^6.15.0"
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: ["--ignore", "DL3008"]
+
+  # Terraform format and validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.3
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_tflint
+        args: ["--args=--only=terraform_deprecated_interpolation"]
+
+  # YAML formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.12.0
+    hooks:
+      - id: pretty-format-yaml
+        args: ["--autofix", "--indent", "2"]
+        exclude: ^(frontend/|\.github/)
+
+  # TOML formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.12.0
+    hooks:
+      - id: pretty-format-toml
+        args: ["--autofix"]
+
+# CI configuration
+default_stages: [commit]
+fail_fast: false

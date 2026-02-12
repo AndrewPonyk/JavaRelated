@@ -1,0 +1,45 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>Your Order Has Shipped! 🚚</h2>
+
+<p>Hi {{ order.user.first_name }},</p>
+
+<p>Great news! Your order is on its way to you.</p>
+
+<div class="order-details">
+    <h3 style="margin-top: 0;">Shipping Details</h3>
+    <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+    <p><strong>Carrier:</strong> {{ order.shipping_carrier }}</p>
+    <p><strong>Tracking Number:</strong> <a href="{{ order.tracking_url }}">{{ order.tracking_number }}</a></p>
+    <p><strong>Estimated Delivery:</strong> {{ order.estimated_delivery }}</p>
+</div>
+
+<center>
+    <a href="{{ order.tracking_url }}" class="btn-primary" target="_blank">Track Your Package</a>
+</center>
+
+<h3>Shipping Address</h3>
+<p>
+    {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+    {{ order.shipping_address.street }}<br>
+    {% if order.shipping_address.apartment %}
+    {{ order.shipping_address.apartment }}<br>
+    {% endif %}
+    {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}<br>
+    {{ order.shipping_address.country }}
+</p>
+
+<div class="alert-box alert-info">
+    <strong>Delivery Tips:</strong>
+    <ul style="margin: 10px 0 0 20px; padding: 0;">
+        <li>Someone should be available to receive the package</li>
+        <li>Check your tracking for delivery updates</li>
+        <li>Bring ID if required for signature release</li>
+    </ul>
+</div>
+
+<p>Questions about your order? <a href="{{ site_url }}/contact">Contact our support team</a>.</p>
+
+<p>Thanks for shopping with {{ site_name }}!</p>
+{% endblock %}

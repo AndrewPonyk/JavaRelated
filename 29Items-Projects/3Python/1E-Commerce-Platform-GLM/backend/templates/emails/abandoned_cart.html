@@ -1,0 +1,38 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2>You Left Something Behind! 🛒</h2>
+
+<p>Hi {{ user.first_name }},</p>
+
+<p>We noticed you have some items waiting in your cart at {{ site_name }}.</p>
+
+<div class="order-details">
+    <h3 style="margin-top: 0;">Your Cart</h3>
+    {% for item in cart_items %}
+    <div class="order-item">
+        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+        <span>${{ item.subtotal }}</span>
+    </div>
+    {% endfor %}
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #667eea;">
+        <p style="margin: 5px 0;"><strong>Total Items:</strong> {{ cart.total_items }}</p>
+        <p style="margin: 10px 0 0 0; font-size: 18px;"><strong>Cart Total:</strong> ${{ cart.total_price }}</p>
+    </div>
+</div>
+
+<center>
+    <a href="{{ site_url }}/cart" class="btn-primary">Complete Your Purchase</a>
+</center>
+
+{% if discount_offer %}
+<div class="alert-box alert-warning">
+    <strong>Special Offer:</strong> Use code <strong>{{ discount_code }}</strong> for {{ discount_percentage }}% off your order!
+    <br><small>Expires in {{ expires_in }} hours.</small>
+</div>
+{% endif %}
+
+<p>Items in your cart are not reserved and may sell out. Complete your purchase now to ensure availability.</p>
+
+<p>See you soon!</p>
+{% endblock %}

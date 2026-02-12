@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ subject }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f4f4f4;
+            -webkit-font-smoothing: antialiased;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .email-body {
+            padding: 40px 30px;
+        }
+        .email-body h2 {
+            color: #333333;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .email-body p {
+            color: #555555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .email-body a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .btn-secondary {
+            display: inline-block;
+            background-color: #f4f4f4;
+            color: #333333;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+        .email-footer {
+            background-color: #f9f9f9;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #eeeeee;
+        }
+        .email-footer p {
+            margin: 5px 0;
+            color: #888888;
+            font-size: 14px;
+        }
+        .email-footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .order-details {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .alert-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .alert-info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .alert-warning {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+        .alert-success {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h1>{{ site_name }}</h1>
+        </div>
+        <div class="email-body">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="email-footer">
+            <p>&copy; {% now "Y" %} {{ site_name }}. All rights reserved.</p>
+            <p>
+                <a href="{{ site_url }}">Visit Our Store</a> |
+                <a href="{{ site_url }}/contact">Contact Us</a>
+            </p>
+            <p style="font-size: 12px; color: #999999;">
+                If you didn't create an account, please disregard this email.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
