@@ -34,12 +34,17 @@ class ArticleController extends Controller
     {
         // Example filtering pattern
         $perPage = $request->input('per_page', 15);
-        $status = $request->input('status', 'published');
+        $status = $request->input('status'); // Default to all if not specified (for Admin view)
 
         // Eloquent builder approach or Service call
-        $articles = Article::with('author', 'tags')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        $query = Article::with('author', 'tags')
+            ->orderBy('created_at', 'desc');
+            
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $articles = $query->paginate($perPage);
 
         return response()->json(
             ArticleResource::collection($articles)->response()->getData(true)
@@ -83,9 +88,14 @@ class ArticleController extends Controller
      * @param  Article  $article
      * @return JsonResponse
      */
-    public function show(Article $article): JsonResponse
+    public function show($id): JsonResponse
     {
-        // Typically leverage Route Model Binding
+        // Support both ID and Slug
+        $article = Article::with(['author', 'tags'])
+            ->where('id', $id)
+            ->orWhere('slug', $id)
+            ->firstOrFail();
+
         return response()->json([
             'data' => new ArticleResource($article)
         ]);

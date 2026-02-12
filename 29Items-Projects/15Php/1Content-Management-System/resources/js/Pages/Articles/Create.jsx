@@ -32,7 +32,7 @@ export default function ArticleCreate() {
 
         try {
             await axios.post('/api/articles', formData);
-            navigate('/articles');
+            navigate('/admin/articles');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create article');
             setIsLoading(false);
@@ -42,7 +42,7 @@ export default function ArticleCreate() {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-8">
-                <button onClick={() => navigate('/articles')} className="text-gray-500 hover:text-gray-700 flex items-center gap-2">
+                <button onClick={() => navigate('/admin/articles')} className="text-gray-500 hover:text-gray-700 flex items-center gap-2">
                     <ArrowLeft size={20} /> Back to List
                 </button>
                 <h1 className="text-2xl font-bold text-gray-800">Create New Article</h1>

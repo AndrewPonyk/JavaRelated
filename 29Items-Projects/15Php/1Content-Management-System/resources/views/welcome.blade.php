@@ -3,7 +3,12 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Enterprise CMS</title>
+        <title>{{ config('app.name', 'InSight CMS') }}</title>
+        <script>
+            window.AppConfig = {
+                name: "{{ config('app.name', 'InSight CMS') }}"
+            };
+        </script>
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     </head>

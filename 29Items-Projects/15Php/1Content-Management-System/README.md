@@ -58,6 +58,28 @@ See `docs/ARCHITECTURE.md` for detailed architectural diagrams and decisions.
 - **Cache/Queue**: Redis
 - **Search**: Elasticsearch
 
+## ✨ Features
+
+### Dynamic Site Configuration
+The site title and other global settings are configurable directly from the Admin Panel, without needing to redeploy or touch environment files.
+- **Admin**: Go to `Admin -> Workflow Settings` to update the Site Name.
+- **Frontend**: The public-facing site automatically reflects these changes.
+- **Storage**: Settings are stored in the `settings` database table.
+
+## 🗄 Database Management
+
+### Running Migrations
+To apply new database changes (like the settings table) without losing data:
+```bash
+docker exec cms-app php artisan migrate
+```
+
+### Resetting Database
+To wipe all data and start fresh:
+```bash
+docker exec cms-app php artisan migrate:fresh --seed
+```
+
 ## 🧪 Testing
 Run the test suite:
 ```bash

@@ -38,7 +38,7 @@ export default function ArticleShow() {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <Link to="/articles" className="inline-flex items-center text-gray-500 hover:text-blue-600 mb-6 transition-colors">
+            <Link to="/admin/articles" className="inline-flex items-center text-gray-500 hover:text-blue-600 mb-6 transition-colors">
                 <ArrowLeft size={18} className="mr-2" /> Back to Articles
             </Link>
 

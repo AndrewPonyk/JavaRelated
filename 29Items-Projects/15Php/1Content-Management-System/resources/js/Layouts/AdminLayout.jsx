@@ -7,11 +7,11 @@ export default function AdminLayout() {
     const location = useLocation();
 
     const navItems = [
-        { path: '/', label: 'Overview', icon: <LayoutDashboard size={20} /> },
-        { path: '/articles', label: 'Content Manager', icon: <FileText size={20} /> },
-        { path: '/sites', label: 'Multi-Site', icon: <Server size={20} /> },
-        { path: '/backups', label: 'Backups & Snapshots', icon: <Database size={20} /> },
-        { path: '/settings', label: 'Workflow Settings', icon: <Settings size={20} /> },
+        { path: '/admin', label: 'Overview', icon: <LayoutDashboard size={20} /> },
+        { path: '/admin/articles', label: 'Content Manager', icon: <FileText size={20} /> },
+        { path: '/admin/sites', label: 'Multi-Site', icon: <Server size={20} /> },
+        { path: '/admin/backups', label: 'Backups & Snapshots', icon: <Database size={20} /> },
+        { path: '/admin/settings', label: 'Workflow Settings', icon: <Settings size={20} /> },
     ];
 
     return (

@@ -47,7 +47,7 @@ export default function ArticlesIndex() {
                     <FileText className="text-blue-600" size={20} />
                     Manage Content
                 </h3>
-                <Link to="/articles/create" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md flex items-center gap-2">
+                <Link to="/admin/articles/create" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-md flex items-center gap-2">
                     <Edit2 size={16} /> New Article
                 </Link>
             </div>
@@ -93,7 +93,7 @@ export default function ArticlesIndex() {
                                             <GitCommit size={18} />
                                         </button>
                                         <Link
-                                            to={`/articles/${article.id}`}
+                                            to={`/admin/articles/${article.id}`}
                                             className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-colors inline-block"
                                             title="Preview"
                                         >
