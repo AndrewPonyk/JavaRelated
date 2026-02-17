@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:build": "docker build -t java-browser-ide .",
+    "docker:run": "docker run -p 8080:80 java-browser-ide",
+    "docker:push": "docker push"
   },
   "dependencies": {
     "react": "^18.2.0",

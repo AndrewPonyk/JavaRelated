@@ -32,6 +32,19 @@ function App() {
     <div className="ide-container">
       <header className="ide-header">
         <span className="ide-title">Java Browser IDE</span>
+        <button
+          className="run-button"
+          onClick={() => {
+            if (activeFile) {
+              alert(`Run: ${activeFile}\n\n(Backend not connected yet - dummy action)`);
+            } else {
+              alert('No file selected. Please select a file to run.');
+            }
+          }}
+          disabled={!activeFile}
+        >
+          ▶ Run File
+        </button>
       </header>
       <main className="ide-main">
         <aside className="ide-sidebar">

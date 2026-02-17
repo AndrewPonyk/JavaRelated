@@ -2,11 +2,11 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 
 ## Project Context
-- **Project Name:** Content Management System
-- **Tech Stack:** PHP 8.3, Laravel 11, MySQL, Redis, Elasticsearch, React, Tailwind, PHPUnit
-- **Short Description:** Laravel with Livewire for reactive UI without JS frameworks. Elasticsearch for full-text search. Redis for caching and queues.
-- **Business Logic:** Enterprise CMS with multi-site versioning, workflow, backups. ML content recommendations using collaborative filtering.
-- **Deployment Platform & CI/CD Tools:** AWS ECS, GitHub Actions, Terraform
+- **Project Name:** Loan Origination System
+- **Tech Stack:** Java, Spring Boot, Oracle, Drools, Kafka, Elasticsearch, React, TypeScript
+- **Short Description:** Rules engine (Drools) for underwriting decision. Kafka for event sourcing. Elasticsearch for document search.
+- **Business Logic:** Fintech-end loan processing from application to funding. ML credit scoring using XGBoost ensemble.
+- **Deployment Platform & CI/CD Tools:** AWS EKS, Jenkins
 
 ---
 

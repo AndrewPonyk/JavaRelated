@@ -46,6 +46,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0 16px;
+  gap: 16px;
   -webkit-app-region: drag;
 }
 
@@ -53,6 +54,32 @@ body {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
+}
+
+.run-button {
+  -webkit-app-region: no-drag;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s;
+}
+
+.run-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.run-button:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .ide-main {

@@ -2,6 +2,29 @@
 
 A robust, scalable CMS built with PHP 8.3, Laravel 11, and React. Features include multi-site versioning, ML-based content recommendations, and full-text search via Elasticsearch.
 
+## 🌟 Functional Overview
+
+This CMS is designed to serve two primary user experiences:
+
+### 1. Public Visitor (Frontend)
+Accessible at the root URL (`/`), the public site offers a clean, performant reading experience.
+- **Home Page**: A curated feed of the latest *Published* articles. Draft or Archived content is automatically hidden.
+- **Article Reader**: A distraction-free reading view for individual articles.
+  - **Slug Support**: Articles are accessible via SEO-friendly URLs (e.g., `/article/my-new-post`) or by ID.
+  - **Full Content**: Displays the complete article text, author bio, read time estimation, and publication date.
+- **Dynamic Branding**: The site title and branding elements are dynamically fetched from the backend configuration.
+
+### 2. Administrator (Content Management)
+Accessible via (`/admin`), providing tools to manage content and site configuration.
+- **Content Dashboard**: 
+  - View all articles regardless of status (Draft, Published, Archived).
+  - Quick status indicators to track content lifecycle.
+- **Article Editor**:
+  - **Create/Edit**: rigorous inputs for Title, Slug, Content, and Status.
+  - **Status Workflow**: Switch articles between `Draft` (hidden), `Published` (live), and `Archived`.
+- **Global Settings**:
+  - **Workflow Settings**: Configure global site parameters (like "Site Name") that instantly update the public-facing frontend without code deployment.
+
 ## 🚀 Getting Started
 
 Follow these steps to set up the project locally.
