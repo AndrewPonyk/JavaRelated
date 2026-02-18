@@ -8,6 +8,8 @@ function App() {
   const { files, createFile, updateFile, deleteFile, renameFile } = useFileSystem()
   const [openFiles, setOpenFiles] = useState([])
   const [activeFile, setActiveFile] = useState(null)
+  const [showConsole, setShowConsole] = useState(false)
+  const [consoleOutput, setConsoleOutput] = useState([])
 
   const handleFileSelect = (path) => {
     if (!openFiles.includes(path)) {
@@ -28,19 +30,34 @@ function App() {
     updateFile(path, content)
   }
 
+  const handleRunFile = () => {
+    if (activeFile) {
+      setShowConsole(true)
+      setConsoleOutput(prev => [...prev, `Running: ${activeFile}`])
+      setConsoleOutput(prev => [...prev, `Compiling ${activeFile}...`])
+      setConsoleOutput(prev => [...prev, `Output:`])
+      setConsoleOutput(prev => [...prev, `Hello from Java!`])
+      setConsoleOutput(prev => [...prev, `(Backend not connected yet - dummy output)`])
+    } else {
+      alert('No file selected. Please select a file to run.')
+    }
+  }
+
+  const handleClearConsole = () => {
+    setConsoleOutput([])
+  }
+
+  const handleCloseConsole = () => {
+    setShowConsole(false)
+  }
+
   return (
     <div className="ide-container">
       <header className="ide-header">
         <span className="ide-title">Java Browser IDE</span>
         <button
           className="run-button"
-          onClick={() => {
-            if (activeFile) {
-              alert(`Run: ${activeFile}\n\n(Backend not connected yet - dummy action)`);
-            } else {
-              alert('No file selected. Please select a file to run.');
-            }
-          }}
+          onClick={handleRunFile}
           disabled={!activeFile}
         >
           ▶ Run File
@@ -83,6 +100,36 @@ function App() {
           />
         </div>
       </main>
+      {showConsole && (
+        <div className="console-panel">
+          <div className="console-header">
+            <span className="console-title">Console Output</span>
+            <div className="console-actions">
+              <button
+                className="console-clear-btn"
+                onClick={handleClearConsole}
+                title="Clear Console"
+              >
+                🗑 Clear
+              </button>
+              <button
+                className="console-close-btn"
+                onClick={handleCloseConsole}
+                title="Close Panel"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <div className="console-content">
+            {consoleOutput.map((line, index) => (
+              <div key={index} className="console-line">
+                {line}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
