@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const initialFiles = {
+const STORAGE_KEY = 'ide-files'
+
+const defaultFiles = {
   'src/Main.java': {
     content: `public class Main {
     public static void main(String[] args) {
@@ -33,7 +35,28 @@ Edit the files in the \`src\` folder to begin.
 }
 
 export function useFileSystem() {
-  const [files, setFiles] = useState(initialFiles)
+  const [files, setFiles] = useState(() => {
+    // Load from localStorage on mount
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? JSON.parse(saved) : defaultFiles
+    } catch (e) {
+      console.error('Failed to load files from localStorage:', e)
+      return defaultFiles
+    }
+  })
+
+  // Save to localStorage whenever files change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(files))
+    } catch (e) {
+      console.error('Failed to save files to localStorage:', e)
+      if (e.name === 'QuotaExceededError') {
+        alert('Storage full! Please delete some files or export them.')
+      }
+    }
+  }, [files])
 
   const createFile = (path, content = '') => {
     setFiles(prev => ({

@@ -30,14 +30,47 @@ function App() {
     updateFile(path, content)
   }
 
-  const handleRunFile = () => {
+  const handleRunFile = async () => {
     if (activeFile) {
+      // Clear previous output
+      setConsoleOutput([])
       setShowConsole(true)
       setConsoleOutput(prev => [...prev, `Running: ${activeFile}`])
       setConsoleOutput(prev => [...prev, `Compiling ${activeFile}...`])
-      setConsoleOutput(prev => [...prev, `Output:`])
-      setConsoleOutput(prev => [...prev, `Hello from Java!`])
-      setConsoleOutput(prev => [...prev, `(Backend not connected yet - dummy output)`])
+      
+      const content = files[activeFile]?.content || ''
+      const fileName = activeFile.split('/').pop()
+      const isPython = fileName.endsWith('.py')
+      const className = fileName.replace(/\.(java|py)$/, '')
+      
+      const endpoint = isPython ? 'http://localhost:8080/api/execute-python' : 'http://localhost:8080/api/execute'
+      
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            className: isPython ? fileName : className,
+            code: content
+          })
+        })
+        
+        const result = await response.json()
+        
+        if (result.success) {
+          setConsoleOutput(prev => [...prev, `Output:`])
+          result.output?.split('\n').forEach(line => {
+            if (line) setConsoleOutput(prev => [...prev, line])
+          })
+        } else {
+          setConsoleOutput(prev => [...prev, `Error:`])
+          result.error?.split('\n').forEach(line => {
+            if (line) setConsoleOutput(prev => [...prev, line])
+          })
+        }
+      } catch (err) {
+        setConsoleOutput(prev => [...prev, `Error: Failed to connect to backend - ${err.message}`])
+      }
     } else {
       alert('No file selected. Please select a file to run.')
     }
@@ -54,7 +87,7 @@ function App() {
   return (
     <div className="ide-container">
       <header className="ide-header">
-        <span className="ide-title">Java Browser IDE</span>
+        <span className="ide-title">Java/Python/JS IDE</span>
         <button
           className="run-button"
           onClick={handleRunFile}
