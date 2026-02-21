@@ -46,7 +46,7 @@ public class LoanDocument {
 
     @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "processed", length = 1)
-    private String processed = "N";
+    private boolean processed = false;
 
     @Column(name = "ocr_text", columnDefinition = "CLOB")
     private String ocrText;
@@ -58,11 +58,7 @@ public class LoanDocument {
         }
     }
 
-    public boolean isProcessed() {
-        return "Y".equals(processed);
-    }
-
     public void markProcessed() {
-        this.processed = "Y";
+        this.processed = true;
     }
 }

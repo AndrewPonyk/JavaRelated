@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ApplicantForm from './components/ApplicantForm';
 import LoanApplicationForm from './components/LoanApplicationForm';
 import DocumentUpload from './components/DocumentUpload';
 import DocumentList from './components/DocumentList';
@@ -24,7 +25,7 @@ const statusBadgeColor = (status?: string): string => {
 };
 
 const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<'apply' | 'dashboard' | 'documents'>('apply');
+  const [activeView, setActiveView] = useState<'applicant' | 'apply' | 'dashboard' | 'documents'>('applicant');
   const { data: applications, isLoading, error } = useAllLoanApplications();
 
   return (
@@ -32,6 +33,20 @@ const App: React.FC = () => {
       <header style={{ borderBottom: '2px solid #1976d2', paddingBottom: '1rem', marginBottom: '2rem' }}>
         <h1 style={{ margin: 0, color: '#1976d2' }}>Loan Origination System</h1>
         <nav style={{ marginTop: '1rem' }}>
+          <button
+            onClick={() => setActiveView('applicant')}
+            style={{
+              padding: '0.5rem 1rem',
+              marginRight: '1rem',
+              backgroundColor: activeView === 'applicant' ? '#1976d2' : '#fff',
+              color: activeView === 'applicant' ? '#fff' : '#1976d2',
+              border: '1px solid #1976d2',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Register Applicant
+          </button>
           <button
             onClick={() => setActiveView('apply')}
             style={{
@@ -77,6 +92,7 @@ const App: React.FC = () => {
       </header>
 
       <main>
+        {activeView === 'applicant' && <ApplicantForm />}
         {activeView === 'apply' && <LoanApplicationForm />}
 
         {activeView === 'documents' && (

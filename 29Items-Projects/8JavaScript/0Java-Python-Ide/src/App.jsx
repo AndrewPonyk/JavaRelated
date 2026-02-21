@@ -37,14 +37,14 @@ function App() {
       setShowConsole(true)
       setConsoleOutput(prev => [...prev, `Running: ${activeFile}`])
       setConsoleOutput(prev => [...prev, `Compiling ${activeFile}...`])
-      
+
       const content = files[activeFile]?.content || ''
       const fileName = activeFile.split('/').pop()
       const isPython = fileName.endsWith('.py')
       const className = fileName.replace(/\.(java|py)$/, '')
-      
-      const endpoint = isPython ? 'http://localhost:8080/api/execute-python' : 'http://localhost:8080/api/execute'
-      
+
+      const endpoint = isPython ? '/api/execute-python' : '/api/execute'
+
       try {
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -54,9 +54,9 @@ function App() {
             code: content
           })
         })
-        
+
         const result = await response.json()
-        
+
         if (result.success) {
           setConsoleOutput(prev => [...prev, `Output:`])
           result.output?.split('\n').forEach(line => {

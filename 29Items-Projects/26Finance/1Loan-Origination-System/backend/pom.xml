@@ -90,6 +90,18 @@
             <version>${drools.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-model-compiler</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+
         <!-- Oracle Database -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>

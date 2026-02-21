@@ -1,6 +1,7 @@
 package underwriting.rules
 
 import com.loanorigination.model.LoanApplication
+import com.loanorigination.drools.UnderwritingRulesService
 import com.loanorigination.drools.UnderwritingRulesService.UnderwritingDecision
 
 // Rule 1: Credit Score Check
@@ -31,8 +32,8 @@ end
 rule "Check DTI Ratio"
     salience 90
     when
-        $app : LoanApplication(debtToIncomeRatio != null && debtToIncomeRatio.doubleValue() > 0.43)
-        $decision : UnderwritingDecision(decision == null || decision == "APPROVED")
+        $app : LoanApplication(debtToIncomeRatio != null, debtToIncomeRatio > 0.43)
+        $decision : UnderwritingDecision(decision in (null, "APPROVED"))
     then
         if ($decision.getDecision() == null) {
             $decision.setDecision("MANUAL_REVIEW");
@@ -47,8 +48,8 @@ end
 rule "Check LTV Ratio"
     salience 80
     when
-        $app : LoanApplication(loanToValueRatio != null && loanToValueRatio.doubleValue() > 0.80)
-        $decision : UnderwritingDecision(decision == null || decision == "APPROVED")
+        $app : LoanApplication(loanToValueRatio != null, loanToValueRatio > 0.80)
+        $decision : UnderwritingDecision(decision in (null, "APPROVED"))
     then
         if ($decision.getDecision() == null) {
             $decision.setDecision("MANUAL_REVIEW");
@@ -63,7 +64,7 @@ end
 rule "Manual Review Mid Credit Score"
     salience 70
     when
-        $app : LoanApplication(creditScore >= 580 && creditScore < 650)
+        $app : LoanApplication(creditScore >= 580, creditScore < 650)
         $decision : UnderwritingDecision(decision == null)
     then
         $decision.setDecision("MANUAL_REVIEW");
@@ -77,8 +78,8 @@ rule "Approve Good Credit with Standard Conditions"
     salience 60
     when
         $app : LoanApplication(
-            creditScore >= 650 && creditScore < 750,
-            debtToIncomeRatio != null && debtToIncomeRatio.doubleValue() <= 0.43
+            creditScore >= 650, creditScore < 750,
+            debtToIncomeRatio != null, debtToIncomeRatio <= 0.43
         )
         $decision : UnderwritingDecision(decision == null)
     then

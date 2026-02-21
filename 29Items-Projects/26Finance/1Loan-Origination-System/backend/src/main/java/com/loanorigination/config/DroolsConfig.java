@@ -18,13 +18,13 @@ public class DroolsConfig {
     public KieContainer kieContainer() {
         KieServices kieServices = KieServices.Factory.get();
         KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
-        
-        kieFileSystem.write(ResourceFactory.newClassPathResource(
-            RULES_PATH + "underwriting-rules.drl"));
-        
+
+        kieFileSystem.write("src/main/resources/drools/underwriting-rules.drl",
+                ResourceFactory.newClassPathResource(RULES_PATH + "underwriting-rules.drl"));
+
         KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
         kieBuilder.buildAll();
-        
+
         KieModule kieModule = kieBuilder.getKieModule();
         return kieServices.newKieContainer(kieModule.getReleaseId());
     }

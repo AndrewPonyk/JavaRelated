@@ -10,7 +10,8 @@ import java.util.List;
  * Repository for {@link com.loanorigination.model.LoanDocument}.
  *
  * NOTE: The document upload feature is planned but not yet implemented.
- * The LoanDocument entity and this repository are retained so that the Flyway migration
+ * The LoanDocument entity and this repository are retained so that the Flyway
+ * migration
  * (V2__create_underwriting_tables.sql) can create the underlying table.
  * When document upload is implemented, add an S3/blob-storage integration here.
  */
@@ -21,7 +22,7 @@ public interface LoanDocumentRepository extends JpaRepository<LoanDocument, Long
 
     List<LoanDocument> findByApplicationIdAndDocumentType(Long applicationId, String documentType);
 
-    List<LoanDocument> findByProcessed(String processed);
+    List<LoanDocument> findByProcessed(boolean processed);
 
     long countByApplicationId(Long applicationId);
 }

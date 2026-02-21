@@ -16,7 +16,7 @@ public interface UnderwritingDecisionRepository extends JpaRepository<Underwriti
 
     List<UnderwritingDecision> findByDecision(UnderwritingDecision.Decision decision);
 
-    @Query("SELECT ud FROM UnderwritingDecision ud WHERE ud.automated = 'Y' AND ud.decisionDate >= :since")
+    @Query("SELECT ud FROM UnderwritingDecision ud WHERE ud.automated = true AND ud.decisionDate >= :since")
     List<UnderwritingDecision> findAutomatedDecisionsSince(LocalDateTime since);
 
     @Query("SELECT COUNT(ud) FROM UnderwritingDecision ud WHERE ud.decision = :decision AND ud.decisionDate >= :since")

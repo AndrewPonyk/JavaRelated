@@ -2,6 +2,8 @@ package com.loanorigination.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -35,7 +37,7 @@ public class UnderwritingDecision {
      * Stored as 'Y' / 'N' in the AUTOMATED column (CHAR(1)).
      * Lombok generates isAutomated() / setAutomated() automatically via @Data.
      */
-    @Convert(converter = BooleanToYNConverter.class)
+    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "automated", length = 1)
     private boolean automated = true;
 
@@ -59,26 +61,5 @@ public class UnderwritingDecision {
         APPROVED,
         REJECTED,
         MANUAL_REVIEW
-    }
-
-    /**
-     * JPA AttributeConverter that maps a Java boolean to the single-character Oracle
-     * representation used in legacy schemas: {@code true} → {@code "Y"}, {@code false} → {@code "N"}.
-     */
-    @Converter(autoApply = false)
-    public static class BooleanToYNConverter implements AttributeConverter<Boolean, String> {
-
-        @Override
-        public String convertToDatabaseColumn(Boolean attribute) {
-            if (attribute == null) {
-                return "N";
-            }
-            return attribute ? "Y" : "N";
-        }
-
-        @Override
-        public Boolean convertToEntityAttribute(String dbData) {
-            return "Y".equalsIgnoreCase(dbData);
-        }
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -78,15 +77,15 @@ public class UnderwritingService {
             return mapToDto(decision);
         }
 
-        UnderwritingRulesService.UnderwritingDecision rulesDecision =
-                rulesService.executeRules(application);
+        UnderwritingRulesService.UnderwritingDecision rulesDecision = rulesService.executeRules(application);
 
         UnderwritingDecision decision = new UnderwritingDecision();
         decision.setApplicationId(applicationId);
         decision.setDecision(mapDecision(rulesDecision.getDecision()));
         decision.setDecisionReason(rulesDecision.getReason());
         decision.setCreditScore(creditScore.getCreditScore());
-        decision.setRiskScore(creditScore.getRiskScore() != null ? BigDecimal.valueOf(creditScore.getRiskScore()) : null);
+        decision.setRiskScore(
+                creditScore.getRiskScore() != null ? BigDecimal.valueOf(creditScore.getRiskScore()) : null);
         decision.setAutomated(true);
 
         if (rulesDecision.getConditions() != null && !rulesDecision.getConditions().isEmpty()) {
@@ -108,8 +107,10 @@ public class UnderwritingService {
     /**
      * Builds a credit score request using real applicant data.
      *
-     * NOTE: existingDebt and loan history fields (numPreviousLoans, numDelinquencies) are
-     * currently set to conservative defaults. In production these should be populated from
+     * NOTE: existingDebt and loan history fields (numPreviousLoans,
+     * numDelinquencies) are
+     * currently set to conservative defaults. In production these should be
+     * populated from
      * a credit bureau integration (e.g., Equifax, Experian, TransUnion).
      */
     private CreditScoreResponse getCreditScore(LoanApplication application, Applicant applicant) {
@@ -146,8 +147,10 @@ public class UnderwritingService {
      * Calculates the debt-to-income ratio from real applicant and loan data.
      *
      * Monthly income = annualIncome / 12
-     * Monthly payment = standard amortisation formula using a 6% default rate assumption.
-     * existingDebtMonthlyPayment defaults to 0 until credit bureau integration provides real data.
+     * Monthly payment = standard amortisation formula using a 6% default rate
+     * assumption.
+     * existingDebtMonthlyPayment defaults to 0 until credit bureau integration
+     * provides real data.
      *
      * TODO: Add existingDebtMonthlyPayment from credit bureau when available.
      */
@@ -161,7 +164,7 @@ public class UnderwritingService {
         BigDecimal monthlyIncome = applicant.getAnnualIncome()
                 .divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP);
 
-        // Monthly payment via annuity formula:  P * r / (1 - (1+r)^-n)
+        // Monthly payment via annuity formula: P * r / (1 - (1+r)^-n)
         // Using a conservative default rate of 6% APR until the rate is finalised.
         double defaultAnnualRate = 0.06;
         double monthlyRate = defaultAnnualRate / 12.0;
@@ -187,19 +190,21 @@ public class UnderwritingService {
     }
 
     private UnderwritingDecision buildManualReviewDecision(Long applicationId,
-                                                            CreditScoreResponse creditScore) {
+            CreditScoreResponse creditScore) {
         UnderwritingDecision decision = new UnderwritingDecision();
         decision.setApplicationId(applicationId);
         decision.setDecision(UnderwritingDecision.Decision.MANUAL_REVIEW);
         decision.setDecisionReason("Auto-underwriting is disabled — routed to manual review");
         decision.setCreditScore(creditScore.getCreditScore());
-        decision.setRiskScore(creditScore.getRiskScore() != null ? BigDecimal.valueOf(creditScore.getRiskScore()) : null);
+        decision.setRiskScore(
+                creditScore.getRiskScore() != null ? BigDecimal.valueOf(creditScore.getRiskScore()) : null);
         decision.setAutomated(false);
         return decision;
     }
 
     private UnderwritingDecision.Decision mapDecision(String decision) {
-        if (decision == null) return UnderwritingDecision.Decision.MANUAL_REVIEW;
+        if (decision == null)
+            return UnderwritingDecision.Decision.MANUAL_REVIEW;
 
         return switch (decision) {
             case "APPROVED" -> UnderwritingDecision.Decision.APPROVED;
