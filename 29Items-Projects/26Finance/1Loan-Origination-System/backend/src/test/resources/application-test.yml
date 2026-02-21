@@ -1,0 +1,36 @@
+spring:
+  # Use H2 in-memory database for integration tests — no Oracle required
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=Oracle
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      # Allow Hibernate to create the schema in tests (Flyway is disabled below)
+      ddl-auto: create-drop
+    show-sql: true
+
+  flyway:
+    # Disable Flyway in tests — Hibernate creates the schema via ddl-auto
+    enabled: false
+
+  # Disable Kafka auto-configuration in tests (use @EmbeddedKafka where Kafka is needed)
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Point at a non-existent issuer so the OAuth2 resource server does not fail
+          # to start when there is no Keycloak available during tests
+          issuer-uri: http://localhost:9999/realms/test
+
+logging:
+  level:
+    root: WARN
+    com.loanorigination: DEBUG

@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: loan-oracle-db
+    ports:
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: oracle
+      # Do NOT set ORACLE_DATABASE to "XE" — the CDB service is already named XE
+      # and creating a PDB with the same name causes ORA-65149.
+      # The backend connects directly to the CDB via SID XE as SYSTEM.
+      # For production use, create a dedicated application user (e.g. LOAN_USER)
+      # with least-privilege grants instead of connecting as SYSTEM.
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: loan-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: loan-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      # 9092 is the internal listener used by containers on this network.
+      # 29092 is the external listener for host-based tools (e.g. kafka-console-consumer).
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: loan-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsSL http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: loan-backend
+    depends_on:
+      oracle:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: oracle
+      DB_PORT: 1521
+      DB_NAME: XE
+      DB_USERNAME: system
+      DB_PASSWORD: oracle
+      # Use the internal Kafka listener — containers communicate on the Docker network
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ELASTICSEARCH_URIS: http://elasticsearch:9200
+      DOCUMENT_STORAGE_ROOT: /app/document-storage
+    volumes:
+      - document-storage:/app/document-storage
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # VITE_ variables must be available at BUILD time — they are inlined by Vite during
+        # the production bundle step. Setting them as runtime env vars has no effect.
+        VITE_API_BASE_URL: http://localhost:8080
+    container_name: loan-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: loan-ml-service
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  oracle-data:
+  elasticsearch-data:
+  document-storage:
+  zookeeper-data:
+  zookeeper-log:
+  kafka-data:
+
+networks:
+  default:
+    name: loan-origination-network

@@ -1,0 +1,172 @@
+pipeline {
+    agent any
+    
+    environment {
+        AWS_REGION = 'us-east-1'
+        ECR_REGISTRY = '123456789.dkr.ecr.us-east-1.amazonaws.com'
+        IMAGE_NAME = 'loan-origination-backend'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Lint & Format Check') {
+            steps {
+                dir('backend') {
+                    sh './mvnw checkstyle:check'
+                    // NOTE: spotless:check requires the Spotless Maven plugin to be declared in pom.xml.
+                    // Uncomment the line below once the plugin is configured.
+                    // sh './mvnw spotless:check'
+                }
+            }
+        }
+        
+        stage('Unit Tests') {
+            steps {
+                dir('backend') {
+                    sh './mvnw test'
+                }
+            }
+            post {
+                always {
+                    junit 'backend/target/surefire-reports/*.xml'
+                    jacoco execPattern: 'backend/target/jacoco.exec'
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir('backend') {
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
+        }
+        
+        stage('Security Scan') {
+            parallel {
+                stage('Dependency Check') {
+                    steps {
+                        dir('backend') {
+                            sh './mvnw dependency-check:check'
+                        }
+                    }
+                }
+                stage('SonarQube Analysis') {
+                    steps {
+                        withSonarQubeEnv('SonarQube') {
+                            dir('backend') {
+                                sh './mvnw sonar:sonar'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Integration Tests') {
+            steps {
+                dir('backend') {
+                    // NOTE: The "integration-tests" Maven profile is not yet declared in pom.xml.
+                    // Replace with the correct profile name or failsafe plugin invocation once configured.
+                    // sh './mvnw verify -P integration-tests'
+                    sh './mvnw verify -Dsurefire.failIfNoSpecifiedTests=false'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dir('backend') {
+                        def appVersion = sh(
+                            returnStdout: true,
+                            script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout'
+                        ).trim()
+                        
+                        env.APP_VERSION = appVersion
+                        env.IMAGE_TAG = "${appVersion}-${env.BUILD_NUMBER}"
+                        
+                        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    }
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                script {
+                    sh """
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                        
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                        
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_NAME}:latest
+                        docker push ${ECR_REGISTRY}/${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy to Dev') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                script {
+                    sh """
+                        aws eks update-kubeconfig --name loan-origination-dev-cluster --region ${AWS_REGION}
+                        kubectl set image deployment/backend-deployment \
+                            backend=${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
+                            -n loan-origination-dev
+                        kubectl rollout status deployment/backend-deployment -n loan-origination-dev
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: 'Deploy to production?', ok: 'Deploy'
+                script {
+                    sh """
+                        aws eks update-kubeconfig --name loan-origination-prod-cluster --region ${AWS_REGION}
+                        kubectl set image deployment/backend-deployment \
+                            backend=${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
+                            -n loan-origination-prod
+                        kubectl rollout status deployment/backend-deployment -n loan-origination-prod
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        failure {
+            slackSend(
+                channel: '#deployments',
+                color: 'danger',
+                message: "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+            )
+        }
+        success {
+            slackSend(
+                channel: '#deployments',
+                color: 'good',
+                message: "Build successful: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+            )
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

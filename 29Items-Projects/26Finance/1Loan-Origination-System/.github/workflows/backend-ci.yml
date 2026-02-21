@@ -1,0 +1,131 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Run tests
+      working-directory: ./backend
+      run: ./mvnw test
+
+    - name: Generate coverage report
+      working-directory: ./backend
+      run: ./mvnw jacoco:report
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/target/site/jacoco/jacoco.xml
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    # Export the ECR registry URL so deploy jobs can reference it without re-authenticating
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      working-directory: ./backend
+      run: ./mvnw clean package -DskipTests
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and push Docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      working-directory: ./backend
+      run: |
+        docker build -t $ECR_REGISTRY/loan-origination-backend:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/loan-origination-backend:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/loan-origination-backend:$IMAGE_TAG $ECR_REGISTRY/loan-origination-backend:latest
+        docker push $ECR_REGISTRY/loan-origination-backend:latest
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update kubeconfig
+      run: aws eks update-kubeconfig --name loan-origination-dev-cluster --region us-east-1
+
+    - name: Deploy to Dev
+      run: |
+        kubectl set image deployment/backend-deployment \
+          backend=${{ needs.build.outputs.ecr_registry }}/loan-origination-backend:${{ github.sha }} \
+          -n loan-origination-dev
+        kubectl rollout status deployment/backend-deployment -n loan-origination-dev
+
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://loans.example.com
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Update kubeconfig
+      run: aws eks update-kubeconfig --name loan-origination-prod-cluster --region us-east-1
+
+    - name: Deploy to Production
+      run: |
+        kubectl set image deployment/backend-deployment \
+          backend=${{ needs.build.outputs.ecr_registry }}/loan-origination-backend:${{ github.sha }} \
+          -n loan-origination-prod
+        kubectl rollout status deployment/backend-deployment -n loan-origination-prod

@@ -1,0 +1,102 @@
+spring:
+  application:
+    name: loan-origination-backend
+
+  # Default to "dev" so the service starts without Keycloak in local development.
+  # Override with SPRING_PROFILES_ACTIVE=prod (or staging) in CI/CD and on the server.
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  datasource:
+    url: jdbc:oracle:thin:@${DB_HOST:localhost}:${DB_PORT:1521}:${DB_NAME:XE}
+    username: ${DB_USERNAME:system}
+    password: ${DB_PASSWORD:oracle}
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  jpa:
+    # Let Hibernate auto-detect the Oracle version from the JDBC metadata.
+    # Explicitly setting database-platform is unnecessary with modern Hibernate + ojdbc11.
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+    schemas: SYSTEM
+    default-schema: SYSTEM
+    clean-disabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: loan-origination-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    producer:
+      acks: all
+      retries: 3
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/loan-origination}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.loanorigination: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+ml-service:
+  url: ${ML_SERVICE_URL:http://localhost:8001}
+  timeout-ms: ${ML_SERVICE_TIMEOUT_MS:5000}
+
+application:
+  features:
+    ml-scoring-enabled: ${FEATURE_ML_SCORING_ENABLED:true}
+    auto-underwriting-enabled: ${FEATURE_AUTO_UNDERWRITING_ENABLED:true}
+  document:
+    storage-root: ${DOCUMENT_STORAGE_ROOT:./document-storage}
+    max-file-size-mb: 10
+    allowed-types: application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg

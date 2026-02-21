@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naval Defense System - Enhanced</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            font-family: monospace;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .hud {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 20, 50, 0.85);
+            border: 2px solid cyan;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 220px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .hud div {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #log {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            width: 320px;
+            text-align: right;
+            pointer-events: none;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(180deg, #00d4ff 0%, #0088aa 100%);
+            color: black;
+            border: 1px solid #00ffff;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: linear-gradient(180deg, #00ffff 0%, #00aaaa 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .overlay-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+            display: none;
+            z-index: 100;
+            letter-spacing: 5px;
+        }
+
+        .weapons-hud {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 20, 50, 0.85);
+            border: 2px solid orange;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+
+        .weapons-hud div {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .weapon-ready { color: lime; }
+        .weapon-firing { color: yellow; }
+        .weapon-reloading { color: orange; }
+    </style>
+    <!-- Import Map for Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="info">NAVAL DEFENSE: INTERCEPTOR PHALANX [ENHANCED]</div>
+
+    <div id="controls">
+        <button id="pause-btn">PAUSE</button>
+        <button id="view-btn">JET VIEW</button>
+        <button id="missile-btn">MISSILE VIEW</button>
+        <button id="night-btn">NIGHT MODE</button>
+    </div>
+
+    <div class="hud">
+        <div style="color:cyan; border-bottom: 1px solid cyan; padding-bottom:5px; margin-bottom:10px;">SHIP STATUS
+        </div>
+        <div><span>HULL:</span> <span id="hull" style="color:lime">100%</span></div>
+        <div><span>KILLS:</span> <span id="score">0</span></div>
+        <div><span>THREATS:</span> <span id="threats">0</span></div>
+        <div><span>WAVE:</span> <span id="wave">0/25</span></div>
+    </div>
+
+    <div class="weapons-hud">
+        <div style="color:orange; border-bottom: 1px solid orange; padding-bottom:5px; margin-bottom:10px;">WEAPONS
+        </div>
+        <div><span>VLS:</span> <span id="vls-status" class="weapon-ready">READY</span></div>
+        <div><span>CIWS:</span> <span id="ciws-status" class="weapon-ready">READY</span></div>
+        <div><span>MAIN GUN:</span> <span id="gun-status" class="weapon-ready">READY</span></div>
+        <div><span>SAM:</span> <span id="sam-status" class="weapon-ready">READY</span></div>
+    </div>
+
+    <div id="log"></div>
+    <div id="victory-msg" class="overlay-msg" style="color: lime;">MISSION ACCOMPLISHED</div>
+    <div id="fail-msg" class="overlay-msg" style="color: red;">SHIP DESTROYED</div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Config ---
+        const CONFIG = {
+            missileSpeed: 500,
+            jetSpeed: 180,
+            spawnRate: 6000,
+            totalJets: 25,
+            gravity: 140,
+            ciwsRange: 750,
+            samRange: 1400
+        };
+
+        // --- Globals ---
+        let scene, camera, renderer, controls;
+        let clock = new THREE.Clock();
+
+        let isPaused = false;
+        let gameActive = true;
+        let cameraMode = 'ORBIT';
+        let currentJet = null;
+        let currentMissile = null;
+        let isNightMode = false;
+        let missileViewMode = false; // Auto-switch to next missile
+
+        // Objects
+        let shipGroup;
+        let mainMast, radarDish, ciwsTurret, mainGun;
+        const enemies = [];
+        const projectiles = [];
+        const particles = [];
+        const vlsCells = []; // Store VLS cells with their covers
+        const samLaunchers = []; // Store SAM launcher positions
+        let pendingVLSMissiles = []; // Store missiles to add after cover opens
+
+        // Weapon Timers
+        let vlsCooldown = 0;
+        let samCooldown = 0;
+        let mainGunCooldown = 0;
+        let ciwsState = 'IDLE';
+        let ciwsTarget = null;
+
+        // Game State
+        let hullIntegrity = 100;
+        let score = 0;
+        let lastSpawn = 0;
+        let jetsSpawned = 0;
+
+        // --- Init ---
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x88ccff);
+            scene.fog = new THREE.FogExp2(0x88ccff, 0.00015);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.set(-350, 150, 350);
+            camera.lookAt(0, 50, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            document.body.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 4000;
+            controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambient);
+
+            const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+            sun.position.set(500, 1000, 500);
+            sun.castShadow = true;
+            sun.shadow.mapSize.set(4096, 4096);
+            const d = 1000;
+            sun.shadow.camera.left = -d; sun.shadow.camera.right = d;
+            sun.shadow.camera.top = d; sun.shadow.camera.bottom = -d;
+            sun.shadow.camera.near = 100;
+            sun.shadow.camera.far = 3000;
+            scene.add(sun);
+
+            const hemi = new THREE.HemisphereLight(0x88ccff, 0x004488, 0.4);
+            scene.add(hemi);
+
+            // Environment
+            buildWater();
+            buildShip();
+            buildIslands();
+
+            // UI Listeners
+            document.getElementById('pause-btn').addEventListener('click', () => {
+                isPaused = !isPaused;
+                document.getElementById('pause-btn').innerText = isPaused ? "RESUME" : "PAUSE";
+                document.getElementById('pause-btn').style.background = isPaused ?
+                    "linear-gradient(180deg, #ff8800 0%, #aa5500 100%)" :
+                    "linear-gradient(180deg, #00d4ff 0%, #0088aa 100%)";
+                log(isPaused ? "Simulation Paused" : "Simulation Resumed");
+            });
+
+            document.getElementById('view-btn').addEventListener('click', () => {
+                if (cameraMode === 'ORBIT') {
+                    const validJet = enemies.find(e => e.state === 'FLYING');
+                    if (validJet) {
+                        cameraMode = 'COCKPIT';
+                        currentJet = validJet;
+                        document.getElementById('view-btn').innerText = "SHIP VIEW";
+                        document.getElementById('view-btn').style.background = "linear-gradient(180deg, #00ff88 0%, #00aa55 100%)";
+                        controls.enabled = false;
+                        log("Camera: Pilot View");
+                    } else {
+                        log("No active jets to view!");
+                    }
+                } else {
+                    cameraMode = 'ORBIT';
+                    currentJet = null;
+                    document.getElementById('view-btn').innerText = "JET VIEW";
+                    document.getElementById('view-btn').style.background = "linear-gradient(180deg, #00d4ff 0%, #0088aa 100%)";
+                    controls.enabled = true;
+                    camera.position.set(-350, 150, 350);
+                    camera.lookAt(0, 0, 0);
+                    log("Camera: Orbit View");
+                }
+            });
+
+            document.getElementById('missile-btn').addEventListener('click', () => {
+                missileViewMode = !missileViewMode;
+                if (missileViewMode) {
+                    // Exit other camera modes
+                    if (cameraMode === 'COCKPIT') {
+                        cameraMode = 'ORBIT';
+                        currentJet = null;
+                        document.getElementById('view-btn').innerText = "JET VIEW";
+                        document.getElementById('view-btn').style.background = "linear-gradient(180deg, #00d4ff 0%, #0088aa 100%)";
+                    }
+                    currentMissile = null;
+                    document.getElementById('missile-btn').innerText = "MISSILE VIEW: ON";
+                    document.getElementById('missile-btn').style.background = "linear-gradient(180deg, #ff6600 0%, #aa4400 100%)";
+                    controls.enabled = false;
+                    camera.position.set(-350, 100, 350);
+                    camera.lookAt(0, 50, 0);
+                    log("Missile camera armed. Waiting for launch...");
+                } else {
+                    missileViewMode = false;
+                    currentMissile = null;
+                    document.getElementById('missile-btn').innerText = "MISSILE VIEW";
+                    document.getElementById('missile-btn').style.background = "linear-gradient(180deg, #00d4ff 0%, #0088aa 100%)";
+                    controls.enabled = true;
+                    cameraMode = 'ORBIT';
+                    camera.position.set(-350, 150, 350);
+                    camera.lookAt(0, 0, 0);
+                    log("Missile view disengaged.");
+                }
+            });
+
+            document.getElementById('night-btn').addEventListener('click', () => {
+                isNightMode = !isNightMode;
+                document.getElementById('night-btn').innerText = isNightMode ? "DAY MODE" : "NIGHT MODE";
+                if (isNightMode) {
+                    scene.background = new THREE.Color(0x0a1020);
+                    scene.fog = new THREE.FogExp2(0x0a1020, 0.00025);
+                    sun.intensity = 0.1;
+                    ambient.intensity = 0.2;
+                    hemi.intensity = 0.1;
+                    log("Night vision engaged.");
+                } else {
+                    scene.background = new THREE.Color(0x88ccff);
+                    scene.fog = new THREE.FogExp2(0x88ccff, 0.00015);
+                    sun.intensity = 1.8;
+                    ambient.intensity = 0.6;
+                    hemi.intensity = 0.4;
+                    log("Day mode restored.");
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            log("System Initialized. AEGIS Combat System Online.");
+        }
+
+        function log(msg) {
+            const el = document.getElementById('log');
+            const line = document.createElement('div');
+            line.innerText = `> ${msg}`;
+            el.appendChild(line);
+            if (el.children.length > 6) el.removeChild(el.firstChild);
+        }
+
+        function buildWater() {
+            const geo = new THREE.PlaneGeometry(15000, 15000, 100, 100);
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0x005588,
+                roughness: 0.05,
+                metalness: 0.3
+            });
+            const water = new THREE.Mesh(geo, mat);
+            water.rotation.x = -Math.PI / 2;
+            water.receiveShadow = true;
+            scene.add(water);
+        }
+
+        function buildShip() {
+            shipGroup = new THREE.Group();
+
+            // Materials
+            const hullMat = new THREE.MeshStandardMaterial({ color: 0x4a5a6a, roughness: 0.6, metalness: 0.4 });
+            const deckMat = new THREE.MeshStandardMaterial({ color: 0x2a3a4a, roughness: 0.8 });
+            const superMat = new THREE.MeshStandardMaterial({ color: 0x5a6a7a, roughness: 0.5, metalness: 0.3 });
+            const darkMat = new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.7 });
+            const gunMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.4, metalness: 0.6 });
+            const vlsMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.9 });
+            const railMat = new THREE.MeshStandardMaterial({ color: 0x8a8a8a, roughness: 0.3, metalness: 0.7 });
+            const glassMat = new THREE.MeshPhysicalMaterial({
+                color: 0x88ccff,
+                metalness: 0.1,
+                roughness: 0.0,
+                transmission: 0.8,
+                transparent: true,
+                opacity: 0.5
+            });
+            const lightMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const redLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const yellowLightMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+            // === MAIN HULL ===
+            // Bow (pointed front)
+            const bowShape = new THREE.Shape();
+            bowShape.moveTo(0, 0);
+            bowShape.lineTo(30, 0);
+            bowShape.lineTo(15, 15);
+            bowShape.lineTo(0, 15);
+            const bowGeo = new THREE.ExtrudeGeometry(bowShape, { depth: 38, bevelEnabled: false });
+            bowGeo.rotateX(-Math.PI / 2);
+            const bow = new THREE.Mesh(bowGeo, hullMat);
+            bow.position.set(100, 5, 0);
+            bow.castShadow = true;
+            bow.receiveShadow = true;
+            shipGroup.add(bow);
+
+            // Main hull body
+            const hullGeo = new THREE.BoxGeometry(180, 18, 38);
+            const hull = new THREE.Mesh(hullGeo, hullMat);
+            hull.position.set(0, 9, 0);
+            hull.castShadow = true;
+            hull.receiveShadow = true;
+            shipGroup.add(hull);
+
+            // Stern (back) - tapered
+            const sternGeo = new THREE.BoxGeometry(35, 14, 32);
+            const stern = new THREE.Mesh(sternGeo, hullMat);
+            stern.position.set(-107, 7, 0);
+            stern.castShadow = true;
+            shipGroup.add(stern);
+
+            // === DECK ===
+            const mainDeck = new THREE.Mesh(new THREE.BoxGeometry(175, 1, 36), deckMat);
+            mainDeck.position.set(2, 18.5, 0);
+            mainDeck.receiveShadow = true;
+            shipGroup.add(mainDeck);
+
+            // Bow deck (raised)
+            const bowDeck = new THREE.Mesh(new THREE.BoxGeometry(40, 0.5, 34), deckMat);
+            bowDeck.position.set(105, 20, 0);
+            bowDeck.rotation.z = 0.08;
+            shipGroup.add(bowDeck);
+
+            // === FORECASTLE (Front section) ===
+            // Main Gun Platform
+            const gunPlatform = new THREE.Mesh(new THREE.CylinderGeometry(8, 9, 2, 8), deckMat);
+            gunPlatform.position.set(75, 21, 0);
+            shipGroup.add(gunPlatform);
+
+            // 5-inch Main Gun (Mk 45)
+            const gunGroup = new THREE.Group();
+            const gunBase = new THREE.Mesh(new THREE.CylinderGeometry(4, 5, 3, 16), gunMat);
+            gunBase.position.y = 1.5;
+            gunGroup.add(gunBase);
+
+            const gunTurret = new THREE.Mesh(new THREE.BoxGeometry(5, 3, 5), gunMat);
+            gunTurret.position.y = 4;
+            gunGroup.add(gunTurret);
+
+            const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 14, 16), gunMat);
+            gunBarrel.rotation.x = Math.PI / 2;
+            gunBarrel.position.set(0, 5, 8);
+            gunGroup.add(gunBarrel);
+
+            // Muzzle brake
+            const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.5, 1, 16), gunMat);
+            muzzle.rotation.x = Math.PI / 2;
+            muzzle.position.set(0, 5, 15);
+            gunGroup.add(muzzle);
+
+            gunGroup.position.set(75, 21, 0);
+            shipGroup.add(gunGroup);
+            mainGun = gunGroup;
+
+            // === BRIDGE / SUPERSTRUCTURE ===
+            // Level 1 - Base
+            const bridge1 = new THREE.Mesh(new THREE.BoxGeometry(35, 8, 28), superMat);
+            bridge1.position.set(30, 25, 0);
+            bridge1.castShadow = true;
+            shipGroup.add(bridge1);
+
+            // Level 2 - Mid
+            const bridge2 = new THREE.Mesh(new THREE.BoxGeometry(25, 6, 20), superMat);
+            bridge2.position.set(35, 32, 0);
+            bridge2.castShadow = true;
+            shipGroup.add(bridge2);
+
+            // Level 3 - Top bridge
+            const bridge3 = new THREE.Mesh(new THREE.BoxGeometry(18, 5, 16), superMat);
+            bridge3.position.set(35, 37.5, 0);
+            bridge3.castShadow = true;
+            shipGroup.add(bridge3);
+
+            // Bridge windows
+            const windowGeo = new THREE.BoxGeometry(0.3, 2, 12);
+            for (let z = -5; z <= 5; z += 2.5) {
+                const win = new THREE.Mesh(windowGeo, glassMat);
+                win.position.set(44, 37.5, z);
+                shipGroup.add(win);
+            }
+
+            // Bridge wing (left)
+            const bridgeWingL = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 8), superMat);
+            bridgeWingL.position.set(25, 34, -18);
+            shipGroup.add(bridgeWingL);
+
+            // Bridge wing (right)
+            const bridgeWingR = new THREE.Mesh(new THREE.BoxGeometry(12, 4, 8), superMat);
+            bridgeWingR.position.set(25, 34, 18);
+            shipGroup.add(bridgeWingR);
+
+            // === MAIN MAST ===
+            const mastGroup = new THREE.Group();
+
+            // Mast base
+            const mastBase = new THREE.Mesh(new THREE.BoxGeometry(4, 15, 4), darkMat);
+            mastBase.position.y = 7.5;
+            mastGroup.add(mastBase);
+
+            // Mast trunk
+            const mastTrunk = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 25, 8), darkMat);
+            mastTrunk.position.y = 27;
+            mastGroup.add(mastTrunk);
+
+            // Radar platform
+            const radarPlat = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 8), darkMat);
+            radarPlat.position.y = 40;
+            mastGroup.add(radarPlat);
+
+            // SPY-1 Radar array (rotating)
+            const radarGeo = new THREE.BoxGeometry(2, 8, 8);
+            const radarMat = new THREE.MeshStandardMaterial({ color: 0x2a3a4a, roughness: 0.3, metalness: 0.7 });
+            const radar = new THREE.Mesh(radarGeo, radarMat);
+            radar.position.y = 45;
+            mastGroup.add(radar);
+            radarDish = radar;
+
+            // Top antenna
+            const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 10, 8), darkMat);
+            antenna.position.y = 52;
+            mastGroup.add(antenna);
+
+            // Navigation lights
+            const navLightF = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), redLightMat);
+            navLightF.position.set(0, 57, 0);
+            mastGroup.add(navLightF);
+
+            const navLightA = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), yellowLightMat);
+            navLightA.position.set(0, 55, 2);
+            mastGroup.add(navLightA);
+
+            mastGroup.position.set(20, 37.5, 0);
+            shipGroup.add(mastGroup);
+            mainMast = mastGroup;
+
+            // === VLS (Vertical Launch System) ===
+            // Forward VLS (8 cells x 2 = 16 cells)
+            const vlsBase = new THREE.Mesh(new THREE.BoxGeometry(12, 2, 26), deckMat);
+            vlsBase.position.set(55, 19.5, 0);
+            shipGroup.add(vlsBase);
+
+            for (let x = 0; x < 2; x++) {
+                for (let z = 0; z < 8; z++) {
+                    const cellX = 52 + x * 3.5;
+                    const cellY = 20.5;
+                    const cellZ = -9 + z * 2.6;
+
+                    const cell = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.5, 16), vlsMat);
+                    cell.position.set(cellX, cellY, cellZ);
+                    shipGroup.add(cell);
+
+                    // Cell cover (hinged on one side)
+                    const coverGroup = new THREE.Group();
+                    const coverPlate = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.2, 2.3), darkMat);
+                    coverPlate.position.y = 0.1;
+                    coverGroup.add(coverPlate);
+                    coverGroup.position.set(cellX, cellY + 0.35, cellZ + 1.15);
+                    shipGroup.add(coverGroup);
+
+                    // Store VLS cell with cover for animation
+                    vlsCells.push({
+                        position: new THREE.Vector3(cellX, cellY + 1, cellZ),
+                        cover: coverGroup,
+                        isOpen: false
+                    });
+                }
+            }
+
+            // Aft VLS
+            const vlsBase2 = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 20), deckMat);
+            vlsBase2.position.set(-20, 19.5, 0);
+            shipGroup.add(vlsBase2);
+
+            for (let x = 0; x < 2; x++) {
+                for (let z = 0; z < 6; z++) {
+                    const cellX = -22.5 + x * 3.5;
+                    const cellY = 20.5;
+                    const cellZ = -6.5 + z * 2.6;
+
+                    const cell = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.5, 16), vlsMat);
+                    cell.position.set(cellX, cellY, cellZ);
+                    shipGroup.add(cell);
+
+                    const coverGroup = new THREE.Group();
+                    const coverPlate = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.2, 2.3), darkMat);
+                    coverPlate.position.y = 0.1;
+                    coverGroup.add(coverPlate);
+                    coverGroup.position.set(cellX, cellY + 0.35, cellZ + 1.15);
+                    shipGroup.add(coverGroup);
+
+                    vlsCells.push({
+                        position: new THREE.Vector3(cellX, cellY + 1, cellZ),
+                        cover: coverGroup,
+                        isOpen: false
+                    });
+                }
+            }
+
+            // === CIWS (Phalanx) ===
+            const ciwsGroup = new THREE.Group();
+
+            // CIWS Base
+            const ciwsBase = new THREE.Mesh(new THREE.CylinderGeometry(3, 3.5, 2, 16), gunMat);
+            ciwsBase.position.y = 1;
+            ciwsGroup.add(ciwsBase);
+
+            // CIWS Turret (search radar)
+            const ciwsTurr = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 3, 16), gunMat);
+            ciwsTurr.position.y = 3.5;
+            ciwsGroup.add(ciwsTurr);
+
+            // CIWS Barrel (gatling)
+            const ciwsBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 5, 8), gunMat);
+            ciwsBarrel.rotation.x = Math.PI / 2;
+            ciwsBarrel.position.set(0, 3.5, 3);
+            ciwsGroup.add(ciwsBarrel);
+
+            // CIWS tracking radar dish
+            const ciwsDish = new THREE.Mesh(new THREE.SphereGeometry(1.5, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), gunMat);
+            ciwsDish.rotation.x = Math.PI;
+            ciwsDish.position.set(0, 5, -1);
+            ciwsGroup.add(ciwsDish);
+
+            ciwsGroup.position.set(-55, 19, 10);
+            shipGroup.add(ciwsGroup);
+            ciwsTurret = ciwsGroup;
+
+            // Second CIWS (port side)
+            const ciwsGroup2 = ciwsGroup.clone();
+            ciwsGroup2.position.set(-55, 19, -10);
+            shipGroup.add(ciwsGroup2);
+
+            // === SAM Launchers (RIM-162 ESSM) ===
+            // Forward SAM
+            const samGroup1 = new THREE.Group();
+            const samBase1 = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3, 1.5, 8), gunMat);
+            samGroup1.add(samBase1);
+            const samTurret1 = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 4), gunMat);
+            samTurret1.position.y = 2;
+            samGroup1.add(samTurret1);
+
+            // 4 missile tubes - store their positions
+            const sam1Tubes = [];
+            for (let i = 0; i < 4; i++) {
+                const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5, 8), gunMat);
+                tube.rotation.x = Math.PI / 2 - 0.3;
+                const angle = (i / 4) * Math.PI * 2;
+                tube.position.set(Math.cos(angle) * 1.5, 2.5, Math.sin(angle) * 1.5);
+                samGroup1.add(tube);
+
+                // Store tube world position for missile launch
+                sam1Tubes.push(new THREE.Vector3(
+                    10 + Math.cos(angle) * 1.5,
+                    19 + 2.5,
+                    14 + Math.sin(angle) * 1.5
+                ));
+            }
+
+            samGroup1.position.set(10, 19, 14);
+            shipGroup.add(samGroup1);
+            samLaunchers.push({ group: samGroup1, tubes: sam1Tubes });
+
+            // Aft SAM
+            const samGroup2 = new THREE.Group();
+            const samBase2 = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3, 1.5, 8), gunMat);
+            samGroup2.add(samBase2);
+            const samTurret2 = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 4), gunMat);
+            samTurret2.position.y = 2;
+            samGroup2.add(samTurret2);
+
+            const sam2Tubes = [];
+            for (let i = 0; i < 4; i++) {
+                const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5, 8), gunMat);
+                tube.rotation.x = Math.PI / 2 - 0.3;
+                const angle = (i / 4) * Math.PI * 2;
+                tube.position.set(Math.cos(angle) * 1.5, 2.5, Math.sin(angle) * 1.5);
+                samGroup2.add(tube);
+
+                sam2Tubes.push(new THREE.Vector3(
+                    -45 + Math.cos(angle) * 1.5,
+                    19 + 2.5,
+                    14 + Math.sin(angle) * 1.5
+                ));
+            }
+
+            samGroup2.position.set(-45, 19, 14);
+            shipGroup.add(samGroup2);
+            samLaunchers.push({ group: samGroup2, tubes: sam2Tubes });
+
+            // === HELICOPTER PAD ===
+            const heloPad = new THREE.Mesh(new THREE.BoxGeometry(25, 0.5, 20), deckMat);
+            heloPad.position.set(-75, 18.75, 0);
+            shipGroup.add(heloPad);
+
+            // Helo pad markings (H)
+            const hMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            for (let i = 0; i < 3; i++) {
+                const hBar = new THREE.Mesh(new THREE.BoxGeometry(8, 0.1, 1.5), hMat);
+                hBar.position.set(-75, 19, -4 + i * 4);
+                if (i === 1) {
+                    hBar.position.set(-75, 19, 0);
+                    hBar.rotation.y = Math.PI / 2;
+                }
+                shipGroup.add(hBar);
+            }
+
+            // === EXHAUST STACKS ===
+            const stack1 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 8, 16), darkMat);
+            stack1.position.set(-5, 27, 10);
+            shipGroup.add(stack1);
+
+            const stack2 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 8, 16), darkMat);
+            stack2.position.set(-5, 27, -10);
+            shipGroup.add(stack2);
+
+            // Stack caps
+            const cap1 = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2, 1, 16), darkMat);
+            cap1.position.set(-5, 31, 10);
+            shipGroup.add(cap1);
+
+            const cap2 = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2, 1, 16), darkMat);
+            cap2.position.set(-5, 31, -10);
+            shipGroup.add(cap2);
+
+            // === LIFEBOATS ===
+            for (let side = -1; side <= 1; side += 2) {
+                for (let i = 0; i < 2; i++) {
+                    const boat = new THREE.Mesh(new THREE.CapsuleGeometry(1.2, 5, 8, 16), hullMat);
+                    boat.rotation.z = Math.PI / 2;
+                    boat.position.set(-60 + i * 15, 14, side * 20);
+                    boat.castShadow = true;
+                    shipGroup.add(boat);
+
+                    // Boat davit
+                    const davit = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 1), railMat);
+                    davit.position.set(-60 + i * 15, 17, side * 23);
+                    shipGroup.add(davit);
+                }
+            }
+
+            // === RAILINGS ===
+            const railGeo = new THREE.BoxGeometry(200, 1.5, 0.3);
+            const rail1 = new THREE.Mesh(railGeo, railMat);
+            rail1.position.set(0, 20, 18.5);
+            shipGroup.add(rail1);
+
+            const rail2 = new THREE.Mesh(railGeo, railMat);
+            rail2.position.set(0, 20, -18.5);
+            shipGroup.add(rail2);
+
+            // Bow rail
+            const bowRailGeo = new THREE.BoxGeometry(30, 1.5, 0.3);
+            const bowRail1 = new THREE.Mesh(bowRailGeo, railMat);
+            bowRail1.position.set(95, 21, 15);
+            bowRail1.rotation.y = 0.3;
+            shipGroup.add(bowRail1);
+
+            const bowRail2 = new THREE.Mesh(bowRailGeo, railMat);
+            bowRail2.position.set(95, 21, -15);
+            bowRail2.rotation.y = -0.3;
+            shipGroup.add(bowRail2);
+
+            // === ANGLE INDICATORS (Navigation) ===
+            const angleLight = new THREE.PointLight(0xff0000, 2, 100);
+            angleLight.position.set(110, 22, 0);
+            shipGroup.add(angleLight);
+
+            // Stern light
+            const sternLight = new THREE.PointLight(0xffffff, 2, 100);
+            sternLight.position.set(-115, 18, 0);
+            shipGroup.add(sternLight);
+
+            // Deck lights (for night mode)
+            const deckLight1 = new THREE.PointLight(0xffffaa, 1, 50);
+            deckLight1.position.set(50, 35, 0);
+            shipGroup.add(deckLight1);
+
+            const deckLight2 = new THREE.PointLight(0xffffaa, 1, 50);
+            deckLight2.position.set(-30, 35, 0);
+            shipGroup.add(deckLight2);
+
+            scene.add(shipGroup);
+        }
+
+        function buildIslands() {
+            // Island 1 - to the right/east of ship
+            createIsland(800, 400, 1.0);
+
+            // Island 2 - to the left/west of ship, slightly smaller
+            createIsland(-700, -500, 0.8);
+        }
+
+        // --- Islands & Environment ---
+
+        function createPalmTree() {
+            const treeGroup = new THREE.Group();
+
+            // Materials
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.9 });
+            const leafMat = new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 0.7, side: THREE.DoubleSide });
+
+            // Trunk (curved, segmented)
+            const trunkSegments = 8;
+            const segmentHeight = 4;
+            for (let i = 0; i < trunkSegments; i++) {
+                const radius = 0.8 - (i * 0.08);
+                const segment = new THREE.Mesh(
+                    new THREE.CylinderGeometry(radius * 0.7, radius, segmentHeight, 8),
+                    trunkMat
+                );
+                segment.position.y = i * segmentHeight + segmentHeight / 2;
+
+                // Add slight curve to trunk
+                segment.rotation.z = Math.sin(i * 0.3) * 0.05;
+                segment.rotation.x = Math.cos(i * 0.4) * 0.03;
+
+                treeGroup.add(segment);
+            }
+
+            // Palm fronds (leaves) at top
+            const frondCount = 9;
+            const frondLength = 10;
+
+            for (let i = 0; i < frondCount; i++) {
+                const angle = (i / frondCount) * Math.PI * 2;
+
+                // Main frond stem
+                const frondGroup = new THREE.Group();
+
+                // Frond shape (elongated leaves)
+                const frondShape = new THREE.Shape();
+                frondShape.moveTo(0, 0);
+                frondShape.quadraticCurveTo(frondLength * 0.5, 0.5, frondLength, 0);
+                frondShape.quadraticCurveTo(frondLength * 0.5, -0.5, 0, 0);
+
+                const frondGeo = new THREE.ExtrudeGeometry(frondShape, {
+                    depth: 0.3,
+                    bevelEnabled: false
+                });
+                frondGeo.rotateX(Math.PI / 2);
+
+                const frond = new THREE.Mesh(frondGeo, leafMat);
+                frond.position.z = frondLength / 2;
+                frondGroup.add(frond);
+
+                // Position and rotate fronds to spread out
+                frondGroup.rotation.y = angle;
+                frondGroup.rotation.z = Math.PI / 3 + Math.sin(angle * 2) * 0.2; // Spread outward
+                frondGroup.rotation.x = Math.sin(angle * 3) * 0.3;
+
+                frondGroup.position.y = trunkSegments * segmentHeight - 1;
+
+                treeGroup.add(frondGroup);
+            }
+
+            // Coconuts (optional, at the top)
+            for (let i = 0; i < 3; i++) {
+                const coconut = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.4, 8, 8),
+                    new THREE.MeshStandardMaterial({ color: 0x654321, roughness: 0.8 })
+                );
+                const angle = (i / 3) * Math.PI * 2;
+                coconut.position.set(
+                    Math.cos(angle) * 0.5,
+                    trunkSegments * segmentHeight - 2,
+                    Math.sin(angle) * 0.5
+                );
+                treeGroup.add(coconut);
+            }
+
+            return treeGroup;
+        }
+
+        function createIsland(x, z, scale = 1) {
+            const islandGroup = new THREE.Group();
+
+            // Materials
+            const sandMat = new THREE.MeshStandardMaterial({ color: 0xF4E4B0, roughness: 1.0 });
+            const grassMat = new THREE.MeshStandardMaterial({ color: 0x3D8B37, roughness: 0.9 });
+            const rockMat = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.85 });
+
+            // Base (sand) - slightly raised mound
+            const sandBase = new THREE.Mesh(
+                new THREE.SphereGeometry(40 * scale, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2.5),
+                sandMat
+            );
+            sandBase.position.y = -5 * scale;
+            sandBase.scale.y = 0.4;
+            islandGroup.add(sandBase);
+
+            // Grass/topped area
+            const grassTop = new THREE.Mesh(
+                new THREE.SphereGeometry(30 * scale, 16, 16, 0, Math.PI * 2, 0, Math.PI / 3),
+                grassMat
+            );
+            grassTop.position.y = 0;
+            grassTop.scale.y = 0.3;
+            islandGroup.add(grassTop);
+
+            // Small rocks scattered around
+            for (let i = 0; i < 5; i++) {
+                const rockSize = 1 + Math.random() * 3;
+                const rock = new THREE.Mesh(
+                    new THREE.DodecahedronGeometry(rockSize * scale, 0),
+                    rockMat
+                );
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 15 + Math.random() * 15;
+                rock.position.set(
+                    Math.cos(angle) * dist * scale,
+                    -2 * scale,
+                    Math.sin(angle) * dist * scale
+                );
+                rock.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                rock.scale.y = 0.6;
+                islandGroup.add(rock);
+            }
+
+            // Palm trees
+            const palmCount = 3 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < palmCount; i++) {
+                const palm = createPalmTree();
+                const angle = (i / palmCount) * Math.PI * 2 + Math.random() * 0.5;
+                const dist = 8 + Math.random() * 12;
+                palm.position.set(
+                    Math.cos(angle) * dist * scale,
+                    -2 * scale,
+                    Math.sin(angle) * dist * scale
+                );
+                palm.scale.setScalar(0.6 + Math.random() * 0.4);
+                // Random slight rotation
+                palm.rotation.y = Math.random() * Math.PI * 2;
+                islandGroup.add(palm);
+            }
+
+            // Position the entire island
+            islandGroup.position.set(x, -2, z);
+
+            scene.add(islandGroup);
+            return islandGroup;
+        }
+
+        // --- Factories ---
+
+        function createJet(pos) {
+            const group = new THREE.Group();
+
+            const matBody = new THREE.MeshStandardMaterial({ color: 0x506070, roughness: 0.3, metalness: 0.6 });
+            const matDark = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.7 });
+            const matCamo = new THREE.MeshStandardMaterial({ color: 0x4a5a50, roughness: 0.4, metalness: 0.5 });
+            const matGlass = new THREE.MeshPhysicalMaterial({
+                color: 0x88aacc,
+                metalness: 0.9,
+                roughness: 0.0,
+                transmission: 0.5,
+                transparent: true,
+                opacity: 0.6
+            });
+            const matBurner = new THREE.MeshBasicMaterial({ color: 0xff8800 });
+
+            // Fuselage
+            const fuseGeo = new THREE.CylinderGeometry(1.0, 1.4, 11, 24);
+            fuseGeo.rotateX(Math.PI / 2);
+            const fuse = new THREE.Mesh(fuseGeo, matCamo);
+            group.add(fuse);
+
+            // Nose cone
+            const noseGeo = new THREE.ConeGeometry(1.0, 4.5, 24);
+            noseGeo.rotateX(Math.PI / 2);
+            const nose = new THREE.Mesh(noseGeo, matBody);
+            nose.position.z = 7.7;
+            group.add(nose);
+
+            // Cockpit
+            const canopyGeo = new THREE.CapsuleGeometry(1.0, 3.5, 4, 16);
+            canopyGeo.rotateX(Math.PI / 2);
+            const canopy = new THREE.Mesh(canopyGeo, matGlass);
+            canopy.position.set(0, 0.7, 2);
+            canopy.scale.set(0.85, 0.65, 1);
+            group.add(canopy);
+
+            // Air intake
+            const intakeShape = new THREE.Shape();
+            intakeShape.moveTo(-0.7, 0);
+            intakeShape.lineTo(-0.5, -1.0);
+            intakeShape.bezierCurveTo(-0.2, -1.3, 0.2, -1.3, 0.5, -1.0);
+            intakeShape.lineTo(0.7, 0);
+            const intakeGeo = new THREE.ExtrudeGeometry(intakeShape, { depth: 2.5, bevelEnabled: false });
+            const intake = new THREE.Mesh(intakeGeo, matDark);
+            intake.position.set(0, -0.7, 3);
+            intake.rotation.y = Math.PI;
+            group.add(intake);
+
+            // Delta wings
+            const wingShape = new THREE.Shape();
+            wingShape.moveTo(0, 0);
+            wingShape.lineTo(7, -4);
+            wingShape.lineTo(7, -6.5);
+            wingShape.lineTo(2, -5);
+            wingShape.lineTo(1.5, 3.5);
+            const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.15, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.08 });
+            wingGeo.rotateX(-Math.PI / 2);
+
+            matBody.side = THREE.DoubleSide;
+            const leftWing = new THREE.Mesh(wingGeo, matBody);
+            leftWing.position.set(0.85, 0, 1);
+            group.add(leftWing);
+
+            const rightWing = new THREE.Mesh(wingGeo, matBody);
+            rightWing.scale.x = -1;
+            rightWing.position.set(-0.85, 0, 1);
+            group.add(rightWing);
+
+            // Vertical tail
+            const vTailShape = new THREE.Shape();
+            vTailShape.moveTo(0, 0);
+            vTailShape.lineTo(0, 4.5);
+            vTailShape.lineTo(1.8, 4.5);
+            vTailShape.lineTo(4, 0);
+            const vTailGeo = new THREE.ExtrudeGeometry(vTailShape, { depth: 0.2, bevelEnabled: false });
+            vTailGeo.rotateY(Math.PI / 2);
+            vTailGeo.translate(0, 0, -5);
+            const vTail = new THREE.Mesh(vTailGeo, matBody);
+            vTail.position.y = 1.2;
+            group.add(vTail);
+
+            // Horizontal stabilizers
+            const hTailShape = new THREE.Shape();
+            hTailShape.moveTo(0, 0);
+            hTailShape.lineTo(3.5, -2.5);
+            hTailShape.lineTo(3.5, -3.5);
+            hTailShape.lineTo(0, -2.5);
+            const hTailGeo = new THREE.ExtrudeGeometry(hTailShape, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.02 });
+            hTailGeo.rotateX(-Math.PI / 2);
+
+            const lStab = new THREE.Mesh(hTailGeo, matBody);
+            lStab.position.set(0.7, -0.3, -5);
+            group.add(lStab);
+
+            const rStab = new THREE.Mesh(hTailGeo, matBody);
+            rStab.scale.x = -1;
+            rStab.position.set(-0.7, -0.3, -5);
+            group.add(rStab);
+
+            // Engine nozzle
+            const nozzleGeo = new THREE.CylinderGeometry(0.8, 1.0, 1.8, 24, 1, true);
+            nozzleGeo.rotateX(Math.PI / 2);
+            const nozzle = new THREE.Mesh(nozzleGeo, matDark);
+            nozzle.position.z = -6;
+            group.add(nozzle);
+
+            // Afterburner glow
+            const glow = new THREE.Mesh(new THREE.CircleGeometry(0.7, 16), matBurner);
+            glow.position.z = -7;
+            glow.rotation.x = Math.PI;
+            group.add(glow);
+
+            // Missiles (wingtip)
+            const misGeo = new THREE.CylinderGeometry(0.08, 0.08, 3.5, 8);
+            misGeo.rotateX(Math.PI / 2);
+            const misMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+
+            const lMis = new THREE.Mesh(misGeo, misMat);
+            lMis.position.set(7.2, -0.3, -3);
+            group.add(lMis);
+
+            const rMis = new THREE.Mesh(misGeo, misMat);
+            rMis.position.set(-7.2, -0.3, -3);
+            group.add(rMis);
+
+            group.position.copy(pos);
+            group.lookAt(0, 50, 0);
+            scene.add(group);
+
+            return {
+                mesh: group,
+                hp: 1,
+                state: 'FLYING',
+                velocity: new THREE.Vector3(),
+                spin: new THREE.Vector3(),
+                cooldown: 0
+            };
+        }
+
+        // --- VLS Launch with Cover Animation ---
+        function launchVLSMissile(target) {
+            // Find an available VLS cell (not already opening/open)
+            const availableCells = vlsCells.filter(c => !c.isOpen);
+            if (availableCells.length === 0) return null;
+
+            const cell = availableCells[Math.floor(Math.random() * availableCells.length)];
+            cell.isOpen = true;
+
+            // Animate cover opening (rotate open)
+            const openDuration = 400; // ms - slower for visibility
+            const startTime = Date.now();
+            const startRotation = 0;
+            const endRotation = Math.PI / 2; // 90 degrees
+
+            const animateOpen = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / openDuration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+
+                cell.cover.rotation.x = startRotation + (endRotation - startRotation) * eased;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateOpen);
+                } else {
+                    // Cover is fully open - NOW launch missile
+                    // Convert local position to world position at launch time
+                    const launchPos = cell.position.clone().applyMatrix4(shipGroup.matrixWorld);
+                    const missile = createMissile(launchPos, target, false);
+
+                    // Set as current missile for camera tracking if in missile view mode
+                    if (missileViewMode && !currentMissile) {
+                        currentMissile = missile;
+                        cameraMode = 'MISSILE';
+                        log("Missile camera tracking!");
+                    }
+
+                    pendingVLSMissiles.push(missile);
+                    log("VLS launch!");
+
+                    // Animate cover closing after a delay
+                    setTimeout(() => {
+                        const closeStartTime = Date.now();
+                        const animateClose = () => {
+                            const elapsed = Date.now() - closeStartTime;
+                            const progress = Math.min(elapsed / openDuration, 1);
+                            const eased = Math.pow(progress, 3); // Ease in cubic
+
+                            cell.cover.rotation.x = endRotation - (endRotation - startRotation) * eased;
+
+                            if (progress < 1) {
+                                requestAnimationFrame(animateClose);
+                            } else {
+                                cell.isOpen = false;
+                            }
+                        };
+                        animateClose();
+                    }, 500); // Longer delay to see missile emerge
+                }
+            };
+            animateOpen();
+
+            return true; // Return success indicator
+        }
+
+        function createMissile(pos, target, isEnemy) {
+            const group = new THREE.Group();
+
+            const matBody = new THREE.MeshStandardMaterial({
+                color: isEnemy ? 0xcc2200 : 0xeeeeee,
+                roughness: 0.3,
+                metalness: 0.5
+            });
+            const matFins = new THREE.MeshStandardMaterial({ color: 0x333333 });
+
+            // Body
+            const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 7, 12), matBody);
+            tube.rotation.x = Math.PI / 2;
+            group.add(tube);
+
+            // Nose
+            const cone = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.8, 12), matBody);
+            cone.rotation.x = Math.PI / 2;
+            cone.position.z = 4.4;
+            group.add(cone);
+
+            // Fins
+            const finGeo = new THREE.BoxGeometry(2.2, 0.1, 1.2);
+            const fin1 = new THREE.Mesh(finGeo, matFins);
+            fin1.position.z = -2.8;
+            group.add(fin1);
+
+            const fin2 = new THREE.Mesh(finGeo, matFins);
+            fin2.position.z = -2.8;
+            fin2.rotation.z = Math.PI / 2;
+            group.add(fin2);
+
+            // Engine flame
+            const flame = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.15, 0, 2.5, 8),
+                new THREE.MeshBasicMaterial({ color: isEnemy ? 0xff4400 : 0xffaa00 })
+            );
+            flame.rotation.x = -Math.PI / 2;
+            flame.position.z = -4.5;
+            group.add(flame);
+
+            group.position.copy(pos);
+
+            if (isEnemy) {
+                group.lookAt(target);
+            } else {
+                group.lookAt(pos.x, pos.y + 100, pos.z);
+            }
+            scene.add(group);
+
+            return {
+                mesh: group,
+                target: target,
+                isEnemy: isEnemy,
+                phase: isEnemy ? 'CRUISE' : 'LAUNCH',
+                life: 8.0
+            };
+        }
+
+        // --- FX ---
+
+        function spawnTracer(start, end, color = 0xffffaa) {
+            const points = [start.clone(), end.clone()];
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            const mat = new THREE.LineBasicMaterial({ color: color, linewidth: 2, transparent: true, opacity: 0.8 });
+            const line = new THREE.Line(geo, mat);
+            scene.add(line);
+
+            setTimeout(() => {
+                scene.remove(line);
+                geo.dispose();
+                mat.dispose();
+            }, 80);
+        }
+
+        function spawnParticle(pos, color, size, life) {
+            const mesh = new THREE.Mesh(
+                new THREE.BoxGeometry(size, size, size),
+                new THREE.MeshBasicMaterial({ color: color, transparent: true })
+            );
+            mesh.position.copy(pos);
+            mesh.position.add(new THREE.Vector3(
+                (Math.random() - .5) * 6,
+                (Math.random() - .5) * 6,
+                (Math.random() - .5) * 6
+            ));
+            scene.add(mesh);
+
+            particles.push({
+                mesh: mesh,
+                life: life,
+                maxLife: life,
+                vel: new THREE.Vector3(
+                    (Math.random() - .5) * 12,
+                    (Math.random() - .5) * 12,
+                    (Math.random() - .5) * 12
+                )
+            });
+        }
+
+        function createSmallExplosion(pos) {
+            spawnParticle(pos, 0xffff00, 5, 0.25);
+            for (let i = 0; i < 8; i++) {
+                spawnParticle(pos, 0x444444, 2.5, 1.2 + Math.random());
+            }
+            for (let i = 0; i < 4; i++) {
+                spawnParticle(pos, 0xff6600, 3, 0.5);
+            }
+        }
+
+        function createSplash(pos) {
+            for (let i = 0; i < 20; i++) {
+                spawnParticle(pos, 0xffffff, 3.5, 1.0 + Math.random() * 0.5);
+            }
+            for (let i = 0; i < 10; i++) {
+                spawnParticle(pos, 0x88ccff, 2, 0.8);
+            }
+        }
+
+        function createMuzzleFlash(pos) {
+            const flash = new THREE.Mesh(
+                new THREE.SphereGeometry(3, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.9 })
+            );
+            flash.position.copy(pos);
+            scene.add(flash);
+
+            setTimeout(() => {
+                scene.remove(flash);
+            }, 50);
+        }
+
+        // --- Main Loop ---
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Camera handling
+            if (cameraMode === 'COCKPIT' && currentJet) {
+                if (enemies.includes(currentJet) && (currentJet.state === 'FLYING' || currentJet.state === 'CRASHING')) {
+                    const jetPos = currentJet.mesh.position.clone();
+                    const jetQuat = currentJet.mesh.quaternion;
+                    const offset = new THREE.Vector3(0, 0.9, 2.0);
+                    offset.applyQuaternion(jetQuat);
+                    camera.position.copy(jetPos).add(offset);
+                    const forward = new THREE.Vector3(0, -0.1, 10).applyQuaternion(jetQuat);
+                    camera.lookAt(jetPos.clone().add(forward));
+                    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(jetQuat);
+                    camera.up.copy(up);
+                } else {
+                    cameraMode = 'ORBIT';
+                    controls.enabled = true;
+                    document.getElementById('view-btn').innerText = "JET VIEW";
+                    document.getElementById('view-btn').style.background = "linear-gradient(180deg, #00d4ff 0%, #0088aa 100%)";
+                    log("Signal Lost.");
+                    camera.position.set(-350, 150, 350);
+                    camera.lookAt(0, 0, 0);
+                    camera.up.set(0, 1, 0);
+                }
+            } else if (cameraMode === 'MISSILE' && currentMissile) {
+                // Check if missile still exists
+                if (projectiles.includes(currentMissile) && currentMissile.mesh) {
+                    const missilePos = currentMissile.mesh.position.clone();
+                    const missileQuat = currentMissile.mesh.quaternion;
+
+                    // Camera behind and slightly above missile
+                    const offset = new THREE.Vector3(0, 3, -15);
+                    offset.applyQuaternion(missileQuat);
+                    camera.position.copy(missilePos).add(offset);
+
+                    // Look at target (where missile is going)
+                    if (currentMissile.target && currentMissile.target.mesh) {
+                        camera.lookAt(currentMissile.target.mesh.position);
+                    } else {
+                        // Look forward along missile direction
+                        const forward = new THREE.Vector3(0, 0, 50).applyQuaternion(missileQuat);
+                        camera.lookAt(missilePos.clone().add(forward));
+                    }
+
+                    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(missileQuat);
+                    camera.up.copy(up);
+                } else {
+                    // Missile destroyed - reset camera
+                    cameraMode = 'ORBIT';
+                    currentMissile = null;
+                    controls.enabled = true;
+                    log("Missile destroyed. Camera reset.");
+                    camera.position.set(-350, 150, 350);
+                    camera.lookAt(0, 0, 0);
+                    camera.up.set(0, 1, 0);
+
+                    // If still in missile view mode, ready for next missile
+                    if (missileViewMode) {
+                        log("Missile camera armed. Waiting for launch...");
+                    }
+                }
+            } else {
+                controls.update();
+            }
+
+            renderer.render(scene, camera);
+
+            if (isPaused) return;
+
+            const dt = 0.016;
+            const now = Date.now();
+
+            // Transfer pending VLS missiles to main projectiles array
+            while (pendingVLSMissiles.length > 0) {
+                projectiles.push(pendingVLSMissiles.shift());
+            }
+
+            // Ship motion
+            if (shipGroup) {
+                shipGroup.position.y = Math.sin(now * 0.0008) * 2.5;
+                shipGroup.rotation.z = Math.sin(now * 0.0006) * 0.025;
+                shipGroup.rotation.x = Math.sin(now * 0.0004) * 0.015;
+            }
+
+            // Rotate radar
+            if (radarDish) {
+                radarDish.rotation.y += 0.03;
+            }
+
+            // CIWS turret tracking
+            if (ciwsTurret && ciwsTarget) {
+                ciwsTurret.lookAt(ciwsTarget.mesh.position);
+            }
+
+            // Weapon cooldowns
+            if (vlsCooldown > 0) vlsCooldown -= dt;
+            if (samCooldown > 0) samCooldown -= dt;
+            if (mainGunCooldown > 0) mainGunCooldown -= dt;
+
+            // Update weapon status UI
+            updateWeaponStatus();
+
+            // Spawn enemies
+            if (gameActive && jetsSpawned < CONFIG.totalJets) {
+                if (now - lastSpawn > CONFIG.spawnRate) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = 1200 + Math.random() * 600;
+                    const h = 250 + Math.random() * 200;
+
+                    const pos = new THREE.Vector3(Math.cos(angle) * dist, h, Math.sin(angle) * dist);
+                    const enemy = createJet(pos);
+                    enemies.push(enemy);
+                    jetsSpawned++;
+
+                    log(`Contact! Bearing ${Math.floor(angle * 180 / Math.PI)}° (${jetsSpawned}/${CONFIG.totalJets})`);
+                    lastSpawn = now;
+                }
+            } else if (gameActive && jetsSpawned >= CONFIG.totalJets && enemies.length === 0) {
+                gameActive = false;
+                document.getElementById('victory-msg').style.display = 'block';
+                log("All threats neutralized. Well done.");
+            }
+
+            const shipPos = new THREE.Vector3(0, 40, 0);
+
+            // Update enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+
+                if (e.state === 'FLYING') {
+                    const dir = shipPos.clone().sub(e.mesh.position).normalize();
+                    e.mesh.lookAt(shipPos);
+                    e.mesh.translateZ(CONFIG.jetSpeed * dt);
+
+                    const dist = e.mesh.position.distanceTo(shipPos);
+
+                    // Fire missile
+                    e.cooldown -= dt;
+                    if (dist < 1100 && dist > 120 && e.cooldown <= 0) {
+                        const missile = createMissile(e.mesh.position.clone(), shipPos, true);
+                        missile.target = shipPos;
+                        projectiles.push(missile);
+                        e.cooldown = 6.5;
+                        log("Missile launch detected!");
+                    }
+
+                    // Crash into ship
+                    if (dist < 45) {
+                        createSmallExplosion(e.mesh.position);
+                        damageShip(12);
+                        scene.remove(e.mesh);
+                        enemies.splice(i, 1);
+                        log("Impact! Hull breached!");
+                        continue;
+                    }
+
+                    // Auto-defense - VLS
+                    if (dist < CONFIG.samRange && dist > 250 && vlsCooldown <= 0 && Math.random() < 0.07) {
+                        const missile = launchVLSMissile(e);
+                        if (missile) {
+                            projectiles.push(missile);
+                            vlsCooldown = 1.2;
+                            document.getElementById('vls-status').className = 'weapon-firing';
+                            setTimeout(() => {
+                                if (vlsCooldown > 0) document.getElementById('vls-status').className = 'weapon-reloading';
+                            }, 100);
+                        }
+                    }
+
+                    // Auto-defense - SAM
+                    if (dist < CONFIG.samRange && dist > 400 && samCooldown <= 0 && Math.random() < 0.05) {
+                        const sam = samLaunchers[Math.floor(Math.random() * samLaunchers.length)];
+                        // Pick a random tube from this SAM launcher
+                        const tubePos = sam.tubes[Math.floor(Math.random() * sam.tubes.length)];
+                        const samPos = tubePos.clone().applyMatrix4(shipGroup.matrixWorld);
+                        const missile = createMissile(samPos, e, false);
+
+                        // Set as current missile for camera tracking if in missile view mode
+                        if (missileViewMode && !currentMissile) {
+                            currentMissile = missile;
+                            cameraMode = 'MISSILE';
+                            log("Missile camera tracking!");
+                        }
+
+                        projectiles.push(missile);
+                        samCooldown = 2.2;
+                        document.getElementById('sam-status').className = 'weapon-firing';
+                        setTimeout(() => {
+                            if (samCooldown > 0) document.getElementById('sam-status').className = 'weapon-reloading';
+                        }, 100);
+                    }
+
+                    // Main Gun (long range)
+                    if (dist < 900 && dist > 450 && mainGunCooldown <= 0 && Math.random() < 0.04) {
+                        if (mainGun) {
+                            mainGun.lookAt(e.mesh.position);
+                            createMuzzleFlash(new THREE.Vector3(75, 30, 8).applyMatrix4(shipGroup.matrixWorld));
+                        }
+                        // Direct hit chance
+                        if (Math.random() < 0.5) {
+                            createSmallExplosion(e.mesh.position);
+                            e.state = 'CRASHING';
+                            e.velocity = e.mesh.getWorldDirection(new THREE.Vector3()).multiplyScalar(CONFIG.jetSpeed * 0.7);
+                            e.spin = new THREE.Vector3(Math.random(), Math.random(), Math.random()).multiplyScalar(8);
+                            changeScore(1);
+                            log("Main gun hit confirmed!");
+                        }
+                        mainGunCooldown = 1.0;
+                        document.getElementById('gun-status').className = 'weapon-firing';
+                        setTimeout(() => {
+                            if (mainGunCooldown > 0) document.getElementById('gun-status').className = 'weapon-reloading';
+                        }, 100);
+                    }
+
+                } else if (e.state === 'CRASHING') {
+                    e.velocity.y -= CONFIG.gravity * dt;
+                    e.velocity.multiplyScalar(0.985);
+                    e.mesh.position.add(e.velocity.clone().multiplyScalar(dt));
+
+                    e.mesh.rotation.x += e.spin.x * dt;
+                    e.mesh.rotation.y += e.spin.y * dt;
+                    e.mesh.rotation.z += e.spin.z * dt;
+
+                    if (Math.random() < 0.5) {
+                        spawnParticle(e.mesh.position, 0x333333, 2.5, 2);
+                    }
+
+                    if (e.mesh.position.y <= 0) {
+                        createSplash(e.mesh.position);
+                        scene.remove(e.mesh);
+                        enemies.splice(i, 1);
+                        changeScore(1);
+                        log("Splash one bandit.");
+                    }
+                }
+            }
+
+            // CIWS Point Defense
+            ciwsTarget = null;
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i];
+                if (!p.isEnemy) continue;
+
+                const dist = p.mesh.position.distanceTo(shipPos);
+
+                if (dist < CONFIG.ciwsRange && dist > 60) {
+                    ciwsTarget = p;
+
+                    // Tracers
+                    if (Math.random() < 0.4) {
+                        spawnTracer(new THREE.Vector3(-55, 40, 10).applyMatrix4(shipGroup.matrixWorld), p.mesh.position, 0xffff44);
+                    }
+
+                    // Intercept chance
+                    if (Math.random() < 0.09) {
+                        createSmallExplosion(p.mesh.position);
+                        scene.remove(p.mesh);
+                        projectiles.splice(i, 1);
+                        log("CIWS splash!");
+                        document.getElementById('ciws-status').className = 'weapon-firing';
+                        setTimeout(() => {
+                            document.getElementById('ciws-status').className = 'weapon-ready';
+                        }, 200);
+                    }
+                }
+            }
+
+            // Update projectiles
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i];
+
+                // Validate missile object has required properties
+                if (!p || !p.mesh || isNaN(p.mesh.position.x)) {
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+
+                p.life -= dt;
+
+                if (p.life <= 0) {
+                    scene.remove(p.mesh);
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+
+                if (p.isEnemy) {
+                    // Enemy missile targeting ship
+                    if (!p.target) {
+                        p.life = 0;
+                        continue;
+                    }
+
+                    const dir = p.target.clone().sub(p.mesh.position).normalize();
+
+                    // Check for valid direction (prevent NaN)
+                    if (dir.lengthSq() < 0.001) {
+                        p.life = 0;
+                        continue;
+                    }
+
+                    p.mesh.position.add(dir.multiplyScalar(CONFIG.missileSpeed * dt));
+                    p.mesh.lookAt(p.target);
+
+                    if (p.mesh.position.distanceTo(p.target) < 25) {
+                        createSmallExplosion(p.mesh.position);
+                        damageShip(7);
+                        scene.remove(p.mesh);
+                        projectiles.splice(i, 1);
+                    }
+                } else {
+                    // Friendly missile targeting enemy
+                    if (p.phase === 'LAUNCH') {
+                        p.mesh.position.y += 180 * dt;
+                        if (p.mesh.position.y > 120) p.phase = 'TRACK';
+                        // Safety: force to TRACK after 1 second in LAUNCH
+                        if (p.life < 7) {
+                            p.phase = 'TRACK';
+                        }
+                    } else {
+                        // Check if target is still valid (FLYING state)
+                        if (!p.target || !p.target.mesh || !enemies.includes(p.target) || p.target.state !== 'FLYING') {
+                            // Target lost - self-destruct missile
+                            createSmallExplosion(p.mesh.position);
+                            scene.remove(p.mesh);
+                            if (currentMissile === p) {
+                                currentMissile = null;
+                            }
+                            projectiles.splice(i, 1);
+                            continue;
+                        }
+
+                        const targetPos = p.target.mesh.position.clone();
+                        const dir = targetPos.sub(p.mesh.position).normalize();
+
+                        // Check for valid direction
+                        if (dir.lengthSq() < 0.001) {
+                            createSmallExplosion(p.mesh.position);
+                            scene.remove(p.mesh);
+                            if (currentMissile === p) {
+                                currentMissile = null;
+                            }
+                            projectiles.splice(i, 1);
+                            continue;
+                        }
+
+                        p.mesh.position.add(dir.multiplyScalar(CONFIG.missileSpeed * dt));
+                        p.mesh.lookAt(p.target.mesh.position);
+
+                        if (p.mesh.position.distanceTo(p.target.mesh.position) < 18) {
+                            createSmallExplosion(p.target.mesh.position);
+                            const e = p.target;
+                            if (e.state === 'FLYING') {
+                                e.state = 'CRASHING';
+                                e.velocity = e.mesh.getWorldDirection(new THREE.Vector3()).multiplyScalar(CONFIG.jetSpeed * 0.8);
+                                e.spin = new THREE.Vector3(Math.random(), Math.random(), Math.random()).multiplyScalar(6);
+                                changeScore(1);
+                                log("Target destroyed.");
+                            }
+                            scene.remove(p.mesh);
+                            // Clear current missile if this was the tracked one
+                            if (currentMissile === p) {
+                                currentMissile = null;
+                            }
+                            projectiles.splice(i, 1);
+                        }
+                    }
+                }
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.life -= dt;
+                pt.mesh.position.add(pt.vel.clone().multiplyScalar(dt));
+                pt.mesh.scale.multiplyScalar(0.94);
+                pt.mesh.material.opacity = pt.life / pt.maxLife;
+
+                if (pt.life <= 0) {
+                    scene.remove(pt.mesh);
+                    particles.splice(i, 1);
+                }
+            }
+
+            // UI updates
+            document.getElementById('threats').innerText = enemies.filter(e => e.state === 'FLYING').length;
+            document.getElementById('wave').innerText = jetsSpawned + "/" + CONFIG.totalJets;
+        }
+
+        function updateWeaponStatus() {
+            if (vlsCooldown <= 0) document.getElementById('vls-status').className = 'weapon-ready';
+            if (samCooldown <= 0) document.getElementById('sam-status').className = 'weapon-ready';
+            if (mainGunCooldown <= 0) document.getElementById('gun-status').className = 'weapon-ready';
+        }
+
+        function damageShip(amt) {
+            if (!gameActive) return;
+            hullIntegrity -= amt;
+            if (hullIntegrity < 0) hullIntegrity = 0;
+            if (hullIntegrity < 30) {
+                document.getElementById('hull').style.color = 'red';
+            } else if (hullIntegrity < 60) {
+                document.getElementById('hull').style.color = 'orange';
+            }
+            document.getElementById('hull').innerText = Math.floor(hullIntegrity) + "%";
+
+            // Camera shake
+            camera.position.x += (Math.random() - .5) * 15;
+            camera.position.y += (Math.random() - .5) * 10;
+
+            if (hullIntegrity <= 0) {
+                hullIntegrity = 0;
+                gameActive = false;
+                document.getElementById('fail-msg').style.display = 'block';
+                log("CRITICAL FAILURE. Ship abandoning...");
+            }
+        }
+
+        function changeScore(amt) {
+            score += amt;
+            document.getElementById('score').innerText = score;
+        }
+
+    </script>
+</body>
+
+</html>

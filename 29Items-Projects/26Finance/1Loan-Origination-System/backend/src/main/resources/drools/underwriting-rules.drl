@@ -1,0 +1,101 @@
+package underwriting.rules
+
+import com.loanorigination.model.LoanApplication
+import com.loanorigination.drools.UnderwritingRulesService.UnderwritingDecision
+
+// Rule 1: Credit Score Check
+rule "Approve High Credit Score"
+    salience 100
+    when
+        $app : LoanApplication(creditScore >= 750)
+        $decision : UnderwritingDecision(decision == null)
+    then
+        $decision.setDecision("APPROVED");
+        $decision.setReason("High credit score (>= 750)");
+        $decision.getConditions().add("Standard terms apply");
+        update($decision);
+end
+
+rule "Reject Low Credit Score"
+    salience 100
+    when
+        $app : LoanApplication(creditScore != null && creditScore < 580)
+        $decision : UnderwritingDecision(decision == null)
+    then
+        $decision.setDecision("REJECTED");
+        $decision.setReason("Credit score below minimum threshold (< 580)");
+        update($decision);
+end
+
+// Rule 2: Debt-to-Income Ratio Check
+rule "Check DTI Ratio"
+    salience 90
+    when
+        $app : LoanApplication(debtToIncomeRatio != null && debtToIncomeRatio.doubleValue() > 0.43)
+        $decision : UnderwritingDecision(decision == null || decision == "APPROVED")
+    then
+        if ($decision.getDecision() == null) {
+            $decision.setDecision("MANUAL_REVIEW");
+            $decision.setReason("DTI ratio exceeds 43% threshold");
+        } else {
+            $decision.getConditions().add("Review DTI ratio - exceeds 43%");
+        }
+        update($decision);
+end
+
+// Rule 3: Loan-to-Value Ratio Check
+rule "Check LTV Ratio"
+    salience 80
+    when
+        $app : LoanApplication(loanToValueRatio != null && loanToValueRatio.doubleValue() > 0.80)
+        $decision : UnderwritingDecision(decision == null || decision == "APPROVED")
+    then
+        if ($decision.getDecision() == null) {
+            $decision.setDecision("MANUAL_REVIEW");
+            $decision.setReason("LTV ratio exceeds 80% - requires PMI or larger down payment");
+        } else {
+            $decision.getConditions().add("LTV > 80% - PMI required");
+        }
+        update($decision);
+end
+
+// Rule 4: Mid-Range Credit Score - Manual Review
+rule "Manual Review Mid Credit Score"
+    salience 70
+    when
+        $app : LoanApplication(creditScore >= 580 && creditScore < 650)
+        $decision : UnderwritingDecision(decision == null)
+    then
+        $decision.setDecision("MANUAL_REVIEW");
+        $decision.setReason("Credit score in manual review range (580-650)");
+        $decision.getConditions().add("Verify employment and income");
+        update($decision);
+end
+
+// Rule 5: Approve Good Credit with Conditions
+rule "Approve Good Credit with Standard Conditions"
+    salience 60
+    when
+        $app : LoanApplication(
+            creditScore >= 650 && creditScore < 750,
+            debtToIncomeRatio != null && debtToIncomeRatio.doubleValue() <= 0.43
+        )
+        $decision : UnderwritingDecision(decision == null)
+    then
+        $decision.setDecision("APPROVED");
+        $decision.setReason("Good credit score with acceptable DTI");
+        $decision.getConditions().add("Standard documentation required");
+        $decision.getConditions().add("Employment verification required");
+        update($decision);
+end
+
+// Default Rule: Manual Review
+rule "Default to Manual Review"
+    salience 1
+    when
+        $decision : UnderwritingDecision(decision == null)
+    then
+        $decision.setDecision("MANUAL_REVIEW");
+        $decision.setReason("Application requires manual underwriting review");
+        update($decision);
+end
