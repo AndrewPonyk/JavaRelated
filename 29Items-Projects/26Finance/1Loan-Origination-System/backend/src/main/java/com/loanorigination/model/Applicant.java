@@ -46,6 +46,15 @@ public class Applicant {
     @Column(name = "years_employed", precision = 3, scale = 1)
     private BigDecimal yearsEmployed;
 
+    @Column(name = "existing_debt", precision = 15, scale = 2)
+    private BigDecimal existingDebt;
+
+    @Column(name = "num_previous_loans")
+    private Integer numPreviousLoans;
+
+    @Column(name = "num_delinquencies")
+    private Integer numDelinquencies;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

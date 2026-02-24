@@ -13,6 +13,9 @@ interface ApplicantFormData {
   employmentStatus: string;
   employerName: string;
   yearsEmployed: number;
+  existingDebt: number;
+  numPreviousLoans: number;
+  numDelinquencies: number;
 }
 
 interface Applicant extends ApplicantFormData {
@@ -192,6 +195,49 @@ const ApplicantForm: React.FC = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="existingDebt">Existing Debt ($)</label>
+            <input
+              type="number"
+              id="existingDebt"
+              {...register('existingDebt', {
+                min: { value: 0, message: 'Must be non-negative' },
+                valueAsNumber: true
+              })}
+              placeholder="0"
+            />
+            {errors.existingDebt && <span className="error">{errors.existingDebt.message}</span>}
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="numPreviousLoans">Previous Loans</label>
+              <input
+                type="number"
+                id="numPreviousLoans"
+                {...register('numPreviousLoans', {
+                  min: { value: 0, message: 'Must be non-negative' },
+                  valueAsNumber: true
+                })}
+                placeholder="0"
+              />
+              {errors.numPreviousLoans && <span className="error">{errors.numPreviousLoans.message}</span>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="numDelinquencies">Delinquencies</label>
+              <input
+                type="number"
+                id="numDelinquencies"
+                {...register('numDelinquencies', {
+                  min: { value: 0, message: 'Must be non-negative' },
+                  valueAsNumber: true
+                })}
+                placeholder="0"
+              />
+              {errors.numDelinquencies && <span className="error">{errors.numDelinquencies.message}</span>}
+            </div>
+          </div>
+
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Creating...' : 'Register Applicant'}
           </button>
@@ -217,7 +263,10 @@ const ApplicantForm: React.FC = () => {
                   <th style={{ padding: '0.75rem', textAlign: 'left', border: '1px solid #ddd' }}>Email</th>
                   <th style={{ padding: '0.75rem', textAlign: 'left', border: '1px solid #ddd' }}>Phone</th>
                   <th style={{ padding: '0.75rem', textAlign: 'right', border: '1px solid #ddd' }}>Annual Income</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'right', border: '1px solid #ddd' }}>Existing Debt</th>
                   <th style={{ padding: '0.75rem', textAlign: 'left', border: '1px solid #ddd' }}>Employment</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'center', border: '1px solid #ddd' }}>Prev Loans</th>
+                  <th style={{ padding: '0.75rem', textAlign: 'center', border: '1px solid #ddd' }}>Delinq.</th>
                   <th style={{ padding: '0.75rem', textAlign: 'left', border: '1px solid #ddd' }}>Created</th>
                 </tr>
               </thead>
@@ -232,7 +281,12 @@ const ApplicantForm: React.FC = () => {
                       <td style={{ padding: '0.75rem', border: '1px solid #ddd', textAlign: 'right' }}>
                         {a.annualIncome != null ? `$${Number(a.annualIncome).toLocaleString()}` : '—'}
                       </td>
+                      <td style={{ padding: '0.75rem', border: '1px solid #ddd', textAlign: 'right' }}>
+                        {a.existingDebt != null ? `$${Number(a.existingDebt).toLocaleString()}` : '—'}
+                      </td>
                       <td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>{a.employmentStatus || '—'}</td>
+                      <td style={{ padding: '0.75rem', border: '1px solid #ddd', textAlign: 'center' }}>{a.numPreviousLoans ?? '—'}</td>
+                      <td style={{ padding: '0.75rem', border: '1px solid #ddd', textAlign: 'center' }}>{a.numDelinquencies ?? '—'}</td>
                       <td style={{ padding: '0.75rem', border: '1px solid #ddd' }}>
                         {a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '—'}
                       </td>
@@ -240,7 +294,7 @@ const ApplicantForm: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', border: '1px solid #ddd' }}>
+                    <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', border: '1px solid #ddd' }}>
                       No applicants registered yet
                     </td>
                   </tr>

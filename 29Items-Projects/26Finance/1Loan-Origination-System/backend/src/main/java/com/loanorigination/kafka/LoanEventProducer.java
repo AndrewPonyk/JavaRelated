@@ -78,6 +78,8 @@ public class LoanEventProducer {
 
     @lombok.Data
     @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
     public static class LoanEvent {
         private String eventId;
         private String eventType;

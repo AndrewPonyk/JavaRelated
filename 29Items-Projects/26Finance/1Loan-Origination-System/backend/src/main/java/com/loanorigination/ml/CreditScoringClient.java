@@ -14,18 +14,21 @@ public class CreditScoringClient {
 
     private final RestTemplate restTemplate;
     private final String mlServiceUrl;
+    private final String scoringMode;
 
     public CreditScoringClient(
             RestTemplate restTemplate,
-            @Value("${ml-service.url:http://localhost:8001}") String mlServiceUrl) {
+            @Value("${ml-service.url:http://localhost:8001}") String mlServiceUrl,
+            @Value("${ml-service.scoring-mode:model}") String scoringMode) {
         this.restTemplate = restTemplate;
         this.mlServiceUrl = mlServiceUrl;
+        this.scoringMode = scoringMode;
     }
 
     public CreditScoreResponse getCreditScore(CreditScoreRequest request) {
         try {
-            log.info("Calling ML service for credit score: {}", mlServiceUrl);
-            String url = mlServiceUrl + "/api/score";
+            log.info("Calling ML service for credit score [mode={}]: {}", scoringMode, mlServiceUrl);
+            String url = mlServiceUrl + "/api/score?mode=" + scoringMode;
             
             CreditScoreResponse response = restTemplate.postForObject(
                 url,

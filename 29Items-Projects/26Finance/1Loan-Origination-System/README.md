@@ -1,6 +1,8 @@
 # Loan Origination System - FULLY IMPLEMENTED
 
-## ✅ What's Been Completed
+![Application Dashboard](Screenshot%202026-02-25%20014908.png)
+
+## What's Been Completed
 
 This is a **production-ready** Loan Origination System with:
 
@@ -27,9 +29,21 @@ This is a **production-ready** Loan Origination System with:
 
 ### ML Service (Python + FastAPI)
 ✅ **100% Functional**
-- ✅ Credit scoring API with XGBoost integration
+- ✅ Credit scoring API with XGBoost integration (German Credit Dataset, 7 features)
+- ✅ Switchable modes: `?mode=model` (XGBoost) / `?mode=rules` (rule-based)
 - ✅ Fallback scoring logic
 - ✅ Feature importance calculation
+- ✅ Hard business rules (income-based loan cap)
+
+> **NOTE: CREDIT SCORE IS A LINEAR APPROXIMATION**
+>
+> The XGBoost model returns a **probability of default** (0.0 - 1.0). This is then
+> mapped to a FICO-like 300-850 credit score via: `credit_score = 300 + (1 - prob_default) * 550`.
+> This is a **simplified linear conversion**, not a real FICO score — it exists because
+> the downstream pipeline (Drools rules, frontend dashboard) was built around integer
+> credit scores. The raw `risk_score` (probability of default) in the API response is
+> the actual model output. Consider migrating the pipeline to use `risk_score` directly
+> for more accurate decision-making.
 
 ### Infrastructure
 ✅ **100% Functional**
@@ -40,7 +54,20 @@ This is a **production-ready** Loan Origination System with:
 
 ---
 
-## 🚀 Quick Start (3 Steps)
+## Stub / Not Yet Implemented
+
+The following components have the full code structure (interfaces, configs, controllers, frontend) wired up but are **not functionally active**:
+
+- **OCR** — `OcrService` is implemented by `NoOpOcrService`, which always returns an empty string. No actual text extraction happens on uploaded documents. Replace with Apache Tika, Tesseract, or AWS Textract when needed.
+- **Elasticsearch** — The `loan_documents` index, `DocumentSearchService`, search controller, and frontend search UI all exist and execute, but since OCR produces no text, the index contains only document names and types. ES adds ~512 MB of memory overhead for what amounts to a `LIKE` query on two short strings. Full-text document search becomes useful only after a real OCR implementation is plugged in.
+- **S3 storage** — `LoanDocument` has `s3Key`/`s3Bucket` fields, but `DocumentService` writes files to a local directory and stores the local path in those columns.
+- **Redis** — Listed in the Quick Start but not referenced in any application code or docker-compose service definitions.
+
+The **ML credit scoring fallback** (rule-based, in `CreditScoringClient`) is functional and produces reasonable scores when the Python ML service is unavailable.
+
+---
+
+## Quick Start (3 Steps)
 
 ### 1. Start Infrastructure Services
 
@@ -391,7 +418,7 @@ docker-compose logs -f kafka
 - [x] Drools rules execute
 - [x] ML service responds
 - [x] Tests pass (unit + integration)
-- [x] No TODO or placeholder code remains
+- [ ] No TODO or placeholder code remains (see "Stub / Not Yet Implemented" above)
 - [x] Complete end-to-end workflow works
 
 ---

@@ -121,8 +121,10 @@ public class UnderwritingService {
                 : 0.0;
         request.setAnnualIncome(annualIncome);
 
-        // TODO: Replace with credit bureau data when available
-        request.setExistingDebt(0.0);
+        double existingDebt = applicant.getExistingDebt() != null
+                ? applicant.getExistingDebt().doubleValue()
+                : 0.0;
+        request.setExistingDebt(existingDebt);
 
         request.setLoanAmount(application.getLoanAmount().doubleValue());
 
@@ -136,9 +138,10 @@ public class UnderwritingService {
                 : 35; // conservative default when DOB is missing
         request.setAge(age);
 
-        // TODO: Replace with credit bureau data when available
-        request.setNumPreviousLoans(0);
-        request.setNumDelinquencies(0);
+        request.setNumPreviousLoans(
+                applicant.getNumPreviousLoans() != null ? applicant.getNumPreviousLoans() : 0);
+        request.setNumDelinquencies(
+                applicant.getNumDelinquencies() != null ? applicant.getNumDelinquencies() : 0);
 
         return creditScoringClient.getCreditScore(request);
     }
@@ -179,8 +182,11 @@ public class UnderwritingService {
                     / (1.0 - Math.pow(1.0 + monthlyRate, -termMonths));
         }
 
-        // TODO: add existing monthly debt payments from credit bureau data
-        double totalMonthlyDebt = monthlyPayment; // + existingDebtMonthlyPayments
+        // Estimate existing monthly debt payments (assume 5-year repayment on existing debt)
+        double existingDebtMonthly = applicant.getExistingDebt() != null
+                ? applicant.getExistingDebt().doubleValue() / 60.0
+                : 0.0;
+        double totalMonthlyDebt = monthlyPayment + existingDebtMonthly;
 
         BigDecimal dti = BigDecimal.valueOf(totalMonthlyDebt)
                 .divide(monthlyIncome, 4, RoundingMode.HALF_UP);

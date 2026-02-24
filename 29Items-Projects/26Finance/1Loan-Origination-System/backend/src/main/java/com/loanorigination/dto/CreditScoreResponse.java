@@ -9,4 +9,6 @@ public class CreditScoreResponse {
     private Double riskScore;
     private String riskCategory;
     private Map<String, Double> featureImportance;
+    private String scoringMode;
+    private String hardRuleViolation;
 }

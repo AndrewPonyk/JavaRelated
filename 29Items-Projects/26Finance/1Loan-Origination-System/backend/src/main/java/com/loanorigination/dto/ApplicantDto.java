@@ -34,4 +34,13 @@ public class ApplicantDto {
     private String employmentStatus;
     private String employerName;
     private BigDecimal yearsEmployed;
+
+    @DecimalMin(value = "0.0", message = "Existing debt must be positive")
+    private BigDecimal existingDebt;
+
+    @Min(value = 0, message = "Number of previous loans must be non-negative")
+    private Integer numPreviousLoans;
+
+    @Min(value = 0, message = "Number of delinquencies must be non-negative")
+    private Integer numDelinquencies;
 }
