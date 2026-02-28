@@ -25,7 +25,7 @@ Imagine you are top software architect, I need correct and perfect answer, CTO a
 21Video (processing, optimimizing and another video algor, ffmpeg, opencv)<br/>
 22Compilers (Compilers/Translator design, Language theory, Parsing theory, LLVM, JIT/AOT techniques, static analysis, type systems)<br/>
 23Bigdata+ETL (Spark, Kafka, Hive/Trino, Flink, Airflow, dbt, NiFi, Snowflake, Databricks, AWS Glue, BigQuery, Beam)<br/>
-24Blockchain(Solidity, Python, Rust, Web3.js, SHA-256,Truffle,IPFS,Hardhat,OpenZeppelin,Ganache,Ethers.js, Ethereum blockchain, Hyperledger Fabric DLT framework, Proof-of-Work (PoW) consensus mechanism, Merkle Trees data structure, Trezor hardware wallet security, MythX smart contract auditing tool, Consensus (PoW, PoS, PBFT implementations))<br/>
+24Blockchain(Solidity, Python, Rust, Web3.js, SHA-256,Truffle(dead not use),IPFS,Hardhat,OpenZeppelin,Ganache,Ethers.js, Ethereum blockchain, Hyperledger Fabric DLT framework, Proof-of-Work (PoW) consensus mechanism, Merkle Trees data structure, Trezor hardware wallet security, MythX smart contract auditing tool, Consensus (PoW, PoS, PBFT implementations))<br/>
 25GIS (ArcGIS, QGIS, PostGIS, Mapbox, Leaflet, GeoServer, GDAL, OpenLayers, Cesium, Coordinate systems, GeoJSON, spatial indexing (R‑tree), Shapefile (.shp))<br/>
 26Finance (Loan Origination &Servicing, Credit-Scoring Models, Risk Management & VaR, Portfolio Optimization, Market Prediction/Time-Series Forecasting, Algorithmic Trading, Derivatives Pricing, Asset Allocation & Rebalancing, Treasury/Liquidity Management, TA-Lib, Fix protocol)<br/>
 27Assebmly (CPU Architecture x86, ARM, Registers, Instruction Set (Opcodes), Assembler (NASM, MASM), Machine Code (Binary), Memory Addressing, System Calls (Interrupts), Linker)<br/>

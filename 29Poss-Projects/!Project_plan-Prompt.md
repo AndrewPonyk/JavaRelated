@@ -2,12 +2,11 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 
 ## Project Context
-- **Project Name:** Loan Origination System
-- **Tech Stack:** Java, Spring Boot, Oracle, Drools, Kafka, Elasticsearch, React, TypeScript
-- **Short Description:** Rules engine (Drools) for underwriting decision. Kafka for event sourcing. Elasticsearch for document search.
-- **Business Logic:** Fintech-end loan processing from application to funding. ML credit scoring using XGBoost ensemble.
-- **Deployment Platform & CI/CD Tools:** AWS EKS, Jenkins
-
+- **Project Name:** Voting System
+- **Tech Stack:** Solidity, Truffle, Ganache, Web3.js, React, Node.js, PostgreSQL, MythX, IPFS, Metamask
+- **Short Description:** Zero-knowledge proofs (zkSNARKs) enable anonymous yet verifiable voting without revealing choices. MythX automated auditing identifies smart contract vulnerabilities before deployment. Ganache provides local blockchain environment for development and integration testing. Commit-reveal scheme prevents vote buying and last-minute manipulation attacks.
+- **Business Logic:** Secure voting platform for organizations, DAOs, and governance token holders. Proposal system enables members to submit, discuss, and amend motions before voting period. Delegation allows members to assign voting power to trusted representatives with revocation capability.
+- **Deployment Platform & CI/CD Tools:** IPFS + Ethereum Testnet/Mainnet, GitHub Actions
 ---
 
 ## CRITICAL INSTRUCTION
