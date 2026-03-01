@@ -1,0 +1,73 @@
+{
+  "name": "voting-system",
+  "version": "0.1.0",
+  "description": "Decentralized voting system with zkSNARK anonymous verification, commit-reveal scheme, and delegation",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test:frontend": "react-scripts test",
+    "eject": "react-scripts eject",
+    "server": "node src/api/server.js",
+    "server:dev": "nodemon src/api/server.js",
+    "test:contracts": "hardhat test",
+    "test:api": "jest test/api/ --forceExit --detectOpenHandles",
+    "test": "npm run test:contracts && npm run test:api",
+    "compile": "hardhat compile",
+    "deploy": "hardhat ignition deploy ignition/modules/VotingSystem.js",
+    "deploy:localhost": "hardhat ignition deploy ignition/modules/VotingSystem.js --network localhost",
+    "deploy:reset": "hardhat ignition deploy ignition/modules/VotingSystem.js --reset",
+    "node": "hardhat node",
+    "seed": "hardhat run scripts/seed.js --network localhost",
+    "lint": "eslint src/ test/ --ext .js,.jsx",
+    "lint:sol": "solhint 'contracts/**/*.sol'",
+    "lint:fix": "eslint src/ test/ --ext .js,.jsx --fix",
+    "format": "prettier --write 'src/**/*.{js,jsx,css}' 'contracts/**/*.sol' 'test/**/*.js'",
+    "mythx": "bash scripts/mythx-analyze.sh",
+    "zk:setup": "bash scripts/generate-zk-keys.sh",
+    "db:migrate": "for f in migrations/sql/*.sql; do psql $DATABASE_URL -f $f; done",
+    "db:reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run db:migrate",
+    "coverage:sol": "hardhat coverage",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "setup": "npm install && npm run compile && npm run deploy:localhost && npm run db:migrate"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.0",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.0",
+    "helmet": "^7.0.0",
+        "morgan": "^1.10.0",
+    "pg": "^8.11.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.0",
+    "react-scripts": "5.0.1",
+    "web3": "^4.1.0",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "chai": "^4.3.7",
+    "eslint": "^8.45.0",
+    "hardhat": "^2.19.0",
+    "jest": "^29.6.0",
+    "nodemon": "^3.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.1.0",
+    "snarkjs": "^0.7.0",
+    "solhint": "^3.6.0",
+    "supertest": "^6.3.3"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["/node_modules/", "/test/contracts/", "/test/e2e/"],
+    "testEnvironment": "node"
+  }
+}

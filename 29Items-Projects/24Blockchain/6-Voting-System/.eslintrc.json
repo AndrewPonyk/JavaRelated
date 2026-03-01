@@ -1,0 +1,27 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "jest": true,
+    "mocha": true
+  },
+  "extends": ["eslint:recommended", "react-app"],
+  "parserOptions": {
+    "ecmaFeatures": { "jsx": true },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  },
+  "overrides": [
+    {
+      "files": ["test/**/*.js", "scripts/**/*.js", "ignition/**/*.js", "hardhat.config.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

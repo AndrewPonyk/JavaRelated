@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Hardhat
+cache/
+artifacts/
+ignition/deployments/
+.secret
+
+# zkSNARK build artifacts (large files)
+contracts/zk/build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log

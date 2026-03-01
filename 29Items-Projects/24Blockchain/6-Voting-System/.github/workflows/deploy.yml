@@ -1,0 +1,79 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment target"
+        required: true
+        default: "testnet"
+        type: choice
+        options:
+          - testnet
+          - mainnet
+
+jobs:
+  deploy-contracts:
+    name: Deploy Smart Contracts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment: ${{ github.event.inputs.environment || 'testnet' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npm run compile
+      - name: Deploy to ${{ github.event.inputs.environment }}
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "mainnet" ]; then
+            npx hardhat ignition deploy ignition/modules/VotingSystem.js --network mainnet
+          else
+            npx hardhat ignition deploy ignition/modules/VotingSystem.js --network sepolia
+          fi
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
+
+  deploy-api:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    needs: deploy-contracts
+    if: always() && !cancelled()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t voting-system-api .
+      # Push to container registry and deploy
+      # - run: docker push $REGISTRY/voting-system-api:${{ github.sha }}
+
+  deploy-frontend:
+    name: Deploy Frontend to IPFS
+    runs-on: ubuntu-latest
+    needs: deploy-api
+    if: always() && !cancelled()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          REACT_APP_API_URL: ${{ vars.API_URL }}
+          REACT_APP_VOTING_SYSTEM_ADDRESS: ${{ vars.VOTING_SYSTEM_ADDRESS }}
+          REACT_APP_PROPOSAL_MANAGER_ADDRESS: ${{ vars.PROPOSAL_MANAGER_ADDRESS }}
+          REACT_APP_DELEGATION_REGISTRY_ADDRESS: ${{ vars.DELEGATION_REGISTRY_ADDRESS }}
+      # Pin to IPFS via Pinata
+      # - name: Pin to IPFS
+      #   run: |
+      #     CID=$(npx ipfs-deploy build/ -p pinata -O)
+      #     echo "Deployed to IPFS: $CID"
+      #   env:
+      #     IPFS_DEPLOY_PINATA__API_KEY: ${{ secrets.PINATA_API_KEY }}
+      #     IPFS_DEPLOY_PINATA__SECRET_API_KEY: ${{ secrets.PINATA_SECRET_KEY }}

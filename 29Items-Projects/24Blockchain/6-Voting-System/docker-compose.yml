@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  # Local blockchain (Hardhat Node)
+  hardhat:
+    build:
+      context: .
+      dockerfile: Dockerfile.hardhat
+    ports:
+      - "8545:8545"
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: voting_system
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/sql:/docker-entrypoint-initdb.d
+
+  # Backend API
+  api:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/voting_system
+      ETHEREUM_RPC_URL: http://hardhat:8545
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      - postgres
+      - hardhat
+
+  # IPFS node (optional for local development)
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "5001:5001"  # API
+      - "8080:8080"  # Gateway
+    volumes:
+      - ipfsdata:/data/ipfs
+
+  # React Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001/api
+      - NODE_ENV=development
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  ipfsdata:
