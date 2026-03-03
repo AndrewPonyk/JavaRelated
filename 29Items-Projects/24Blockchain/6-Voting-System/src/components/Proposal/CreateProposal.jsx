@@ -4,7 +4,7 @@ import { useWeb3 } from "../../hooks/useWeb3";
 import * as api from "../../utils/api";
 
 function CreateProposal() {
-  const { account, isConnected, authData, authenticate } = useWeb3();
+  const { account, isConnected, authData, authenticate, clearAuth } = useWeb3();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -48,24 +48,54 @@ function CreateProposal() {
     setError(null);
 
     try {
-      // Authenticate if not already
+      // Get fresh auth first
       let auth = authData;
+      console.log("Initial authData:", auth);
+
       if (!auth) {
+        console.log("No auth, requesting new signature...");
         auth = await authenticate();
+        console.log("Got new auth:", auth);
       }
+
       if (!auth) {
         setError("Authentication required. Please sign the message in Metamask.");
         setSubmitting(false);
         return;
       }
 
-      const result = await api.createProposal(
-        { title, description, options: validOptions },
-        auth
-      );
+      // Try the API call
+      try {
+        const result = await api.createProposal(
+          { title, description, options: validOptions },
+          auth
+        );
+        navigate(`/proposals/${result.data.id}`);
+        return;
+      } catch (apiErr) {
+        console.log("API error:", apiErr);
+        // If nonce error, clear auth and retry
+        if (apiErr.code === "NONCE_USED" || apiErr.code === "NONCE_EXPIRED" || apiErr.status === 401) {
+          console.log("Nonce error, clearing auth and retrying...");
+          clearAuth();
+          auth = await authenticate();
+          if (!auth) {
+            setError("Authentication required. Please sign the message in Metamask.");
+            setSubmitting(false);
+            return;
+          }
 
-      navigate(`/proposals/${result.data.id}`);
+          const result = await api.createProposal(
+            { title, description, options: validOptions },
+            auth
+          );
+          navigate(`/proposals/${result.data.id}`);
+        } else {
+          throw apiErr;
+        }
+      }
     } catch (err) {
+      console.error("Create proposal error:", err);
       setError(err.message);
     } finally {
       setSubmitting(false);

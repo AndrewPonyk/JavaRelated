@@ -4,7 +4,7 @@ const logger = require("../utils/logger");
 
 /**
  * GET /api/proposals/:id/results
- * Get cached vote results for a proposal.
+ * Get vote results — reads from chain if DB cache has no votes.
  */
 async function getResults(req, res, next) {
   try {
@@ -12,6 +12,31 @@ async function getResults(req, res, next) {
     if (!results) {
       return res.status(404).json({ error: { code: "NOT_FOUND", message: "Results not available" } });
     }
+
+    // If DB has no votes, try reading directly from chain (only works for tallied proposals)
+    if (results.totalVotes === 0 && results.phase === "tallied") {
+      const db = require("../utils/db");
+      const proposal = await db.query("SELECT chain_proposal_id, option_count FROM proposals WHERE id = $1", [req.params.id]);
+      if (proposal.rows.length > 0 && proposal.rows[0].chain_proposal_id) {
+        const chainId = proposal.rows[0].chain_proposal_id;
+        const onChain = await blockchainService.getOnChainProposal(chainId);
+        if (onChain && Number(onChain.state) === 3) { // 3 = Tallied
+          const totalVotes = Number(onChain.totalVotes || 0);
+          if (totalVotes > 0) {
+            const optionCount = Number(onChain.optionCount || proposal.rows[0].option_count);
+            for (let i = 0; i < optionCount; i++) {
+              const count = Number(await blockchainService.getOnChainResult(chainId, i) || 0);
+              if (results.options[i]) {
+                results.options[i].votes = count;
+                results.options[i].percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : "0.0";
+              }
+            }
+            results.totalVotes = totalVotes;
+          }
+        }
+      }
+    }
+
     res.json({ data: results });
   } catch (err) {
     next(err);
@@ -54,8 +79,16 @@ async function getVotingStatus(req, res, next) {
     const commitCount = await voteService.getCommitCount(proposalId);
     const revealCount = await voteService.getRevealCount(proposalId);
 
-    // Try to get on-chain data
-    const onChainData = await blockchainService.getOnChainProposal(proposalId);
+    // Look up chain_proposal_id from database — do NOT use database ID for on-chain queries
+    const db = require("../utils/db");
+    const proposal = await db.query("SELECT chain_proposal_id FROM proposals WHERE id = $1", [proposalId]);
+    const chainProposalId = proposal.rows.length > 0 ? proposal.rows[0].chain_proposal_id : null;
+
+    // Only query on-chain data if we have a valid chain proposal ID
+    let onChainData = null;
+    if (chainProposalId) {
+      onChainData = await blockchainService.getOnChainProposal(chainProposalId);
+    }
 
     const currentBlock = await blockchainService.getBlockNumber();
 

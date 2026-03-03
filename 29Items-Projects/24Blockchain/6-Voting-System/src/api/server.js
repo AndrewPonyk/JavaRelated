@@ -1,3 +1,9 @@
+// Web3.js v4 returns BigInt values which JSON.stringify cannot serialize.
+// This polyfill ensures BigInts are converted to strings during serialization.
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -79,10 +85,54 @@ app.get("/health", async (_req, res) => {
 app.use(errorHandler);
 
 // --- Start ---
+/**
+ * Detect if the Hardhat node was restarted (chain state wiped) and reset
+ * stale proposals that reference on-chain data that no longer exists.
+ */
+async function resetStaleChainData() {
+  const db = require("./utils/db");
+  try {
+    // Check if VotingSystem contract has any proposals
+    const onChainProposal = await blockchainService.getOnChainProposal(1);
+    const chainHasProposals = onChainProposal && Number(onChainProposal.id) > 0;
+
+    // Find DB proposals that claim to be on-chain
+    const staleResult = await db.query(
+      "SELECT id, chain_proposal_id, phase FROM proposals WHERE chain_proposal_id IS NOT NULL AND phase IN ('commit', 'reveal')"
+    );
+
+    if (staleResult.rows.length > 0 && !chainHasProposals) {
+      // Chain was wiped but DB still has on-chain proposals — reset them
+      logger.warn(`Detected ${staleResult.rows.length} stale on-chain proposals after chain reset. Resetting to draft.`);
+      await db.query(
+        "UPDATE proposals SET phase = 'draft', chain_proposal_id = NULL, commit_deadline = NULL, reveal_deadline = NULL, updated_at = NOW() WHERE chain_proposal_id IS NOT NULL AND phase IN ('commit', 'reveal')"
+      );
+      logger.info("Stale proposals reset to draft phase.");
+    } else if (staleResult.rows.length > 0 && chainHasProposals) {
+      // Chain has proposals — verify each one still exists
+      for (const row of staleResult.rows) {
+        const chainData = await blockchainService.getOnChainProposal(row.chain_proposal_id);
+        if (!chainData || Number(chainData.id) === 0) {
+          logger.warn(`Proposal ${row.id} (chain_id=${row.chain_proposal_id}) not found on-chain. Resetting to draft.`);
+          await db.query(
+            "UPDATE proposals SET phase = 'draft', chain_proposal_id = NULL, commit_deadline = NULL, reveal_deadline = NULL, updated_at = NOW() WHERE id = $1",
+            [row.id]
+          );
+        }
+      }
+    }
+  } catch (err) {
+    logger.warn(`Could not verify chain state on startup: ${err.message}`);
+  }
+}
+
 async function start() {
   try {
     // Initialize blockchain connection
     blockchainService.initialize();
+
+    // Detect and reset stale chain data from previous Hardhat runs
+    await resetStaleChainData();
 
     // Start event listeners to sync on-chain events to PostgreSQL
     blockchainService.startEventListener({

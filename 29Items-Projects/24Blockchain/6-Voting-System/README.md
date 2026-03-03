@@ -189,6 +189,94 @@ Vote delegation with per-proposal or global scope.
 - `getEffectiveDelegate(voter, proposalId)` — proposal-specific > global
 - `getVotingPower(delegate)` — 1 + delegator count
 
+## How Voting Works
+
+### Data Storage
+
+| Data | Where | Why |
+|------|-------|-----|
+| Title, options, author | PostgreSQL | Fast queries, filtering, pagination |
+| Full proposal description | IPFS | Cheap off-chain storage; CID hash guarantees integrity |
+| Vote hashes (commits) | Blockchain | Immutable, tamper-proof |
+| Revealed votes + tallies | Blockchain | Trustless verification |
+| Cached results | PostgreSQL | Synced from chain events for fast reads |
+
+### Voting Flow
+
+```
+1. CREATE PROPOSAL (draft)
+   User ──POST /api/proposals──> PostgreSQL + IPFS
+   (nothing on-chain yet)
+
+2. ADVANCE TO VOTING
+   User ──MetaMask tx──> VotingSystem.createProposal() ──> on-chain proposal
+        ──POST /advance/complete──> PostgreSQL: saves chain_proposal_id, phase='commit'
+
+3. COMMIT VOTE (hide your choice)
+   choice + random secret ──keccak256──> hash
+   User ──MetaMask tx──> VotingSystem.commitVote(proposalId, hash)
+   On-chain stores ONLY the hash — nobody knows your choice
+
+4. REVEAL VOTE (prove your choice)
+   User sends original choice + secret
+   Contract checks: keccak256(choice + secret) == stored hash?
+   Match ──> vote counted in tally[choice]++
+
+5. TALLY
+   Anyone ──> VotingSystem.tallyVotes(proposalId)
+   Results become readable via getResult()
+```
+
+### Commit-Reveal Scheme
+
+**Problem:** If votes are public immediately, later voters see results and are influenced.
+
+**Solution:** Two phases:
+- **Commit phase** — submit a hash of your vote (sealed envelope)
+- **Reveal phase** — open the envelope, contract verifies the hash matches
+
+You can't change your vote after committing because the hash won't match.
+
+### Deadlines
+
+Deadlines use **block numbers** (via `block.number` in Solidity):
+
+```
+Created at block #7, commitDuration=5, revealDuration=5
+
+Commit phase:  block 7 ──── block 12    (commitVote allowed)
+Reveal phase:  block 13 ─── block 17    (revealVote allowed)
+Tally:         block 18+                 (tallyVotes allowed)
+```
+
+```solidity
+// VotingSystem.sol:118-119
+p.commitDeadline = block.number + _commitDuration;
+p.revealDeadline = block.number + _commitDuration + _revealDuration;
+```
+
+### Production vs Local Development
+
+On real Ethereum, new blocks are produced automatically every ~12 seconds by the global network. Deadlines pass naturally with time — no intervention needed.
+
+On Hardhat (local dev chain), **you are the only user** — blocks are only mined when you send a transaction. Between transactions, the chain is frozen: no new blocks, no time passing. A deadline of 2400 blocks would never arrive on its own.
+
+| Environment | Block production | 8-hour vote deadline | Action needed? |
+|---|---|---|---|
+| Ethereum mainnet | ~12 sec, automatic | `commitDuration = 2400` (~8 hours) | No — just wait |
+| Sepolia testnet | ~12 sec, automatic | Same as mainnet | No — just wait |
+| Hardhat local dev | Only on transactions | `commitDuration = 5` (instant) | Yes — auto-mine via `POST /api/dev/mine` |
+
+**Production example** (8 hours commit, 4 hours reveal):
+```javascript
+advanceToVoting(proposalId, auth, 2400, 1200) // blocks ≈ hours at 12s/block
+```
+
+**Local dev** (the app uses small durations and auto-mines blocks to skip past deadlines):
+```javascript
+advanceToVoting(proposalId, auth, 5, 5)       // 5 blocks, mined instantly
+```
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagrams.

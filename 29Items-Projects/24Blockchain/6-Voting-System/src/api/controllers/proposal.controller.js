@@ -164,4 +164,94 @@ async function addAmendment(req, res, next) {
   }
 }
 
-module.exports = { listProposals, getProposal, createProposal, updateProposal, deleteProposal, addAmendment };
+/**
+ * POST /api/proposals/:id/advance
+ * Advance a draft proposal to active voting. Authenticated, proposer only.
+ * Returns transaction data for frontend to sign.
+ */
+async function advanceToVoting(req, res, next) {
+  try {
+    const proposal = await proposalService.getProposalById(req.params.id);
+    if (!proposal) {
+      return res.status(404).json({ error: { code: "NOT_FOUND", message: "Proposal not found" } });
+    }
+    if (proposal.proposer_address !== req.user.walletAddress) {
+      return res.status(403).json({ error: { code: "FORBIDDEN", message: "Not the proposer" } });
+    }
+    if (proposal.phase !== "draft") {
+      return res.status(400).json({ error: { code: "INVALID_STATE", message: "Can only advance draft proposals" } });
+    }
+
+    const { commitDuration = 5, revealDuration = 5 } = req.body;
+    const txData = await proposalService.advanceToVoting(req.params.id, { commitDuration, revealDuration });
+
+    res.json({
+      data: {
+        proposalId: req.params.id,
+        ...txData,
+        message: "Sign this transaction to create the proposal on-chain",
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/proposals/:id/advance/complete
+ * Complete the advancement after on-chain transaction is confirmed.
+ */
+async function completeAdvancement(req, res, next) {
+  try {
+    const { chainProposalId, commitDeadline, revealDeadline } = req.body;
+    if (!chainProposalId) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "chainProposalId required" } });
+    }
+
+    const proposal = await proposalService.completeAdvancement(req.params.id, {
+      chainProposalId,
+      commitDeadline,
+      revealDeadline,
+    });
+
+    res.json({ data: proposal });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/proposals/:id/phase
+ * Update a proposal's phase (e.g., after on-chain tallyVotes).
+ */
+async function updatePhase(req, res, next) {
+  try {
+    const { phase } = req.body;
+    const validPhases = ["commit", "reveal", "tallied", "cancelled"];
+    if (!phase || !validPhases.includes(phase)) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: `Invalid phase. Must be one of: ${validPhases.join(", ")}` } });
+    }
+
+    const proposal = await proposalService.getProposalById(req.params.id);
+    if (!proposal) {
+      return res.status(404).json({ error: { code: "NOT_FOUND", message: "Proposal not found" } });
+    }
+
+    const updated = await proposalService.updatePhase(req.params.id, phase);
+    res.json({ data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  listProposals,
+  getProposal,
+  createProposal,
+  updateProposal,
+  deleteProposal,
+  addAmendment,
+  advanceToVoting,
+  completeAdvancement,
+  updatePhase,
+};

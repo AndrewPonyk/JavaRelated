@@ -8,6 +8,15 @@ services:
       dockerfile: Dockerfile.hardhat
     ports:
       - "8545:8545"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./ignition:/app/ignition
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -f /app/ignition/deployments/chain-1337/deployed_addresses.json && curl -sf http://127.0.0.1:8545"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
 
   # PostgreSQL database
   postgres:
@@ -33,9 +42,14 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/voting_system
       ETHEREUM_RPC_URL: http://hardhat:8545
       CORS_ORIGIN: http://localhost:3000
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./ignition:/app/ignition
     depends_on:
-      - postgres
-      - hardhat
+      postgres:
+        condition: service_started
+      hardhat:
+        condition: service_healthy
 
   # IPFS node (optional for local development)
   ipfs:

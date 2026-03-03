@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS proposals (
     id                  SERIAL PRIMARY KEY,
-    chain_proposal_id   INTEGER UNIQUE,                -- On-chain proposal ID
+    chain_proposal_id   INTEGER,                        -- On-chain proposal ID
     contract_address    VARCHAR(42),                    -- Which contract this belongs to
     title               VARCHAR(500) NOT NULL,
     description_cid     VARCHAR(100),                   -- IPFS CID of full proposal document

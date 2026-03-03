@@ -2,9 +2,12 @@ FROM node:18-alpine
 
 WORKDIR /app
 COPY package.json ./
-RUN npm install
+RUN npm install && apk add --no-cache curl
 COPY hardhat.config.js ./
 COPY contracts/ contracts/
+COPY scripts/ scripts/
+COPY ignition/ ignition/
 
 EXPOSE 8545
-CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0"]
+RUN chmod +x scripts/entrypoint.sh
+CMD ["sh", "scripts/entrypoint.sh"]

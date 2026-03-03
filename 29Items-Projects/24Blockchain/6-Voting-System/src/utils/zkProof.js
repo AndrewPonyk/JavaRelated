@@ -35,7 +35,8 @@ async function checkProvingKey() {
   if (provingKeyAvailable !== null) return provingKeyAvailable;
   try {
     const res = await fetch(PROVING_KEY_URL, { method: "HEAD" });
-    provingKeyAvailable = res.ok;
+    const contentType = res.headers.get("content-type") || "";
+    provingKeyAvailable = res.ok && !contentType.includes("text/html");
   } catch {
     provingKeyAvailable = false;
   }

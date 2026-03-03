@@ -145,36 +145,37 @@ async function startEventListener(handlers = {}) {
   const proposalAddress = resolveAddress(proposalArtifact, "PROPOSAL_MANAGER_ADDRESS");
 
   if (votingArtifact && votingAddress) {
-    const wsVoting = new web3Ws.eth.Contract(votingArtifact.abi, votingAddress);
+    try {
+      const wsVoting = new web3Ws.eth.Contract(votingArtifact.abi, votingAddress);
 
-    const commitSub = wsVoting.events.VoteCommitted()
-      .on("data", (event) => {
-        logger.info(`Event VoteCommitted: proposal=${event.returnValues.proposalId}, voter=${event.returnValues.voter}`);
-        if (handlers.onVoteCommitted) {
-          handlers.onVoteCommitted({
-            proposalId: event.returnValues.proposalId,
-            voter: event.returnValues.voter,
-            txHash: event.transactionHash,
-            blockNumber: event.blockNumber,
-          });
-        }
-      })
-      .on("error", (err) => logger.error("VoteCommitted listener error:", err));
+      const commitSub = wsVoting.events.VoteCommitted()
+        .on("data", (event) => {
+          logger.info(`Event VoteCommitted: proposal=${event.returnValues.proposalId}, voter=${event.returnValues.voter}`);
+          if (handlers.onVoteCommitted) {
+            handlers.onVoteCommitted({
+              proposalId: event.returnValues.proposalId,
+              voter: event.returnValues.voter,
+              txHash: event.transactionHash,
+              blockNumber: event.blockNumber,
+            });
+          }
+        })
+        .on("error", (err) => logger.error("VoteCommitted listener error:", err));
 
-    const revealSub = wsVoting.events.VoteRevealed()
-      .on("data", (event) => {
-        logger.info(`Event VoteRevealed: proposal=${event.returnValues.proposalId}, voter=${event.returnValues.voter}, choice=${event.returnValues.choice}`);
-        if (handlers.onVoteRevealed) {
-          handlers.onVoteRevealed({
-            proposalId: event.returnValues.proposalId,
-            voter: event.returnValues.voter,
-            choice: event.returnValues.choice,
-            txHash: event.transactionHash,
-            blockNumber: event.blockNumber,
-          });
-        }
-      })
-      .on("error", (err) => logger.error("VoteRevealed listener error:", err));
+      const revealSub = wsVoting.events.VoteRevealed()
+        .on("data", (event) => {
+          logger.info(`Event VoteRevealed: proposal=${event.returnValues.proposalId}, voter=${event.returnValues.voter}, choice=${event.returnValues.choice}`);
+          if (handlers.onVoteRevealed) {
+            handlers.onVoteRevealed({
+              proposalId: event.returnValues.proposalId,
+              voter: event.returnValues.voter,
+              choice: event.returnValues.choice,
+              txHash: event.transactionHash,
+              blockNumber: event.blockNumber,
+            });
+          }
+        })
+        .on("error", (err) => logger.error("VoteRevealed listener error:", err));
 
     const tallySub = wsVoting.events.ProposalTallied()
       .on("data", (event) => {
@@ -186,25 +187,32 @@ async function startEventListener(handlers = {}) {
       .on("error", (err) => logger.error("ProposalTallied listener error:", err));
 
     eventSubscriptions.push(commitSub, revealSub, tallySub);
+    } catch (err) {
+      logger.warn(`Failed to subscribe to VotingSystem events: ${err.message}`);
+    }
   }
 
   if (proposalArtifact && proposalAddress) {
-    const wsProposal = new web3Ws.eth.Contract(proposalArtifact.abi, proposalAddress);
+    try {
+      const wsProposal = new web3Ws.eth.Contract(proposalArtifact.abi, proposalAddress);
 
-    const proposalSub = wsProposal.events.ProposalSubmitted()
-      .on("data", (event) => {
-        logger.info(`Event ProposalSubmitted: id=${event.returnValues.id}, proposer=${event.returnValues.proposer}`);
-        if (handlers.onProposalSubmitted) {
-          handlers.onProposalSubmitted({
-            id: event.returnValues.id,
-            proposer: event.returnValues.proposer,
-            title: event.returnValues.title,
-          });
-        }
-      })
-      .on("error", (err) => logger.error("ProposalSubmitted listener error:", err));
+      const proposalSub = wsProposal.events.ProposalSubmitted()
+        .on("data", (event) => {
+          logger.info(`Event ProposalSubmitted: id=${event.returnValues.id}, proposer=${event.returnValues.proposer}`);
+          if (handlers.onProposalSubmitted) {
+            handlers.onProposalSubmitted({
+              id: event.returnValues.id,
+              proposer: event.returnValues.proposer,
+              title: event.returnValues.title,
+            });
+          }
+        })
+        .on("error", (err) => logger.error("ProposalSubmitted listener error:", err));
 
-    eventSubscriptions.push(proposalSub);
+      eventSubscriptions.push(proposalSub);
+    } catch (err) {
+      logger.warn(`Failed to subscribe to ProposalManager events: ${err.message}`);
+    }
   }
 
   logger.info("Event listeners started");
@@ -231,14 +239,14 @@ async function getOnChainProposal(proposalId) {
   try {
     const result = await votingSystemContract.methods.proposals(proposalId).call();
     return {
-      id: result.id,
+      id: Number(result.id),
       ipfsCid: result.ipfsCid,
       creator: result.creator,
-      commitDeadline: result.commitDeadline,
-      revealDeadline: result.revealDeadline,
-      optionCount: result.optionCount,
-      state: result.state,
-      totalVotes: result.totalVotes,
+      commitDeadline: Number(result.commitDeadline),
+      revealDeadline: Number(result.revealDeadline),
+      optionCount: Number(result.optionCount),
+      state: Number(result.state),
+      totalVotes: Number(result.totalVotes),
     };
   } catch (err) {
     logger.error(`Failed to read on-chain proposal ${proposalId}: ${err.message}`);
@@ -252,7 +260,8 @@ async function getOnChainProposal(proposalId) {
 async function getOnChainResult(proposalId, optionIndex) {
   if (!votingSystemContract) return null;
   try {
-    return await votingSystemContract.methods.getResult(proposalId, optionIndex).call();
+    const result = await votingSystemContract.methods.getResult(proposalId, optionIndex).call();
+    return Number(result);
   } catch (err) {
     logger.error(`Failed to read on-chain result: ${err.message}`);
     return null;
@@ -279,7 +288,7 @@ async function getOnChainVotingPower(address) {
   if (!delegationRegistryContract) return 1;
   try {
     const power = await delegationRegistryContract.methods.getVotingPower(address).call();
-    return parseInt(power, 10);
+    return Number(power);
   } catch (err) {
     logger.error(`Failed to read voting power: ${err.message}`);
     return 1;
@@ -291,7 +300,7 @@ async function getOnChainVotingPower(address) {
  */
 async function getBlockNumber() {
   if (!web3) return 0;
-  return await web3.eth.getBlockNumber();
+  return Number(await web3.eth.getBlockNumber());
 }
 
 /**
@@ -300,6 +309,20 @@ async function getBlockNumber() {
 function verifySignature(message, signature) {
   if (!web3) initialize();
   return web3.eth.accounts.recover(message, signature);
+}
+
+/**
+ * Verify that a contract has deployed code at the given address.
+ * Returns true if code exists, false if address is empty/EOA.
+ */
+async function hasContractCode(address) {
+  if (!web3 || !address) return false;
+  try {
+    const code = await web3.eth.getCode(address);
+    return code && code !== "0x" && code !== "0x0";
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -315,6 +338,49 @@ function getStatus() {
   };
 }
 
+/**
+ * Get deployed contract addresses.
+ */
+function getAddresses() {
+  const votingArtifact = loadContractArtifact("VotingSystem");
+  const proposalArtifact = loadContractArtifact("ProposalManager");
+  const delegationArtifact = loadContractArtifact("DelegationRegistry");
+  return {
+    votingSystem: resolveAddress(votingArtifact, "VOTING_SYSTEM_ADDRESS") || null,
+    proposalManager: resolveAddress(proposalArtifact, "PROPOSAL_MANAGER_ADDRESS") || null,
+    delegationRegistry: resolveAddress(delegationArtifact, "DELEGATION_REGISTRY_ADDRESS") || null,
+  };
+}
+
+/**
+ * Mine empty blocks on the Hardhat node (dev only).
+ * Uses raw JSON-RPC to call hardhat_mine (avoids Web3.js v4 provider API issues).
+ */
+async function mineBlocks(count) {
+  if (!web3) return 0;
+  const rpcUrl = process.env.ETHEREUM_RPC_URL || "http://127.0.0.1:8545";
+  try {
+    const res = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "hardhat_mine",
+        params: ["0x" + count.toString(16)],
+        id: Date.now(),
+      }),
+    });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error.message);
+    const newBlock = Number(await web3.eth.getBlockNumber());
+    logger.info(`Mined ${count} blocks, now at block #${newBlock}`);
+    return newBlock;
+  } catch (err) {
+    logger.error(`Failed to mine blocks: ${err.message}`);
+    throw err;
+  }
+}
+
 module.exports = {
   initialize,
   startEventListener,
@@ -324,6 +390,9 @@ module.exports = {
   getEffectiveDelegate,
   getOnChainVotingPower,
   getBlockNumber,
+  mineBlocks,
   verifySignature,
   getStatus,
+  getAddresses,
+  hasContractCode,
 };

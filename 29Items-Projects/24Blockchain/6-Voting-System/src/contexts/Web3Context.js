@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import Web3 from "web3";
+import { Web3 } from "web3";
 import { SUPPORTED_CHAINS } from "../utils/constants";
 
 const Web3Context = createContext(null);
@@ -26,7 +26,7 @@ export function Web3Provider({ children }) {
     try {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       const web3Instance = new Web3(window.ethereum);
-      const chain = await web3Instance.eth.getChainId();
+      const chain = await window.ethereum.request({ method: "eth_chainId" });
 
       setWeb3(web3Instance);
       setAccount(accounts[0]);
@@ -43,6 +43,11 @@ export function Web3Provider({ children }) {
     setAccount(null);
     setChainId(null);
     setAuthData(null);
+  }, []);
+
+  const clearAuth = useCallback(() => {
+    setAuthData(null);
+    setError(null);
   }, []);
 
   /**
@@ -64,7 +69,10 @@ export function Web3Provider({ children }) {
       const { data } = await nonceRes.json();
 
       // Sign the message with Metamask
-      const signature = await web3.eth.personal.sign(data.message, account, "");
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [data.message, account],
+      });
 
       const auth = {
         walletAddress: account,
@@ -122,6 +130,7 @@ export function Web3Provider({ children }) {
     connectWallet,
     disconnectWallet,
     authenticate,
+    clearAuth,
     setError,
   };
 

@@ -94,6 +94,43 @@ export async function addAmendment(proposalId, content, auth) {
   });
 }
 
+export async function advanceToVoting(proposalId, auth, commitDuration = 5, revealDuration = 5) {
+  return apiFetch(`/proposals/${proposalId}/advance`, {
+    method: "POST",
+    headers: authHeaders(auth),
+    body: JSON.stringify({ commitDuration, revealDuration }),
+  });
+}
+
+export async function completeAdvancement(proposalId, chainProposalId, commitDeadline, revealDeadline, auth) {
+  return apiFetch(`/proposals/${proposalId}/advance/complete`, {
+    method: "POST",
+    headers: authHeaders(auth),
+    body: JSON.stringify({ chainProposalId, commitDeadline, revealDeadline }),
+  });
+}
+
+export async function updatePhase(proposalId, phase, auth) {
+  return apiFetch(`/proposals/${proposalId}/phase`, {
+    method: "POST",
+    headers: authHeaders(auth),
+    body: JSON.stringify({ phase }),
+  });
+}
+
+// --- Dev ---
+export async function mineBlocks(count) {
+  return apiFetch("/dev/mine", {
+    method: "POST",
+    body: JSON.stringify({ count }),
+  });
+}
+
+// --- Contracts ---
+export async function getContractAddresses() {
+  return apiFetch("/contracts");
+}
+
 // --- Votes ---
 export async function getResults(proposalId) {
   return apiFetch(`/proposals/${proposalId}/results`);

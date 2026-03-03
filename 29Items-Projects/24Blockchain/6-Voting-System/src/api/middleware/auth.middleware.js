@@ -89,11 +89,7 @@ async function authenticate(req, res, next) {
 
     const nonceRecord = nonceResult.rows[0];
 
-    if (nonceRecord.used) {
-      return res.status(401).json({
-        error: { code: "NONCE_USED", message: "Nonce has already been used" },
-      });
-    }
+    // Nonce reuse is allowed within the expiry window
 
     if (new Date(nonceRecord.expires_at) < new Date()) {
       return res.status(401).json({
@@ -101,8 +97,7 @@ async function authenticate(req, res, next) {
       });
     }
 
-    // Mark nonce as used
-    await db.query("UPDATE auth_nonces SET used = TRUE WHERE id = $1", [nonceRecord.id]);
+    // Nonce remains valid until expiry
 
     req.user = { walletAddress: normalized };
     next();

@@ -1,5 +1,6 @@
 const db = require("../utils/db");
 const ipfsService = require("./ipfs.service");
+const blockchainService = require("./blockchain.service");
 const logger = require("../utils/logger");
 
 /**
@@ -137,6 +138,122 @@ async function updatePhase(id, phase) {
 }
 
 /**
+ * Advance a draft proposal to active voting on-chain.
+ * Creates proposal on VotingSystem contract and links it to database record.
+ */
+async function advanceToVoting(id, { commitDuration = 5, revealDuration = 5 } = {}) {
+  const proposal = await getProposalById(id);
+  if (!proposal) {
+    throw new Error("Proposal not found");
+  }
+  if (proposal.phase !== "draft") {
+    throw new Error("Only draft proposals can be advanced to voting");
+  }
+
+  try {
+    // Get the VotingSystem contract
+    const web3 = blockchainService.getStatus().connected
+      ? new (require("web3").Web3)(process.env.ETHEREUM_RPC_URL || "http://127.0.0.1:8545")
+      : null;
+
+    if (!web3) {
+      throw new Error("Blockchain connection not available");
+    }
+
+    // Load contract artifacts and address
+    const fs = require("fs");
+    const path = require("path");
+    const artifactPath = path.join(__dirname, "../../../artifacts/contracts/VotingSystem.sol/VotingSystem.json");
+    if (!fs.existsSync(artifactPath)) {
+      throw new Error("VotingSystem contract not compiled. Run 'npm run compile' first.");
+    }
+
+    const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
+
+    // Resolve address from ignition/deployments folder
+    const ignitionPath = path.join(__dirname, "../../../ignition/deployments");
+    let contractAddress = null;
+    if (fs.existsSync(ignitionPath)) {
+      const chains = fs.readdirSync(ignitionPath);
+      for (const chain of chains) {
+        const addrFile = path.join(ignitionPath, chain, "deployed_addresses.json");
+        if (fs.existsSync(addrFile)) {
+          const addresses = JSON.parse(fs.readFileSync(addrFile, "utf8"));
+          for (const [key, addr] of Object.entries(addresses)) {
+            if (key.endsWith("#VotingSystem")) {
+              contractAddress = addr;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (!contractAddress) {
+      throw new Error("VOTING_SYSTEM_ADDRESS not found in deployments. Run 'npm run deploy:localhost' first.");
+    }
+
+    // Verify the contract actually has code at this address
+    const code = await web3.eth.getCode(contractAddress);
+    if (!code || code === "0x" || code === "0x0") {
+      throw new Error(
+        `No contract code at VotingSystem address ${contractAddress}. ` +
+        "The Hardhat node may have restarted. Redeploy with: npm run deploy:localhost"
+      );
+    }
+
+    const contract = new web3.eth.Contract(artifact.abi, contractAddress);
+
+    // Get current block number for deadline calculation
+    const currentBlock = Number(await web3.eth.getBlockNumber());
+    const commitDeadline = currentBlock + commitDuration;
+    const revealDeadline = commitDeadline + revealDuration;
+
+    // Call createProposal on the smart contract
+    // Note: This requires a transaction, so we need the caller's address to sign
+    // For now, we'll return the data needed for the frontend to send the transaction
+    logger.info(`Preparing to advance proposal ${id} to voting phase`);
+
+    return {
+      contractAddress,
+      commitDeadline: Number(commitDeadline),
+      revealDeadline: Number(revealDeadline),
+      optionCount: Number(proposal.option_count),
+      ipfsCid: proposal.description_cid,
+      abi: artifact.abi,
+      methodName: "createProposal",
+      params: [proposal.description_cid, Number(commitDuration), Number(revealDuration), Number(proposal.option_count)]
+    };
+  } catch (err) {
+    logger.error(`Failed to advance proposal ${id}: ${err.message}`);
+    throw err;
+  }
+}
+
+/**
+ * Complete the advancement after on-chain transaction is confirmed.
+ */
+async function completeAdvancement(id, { chainProposalId, commitDeadline, revealDeadline }) {
+  const result = await db.query(
+    `UPDATE proposals SET
+       chain_proposal_id = $1,
+       phase = 'commit',
+       commit_deadline = $2,
+       reveal_deadline = $3,
+       updated_at = NOW()
+     WHERE id = $4 RETURNING *`,
+    [chainProposalId, commitDeadline, revealDeadline, id]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error("Proposal not found");
+  }
+
+  logger.info(`Proposal ${id} advanced to voting phase, chain ID: ${chainProposalId}`);
+  return await getProposalById(id);
+}
+
+/**
  * Sync a proposal from on-chain data.
  */
 async function syncFromChain({ chainProposalId, contractAddress, commitDeadline, revealDeadline, phase, title, ipfsCid, proposerAddress, optionCount }) {
@@ -204,6 +321,8 @@ module.exports = {
   updateProposal,
   deleteProposal,
   updatePhase,
+  advanceToVoting,
+  completeAdvancement,
   syncFromChain,
   addAmendment,
   getProposalCount,
