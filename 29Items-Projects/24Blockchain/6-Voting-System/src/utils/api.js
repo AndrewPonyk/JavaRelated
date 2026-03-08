@@ -94,7 +94,7 @@ export async function addAmendment(proposalId, content, auth) {
   });
 }
 
-export async function advanceToVoting(proposalId, auth, commitDuration = 5, revealDuration = 5) {
+export async function advanceToVoting(proposalId, auth, commitDuration = 40, revealDuration = 40) {
   return apiFetch(`/proposals/${proposalId}/advance`, {
     method: "POST",
     headers: authHeaders(auth),

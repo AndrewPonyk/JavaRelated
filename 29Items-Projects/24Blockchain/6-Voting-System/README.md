@@ -227,6 +227,19 @@ Vote delegation with per-proposal or global scope.
    Results become readable via getResult()
 ```
 
+<div style="color: #9b59b6;">
+<h3>💡 Local Testing Tally Flow (No F5 required!)</h3>
+<ol>
+  <li><strong>Create an entirely new proposal</strong> (the old ones are broken because the Secret is lost from the UI state).</li>
+  <li>Click <strong>Advance to Voting</strong> and confirm.</li>
+  <li>Select an option, click <strong>Commit Vote</strong>, and confirm the transaction.</li>
+  <li>Immediately after: <strong>without refreshing the page (no F5)</strong>, click the blue <strong>Advance to Reveal Phase</strong> button.</li>
+  <li>Wait a few seconds (the button will change to the green text "Commit deadline passed...").</li>
+  <li>Again, <strong>WITHOUT REFRESHING (no F5)</strong>, click <strong>Reveal Vote Now</strong>. The transaction will succeed and show the green "Vote revealed successfully" status.</li>
+  <li>Only after this, scroll down and click the main <strong>Tally Votes</strong> button, confirm, and instantly see the results!</li>
+</ol>
+</div>
+
 ### Commit-Reveal Scheme
 
 **Problem:** If votes are public immediately, later voters see results and are influenced.

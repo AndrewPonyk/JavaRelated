@@ -26,6 +26,7 @@ export function Web3Provider({ children }) {
     try {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       const web3Instance = new Web3(window.ethereum);
+      // Removed transactionBlockTimeout override due to Web3 v4 strict config
       const chain = await window.ethereum.request({ method: "eth_chainId" });
 
       setWeb3(web3Instance);
