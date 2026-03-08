@@ -177,6 +177,7 @@ function ProposalDetail() {
 
       // PRE-MINE BLOCKS BEFORE WEB3 TRANSACTION
       // Auto-mine past reveal deadline for local dev
+      // |su:5) Local Development Time Machine. To test phase transitions without waiting 10 hours for the Blockchain, we artificially advance the block height (mineBlocks api) before trying to Tally.
       // We do this via standard fetch/REST API first so Web3 doesn't time out
       const tempContract = new web3.eth.Contract(abi, contractAddress);
       const onChainProposal = await tempContract.methods.proposals(Number(proposal.chain_proposal_id)).call();

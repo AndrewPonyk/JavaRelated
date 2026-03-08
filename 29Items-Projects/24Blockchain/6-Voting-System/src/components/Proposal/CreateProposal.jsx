@@ -75,6 +75,7 @@ function CreateProposal() {
       } catch (apiErr) {
         console.log("API error:", apiErr);
         // If nonce error, clear auth and retry
+        // |su:13) Web3 Nonce Re-use Protection. A signature (nonce) can only be used once or it expires after a few minutes. This protects users from Replay Attacks if a hacker intercepts their signature. If it expired, we seamlessly ask the user to sign a fresh one.
         if (apiErr.code === "NONCE_USED" || apiErr.code === "NONCE_EXPIRED" || apiErr.status === 401) {
           console.log("Nonce error, clearing auth and retrying...");
           clearAuth();

@@ -79,6 +79,7 @@ function VotingBooth({ proposal, onVoteSubmitted }) {
         }
       }
 
+      // |su:3) We generate the exact same keccak256 hash here in React as the smart contract does. The raw choice and secret never leave the user's browser during the Commit phase, which is impossible to decrypt without the original inputs.
       // Generate commitment hash: keccak256(proposalId, choice, secret)
       const hash = web3.utils.soliditySha3(
         { type: "uint256", value: String(chainProposalId) },
@@ -214,6 +215,7 @@ function VotingBooth({ proposal, onVoteSubmitted }) {
     } catch (err) {
       const msg = err.message || "Failed to reveal vote";
       if (msg.includes("not mined within")) {
+        // |su:4) Web3 Timeout Bypass: Hardhat's instant block mining causes Web3 to think the transaction was stuck and timed out. By catching this specific error, we create a "fake success" loop that bypasses the frontend error since we know the local chain actually processed it.
         console.warn("Ignoring Web3 timeout false-positive during local dev");
         // Must update phase on backend too, otherwise onVoteSubmitted fetch will revert to 'commit'
         try { await api.updatePhase(proposal.id, "reveal", null); } catch (_) { console.error(_); }

@@ -69,6 +69,7 @@ export function Web3Provider({ children }) {
       if (!nonceRes.ok) throw new Error("Failed to get nonce");
       const { data } = await nonceRes.json();
 
+      // |su:10) Web3 Authentication (Sign-in with Ethereum). Instead of passwords, Web3 apps use wallet signatures to prove identity. We ask the backend for a random "nonce", and the user mathematically signs it with their private key in MetaMask. The backend can verify this signature belongs to their exact address.
       // Sign the message with Metamask
       const signature = await window.ethereum.request({
         method: 'personal_sign',

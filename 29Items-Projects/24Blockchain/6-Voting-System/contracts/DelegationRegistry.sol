@@ -47,6 +47,7 @@ contract DelegationRegistry is AccessControl {
         require(_delegate != msg.sender, "Cannot delegate to self");
 
         // Check for circular delegation (one level deep)
+        // |su:8) Circular Delegation Prevention. A common vulnerability in delegation systems is A delegating to B, and B delegating back to A, causing infinite loops or locked votes. We prevent this by checking if the target delegate has already delegated back to us.
         Delegation storage theirDelegation = delegations[_delegate][_proposalId];
         if (theirDelegation.active) {
             require(theirDelegation.delegate != msg.sender, "Circular delegation");
@@ -103,6 +104,7 @@ contract DelegationRegistry is AccessControl {
     function getEffectiveDelegate(address _voter, uint256 _proposalId)
         external view returns (address)
     {
+        // |su:9) Fallback Delegation Strategy. We check if the user delegated specifically for this single proposal first. If not, we fall back to checking if they have a 'global' delegation (proposalId = 0). This gives voters maximum flexibility.
         // Check proposal-specific delegation first
         if (_proposalId != 0) {
             Delegation storage specific = delegations[_voter][_proposalId];

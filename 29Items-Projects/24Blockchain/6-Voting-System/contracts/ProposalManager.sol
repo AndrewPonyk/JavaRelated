@@ -81,6 +81,7 @@ contract ProposalManager is AccessControl {
         require(_discussionDuration >= minDiscussionPeriod, "Discussion period too short");
 
         // Check eligibility: either open submission or caller has MEMBER_ROLE
+        // |su:6) Smart Contract Role-Based Access Control (RBAC). OpenZeppelin's AccessControl lets us define custom permissions. If `openSubmission` is false, only addresses explicitly granted the MEMBER_ROLE by an admin can submit proposals.
         require(openSubmission || hasRole(MEMBER_ROLE, msg.sender), "Not a member");
 
         proposalCount++;
@@ -129,6 +130,7 @@ contract ProposalManager is AccessControl {
         require(block.timestamp > p.discussionDeadline, "Discussion period not ended");
 
         p.phase = ProposalPhase.Voting;
+        // |su:7) Event-Driven Architecture. Smart contracts cannot make HTTP requests. To tell our Node.js backend that a proposal is ready for voting, we emit an event. The backend listens for this event and triggers the next logic phase.
         emit ProposalAdvanced(_proposalId, ProposalPhase.Voting);
         // The off-chain backend listens for ProposalAdvanced events and triggers
         // VotingSystem.createProposal() via the blockchain service.

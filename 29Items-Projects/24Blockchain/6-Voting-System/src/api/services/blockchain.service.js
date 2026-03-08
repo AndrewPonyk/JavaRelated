@@ -177,16 +177,16 @@ async function startEventListener(handlers = {}) {
         })
         .on("error", (err) => logger.error("VoteRevealed listener error:", err));
 
-    const tallySub = wsVoting.events.ProposalTallied()
-      .on("data", (event) => {
-        logger.info(`Event ProposalTallied: proposal=${event.returnValues.proposalId}`);
-        if (handlers.onProposalTallied) {
-          handlers.onProposalTallied({ proposalId: event.returnValues.proposalId });
-        }
-      })
-      .on("error", (err) => logger.error("ProposalTallied listener error:", err));
+      const tallySub = wsVoting.events.ProposalTallied()
+        .on("data", (event) => {
+          logger.info(`Event ProposalTallied: proposal=${event.returnValues.proposalId}`);
+          if (handlers.onProposalTallied) {
+            handlers.onProposalTallied({ proposalId: event.returnValues.proposalId });
+          }
+        })
+        .on("error", (err) => logger.error("ProposalTallied listener error:", err));
 
-    eventSubscriptions.push(commitSub, revealSub, tallySub);
+      eventSubscriptions.push(commitSub, revealSub, tallySub);
     } catch (err) {
       logger.warn(`Failed to subscribe to VotingSystem events: ${err.message}`);
     }
@@ -354,6 +354,7 @@ function getAddresses() {
 
 /**
  * Mine empty blocks on the Hardhat node (dev only).
+ * // |su:11) Hardhat Special RPC Methods: In local development, blocks don't automatically generate every 12 seconds like mainnet. We use a special Hardhat-only RPC call `hardhat_mine` to instantly create X empty blocks. This lets us test time-delayed smart contract logic (like voting deadlines) without waiting real hours.
  * Uses raw JSON-RPC to call hardhat_mine (avoids Web3.js v4 provider API issues).
  */
 async function mineBlocks(count) {

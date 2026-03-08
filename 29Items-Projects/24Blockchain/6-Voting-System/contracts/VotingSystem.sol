@@ -126,6 +126,7 @@ contract VotingSystem is AccessControl, ReentrancyGuard {
 
     /**
      * @notice Commit a vote hash. hash = keccak256(abi.encodePacked(proposalId, choice, secret))
+     * //  |su:1)  This is the heart of the Commit-Reveal pattern. By hashing the proposal ID, choice, and a random secret, the voter mathematically seals their vote. The blockchain only stores this incomprehensible hash, ensuring absolute anonymity while voting is open.
      */
     function commitVote(uint256 _proposalId, bytes32 _commitHash) external {
         Proposal storage p = proposals[_proposalId];
@@ -186,6 +187,7 @@ contract VotingSystem is AccessControl, ReentrancyGuard {
         require(!c.revealed, "Already revealed");
 
         // Verify commitment hash matches
+        // |su:2) During the Reveal phase, the voter must provide the exact same choice and secret they used to create their hash. The contract hashes them again and verifies they match the original commitment. If they match, the block chain finally records the actual vote.
         bytes32 expectedHash = keccak256(abi.encodePacked(_proposalId, _choice, _secret));
         require(expectedHash == c.commitHash, "Commitment mismatch");
 
