@@ -2,13 +2,12 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 
 ## Project Context
-- **Project Name:** Voting System
-- **Tech Stack:** Solidity, Truffle, Ganache, Web3.js, React, Node.js, PostgreSQL, MythX, IPFS, Metamask
-- **Short Description:** Zero-knowledge proofs (zkSNARKs) enable anonymous yet verifiable voting without revealing choices. MythX automated auditing identifies smart contract vulnerabilities before deployment. Ganache provides local blockchain environment for development and integration testing. Commit-reveal scheme prevents vote buying and last-minute manipulation attacks.
-- **Business Logic:** Secure voting platform for organizations, DAOs, and governance token holders. Proposal system enables members to submit, discuss, and amend motions before voting period. Delegation allows members to assign voting power to trusted representatives with revocation capability.
-- **Deployment Platform & CI/CD Tools:** IPFS + Ethereum Testnet/Mainnet, GitHub Actions
+- **Project Name:** File Processing Pipeline
+- **Tech Stack:** AWS Lambda, S3, SQS, DynamoDB, Textract, Comprehend, Python, Vue.js
+- **Short Description:** Event-driven file processing triggered by S3 uploads. Textract for OCR. Comprehend for entity extraction. results stored in DynamoDB.
+- **Business Logic:** Document digitization service extracting structured data from PDFs. ML classification of document types using custom model on SageMaker.
+- **Deployment Platform & CI/CD Tools:** AWS SAM, GitHub Actions
 ---
-
 ## CRITICAL INSTRUCTION
 Create every file mentioned below as actual files in the filesystem.
 Use stub implementations with TODO comments where full code isn't needed.

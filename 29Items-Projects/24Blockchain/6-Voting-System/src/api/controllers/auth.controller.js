@@ -17,7 +17,7 @@ async function requestNonce(req, res, next) {
 
     const nonce = await generateNonce(walletAddress);
 
-    // |su:12) Passwordless Web3 Authentication. Notice there are no passwords here. We send back a random string (nonce). The frontend will ask the user's secure crypto wallet to mathematically sign this nonce using their private key.
+    // |su:12) Passwordless Web3 Authentication. Notice there are no passwords here. We send back a random string (nonce). The frontend will ask the user's secure crypto wallet to mathematically sign this nonce using their private key. --c
     res.json({
       data: {
         nonce,

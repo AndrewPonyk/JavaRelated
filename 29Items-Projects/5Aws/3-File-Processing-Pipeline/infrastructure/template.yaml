@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: File Processing Pipeline SAM Template
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.9
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref DocumentsTable
+        RAW_BUCKET_NAME: !Ref RawDocumentsBucket
+        PROCESS_QUEUE_URL: !Ref DocumentProcessingQueue
+
+Resources:
+  # ==============================
+  # DATA STORES
+  # ==============================
+  DocumentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: DocumentsTable
+      AttributeDefinitions:
+        - AttributeName: documentId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: documentId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  RawDocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ["*"]
+            AllowedMethods: ["PUT", "POST", "GET"]
+            AllowedOrigins: ["*"]
+            MaxAge: 300
+
+  # ==============================
+  # QUEUES
+  # ==============================
+  DocumentProcessingDLQ:
+    Type: AWS::SQS::Queue
+
+  DocumentProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 120
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DocumentProcessingDLQ.Arn
+        maxReceiveCount: 3
+
+  # ==============================
+  # LAMBDA FUNCTIONS
+  # ==============================
+  ListDocumentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/src/
+      Handler: api.document_controller.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DocumentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /documents
+            Method: get
+
+  UploadControllerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/src/
+      Handler: api.upload_controller.lambda_handler
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref RawDocumentsBucket
+        - DynamoDBWritePolicy:
+            TableName: !Ref DocumentsTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /documents/upload-url
+            Method: post
+
+  S3EventHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/src/
+      Handler: api.s3_event_handler.lambda_handler
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt DocumentProcessingQueue.QueueName
+      Events:
+        FileUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref RawDocumentsBucket
+            Events: s3:ObjectCreated:*
+
+  ProcessingWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/src/
+      Handler: api.processing_worker.lambda_handler
+      Timeout: 120
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DocumentsTable
+        - S3ReadPolicy:
+            BucketName: !Ref RawDocumentsBucket
+        - TextractPolicy: {}
+        - ComprehendBasicAccessPolicy: {}
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt DocumentProcessingQueue.Arn
+            BatchSize: 1
+
+  # ==============================
+  # FRONTEND HOSTING
+  # ==============================
+  FrontendHostingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendHostingBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub "${FrontendHostingBucket.Arn}/*"
+            Principal: "*"
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  FrontendBucketName:
+    Description: "S3 Bucket Name for uploading the Vue.js dist payload via CI/CD"
+    Value: !Ref FrontendHostingBucket
+  FrontendURL:
+    Description: "Frontend Website URL"
+    Value: !GetAtt FrontendHostingBucket.WebsiteURL

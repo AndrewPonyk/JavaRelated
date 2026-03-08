@@ -179,7 +179,18 @@ class SuCommentsProvider {
     }
     // |su:24) File filter - only scan text-based files
     isTextFile(filePath) {
-        const textExtensions = ['.txt', '.js', '.ts', '.jsx', '.tsx', '.html', '.css', '.scss', '.json', '.md', '.py', '.java', '.cpp', '.c', '.h', '.cs', '.go', '.rb', '.php', '.xml', '.yaml', '.yml'];
+        const textExtensions = [
+            // General & Config
+            '.txt', '.md', '.json', '.xml', '.yaml', '.yml', '.toml', '.ini',
+            // Web & Styling
+            '.html', '.css', '.scss', '.less', '.js', '.ts', '.jsx', '.tsx', '.vue', '.svelte',
+            // Backend, Systems, Mobile
+            '.py', '.java', '.cpp', '.c', '.h', '.cs', '.go', '.rb', '.php', '.kt', '.swift', '.dart', '.scala', '.lua',
+            // Web3 / Blockchain
+            '.sol', '.rs',
+            // Scripts & Database
+            '.sh', '.bat', '.ps1', '.sql', '.graphql', '.gql'
+        ];
         const ext = path.extname(filePath).toLowerCase();
         return textExtensions.includes(ext);
     }

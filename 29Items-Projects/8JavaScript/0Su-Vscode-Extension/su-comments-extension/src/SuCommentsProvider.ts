@@ -193,7 +193,18 @@ export class SuCommentsProvider implements vscode.TreeDataProvider<SuCommentItem
 
     // |su:24) File filter - only scan text-based files
     private isTextFile(filePath: string): boolean {
-        const textExtensions = ['.txt', '.js', '.ts', '.jsx', '.tsx', '.html', '.css', '.scss', '.json', '.md', '.py', '.java', '.cpp', '.c', '.h', '.cs', '.go', '.rb', '.php', '.xml', '.yaml', '.yml'];
+        const textExtensions = [
+            // General & Config
+            '.txt', '.md', '.json', '.xml', '.yaml', '.yml', '.toml', '.ini',
+            // Web & Styling
+            '.html', '.css', '.scss', '.less', '.js', '.ts', '.jsx', '.tsx', '.vue', '.svelte',
+            // Backend, Systems, Mobile
+            '.py', '.java', '.cpp', '.c', '.h', '.cs', '.go', '.rb', '.php', '.kt', '.swift', '.dart', '.scala', '.lua',
+            // Web3 / Blockchain
+            '.sol', '.rs',
+            // Scripts & Database
+            '.sh', '.bat', '.ps1', '.sql', '.graphql', '.gql'
+        ];
         const ext = path.extname(filePath).toLowerCase();
         return textExtensions.includes(ext);
     }
@@ -260,7 +271,7 @@ class SuCommentItem extends vscode.TreeItem {
 
     // |su:41) Icon assignment based on status - uses VS Code theme icons
     private setIconByStatus(): void {
-        switch(this.comment.status) {
+        switch (this.comment.status) {
             case 'clear':
                 this.iconPath = new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'));
                 break;
