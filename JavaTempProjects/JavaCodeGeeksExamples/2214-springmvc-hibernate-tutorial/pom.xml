@@ -11,7 +11,7 @@
     <properties>
         <springframework.version>4.1.9.RELEASE</springframework.version>
         <hibernate.version>4.3.6.Final</hibernate.version>
-        <mysql.connector.version>5.0.4</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <joda-time.version>2.3</joda-time.version>
         <testng.version>6.9.4</testng.version>
     </properties>
