@@ -2,11 +2,11 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 
 ## Project Context
-- **Project Name:** File Processing Pipeline
-- **Tech Stack:** AWS Lambda, S3, SQS, DynamoDB, Textract, Comprehend, Python, Vue.js
-- **Short Description:** Event-driven file processing triggered by S3 uploads. Textract for OCR. Comprehend for entity extraction. results stored in DynamoDB.
-- **Business Logic:** Document digitization service extracting structured data from PDFs. ML classification of document types using custom model on SageMaker.
-- **Deployment Platform & CI/CD Tools:** AWS SAM, GitHub Actions
+- **Project Name:** Smart Issue Tracker
+- **Tech Stack:** Quarkus, Svelte, MySQL, Langchain
+- **Short Description:** Quarkus provides a reactive backend compiled to native code via GraalVM. Data persists in a MySQL relational database. Langchain integrates an LLM to auto-summarize bug reports.
+- **Business Logic:** Teams track software bugs and feature requests. The system assigns tasks based on developer availability. The AI automatically generates daily project summaries.
+- **Deployment Platform & CI/CD Tools:** AWS App Runner, Jenkins
 ---
 ## CRITICAL INSTRUCTION
 Create every file mentioned below as actual files in the filesystem.
