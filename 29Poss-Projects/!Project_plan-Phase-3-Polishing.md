@@ -28,7 +28,7 @@ Phase 3: Production Polish. Audit your Phase 2 implementation and make it produc
 - [ ] HTTPS enforced (if web-facing)
 
 ## 5. Testing
-- [ ] Test coverage ≥ 80%. All tests passing
+- [ ] Test coverage ≥ 70%. All tests passing
 - [ ] Integration tests for main flows
 - [ ] Test error scenarios
 
@@ -58,4 +58,4 @@ Before finishing, verify what YOU implemented:
 - [ ] Main user flow works end-to-end
 - [ ] No secrets in code
 - [ ] README instructions are accurate
-**Fix and polish everything you created. Make it production-ready.
+**Fix and polish everything you created. Make it production-ready.**
