@@ -2,11 +2,11 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 (!Create also empty text file named '<your-llm-name>'.txt  - where <you-llm-name> is name of model you are) 
 ## Project Context
-- **Project Name:** Hotel Booking Website
-- **Tech Stack:** HTML5, Bootstrap 5, Vanilla JS, Leaflet.js, AOS, Swiper.js
-- **Short Description:** Hotel Booking Website is a responsive platform for browsing hotels, viewing rooms, checking availability, and making online reservations.
-- **Business Logic:**  Users choose dates, guests, and room type; the system checks availability, calculates the total price, and creates a booking. Hotel staff can manage rooms, pricing, availability, and reservations
-- **Deployment Platform & CI/CD Tools:** Netlify, GitHub Actions
+- **Project Name:** Image Processing Library
+- **Tech Stack:** C++20, OpenCV, CUDA, CMake, GTTest, python11
+- **Short Description:** OpenCV algorithms with CUDA acceleration. python11 for Python bindings. GTTest for unit testing.
+- **Business Logic:**  Computer vision library for object detection and tracking. ML model integration.
+- **Deployment Platform & CI/CD Tools:** vcpkg/Conan, GitHub Actions
 
 ---
 ## CRITICAL INSTRUCTION

@@ -37,7 +37,7 @@ Now analyze EVERYTHING you created and implement the COMPLETE working applicatio
 - Responsive design
 
 ### Infrastructure
-- Docker setup: `docker-compose up` runs the full stack
+- Docker setup: `docker-compose up` runs the full stack (Only if APPLICABLE to the specific stack)
 - Database migrations: ready to execute
 - CI/CD pipeline: functional (can run tests, build, deploy)
 - Environment configs: complete

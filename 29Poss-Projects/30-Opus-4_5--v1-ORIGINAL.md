@@ -109,12 +109,11 @@ I am Claude Opus 4.5, Anthropic's most capable model. Here's the comprehensive p
 ## 12. C# Projects
 
 | Size | Project Name | Tech Stack                                                                                 | Short Tech Description | Business Logic | IDE | Deployment & CI/CD |
-|------|--------------|--------------------------------------------------------------------------------------------|------------------------|----------------|-----|-------------------|
+|------|---------|--------------------------------------------------------------------------------------------|------------------------|----------------|-----|-------------------|
 | 51 B | Enterprise ERP System | .NET 8, ASP.NET Core, Blazor, Entity Framework, SQL Server, SignalR, Azure AD, xUnit, gRPC | Modular monolith with clean architecture. EF Core with migrations. SignalR for real-time updates, gRPC for service communication. | Full ERP with finance, HR, operations modules. SQL Server CRM modules. ML-powered demand forecasting .NET for inventory optimization. | Visual Studio 2022 | Azure AKS, Azure DevOps |
 | 52 B | Multi-Tenant SaaS Platform | .NET 8, EF Core, PostgreSQL, IdentityServer, SignalR, gRPC, Angular                        | Multi-tenancy with schema-per-tenant isolation. OAuth2 via IdentityServer4+OpenIDConnect. Real-time updates via SignalR. | B2B SaaS with subscription management and usage metering. ML churn prediction using ML.NET for user retention. | Visual Studio 2022 | Render, GitHub Actions |
 | 53 M | Real-Time Chat Application | .NET 8, ASP.NET Core, SignalR, MongoDB, Redis, Blazor, xUnit                               | SignalR hubs for WebSocket communication with Redis backplane. MongoDB for message persistence, presence system with Redis pub/sub. | Team chat with channels, threads, file sharing, reactions. Sentiment analysis on messages using ML.NET for mood indicators. | Visual Studio 2022 | Azure SignalR Service, GitHub Actions |
-| 54 M | Background Job Processor | .NET 8, Hangfire, Quartz.NET, PostgreSQL, RabbitMQ, .NET Core, React                       | Hangfire dashboard for job monitoring with Quartz.NET for complex cron schedules. RabbitMQ exponential backoff. Dead letter queues. | Scheduled report generation and data synchronization jobs. Job retry with ML-based failure prediction using regression. | Visual Studio 2022 | Docker Compose, GitHub Actions |
-
+| 54 B | Enterprise Insurance Portal | .NET 8, ASP.NET Core, Blazor Server, Entity Framework Core, LINQ, SignalR, gRPC, xUnit, IdentityServer, Hangfire, SQL Server, Kafka, React (public portal) | Blazor Server internal app paired with React public portal; SignalR pushes real-time policy updates; gRPC connects microservices. Hangfire runs nightly premium calculations; Kafka streams policy events. | Brokers issue quotes, bind policies, and manage claims. Customers self-serve via React portal. Regulatory reports generated monthly. | Visual Studio 2022 / Rider | Azure AKS + Azure DevOps |
 ## 13. Go Projects
 
 | Size | Project Name | Tech Stack | Short Tech Description | Business Logic | IDE | Deployment & CI/CD |
@@ -162,12 +161,12 @@ I am Claude Opus 4.5, Anthropic's most capable model. Here's the comprehensive p
 
 ## 18. C Projects
 
-| Size | Project Name | Tech Stack | Short Tech Description | Business Logic | IDE | Deployment & CI/CD |
-|------|--------------|------------|------------------------|----------------|-----|-------------------|
-| 75 B | Operating System Kernel | C (C17), GCC, Make, GDB, QEMU, Assembly (x86-64) | Microkernel with memory management, process scheduling, system calls. Basic filesystem implementation. | Educational OS demonstrating kernel concepts. Simple ML-based process priority scheduling. | VS Code + GDB | QEMU, Makefile |
-| 76 B | Embedded IoT Firmware | FreeRTOS, C, ARM Cortex-M, MQTT, TLS, Zephyr | FreeRTOS tasks for sensor reading and communication. MQTT for cloud connectivity. Zephyr RTOS alternative. | Smart sensor firmware with monitoring. Edge ML inference using TensorFlow Lite Micro. | VS Code + ARM Toolchain | OTA updates, GitHub Actions |
-| 77 M | Network Packet Analyzer | C, libpcap, ncurses, POSIX threads, Makefile | Packet capture with libpcap. ncurses TUI for display. Multi-threaded packet processing with ring buffers. | Wireshark-lite for network troubleshooting and analysis. Protocol anomaly detection using pattern matching. | VS Code | apt/brew, Makefile |
-| 78 M | Memory Allocator | C, Valgrind, GDB, Makefile | Custom malloc/free with different strategies (first-fit, best-fit, buddy system). Debugging and fragmentation handling. | Educational memory allocator with debugging features. Allocation pattern heuristics. | VS Code | Makefile, local |
+| Size | Project Name | Tech Stack                                                     | Short Tech Description | Business Logic | IDE | Deployment & CI/CD |
+|------|--------------|----------------------------------------------------------------|------------------------|----------------|-----|-------------------|
+| 75 B | Operating System Kernel | C (C17), GCC, Make, GDB, QEMU, Assembly (x86-64)               | Microkernel with memory management, process scheduling, system calls. Basic filesystem implementation. | Educational OS demonstrating kernel concepts. Simple ML-based process priority scheduling. | VS Code + GDB | QEMU, Makefile |
+| 76 B | Portable Process Monitor | C, Windows API, PSAPI, PDH, NtQuerySystemInformation, WinSock2 | Polling loop with configurable interval using QueryPerformanceCounter. PSAPI for per-process CPU/memory metrics. PDH for system-wide counters. NtQuerySystemInformation for low-level process enumeration. | Lightweight process monitor with real-time CPU, memory, and I/O metrics. CSV export and threshold-based alerting via console. | VS Code + MSVC | CTest, GitHub Actions |
+| 77 M | Network Packet Analyzer | C, libpcap, ncurses, POSIX threads, Makefile                   | Packet capture with libpcap. ncurses TUI for display. Multi-threaded packet processing with ring buffers. | Wireshark-lite for network troubleshooting and analysis. Protocol anomaly detection using pattern matching. | VS Code | apt/brew, Makefile |
+| 78 M | Memory Allocator | C, Valgrind(not exist for WIN), GDB, Makefile                  | Custom malloc/free with different strategies (first-fit, best-fit, buddy system). Debugging and fragmentation handling. | Educational memory allocator with debugging features. Allocation pattern heuristics. | VS Code | Makefile, local |
 
 ## 19. Flutter Projects
 
