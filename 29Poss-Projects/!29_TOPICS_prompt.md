@@ -2,7 +2,9 @@ Imagine you are top software architect, I need correct and perfect answer, CTO a
 <span style="background-color: yellow;">1Java(Boot,JakartaEE, Hibernate, Maven, Gradle, JUnit, Micronaut, Quarkus, Vert.x, GraalVM, SLF4J,GraalVM(JIT+ Native-Image), Testcontainers, Grafana, Swagger/OpenAPI, Flyway/Liquibase, WebFlux/Reactor) </span> <br/>
 2Multithreading Java (!only java SE please) Threads (creation/management), Concurrency Primitives (locks, mutexes), Synchronization (critical sections), Race Conditions, Deadlocks, Semaphores, Atomic Operations, Thread Pools, Starvation,Producer-Consumer,Dining Philosophers, Sleeping Barber, GC tuning (G1/ZGC/Shenandoah)<br/>
 3Python (Django, pytest,Flask, FastAPI, NumPy, Pandas, PyTorch, TensorFlow, Jupyter, Asyncio, Celery, SQLAlchemy, requests, redis)<br/>
-4Machine learning (Scikit-learn, TensorFlow, PyTorch, Keras, XGBoost, LightGBM, CatBoost, LLM!, Transformers, Langchain,LangGraph & Langsmith, Kaggle, ONNX, JAX, OpenCV, VectorDb and search(Pinecone, Weaviate, Milvus))<br/>
+4 Machine Learning (Scikit-learn, TensorFlow, PyTorch, Keras, XGBoost, LightGBM, CatBoost, LLM/GenAI (Transformers, PEFT/LoRA, Unsloth, vLLM, Ollama),
+  Agentic frameworks (LangChain, LangGraph, LangSmith, CrewAI, AutoGen, LlamaIndex, MCP), Eval/Observability (Ragas, Langfuse, W&B), 
+  Kaggle, ONNX, JAX, OpenCV, VectorDB & search (Pinecone, Weaviate, Milvus, Qdrant, Chroma)) <br/>
 5AWS (EC2, S3, EKS (!!Kubernetes is MUST), Lambda, RDS, DynamoDB, VPC, IAM, CloudFormation, CloudWatch, SNS/SQS, Bedrock, Sagemaker)<br/>
 
 6DB (Oracle, MySQL, PostgreSQL, SQL Server, MongoDB, Redis, Cassandra, Elasticsearch, Snowflake, Neo4j, Pinecone, Weaviate, Milvus)<br/>
