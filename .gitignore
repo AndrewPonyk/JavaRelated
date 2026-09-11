@@ -1,35 +1,189 @@
+# =====================================================================
+# Root .gitignore — polyglot monorepo
+# Java / Kotlin / Android / Gradle / Maven / JS / TS / Python / C / C++ /
+# C# (.NET) / Rust / Go / PHP / Ruby / Flutter-Dart / IDEs / OS junk
+#
+# NOTE: gitignore only affects UNTRACKED files. Files committed before
+# these rules stay tracked until `git rm -r --cached <path>` is run.
+# =====================================================================
+
+# ---------- Legacy / repo-specific ----------
 *path
 *~
-*.class
+.metadata/
+gwt-unitCache/
+.aider*
+temp.txt
+temp-folders-analysis.csv
 
-node_modules/
+# ---------- Secrets / environment (keep .env.example trackable) ----------
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+
+# ---------- Java / JVM / Maven (target/ also covers Rust) ----------
 target/
-gwt-unitCache
-/JavaEE/7JEE/JavaEEWithNetbeans5Parts/HelloJeeWithNetbeans/nbproject/private/
-/JavaEE/7JEE/JavaEEWithNetbeans5Parts/HelloJeeWithNetbeans/build/
-/JavaEE/7JEE/JavaEEWithNetbeans5Parts/HelloJeeWithNetbeans/dist/
-.metadata
+*.class
+hs_err_pid*
+replay_pid*
+*.hprof
 
+# ---------- Gradle / Kotlin / Android ----------
+.gradle/
+build/
+.kotlin/
+local.properties
+.cxx/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.keystore
+*.jks
 
-# Eclipse
-.classpath
-.project
-.settings/
+# ---------- JavaScript / TypeScript ----------
+node_modules/
+dist/
+out/
+coverage/
+.npm/
+.vite/
+.angular/
+.next/
+.nuxt/
+.output/
+.turbo/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vercel
+.firebase/
 
-# Intellij
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+.eggs/
+.ipynb_checkpoints/
+pip-log.txt
+
+# ---------- C / C++ ----------
+*.o
+*.obj
+*.so
+*.so.*
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.app
+*.gch
+*.pch
+*.ipdb
+*.iobj
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+ipch/
+Debug/
+Release/
+x64/
+x86/
+
+# ---------- C# / .NET ----------
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+TestResults/
+*.nupkg
+.artifacts/
+
+# ---------- Rust ----------
+# (target/ already covered above under Java — same dir name)
+**/*.rs.bk
+# Cargo.lock intentionally NOT ignored — lockfiles should be committed
+
+# ---------- Go ----------
+*.test
+*.prof
+a.out
+# go.sum / vendor dirs: do NOT ignore (Go convention keeps them)
+
+# ---------- PHP ----------
+vendor/
+composer.phar
+.phpunit.result.cache
+.phpunit.cache/
+.php_cs.cache
+.php-cs-fixer.cache
+
+# ---------- Ruby ----------
+.bundle/
+*.gem
+# (Ruby pkg/ intentionally NOT ignored — collides with Go pkg/ source dirs)
+
+# ---------- Flutter / Dart ----------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+
+# ---------- IDEs / editors ----------
 .idea/
 *.iml
 *.iws
+*.ipr
+.vs/
+.vscode/
+.classpath
+.project
+.settings/
+nbproject/private/
+.history/
+.metals/
+.bloop/
+.bsp/
+*.sublime-workspace
+*.swp
+*.swo
 
-# Mac
+# ---------- OS junk ----------
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Maven
-target/
-
-.gradle
-.nb-gradle
-.aider*
-
-#visual studio
-.vs
+# ---------- Logs / temp ----------
+*.log
+logs/
+*.tmp
+*.temp
+~$*
