@@ -2,12 +2,11 @@ You are a highly experienced and pragmatic App Architect. Your task is to design
 a robust, scalable, and maintainable software solution AND CREATE ALL FILES  in the project directory (not just describe them).
 (!Create also empty text file named '<your-llm-name>'.txt  - where <you-llm-name> is name of model you are) 
 ## Project Context
-- **Project Name:** Image Processing Library
-- **Tech Stack:** C++20, OpenCV, CUDA, CMake, GTTest, python11
-- **Short Description:** OpenCV algorithms with CUDA acceleration. python11 for Python bindings. GTTest for unit testing.
-- **Business Logic:**  Computer vision library for object detection and tracking. ML model integration.
-- **Deployment Platform & CI/CD Tools:** vcpkg/Conan, GitHub Actions
-
+- **Project Name:** Cryptography Toolkit
+- **Tech Stack:** Python, PyCryptodome, OpenSSL, Flask, React
+- **Short Description:** Implementation of AES, RSA, ECDSA, SHA-3. Argon2 for password hashing. TLS implementation protocols with TLS 1.3 demonstration.
+- **Business Logic:** Educational platform for cryptography with interactive demonstrations and countermeasures.
+- **Deployment Platform & CI/CD Tools:** GitHub Actions
 ---
 ## CRITICAL INSTRUCTION
 Create every file mentioned below as actual files in the filesystem.
