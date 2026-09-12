@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: inventory-backend, namespace: inventory }
+spec: { replicas: 3 }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: inventory-frontend, namespace: inventory }
+spec: { replicas: 2 }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: inventory-forecast, namespace: inventory }
+spec: { replicas: 2 }
+

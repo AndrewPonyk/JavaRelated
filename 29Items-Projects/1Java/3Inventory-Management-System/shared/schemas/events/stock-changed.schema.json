@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://inventory.example.com/schemas/events/stock-changed.v1.json",
+  "title": "Stock changed event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "eventType",
+    "schemaVersion",
+    "inventoryItemId",
+    "warehouseId",
+    "sku",
+    "quantity",
+    "reservedQuantity",
+    "availableQuantity",
+    "reorderPoint",
+    "lowStock",
+    "actor",
+    "correlationId",
+    "occurredAt"
+  ],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "inventory.item-created",
+        "inventory.item-updated",
+        "inventory.item-deactivated",
+        "inventory.stock-changed",
+        "inventory.stock-transferred",
+        "inventory.reserved",
+        "inventory.reservation-fulfilled",
+        "inventory.reservation-released"
+      ]
+    },
+    "schemaVersion": { "const": 1 },
+    "inventoryItemId": { "type": "string", "format": "uuid" },
+    "warehouseId": { "type": "string", "format": "uuid" },
+    "sku": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "quantity": { "type": "integer", "minimum": 0 },
+    "reservedQuantity": { "type": "integer", "minimum": 0 },
+    "availableQuantity": { "type": "integer", "minimum": 0 },
+    "reorderPoint": { "type": "integer", "minimum": 0 },
+    "lowStock": { "type": "boolean" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "correlationId": { "type": "string", "minLength": 1, "maxLength": 128 }
+  }
+}

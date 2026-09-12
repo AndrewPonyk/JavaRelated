@@ -1,0 +1,6 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme for Jetpack Compose (NoActionBar) -->
+    <style name="Theme._4FitnessTrackerApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here if needed -->
+    </style>
+</resources>

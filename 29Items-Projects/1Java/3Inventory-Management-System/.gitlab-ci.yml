@@ -1,0 +1,188 @@
+stages:
+  - validate
+  - test
+  - build
+  - publish
+  - deploy
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+default:
+  interruptible: true
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  DOCKER_TLS_CERTDIR: "/certs"
+
+.maven-cache:
+  cache:
+    key: maven
+    paths: [.m2/repository]
+
+configuration-validation:
+  stage: validate
+  image: python:3.12-slim
+  script:
+    - pip install --disable-pip-version-check -r tools/requirements.txt
+    - python tools/validate_config.py
+
+backend-test:
+  stage: test
+  image: maven:3.9.9-eclipse-temurin-17
+  services:
+    - name: docker:27-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  extends: .maven-cache
+  script:
+    - mvn -B -f backend/pom.xml verify
+    - mvn -B -f backend/pom.xml org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - backend/target/surefire-reports/TEST-*.xml
+        - backend/target/failsafe-reports/TEST-*.xml
+    paths:
+      - backend/target/site/jacoco/
+      - backend/target/bom.json
+
+frontend-check:
+  stage: validate
+  image: node:20-alpine
+  cache:
+    key:
+      files: [frontend/package-lock.json]
+    paths: [frontend/.npm/]
+  script:
+    - npm --prefix frontend ci --cache frontend/.npm --prefer-offline
+    - npm --prefix frontend run lint
+    - npm --prefix frontend run typecheck
+    - npm --prefix frontend run test:coverage
+    - npm --prefix frontend run build
+    - npm --prefix frontend audit --audit-level=high
+  artifacts:
+    paths: [frontend/coverage/]
+
+frontend-e2e:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.62.1-noble
+  needs: [frontend-check]
+  script:
+    - npm --prefix frontend ci
+    - npm --prefix frontend run test:e2e
+  artifacts:
+    when: always
+    paths:
+      - frontend/playwright-report/
+      - frontend/test-results/
+
+forecast-test:
+  stage: test
+  image: python:3.12-slim
+  cache:
+    key: pip
+    paths: [.cache/pip]
+  before_script:
+    - pip install --cache-dir .cache/pip -r forecast-service/requirements-dev.txt
+  script:
+    - ruff check forecast-service/app forecast-service/tests
+    - pytest forecast-service/tests --cov=forecast-service/app --cov-fail-under=80 --cov-report=term --cov-report=xml:forecast-service/coverage.xml --junitxml=forecast-service/test-results.xml
+    - pip-audit -r forecast-service/requirements.txt
+  artifacts:
+    when: always
+    reports:
+      junit: forecast-service/test-results.xml
+
+container-build:
+  stage: build
+  image: docker:27-cli
+  services: [docker:27-dind]
+  needs: [configuration-validation, backend-test, frontend-check, frontend-e2e, forecast-test]
+  before_script:
+    - export MYSQL_PASSWORD="ci-$CI_JOB_ID"
+    - export MYSQL_ROOT_PASSWORD="ci-root-$CI_JOB_ID"
+    - export SPRING_DATASOURCE_PASSWORD="$MYSQL_PASSWORD"
+  script:
+    - docker compose config --quiet
+    - docker compose build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+container-publish:
+  stage: publish
+  image: docker:27-cli
+  services: [docker:27-dind]
+  needs: [container-build]
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA" backend
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA" --build-arg VITE_API_BASE_URL=/ frontend
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/forecast:$CI_COMMIT_SHA" forecast-service
+    - docker push "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/forecast:$CI_COMMIT_SHA"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+container_scanning:
+  stage: publish
+  needs: [container-publish]
+  variables:
+    CS_IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+.deploy:
+  stage: deploy
+  image: bitnami/kubectl:1.31
+  script:
+    - kubectl config use-context "$KUBE_CONTEXT"
+    - kubectl apply -k "infrastructure/k8s/overlays/$DEPLOY_ENV"
+    - kubectl -n inventory set image deployment/inventory-backend backend="$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA"
+    - kubectl -n inventory set image deployment/inventory-frontend frontend="$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
+    - kubectl -n inventory set image deployment/inventory-forecast forecast="$CI_REGISTRY_IMAGE/forecast:$CI_COMMIT_SHA"
+    - kubectl -n inventory rollout status deployment/inventory-backend --timeout=5m
+    - kubectl -n inventory rollout status deployment/inventory-frontend --timeout=5m
+    - kubectl -n inventory rollout status deployment/inventory-forecast --timeout=5m
+
+deploy-dev:
+  extends: .deploy
+  needs: [container-publish]
+  variables: { DEPLOY_ENV: dev }
+  environment: { name: development }
+  resource_group: development
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy-staging:
+  extends: .deploy
+  needs: [deploy-dev]
+  variables: { DEPLOY_ENV: staging }
+  environment: { name: staging }
+  resource_group: staging
+  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+deploy-production:
+  extends: .deploy
+  needs: [container-publish]
+  variables: { DEPLOY_ENV: prod }
+  environment: { name: production }
+  resource_group: production
+  when: manual
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_TAG

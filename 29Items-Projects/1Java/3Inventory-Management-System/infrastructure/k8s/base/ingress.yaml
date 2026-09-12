@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory
+  namespace: inventory
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "15"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [inventory.example.com]
+      secretName: inventory-tls
+  rules:
+    - host: inventory.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service: { name: inventory-backend, port: { number: 8080 } }
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service: { name: inventory-backend, port: { number: 8080 } }
+          - path: /v3/api-docs
+            pathType: Prefix
+            backend:
+              service: { name: inventory-backend, port: { number: 8080 } }
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: inventory-frontend, port: { number: 8080 } }

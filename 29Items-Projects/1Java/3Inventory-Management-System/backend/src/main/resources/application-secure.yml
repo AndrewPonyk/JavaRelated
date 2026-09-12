@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: secure
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER_URI}
+  graphql:
+    graphiql:
+      enabled: false
+
+app:
+  security:
+    enabled: true
+    audience: ${OIDC_AUDIENCE}
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS}
+
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}

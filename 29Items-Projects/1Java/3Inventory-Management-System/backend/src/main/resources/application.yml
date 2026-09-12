@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: inventory-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_POOL_MIN_IDLE:2}
+      connection-timeout: 3000
+      validation-timeout: 1000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        acks: all
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    listener:
+      ack-mode: record
+  graphql:
+    graphiql:
+      enabled: false
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.scheduler.instanceId: AUTO
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+      org.quartz.jobStore.isClustered: true
+      org.quartz.jobStore.clusterCheckinInterval: 10000
+      org.quartz.threadPool.threadCount: 2
+  jackson:
+    time-zone: UTC
+
+server:
+  port: 8080
+  shutdown: graceful
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/problem+json,application/graphql-response+json,text/html,text/css,application/javascript
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+    prometheus:
+      access: read-only
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: false
+
+app:
+  security:
+    enabled: ${SECURITY_ENABLED:true}
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS}
+  kafka:
+    stock-changed-topic: ${KAFKA_TOPIC_STOCK_CHANGED:inventory.stock-changed.v1}
+  forecast:
+    base-url: ${FORECAST_BASE_URL:http://localhost:8000}
+    timeout: ${FORECAST_TIMEOUT:3s}
+    horizon-days: ${FORECAST_HORIZON_DAYS:14}
+    refresh-cron: ${FORECAST_REFRESH_CRON:0 0 2 * * ?}
+  reconciliation:
+    cron: ${RECONCILIATION_CRON:0 30 2 * * ?}
+  idempotency:
+    retention: ${IDEMPOTENCY_RETENTION:PT24H}
+    cleanup-cron: ${IDEMPOTENCY_CLEANUP_CRON:0 15 * * * *}
+  outbox:
+    poll-delay: ${OUTBOX_POLL_DELAY:500}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{correlationId:-},%X{traceId:-},%X{spanId:-}]"

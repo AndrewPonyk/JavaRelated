@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Auto-backup rules (API < 31 devices).
+  bank_secure_prefs is EncryptedSharedPreferences: its AES key lives in the Android
+  Keystore and never survives a restore to a different device — restoring the ciphertext
+  would only yield unreadable prefs (TECH-NOTES 3.6 #8).
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="bank_secure_prefs.xml"/>
+</full-backup-content>

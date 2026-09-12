@@ -1,0 +1,28 @@
+{
+  "http": {
+    "port": 8080,
+    "host": "0.0.0.0"
+  },
+  "jwt": {
+    "secret": "super-secret-document-approval-workflow-key-32-chars",
+    "expirationSeconds": 86400
+  },
+  "mongodb": {
+    "connection_string": "mongodb://root:example@localhost:27017/document_workflow?authSource=admin",
+    "db_name": "document_workflow",
+    "maxPoolSize": 50
+  },
+  "nlp": {
+    "host": "localhost",
+    "port": 8000,
+    "timeoutMs": 3000,
+    "circuitBreakerMaxFailures": 5
+  },
+  "sla": {
+    "checkIntervalSeconds": 30,
+    "tier1Hours": 4,
+    "tier2Hours": 24,
+    "tier3Hours": 48,
+    "autoEscalate": true
+  }
+}

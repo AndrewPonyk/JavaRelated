@@ -1,0 +1,78 @@
+type Query {
+  inventoryItems(
+    warehouseId: ID
+    query: String
+    active: Boolean
+    page: Int = 0
+    size: Int = 20
+  ): [InventoryItem!]!
+  inventoryItem(id: ID!): InventoryItem
+  warehouses(page: Int = 0, size: Int = 50): [Warehouse!]!
+  stockMovements(itemId: ID!, page: Int = 0, size: Int = 50): [StockMovement!]!
+  latestForecast(itemId: ID!): Forecast
+}
+
+type InventoryItem {
+  id: ID!
+  sku: String!
+  barcode: String!
+  barcodes: [Barcode!]!
+  name: String!
+  quantity: Float!
+  reservedQuantity: Float!
+  availableQuantity: Float!
+  reorderPoint: Float!
+  lowStock: Boolean!
+  active: Boolean!
+  warehouseId: ID!
+  warehouseCode: String!
+  version: Float!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Barcode {
+  id: ID!
+  barcode: String!
+  symbology: String!
+  primary: Boolean!
+}
+
+type Warehouse {
+  id: ID!
+  code: String!
+  name: String!
+  active: Boolean!
+  version: Float!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type StockMovement {
+  id: ID!
+  inventoryItemId: ID!
+  relatedItemId: ID
+  type: String!
+  quantityDelta: Float!
+  quantityBefore: Float!
+  quantityAfter: Float!
+  reason: String!
+  referenceType: String
+  referenceId: String
+  actor: String!
+  occurredAt: String!
+}
+
+type Forecast {
+  id: ID!
+  inventoryItemId: ID!
+  sku: String!
+  horizonDays: Int!
+  predictedDemand: Float!
+  lowerBound: Float!
+  upperBound: Float!
+  modelVersion: String!
+  featureVersion: String!
+  modelMae: Float
+  generatedAt: String!
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Data extraction rules (API 31+): cloud backup + device transfer.
+  Same Keystore rationale as backup_rules.xml — never restore the encrypted prefs.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="bank_secure_prefs.xml"/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="bank_secure_prefs.xml"/>
+    </device-transfer>
+</data-extraction-rules>

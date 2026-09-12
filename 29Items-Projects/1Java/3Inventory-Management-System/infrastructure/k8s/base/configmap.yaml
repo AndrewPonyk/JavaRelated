@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-config
+  namespace: inventory
+data:
+  SPRING_PROFILES_ACTIVE: secure
+  SECURITY_ENABLED: "true"
+  KAFKA_BOOTSTRAP_SERVERS: kafka.example.internal:9092
+  KAFKA_TOPIC_STOCK_CHANGED: inventory.stock-changed.v1
+  FORECAST_BASE_URL: http://inventory-forecast:8000
+  FORECAST_TIMEOUT: 3s
+  ALLOWED_ORIGINS: https://inventory.example.com
+  REDIS_URL: redis://redis.example.internal:6379/0
+  MODEL_KEY: forecast:model:active
+  FORECAST_ALLOWED_HOSTS: inventory-forecast
+  FORECAST_REQUIRE_ADMIN_TOKEN: "true"
+  LOG_LEVEL: INFO

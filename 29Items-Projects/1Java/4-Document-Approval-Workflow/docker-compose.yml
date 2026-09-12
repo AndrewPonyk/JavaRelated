@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # MongoDB Persistence Layer
+  mongodb:
+    image: mongo:6.0
+    container_name: workflow-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: document_workflow
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init/01-init-collections.js:/docker-entrypoint-initdb.d/01-init-collections.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Python spaCy NLP Microservice
+  nlp-service:
+    build:
+      context: ./nlp-service
+      dockerfile: Dockerfile
+    container_name: workflow-nlp-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Vert.x Java 17 Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: workflow-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - HTTP_PORT=8080
+      - HTTP_HOST=0.0.0.0
+      - APP_ENV=production
+      - MONGODB_URI=mongodb://root:example@mongodb:27017/document_workflow?authSource=admin
+      - MONGODB_DB_NAME=document_workflow
+      - NLP_SERVICE_HOST=nlp-service
+      - NLP_SERVICE_PORT=8000
+      - JWT_SECRET=super-secret-document-approval-workflow-key-32-chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
+
+  # React + TypeScript Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: workflow-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

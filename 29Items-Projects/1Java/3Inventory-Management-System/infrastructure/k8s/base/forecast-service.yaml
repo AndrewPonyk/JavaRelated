@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-forecast
+  namespace: inventory
+spec:
+  selector:
+    app.kubernetes.io/name: inventory-forecast
+  ports:
+    - { name: http, port: 8000, targetPort: http }
+
