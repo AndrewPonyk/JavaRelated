@@ -1,0 +1,48 @@
+-- SQLDelight Schema for Local Article Caching and Offline-First Storage
+
+CREATE TABLE ArticleEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    content TEXT,
+    sourceName TEXT NOT NULL,
+    sourceProvider TEXT NOT NULL,
+    author TEXT,
+    url TEXT NOT NULL,
+    imageUrl TEXT,
+    publishedAtEpochMillis INTEGER NOT NULL,
+    isUkraineRelated INTEGER NOT NULL DEFAULT 0,
+    relevanceScore INTEGER NOT NULL DEFAULT 0,
+    cachedAtEpochMillis INTEGER NOT NULL
+);
+
+-- Index for speedy chronological and relevance lookups
+CREATE INDEX idx_article_published ON ArticleEntity(publishedAtEpochMillis DESC);
+CREATE INDEX idx_article_ukraine ON ArticleEntity(isUkraineRelated DESC, relevanceScore DESC);
+
+-- Queries
+selectAllArticles:
+SELECT * FROM ArticleEntity
+ORDER BY isUkraineRelated DESC, relevanceScore DESC, publishedAtEpochMillis DESC;
+
+selectArticleById:
+SELECT * FROM ArticleEntity
+WHERE id = :id LIMIT 1;
+
+insertOrReplaceArticle:
+INSERT OR REPLACE INTO ArticleEntity(
+    id, title, description, content, sourceName, sourceProvider,
+    author, url, imageUrl, publishedAtEpochMillis, isUkraineRelated,
+    relevanceScore, cachedAtEpochMillis
+) VALUES (
+    :id, :title, :description, :content, :sourceName, :sourceProvider,
+    :author, :url, :imageUrl, :publishedAtEpochMillis, :isUkraineRelated,
+    :relevanceScore, :cachedAtEpochMillis
+);
+
+deleteAllArticles:
+DELETE FROM ArticleEntity;
+
+deleteOldArticles:
+DELETE FROM ArticleEntity
+WHERE cachedAtEpochMillis < :cutoffEpochMillis;

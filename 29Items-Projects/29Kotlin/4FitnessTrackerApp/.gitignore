@@ -1,0 +1,31 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Secrets and Environment Variables
+.env
+.env.local
+.env.*.local
+*.env
+secrets.properties
+
+# Keystores & Release Keys
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+google-services.json
+
+# Backend Build & DB data
+backend/build/
+backend/out/
+backend/.env
+mysql_data/

@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "Placeholder shape only. Create a real Firebase project (console.firebase.google.com),",
+    "add an Android app with package com.example.a1_android_banking_app, download its",
+    "google-services.json into app/, and apply the com.google.gms.google-services plugin",
+    "in the same commit — see docs/TECH-NOTES.md 3.6 #3."
+  ],
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "your-bank-app",
+    "storage_bucket": "your-bank-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "com.example.a1_android_banking_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-placeholder-0000000000000000000"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

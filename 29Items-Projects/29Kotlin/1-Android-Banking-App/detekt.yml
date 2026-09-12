@@ -1,0 +1,25 @@
+# detekt configuration — layered on the defaults via buildUponDefaultConfig = true (app module).
+# Entries below only relax rules that fight Compose / Room DAO idioms; tighten over time.
+complexity:
+  LongMethod:
+    active: false
+  LongParameterList:
+    active: false
+  TooManyFunctions:
+    active: false
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: false
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  PackageNaming:
+    # The app id com.example.a1_android_banking_app carries the project-name underscores.
+    active: false
+exceptions:
+  TooGenericExceptionCaught:
+    active: false

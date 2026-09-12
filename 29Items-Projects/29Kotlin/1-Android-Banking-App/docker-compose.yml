@@ -1,0 +1,38 @@
+# Full backend stack: Ktor API (fat jar image) + PostgreSQL with Flyway migrations.
+#   ./gradlew :backend:buildFatJar     # jar is COPY'd into the image
+#   docker compose up -d --build
+# The API then listens on :8080 (0.0.0.0) — reachable over the LAN from the app
+# with -PbackendBaseUrl=http://<host-ip>:8080/ (debug cleartext whitelist required).
+name: bank
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bank
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bank -d bank"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_ENABLED: "true"                      # Exposed+PostgreSQL repo (in-memory otherwise)
+      DATABASE_URL: jdbc:postgresql://db:5432/bank
+      DB_USER: bank
+      DB_PASSWORD: bank
+      FLYWAY_LOCATIONS: filesystem:/app/migration
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

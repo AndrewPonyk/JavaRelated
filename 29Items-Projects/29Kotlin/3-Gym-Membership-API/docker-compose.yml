@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gym-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gym_db
+      POSTGRES_USER: gym_admin
+      POSTGRES_PASSWORD: super_secure_pg_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym_admin -d gym_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: gym-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8088:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/gym_db
+      DATABASE_USER: gym_admin
+      DATABASE_PASSWORD: super_secure_pg_password
+      DATABASE_DRIVER: org.postgresql.Driver
+      JWT_SECRET: gym-api-super-secret-key-32-chars-minimum-for-production
+      MAX_GYM_CAPACITY: 250
+      ANTI_PASSBACK_COOLDOWN_MINUTES: 15
+
+volumes:
+  postgres_data:

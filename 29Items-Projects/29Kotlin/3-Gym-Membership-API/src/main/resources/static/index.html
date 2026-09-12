@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Membership API & Turnstile Operations Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-card: #111827;
+            --bg-card-hover: #1f2937;
+            --border-color: #374151;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            background: #064e3b;
+            color: #6ee7b7;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #059669;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 992px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Occupancy Progress Bar */
+        .occupancy-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .occupancy-numbers {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .occupancy-bar-bg {
+            height: 14px;
+            background: #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+
+        .occupancy-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1f2937;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-primary-hover);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            background: #374151;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            border: 1px solid var(--accent-danger);
+            color: var(--accent-danger);
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--accent-danger);
+            color: #fff;
+        }
+
+        /* Quick-test buttons */
+        .quick-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .badge-chip {
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            color: #93c5fd;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: all 0.15s;
+        }
+
+        .badge-chip:hover {
+            background: #2563eb;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+
+        /* Scan response banner */
+        .scan-result-banner {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scan-result-granted {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        .scan-result-rejected {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        /* Activity Table */
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .activity-table th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .activity-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-granted {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .tier-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .tier-BASIC { background: #374151; color: #9ca3af; }
+        .tier-PREMIUM { background: #1e3a8a; color: #93c5fd; }
+        .tier-VIP { background: #581c87; color: #d8b4fe; }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .tab-btn.active {
+            background: #1f2937;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <div class="brand-badge">GYM API</div>
+            <div>
+                <div class="brand-title">Turnstile & Membership Operations Console</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Ktor 3.1.1 • Kotlin 2.1 • PostgreSQL 16 • AWS ECS Ready</div>
+            </div>
+        </div>
+        <div class="server-status">
+            <div class="pulse-dot"></div>
+            <span id="api-health-text">API Healthy</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Column: Turnstile Scanner & Actions -->
+        <div>
+            <!-- Occupancy Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Live Facility Occupancy</div>
+                    <span id="capacity-percentage-badge" style="font-size: 13px; font-weight: 700; color: #10b981;">0% FULL</span>
+                </div>
+                <div class="occupancy-wrapper">
+                    <div class="occupancy-numbers">
+                        <span>Current Occupancy:</span>
+                        <span id="occupancy-stats">0 / 250 Members</span>
+                    </div>
+                    <div class="occupancy-bar-bg">
+                        <div class="occupancy-bar-fill" id="occupancy-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turnstile Scanner Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Turnstile Badge Access Gate</div>
+                    <span style="font-size: 12px; color: var(--text-muted); font-family: monospace;">GATE-01</span>
+                </div>
+
+                <form id="checkin-form">
+                    <div class="form-group">
+                        <label>Access Zone</label>
+                        <select id="zone-select">
+                            <option value="GYM_FLOOR">Gym Floor (All Tiers: Basic, Premium, VIP)</option>
+                            <option value="POOL">Swimming Pool (Premium & VIP Only)</option>
+                            <option value="SAUNA">Sauna & Spa (Premium & VIP Only)</option>
+                            <option value="CLASS_STUDIO">Group Fitness Studio (Premium & VIP Only)</option>
+                            <option value="VIP_LOUNGE">VIP Executive Lounge (VIP Tier Only)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Member RFID / Barcode Badge</label>
+                        <input type="text" id="badge-input" placeholder="e.g. BADGE-VIP-001" autocomplete="off" required>
+                        <div class="quick-badges">
+                            <span style="font-size: 11px; color: var(--text-muted); align-self: center;">Quick test:</span>
+                            <span class="badge-chip" onclick="setQuickBadge('BADGE-JANE-001')">BADGE-JANE-001</span>
+                            <span class="badge-chip" onclick="setQuickBadge('BADGE-ADMIN-001')">BADGE-ADMIN-001</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="btn-scan">
+                        <span>Scan Badge & Unlock Gate</span>
+                    </button>
+                </form>
+
+                <div id="scan-result-box" class="scan-result-banner">
+                    <div id="scan-result-title" style="font-weight: 800; font-size: 16px; margin-bottom: 6px;"></div>
+                    <div id="scan-result-message" style="font-size: 14px;"></div>
+                </div>
+            </div>
+
+            <!-- Recent Check-In Feed -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Recent Gate Activity Log</div>
+                    <button class="btn btn-secondary btn-sm" onclick="loadLiveStats()">Refresh</button>
+                </div>
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Badge</th>
+                            <th>Zone</th>
+                            <th>Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activity-tbody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted);">No scan events recorded yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Column: Member Lifecycle & Subscription Operations -->
+        <div>
+            <!-- Member Registration & Subscription Actions -->
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('tab-register')">New Member</button>
+                    <button class="tab-btn" onclick="switchTab('tab-freeze')">Freeze Sub</button>
+                    <button class="tab-btn" onclick="switchTab('tab-plans')">Plans Catalog</button>
+                </div>
+
+                <!-- Tab 1: Register Member -->
+                <div id="tab-register">
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="reg-name" placeholder="John Athlete" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="reg-email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Badge Code</label>
+                            <input type="text" id="reg-badge" placeholder="BADGE-JOHN-99" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="reg-password" placeholder="Min 8 characters" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Member & Generate JWT</button>
+                    </form>
+                    <div id="reg-result" style="margin-top: 14px; font-size: 13px; display: none;"></div>
+                </div>
+
+                <!-- Tab 2: Freeze Membership -->
+                <div id="tab-freeze" style="display: none;">
+                    <form id="freeze-form">
+                        <div class="form-group">
+                            <label>Member ID</label>
+                            <input type="text" id="freeze-member-id" placeholder="Enter Member UUID" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Freeze Duration (Days, Max 30/year)</label>
+                            <input type="number" id="freeze-days" min="1" max="30" value="14" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <input type="text" id="freeze-reason" placeholder="Travel / Medical recovery">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1;">Freeze Account</button>
+                            <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="handleUnfreeze()">Unfreeze</button>
+                        </div>
+                    </form>
+                    <div id="freeze-result" style="margin-top: 14px; font-size: 13px; display: none;"></div>
+                </div>
+
+                <!-- Tab 3: Plans Catalog -->
+                <div id="tab-plans" style="display: none;">
+                    <div id="plans-container" style="display: flex; flex-direction: column; gap: 12px;">
+                        Loading plans...
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Endpoints Cheat Sheet -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">REST API Endpoints</div>
+                </div>
+                <div style="font-size: 12px; font-family: monospace; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #60a5fa;">GET</strong> /health</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #34d399;">POST</strong> /api/v1/check-in</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #60a5fa;">GET</strong> /api/v1/occupancy</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #34d399;">POST</strong> /api/v1/auth/register</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #34d399;">POST</strong> /api/v1/auth/login</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #60a5fa;">GET</strong> /api/v1/plans</div>
+                    <div style="padding: 8px; background: #1f2937; border-radius: 6px;"><strong style="color: #34d399;">POST</strong> /api/v1/subscriptions/{id}/freeze</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const activityLog = [];
+
+        function setQuickBadge(code) {
+            document.getElementById('badge-input').value = code;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            ['tab-register', 'tab-freeze', 'tab-plans'].forEach(id => {
+                document.getElementById(id).style.display = (id === tabId) ? 'block' : 'none';
+            });
+            if (tabId === 'tab-plans') loadPlans();
+        }
+
+        async function loadLiveStats() {
+            try {
+                const res = await fetch('/api/v1/occupancy');
+                if (res.ok) {
+                    const data = await res.json();
+                    const percent = Math.round((data.currentOccupancy / data.maxCapacity) * 100);
+                    document.getElementById('occupancy-stats').textContent = `${data.currentOccupancy} / ${data.maxCapacity} Members`;
+                    document.getElementById('occupancy-bar').style.width = `${percent}%`;
+                    document.getElementById('capacity-percentage-badge').textContent = `${percent}% FULL`;
+                }
+            } catch (e) {
+                console.error("Failed to load occupancy", e);
+            }
+        }
+
+        async function loadPlans() {
+            const container = document.getElementById('plans-container');
+            try {
+                const res = await fetch('/api/v1/plans');
+                if (res.ok) {
+                    const plans = await res.json();
+                    container.innerHTML = plans.map(p => `
+                        <div style="background: #1f2937; padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            <div style="display: flex; justify-content: space-between; font-weight: 700;">
+                                <span>${p.name} <span class="tier-tag tier-${p.tier}">${p.tier}</span></span>
+                                <span style="color: #34d399;">$${(p.priceCents / 100).toFixed(2)}</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                                ${p.durationDays} Days • ${p.maxGuestPasses} Guest Passes • Features: ${p.features.join(', ')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                container.textContent = 'Error loading plans catalog.';
+            }
+        }
+
+        // Handle Check-in Scan
+        document.getElementById('checkin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const badgeCode = document.getElementById('badge-input').value.trim();
+            const zone = document.getElementById('zone-select').value;
+            const resultBox = document.getElementById('scan-result-box');
+            const resultTitle = document.getElementById('scan-result-title');
+            const resultMsg = document.getElementById('scan-result-message');
+
+            resultBox.style.display = 'block';
+            resultBox.className = 'scan-result-banner';
+
+            try {
+                const res = await fetch('/api/v1/check-in', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ badgeCode, zone, turnstileId: 'GATE-01' })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.accessGranted) {
+                    resultBox.classList.add('scan-result-granted');
+                    resultTitle.textContent = ' ACCESS GRANTED';
+                    resultMsg.textContent = `${data.message} (Guest passes remaining: ${data.remainingGuestPasses || 0})`;
+                    logActivity(badgeCode, zone, 'GRANTED');
+                } else {
+                    resultBox.classList.add('scan-result-rejected');
+                    resultTitle.textContent = ' ACCESS DENIED';
+                    resultMsg.textContent = data.message || 'Access rejected';
+                    logActivity(badgeCode, zone, 'REJECTED');
+                }
+                loadLiveStats();
+            } catch (err) {
+                resultBox.classList.add('scan-result-rejected');
+                resultTitle.textContent = ' GATE ERROR';
+                resultMsg.textContent = err.message;
+            }
+        });
+
+        // Handle Member Registration
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const badgeCode = document.getElementById('reg-badge').value;
+            const password = document.getElementById('reg-password').value;
+            const resultDiv = document.getElementById('reg-result');
+
+            try {
+                const res = await fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, badgeCode, password })
+                });
+                const data = await res.json();
+                resultDiv.style.display = 'block';
+                if (res.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #6ee7b7; padding: 10px; border-radius: 6px;">
+                            <strong>Success!</strong> Member registered (ID: <code>${data.member.id}</code>).<br>
+                            Badge: <strong>${data.member.badgeCode}</strong>
+                        </div>
+                    `;
+                    document.getElementById('freeze-member-id').value = data.member.id;
+                    setQuickBadge(data.member.badgeCode);
+                } else {
+                    resultDiv.innerHTML = `<div style="color: #f87171;">${data.message || 'Registration failed'}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="color: #f87171;">${err.message}</div>`;
+            }
+        });
+
+        // Handle Freeze
+        document.getElementById('freeze-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const memberId = document.getElementById('freeze-member-id').value.trim();
+            const days = parseInt(document.getElementById('freeze-days').value);
+            const reason = document.getElementById('freeze-reason').value;
+            const resultDiv = document.getElementById('freeze-result');
+
+            try {
+                // In production, pass Authorization: Bearer <jwt>
+                const res = await fetch(`/api/v1/subscriptions/member/${memberId}/freeze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ days, reason })
+                });
+                const data = await res.json();
+                resultDiv.style.display = 'block';
+                if (res.ok) {
+                    resultDiv.innerHTML = `<div style="color: #34d399;">Membership frozen for ${days} days (Scheduled return: ${data.scheduledEndDate})</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: #f87171;">${data.message || 'Freeze request failed'}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="color: #f87171;">${err.message}</div>`;
+            }
+        });
+
+        async function handleUnfreeze() {
+            const memberId = document.getElementById('freeze-member-id').value.trim();
+            const resultDiv = document.getElementById('freeze-result');
+            resultDiv.style.display = 'block';
+            try {
+                const res = await fetch(`/api/v1/subscriptions/member/${memberId}/unfreeze`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    resultDiv.innerHTML = `<div style="color: #34d399;">Membership reactivated to ACTIVE!</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div style="color: #f87171;">${data.message || 'Unfreeze failed'}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="color: #f87171;">${err.message}</div>`;
+            }
+        }
+
+        function logActivity(badge, zone, status) {
+            const now = new Date().toLocaleTimeString();
+            activityLog.unshift({ time: now, badge, zone, status });
+            if (activityLog.length > 8) activityLog.pop();
+
+            const tbody = document.getElementById('activity-tbody');
+            tbody.innerHTML = activityLog.map(item => `
+                <tr>
+                    <td>${item.time}</td>
+                    <td><code>${item.badge}</code></td>
+                    <td>${item.zone}</td>
+                    <td><span class="status-tag status-${item.status.toLowerCase()}">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Init
+        loadLiveStats();
+        setInterval(loadLiveStats, 8000);
+    </script>
+</body>
+</html>

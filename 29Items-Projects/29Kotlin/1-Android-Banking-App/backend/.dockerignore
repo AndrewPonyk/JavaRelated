@@ -1,0 +1,19 @@
+# Ignore everything except the fat jar + the Flyway migration sources
+# (parents must be re-included stepwise).
+*
+!build
+build/*
+!build/libs
+build/libs/*
+!build/libs/*-all.jar
+!src
+src/*
+!src/main
+src/main/*
+!src/main/resources
+src/main/resources/*
+!src/main/resources/db
+src/main/resources/db/*
+!src/main/resources/db/migration
+src/main/resources/db/migration/*
+!src/main/resources/db/migration/*.sql

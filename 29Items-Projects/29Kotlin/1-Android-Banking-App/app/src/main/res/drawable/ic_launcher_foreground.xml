@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bank-card motif, kept inside the 66dp adaptive-icon safe zone (center 54,54). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="108dp"
+        android:height="108dp"
+        android:viewportWidth="108"
+        android:viewportHeight="108">
+    <!-- card body -->
+    <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M31,40 h46 c2.2,0 4,1.8 4,4 v20 c0,2.2 -1.8,4 -4,4 h-46 c-2.2,0 -4,-1.8 -4,-4 v-20 c0,-2.2 1.8,-4 4,-4 z"/>
+    <!-- chip -->
+    <path
+            android:fillColor="#FF0B5D3B"
+            android:pathData="M33,46 h12 v5 h-12 z"/>
+    <!-- number stripe -->
+    <path
+            android:fillColor="#FF0B5D3B"
+            android:pathData="M33,58 h28 v3 h-28 z"/>
+</vector>
