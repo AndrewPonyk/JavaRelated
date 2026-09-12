@@ -1,0 +1,46 @@
+<%= form_with model: [project, issue], class: "space-y-4" do |f| %>
+  <% if issue.errors.any? %>
+    <div class="bg-red-50 border border-red-300 rounded p-3 text-sm text-red-800">
+      <ul class="list-disc pl-5">
+        <% issue.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= f.label :title, class: "field-label" %>
+    <%= f.text_field :title, class: "field-input", required: true %>
+  </div>
+  <div>
+    <%= f.label :description, class: "field-label" %>
+    <%= f.text_area :description, rows: 6, class: "field-input" %>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div>
+      <%= f.label :status, class: "field-label" %>
+      <%= f.select :status, Issue::STATUSES.map { |s| [status_label(s), s] }, {}, class: "field-input" %>
+    </div>
+    <div>
+      <%= f.label :priority, class: "field-label" %>
+      <%= f.select :priority, Issue::PRIORITIES, {}, class: "field-input" %>
+    </div>
+    <div>
+      <%= f.label :estimate_hours, class: "field-label" %>
+      <%= f.number_field :estimate_hours, step: 0.25, min: 0, class: "field-input" %>
+    </div>
+    <div>
+      <%= f.label :sprint_id, "Sprint", class: "field-label" %>
+      <%= f.collection_select :sprint_id, project.sprints.order(:starts_on),
+                              :id, :name, { include_blank: "Backlog" },
+                              class: "field-input" %>
+    </div>
+  </div>
+  <div>
+    <%= f.label :assignee_id, "Assignee", class: "field-label" %>
+    <%= f.collection_select :assignee_id, project.users.order(:name),
+                            :id, :display_name, { include_blank: "Unassigned" },
+                            class: "field-input" %>
+  </div>
+  <%= f.submit class: "btn" %>
+<% end %>

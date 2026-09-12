@@ -1,0 +1,20 @@
+<article class="doc-page">
+  <header class="doc-header">
+    <p class="doc-version"><%= h page.version %></p>
+    <h1><%= h page.title %></h1>
+    <% description = page.front_matter["description"].to_s %>
+    <% unless description.empty? %>
+      <p class="doc-description"><%= h description %></p>
+    <% end %>
+    <% unless page.tags.empty? %>
+      <ul class="tag-list" aria-label="Tags">
+        <% page.tags.each do |tag| %>
+          <li><%= h tag %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </header>
+  <div class="doc-body">
+    <%= page.html %>
+  </div>
+</article>

@@ -1,0 +1,13 @@
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <%= link_to "PM", root_path, class: "font-bold text-indigo-600 text-lg" %>
+      <%= link_to "Projects", projects_path, class: "text-sm text-gray-700 hover:text-indigo-600" %>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <span class="text-gray-500"><%= current_user.display_name %></span>
+      <%= button_to "Sign out", destroy_user_session_path, method: :delete,
+                                                           class: "text-gray-600 hover:text-red-600" %>
+    </div>
+  </div>
+</nav>

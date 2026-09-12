@@ -1,0 +1,10 @@
+.bundle/
+.env
+.env.*
+!.env.example
+build/*
+!build/.gitkeep
+coverage/
+log/
+tmp/
+vendor/bundle/

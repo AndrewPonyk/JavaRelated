@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: social
+          POSTGRES_PASSWORD: social
+          POSTGRES_DB: social_test
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: backend
+      - run: bundle exec rubocop
+      - run: bundle exec rails db:prepare
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://social:social@localhost:5432/social_test
+          REDIS_URL: redis://localhost:6379/1
+          JWT_SECRET_KEY_BASE: test-secret
+      - run: bundle exec rspec
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://social:social@localhost:5432/social_test
+          REDIS_URL: redis://localhost:6379/1
+          JWT_SECRET_KEY_BASE: test-secret
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --run
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+
+  deploy-azure:
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.ref == 'refs/heads/main' && vars.AZURE_CONTAINER_REGISTRY != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - run: az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY }}
+      - run: docker build -t ${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-backend:${{ github.sha }} backend
+      - run: docker build -t ${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-frontend:${{ github.sha }} frontend
+      - run: docker push ${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-backend:${{ github.sha }}
+      - run: docker push ${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-frontend:${{ github.sha }}
+      - run: >
+          az deployment group create
+          --resource-group ${{ vars.AZURE_RESOURCE_GROUP }}
+          --template-file infrastructure/azure/container-apps.bicep
+          --parameters
+          environmentName=${{ vars.AZURE_CONTAINER_APP_ENV }}
+          backendImage=${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-backend:${{ github.sha }}
+          frontendImage=${{ vars.AZURE_CONTAINER_REGISTRY }}.azurecr.io/social-frontend:${{ github.sha }}
+          databaseUrl='${{ secrets.DATABASE_URL }}'
+          redisUrl='${{ secrets.REDIS_URL }}'
+          elasticsearchUrl='${{ vars.ELASTICSEARCH_URL }}'
+          secretKeyBase='${{ secrets.SECRET_KEY_BASE }}'
+          jwtSecretKeyBase='${{ secrets.JWT_SECRET_KEY_BASE }}'

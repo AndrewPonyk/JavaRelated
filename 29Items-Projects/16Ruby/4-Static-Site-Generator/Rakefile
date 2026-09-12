@@ -1,0 +1,35 @@
+# frozen_string_literal: true
+
+require "rake"
+
+task default: %i[lint test build validate]
+
+desc "Run RuboCop"
+task :lint do
+  sh "bundle exec rubocop"
+end
+
+desc "Run RSpec"
+task :test do
+  sh "bundle exec rspec --format documentation"
+end
+
+desc "Run database migrations"
+task :migrate do
+  sh "bundle exec ruby scripts/migrate.rb"
+end
+
+desc "Build the static site"
+task build: :migrate do
+  sh "bundle exec ruby scripts/build.rb"
+end
+
+desc "Validate generated build output"
+task :validate do
+  sh "bundle exec ruby scripts/validate.rb"
+end
+
+desc "Deploy the static site"
+task deploy: %i[build validate] do
+  sh "bundle exec ruby scripts/deploy.rb"
+end

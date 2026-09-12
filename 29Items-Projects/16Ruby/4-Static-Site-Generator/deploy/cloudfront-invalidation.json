@@ -1,0 +1,14 @@
+{
+  "DistributionId": "EXAMPLE",
+  "InvalidationBatch": {
+    "CallerReference": "static-site-generator-reference",
+    "Paths": {
+      "Quantity": 3,
+      "Items": [
+        "/index.html",
+        "/docs/*",
+        "/search/*"
+      ]
+    }
+  }
+}

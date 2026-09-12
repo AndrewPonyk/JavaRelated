@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center px-4 py-2 rounded-md font-medium text-sm
+           bg-indigo-600 text-white hover:bg-indigo-700 transition;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center px-4 py-2 rounded-md font-medium text-sm
+           bg-gray-200 text-gray-900 hover:bg-gray-300 transition;
+  }
+  .card {
+    @apply rounded-lg border border-gray-200 bg-white shadow-sm p-4;
+  }
+  .field-label { @apply block text-sm font-medium text-gray-700 mb-1; }
+  .field-input { @apply w-full rounded-md border-gray-300 shadow-sm
+                         focus:border-indigo-500 focus:ring-indigo-500; }
+}

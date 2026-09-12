@@ -1,0 +1,11 @@
+<nav class="version-nav" aria-label="Documentation versions">
+  <% versions.each do |version| %>
+    <% current = current_page && current_page.version == version %>
+    <% slug = version_links.fetch(version, "getting-started") %>
+    <a href="/docs/<%= escape.call(version) %>/<%= escape.call(slug) %>"<%= current ? " aria-current=\"page\"" : "" %>>
+      <%= escape.call(version) %>
+    </a>
+  <% end %>
+  <a href="/docs">Docs</a>
+  <a href="/search">Search</a>
+</nav>

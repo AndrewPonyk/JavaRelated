@@ -1,0 +1,35 @@
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <span class="font-mono text-xs text-gray-500"><%= @project.key %></span>
+    <h1 class="text-2xl font-bold"><%= @project.name %></h1>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Board", project_board_path(@project), class: "btn-secondary" %>
+    <%= link_to "Issues", project_issues_path(@project), class: "btn-secondary" %>
+    <%= link_to "Sprints", project_sprints_path(@project), class: "btn-secondary" %>
+    <%= link_to "New Issue", new_project_issue_path(@project), class: "btn" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="card">
+    <h2 class="font-semibold mb-2">Active Sprint</h2>
+    <% if @active_sprint %>
+      <%= link_to @active_sprint.name, [@project, @active_sprint], class: "text-indigo-600" %>
+      <p class="text-sm text-gray-600 mt-1"><%= @active_sprint.goal %></p>
+    <% else %>
+      <p class="text-gray-500 text-sm">No active sprint</p>
+    <% end %>
+  </div>
+  <div class="card">
+    <h2 class="font-semibold mb-2">Recent Activity</h2>
+    <ul class="space-y-1 text-sm">
+      <% @recent_issues.each do |issue| %>
+        <li>
+          <%= link_to issue.title, project_issue_path(@project, issue), class: "text-indigo-600" %>
+          <span class="text-xs text-gray-500"><%= status_label(issue.status) %></span>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

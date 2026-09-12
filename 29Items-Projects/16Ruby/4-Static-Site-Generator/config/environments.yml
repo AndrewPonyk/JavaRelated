@@ -1,0 +1,15 @@
+development:
+  log_level: debug
+  cache_static_assets: false
+
+test:
+  log_level: warn
+  cache_static_assets: false
+
+staging:
+  log_level: info
+  cache_static_assets: true
+
+production:
+  log_level: info
+  cache_static_assets: true

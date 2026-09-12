@@ -1,0 +1,16 @@
+<%# Issue card partial — rendered from Turbo Stream broadcasts and in board columns %>
+<%= tag.article id: dom_id(issue),
+      class: "rounded border p-3 shadow-sm bg-white cursor-grab",
+      data: { issue_id: issue.id, controller: "issue-card" } do %>
+  <div class="flex items-center justify-between">
+    <span class="text-xs font-mono text-gray-500"><%= issue.project.key %>-<%= issue.id %></span>
+    <span class="text-xs px-2 py-0.5 rounded <%= priority_class(issue.priority) %>">
+      <%= issue.priority %>
+    </span>
+  </div>
+  <h3 class="mt-1 font-medium"><%= link_to issue.title, project_issue_path(issue.project, issue) %></h3>
+  <div class="mt-2 flex items-center justify-between text-xs text-gray-600">
+    <span><%= issue.assignee&.display_name || "Unassigned" %></span>
+    <span><%= issue.logged_hours %>/<%= issue.estimate_hours || "?" %>h</span>
+  </div>
+<% end %>

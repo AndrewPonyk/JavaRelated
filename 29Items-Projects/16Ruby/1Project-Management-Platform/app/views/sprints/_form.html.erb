@@ -1,0 +1,17 @@
+<%= form_with model: [@project, sprint], class: "space-y-4" do |f| %>
+  <% if sprint.errors.any? %>
+    <div class="bg-red-50 border border-red-300 rounded p-3 text-sm text-red-800">
+      <ul class="list-disc pl-5">
+        <% sprint.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+      </ul>
+    </div>
+  <% end %>
+  <div><%= f.label :name, class: "field-label" %><%= f.text_field :name, class: "field-input", required: true %></div>
+  <div class="grid grid-cols-2 gap-4">
+    <div><%= f.label :starts_on, class: "field-label" %><%= f.date_field :starts_on, class: "field-input", required: true %></div>
+    <div><%= f.label :ends_on, class: "field-label" %><%= f.date_field :ends_on, class: "field-input", required: true %></div>
+  </div>
+  <div><%= f.label :state, class: "field-label" %><%= f.select :state, Sprint::STATES, {}, class: "field-input" %></div>
+  <div><%= f.label :goal, class: "field-label" %><%= f.text_area :goal, rows: 3, class: "field-input" %></div>
+  <%= f.submit class: "btn" %>
+<% end %>

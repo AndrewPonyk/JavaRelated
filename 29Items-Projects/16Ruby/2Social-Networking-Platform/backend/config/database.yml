@@ -1,0 +1,15 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://social:social@localhost:5432/social_development") %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://social:social@localhost:5432/social_test") %>
+
+production:
+  <<: *default

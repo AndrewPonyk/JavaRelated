@@ -1,0 +1,21 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Projects</h1>
+  <%= link_to "New Project", new_project_path, class: "btn" %>
+</div>
+
+<% if @projects.empty? %>
+  <div class="card text-gray-500 text-center">No projects yet. Create one to get started.</div>
+<% else %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% @projects.each do |project| %>
+      <%= link_to project, class: "card hover:shadow-md transition block" do %>
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-gray-500"><%= project.key %></span>
+          <span class="text-xs text-gray-400"><%= project.issues.count %> issues</span>
+        </div>
+        <h2 class="font-semibold mt-1"><%= project.name %></h2>
+        <p class="text-sm text-gray-600 mt-1"><%= truncate(project.description.to_s, length: 100) %></p>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

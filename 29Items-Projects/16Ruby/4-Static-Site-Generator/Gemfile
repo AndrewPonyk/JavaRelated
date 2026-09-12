@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+ruby "~> 3.3"
+
+gem "aws-sdk-cloudfront", "~> 1.95"
+gem "aws-sdk-s3", "~> 1.149"
+gem "puma", "~> 6.4"
+gem "rackup", "~> 2.1"
+gem "rake", "~> 13.2"
+gem "redcarpet", "~> 3.6"
+gem "sinatra", "~> 4.0"
+gem "sqlite3", "~> 1.7"
+
+group :development, :test do
+  gem "rack-test", "~> 2.1"
+  gem "rexml", "~> 3.3"
+  gem "rspec", "~> 3.13"
+  gem "rubocop", "~> 1.63", require: false
+  gem "rubocop-rspec", "~> 3.0", require: false
+  gem "simplecov", "~> 0.22", require: false
+end

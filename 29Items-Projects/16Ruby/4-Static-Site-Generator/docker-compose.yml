@@ -1,0 +1,52 @@
+services:
+  app:
+    build: .
+    command: >
+      sh -c "bundle exec ruby scripts/migrate.rb
+      && bundle exec ruby scripts/build.rb
+      && bundle exec rackup --host 0.0.0.0 --port 4567"
+    ports:
+      - "4567:4567"
+    environment:
+      APP_ENV: development
+      SITE_NAME: Static Site Generator
+      SITE_BASE_URL: http://localhost:4567
+      CONTENT_DIR: content/docs
+      BUILD_DIR: build
+      PUBLIC_DIR: public
+      DATABASE_PATH: data/site.db
+      LOG_LEVEL: info
+      API_AUTH_TOKEN: ""
+    volumes:
+      - .:/app
+      - bundle-cache:/usr/local/bundle
+
+  migrate:
+    build: .
+    command: bundle exec ruby scripts/migrate.rb
+    environment:
+      DATABASE_PATH: data/site.db
+    volumes:
+      - .:/app
+      - bundle-cache:/usr/local/bundle
+    profiles:
+      - tools
+
+  test:
+    build: .
+    command: bundle exec rake
+    environment:
+      APP_ENV: test
+      CONTENT_DIR: spec/fixtures/content/docs
+      BUILD_DIR: tmp/build
+      PUBLIC_DIR: public
+      DATABASE_PATH: tmp/test.db
+      API_AUTH_TOKEN: ""
+    volumes:
+      - .:/app
+      - bundle-cache:/usr/local/bundle
+    profiles:
+      - tools
+
+volumes:
+  bundle-cache:

@@ -1,0 +1,8 @@
+.bundle
+.env
+build
+coverage
+data/*.db
+log
+tmp
+vendor/bundle

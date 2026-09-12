@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= h title %></title>
+    <% if defined?(page) && page && !page.canonical_url.empty? %>
+      <link rel="canonical" href="<%= h page.canonical_url %>">
+    <% end %>
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <script src="/assets/js/search_component.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-title" href="/"><%= h ENV.fetch("SITE_NAME", "Static Site Generator") %></a>
+      <%= partial(
+        "partials/nav.erb",
+        versions: versions || [],
+        current_page: defined?(page) ? page : nil,
+        version_links: defined?(version_links) ? version_links : {}
+      ) %>
+    </header>
+    <main class="site-main">
+      <% if defined?(content) && content %>
+        <%= content %>
+      <% else %>
+        <%= yield %>
+      <% end %>
+    </main>
+  </body>
+</html>

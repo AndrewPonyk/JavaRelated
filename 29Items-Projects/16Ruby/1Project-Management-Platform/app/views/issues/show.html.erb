@@ -1,0 +1,66 @@
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <span class="font-mono text-xs text-gray-500"><%= @project.key %>-<%= @issue.id %></span>
+    <h1 class="text-2xl font-bold"><%= @issue.title %></h1>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_project_issue_path(@project, @issue), class: "btn-secondary" %>
+    <%= button_to "Delete", project_issue_path(@project, @issue), method: :delete,
+                                                                 form: { data: { turbo_confirm: "Delete this issue?" } },
+                                                                 class: "btn-secondary" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="md:col-span-2 space-y-4">
+    <div class="card">
+      <h2 class="font-semibold mb-2">Description</h2>
+      <div class="prose prose-sm max-w-none"><%= simple_format(@issue.description.presence || "_No description._") %></div>
+    </div>
+
+    <div class="card" id="time-entries">
+      <h2 class="font-semibold mb-2">Time tracking (<%= @issue.logged_hours %>h logged)</h2>
+      <%= form_with model: @time_entry, url: project_issue_time_entries_path(@project, @issue), class: "flex flex-wrap gap-2 items-end" do |f| %>
+        <div>
+          <%= f.label :hours, class: "field-label" %>
+          <%= f.number_field :hours, step: 0.25, min: 0.25, max: 24, class: "field-input w-28", required: true %>
+        </div>
+        <div>
+          <%= f.label :worked_on, class: "field-label" %>
+          <%= f.date_field :worked_on, value: Date.current, class: "field-input", required: true %>
+        </div>
+        <div class="flex-1">
+          <%= f.label :note, class: "field-label" %>
+          <%= f.text_field :note, class: "field-input" %>
+        </div>
+        <%= f.submit "Log", class: "btn" %>
+      <% end %>
+      <ul class="mt-4 text-sm space-y-1">
+        <% @issue.time_entries.order(worked_on: :desc).limit(20).each do |te| %>
+          <li class="flex items-center justify-between border-t pt-1">
+            <span><%= te.worked_on %> — <%= te.user.display_name %> — <%= te.hours %>h <%= te.note %></span>
+            <% if policy(te).destroy? %>
+              <%= button_to "×", project_issue_time_entry_path(@project, @issue, te), method: :delete,
+                                                                               class: "text-red-600 hover:underline" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <aside class="space-y-3 text-sm">
+    <div class="card">
+      <dl class="space-y-2">
+        <div><dt class="text-gray-500">Status</dt>
+          <dd><span class="px-2 py-0.5 rounded text-xs <%= status_class(@issue.status) %>"><%= status_label(@issue.status) %></span></dd></div>
+        <div><dt class="text-gray-500">Priority</dt>
+          <dd><span class="px-2 py-0.5 rounded text-xs <%= priority_class(@issue.priority) %>"><%= @issue.priority %></span></dd></div>
+        <div><dt class="text-gray-500">Assignee</dt><dd><%= @issue.assignee&.display_name || "Unassigned" %></dd></div>
+        <div><dt class="text-gray-500">Reporter</dt><dd><%= @issue.reporter.display_name %></dd></div>
+        <div><dt class="text-gray-500">Sprint</dt><dd><%= @issue.sprint&.name || "Backlog" %></dd></div>
+        <div><dt class="text-gray-500">Estimate</dt><dd><%= @issue.estimate_hours || "—" %>h</dd></div>
+      </dl>
+    </div>
+  </aside>
+</div>

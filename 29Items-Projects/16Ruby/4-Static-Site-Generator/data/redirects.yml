@@ -1,0 +1,3 @@
+# Redirect source paths to destination paths during static generation.
+---
+"/docs/latest/getting-started": "/docs/v2/getting-started"

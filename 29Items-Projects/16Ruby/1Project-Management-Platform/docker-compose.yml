@@ -1,0 +1,77 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pm_platform_dev
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: .
+    command: >
+      bash -c "bundle exec rails db:prepare &&
+               bundle exec rails db:seed &&
+               bundle exec rails tailwindcss:build &&
+               bundle exec rails server -b 0.0.0.0 -p 3000"
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/pm_platform_dev
+      REDIS_URL: redis://redis:6379/0
+      REDIS_CACHE_URL: redis://redis:6379/1
+      REDIS_SIDEKIQ_URL: redis://redis:6379/2
+      REDIS_CABLE_URL: redis://redis:6379/3
+      ML_PREDICTOR_URL: http://ml:8000
+      ML_PREDICTOR_API_KEY: dev
+      APPLICATION_HOST: localhost:3000
+      SECRET_KEY_BASE: dev_dummy_secret_key_base_at_least_thirty_chars_long
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - bundle_data:/usr/local/bundle
+
+  worker:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/pm_platform_dev
+      REDIS_URL: redis://redis:6379/0
+      REDIS_SIDEKIQ_URL: redis://redis:6379/2
+      SECRET_KEY_BASE: dev_dummy_secret_key_base_at_least_thirty_chars_long
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - bundle_data:/usr/local/bundle
+
+volumes:
+  pg_data:
+  bundle_data:

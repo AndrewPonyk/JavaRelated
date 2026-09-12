@@ -1,0 +1,26 @@
+<%= turbo_stream_from [@sprint.project, :sprint_metrics] %>
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <h1 class="text-2xl font-bold"><%= @sprint.name %></h1>
+    <p class="text-sm text-gray-500"><%= @sprint.starts_on %> → <%= @sprint.ends_on %> · <%= @sprint.state %></p>
+  </div>
+  <%= link_to "Edit", edit_project_sprint_path(@project, @sprint), class: "btn-secondary" %>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="md:col-span-2 card">
+    <h2 class="font-semibold mb-2">Issues (<%= @issues.size %>)</h2>
+    <ul class="space-y-1 text-sm">
+      <% @issues.each do |issue| %>
+        <li class="flex items-center justify-between border-t py-1">
+          <%= link_to issue.title, [@project, issue], class: "text-indigo-600" %>
+          <span class="text-xs px-2 py-0.5 rounded <%= status_class(issue.status) %>"><%= status_label(issue.status) %></span>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <aside class="card" id="<%= "sprint_#{@sprint.id}_forecast" %>">
+    <%= render "forecast", sprint: @sprint, prediction: @latest_prediction %>
+  </aside>
+</div>

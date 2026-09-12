@@ -1,0 +1,26 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold"><%= @project.name %> — Board</h1>
+  <%= link_to "New Issue", new_project_issue_path(@project), class: "btn" %>
+</div>
+
+<%= turbo_stream_from [@project, :board] %>
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-3"
+     data-controller="board"
+     data-board-base-url-value="<%= project_issues_path(@project) %>">
+  <% @columns.each do |status, issues| %>
+    <section class="bg-gray-100 rounded p-2">
+      <header class="flex items-center justify-between px-1 pb-2">
+        <h2 class="font-semibold text-sm"><%= status_label(status) %></h2>
+        <span class="text-xs text-gray-500"><%= issues.size %></span>
+      </header>
+      <div class="space-y-2 min-h-[50px]"
+           data-board-target="column"
+           data-status="<%= status %>">
+        <% issues.each do |issue| %>
+          <%= render "issues/card", issue: issue %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

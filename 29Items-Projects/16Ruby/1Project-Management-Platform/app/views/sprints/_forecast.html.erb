@@ -1,0 +1,12 @@
+<h2 class="font-semibold mb-2">Workload Forecast</h2>
+<% if local_assigns[:prediction] && prediction %>
+  <p class="text-3xl font-bold text-indigo-600"><%= prediction.predicted_hours.to_f.round(1) %>h</p>
+  <p class="text-xs text-gray-500 mt-1">
+    Confidence <%= (prediction.confidence * 100).round %>% · <%= prediction.model_version %>
+  </p>
+  <p class="text-xs text-gray-500 mt-1">
+    Team estimate: <%= sprint.total_estimate.to_f.round(1) %>h
+  </p>
+<% else %>
+  <p class="text-sm text-gray-500">Prediction pending…</p>
+<% end %>

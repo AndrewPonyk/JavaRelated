@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project Management Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <%= render "layouts/nav" if user_signed_in? %>
+    <main class="max-w-7xl mx-auto p-6">
+      <% flash.each do |level, message| %>
+        <div class="border rounded px-4 py-2 mb-4 <%= flash_class(level) %>">
+          <%= message %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

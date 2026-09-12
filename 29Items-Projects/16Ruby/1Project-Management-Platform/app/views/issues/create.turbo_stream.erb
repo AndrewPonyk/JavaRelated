@@ -1,0 +1,2 @@
+<%= turbo_stream.prepend "issues_list", partial: "issues/card", locals: { issue: @issue } %>
+<%= turbo_stream.update "flash", "Issue created." %>

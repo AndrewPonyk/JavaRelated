@@ -1,0 +1,20 @@
+site:
+  name: Static Site Generator
+  default_version: v2
+  base_url: http://localhost:4567
+
+build:
+  content_dir: content/docs
+  output_dir: build
+  search_index_path: public/search/index.json
+  database_path: data/site.db
+  public_dir: public
+
+markdown:
+  fenced_code_blocks: true
+  tables: true
+  heading_anchors: true
+
+validation:
+  fail_on_broken_links: true
+  require_descriptions: false

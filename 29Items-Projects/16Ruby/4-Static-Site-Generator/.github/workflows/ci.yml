@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Lint
+        run: bundle exec rubocop
+
+      - name: Test
+        env:
+          APP_ENV: test
+          CONTENT_DIR: spec/fixtures/content/docs
+          BUILD_DIR: tmp/build
+          DATABASE_PATH: tmp/test.db
+        run: bundle exec rspec --format documentation
+
+      - name: Build
+        env:
+          DATABASE_PATH: data/site.db
+        run: bundle exec ruby scripts/build.rb
+
+      - name: Validate
+        run: bundle exec ruby scripts/validate.rb
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site-build
+          path: build/
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: lint-test-build
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Build
+        env:
+          DATABASE_PATH: data/site.db
+        run: bundle exec ruby scripts/build.rb
+
+      - name: Deploy to S3
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: bundle exec ruby scripts/deploy.rb
