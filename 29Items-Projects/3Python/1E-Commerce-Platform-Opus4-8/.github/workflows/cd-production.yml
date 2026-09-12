@@ -1,0 +1,36 @@
+name: CD — Production
+
+on:
+  push:
+    tags: ["v*.*.*"]   # Releases are git tags (TECH-NOTES §3.5)
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Requires a manual approval configured on the `production` environment.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PROD_DEPLOY_ROLE }}
+          aws-region: eu-central-1
+
+      - name: Promote the staging-tested image to production ECR
+        run: ./scripts/promote_image.sh "$GITHUB_REF_NAME"
+
+      - name: Run DB migrations (backward-compatible, one-off task)
+        run: ./scripts/run_migrations.sh production "$GITHUB_REF_NAME"
+
+      - name: Blue/green deploy via CodeDeploy (auto-rollback on alarm)
+        run: ./scripts/deploy_ecs.sh production "$GITHUB_REF_NAME" --blue-green

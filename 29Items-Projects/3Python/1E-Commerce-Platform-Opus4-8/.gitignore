@@ -1,0 +1,36 @@
+# --- Secrets / env ---
+.env
+*.pem
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+staticfiles/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+*.local
+
+# --- ML artifacts ---
+*.pt
+*.ckpt
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store

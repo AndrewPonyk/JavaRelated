@@ -1,0 +1,42 @@
+name: CD — Staging
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # OIDC federation to assume the AWS deploy role
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_STAGING_DEPLOY_ROLE }}
+          aws-region: eu-central-1
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push images (tagged by SHA)
+        run: |
+          ./scripts/build_and_push.sh "$GITHUB_SHA"
+
+      - name: Run DB migrations (one-off ECS task)
+        run: ./scripts/run_migrations.sh staging "$GITHUB_SHA"
+
+      - name: Deploy services to ECS
+        run: ./scripts/deploy_ecs.sh staging "$GITHUB_SHA"
+
+      - name: Smoke + E2E tests
+        run: ./scripts/e2e_smoke.sh https://staging.example.com

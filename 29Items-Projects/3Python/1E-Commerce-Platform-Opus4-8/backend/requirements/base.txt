@@ -1,0 +1,37 @@
+# Core runtime dependencies (shared by all environments).
+# Versions patched against known CVEs (audited with pip-audit).
+Django==5.2.15  # LTS, latest security patch (audited clean with pip-audit)
+djangorestframework==3.16.0  # fixes CVE-2024-21520
+djangorestframework-simplejwt==5.5.1  # fixes CVE-2024-22513
+django-cors-headers==4.3.1
+django-filter==24.2
+django-environ==0.11.2
+drf-spectacular==0.27.2
+
+# Password hashing (OWASP-recommended Argon2)
+argon2-cffi==23.1.0
+
+# Async task processing
+celery==5.4.0
+redis==5.0.4
+
+# Database
+psycopg[binary]==3.1.19
+SQLAlchemy==2.0.30
+
+# Search
+elasticsearch==8.13.1
+
+# ML / numerics (collaborative filtering)
+numpy==1.26.4
+# Upgraded to clear CVE-2025-3001. Residual CVE-2025-3000 affects torch.jit.script
+# (unused here — the recommender uses nn.Module only) and has no upstream fix yet;
+# training runs in an isolated, non-web-facing Celery worker.
+torch==2.12.0
+
+# WSGI/ASGI servers
+gunicorn==22.0.0
+uvicorn==0.29.0
+
+# AWS
+boto3==1.34.106

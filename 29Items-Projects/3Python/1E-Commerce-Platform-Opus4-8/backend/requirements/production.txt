@@ -1,0 +1,8 @@
+# Production-only additions on top of base. Kept lean.
+-r base.txt
+
+# Error tracking & observability
+sentry-sdk==2.40.0  # patched (CVE-2024-40647)
+
+# S3-backed media storage
+django-storages==1.14.3

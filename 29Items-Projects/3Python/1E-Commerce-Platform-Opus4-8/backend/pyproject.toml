@@ -1,0 +1,57 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["."]
+# Auto-generated migrations are excluded from linting.
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ", "C4"]
+ignore = [
+    "E501",   # line length handled by black
+    "DJ012",  # model member ordering is cosmetic
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "common", "config"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+explicit_package_bases = true
+# Migrations are generated; ml/ pulls heavy optional deps (torch).
+exclude = "(migrations|/ml/)"
+
+[[tool.mypy.overrides]]
+# Tests favour brevity over strict typing.
+module = "tests.*"
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.development"
+
+[tool.coverage.run]
+branch = false
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    # PyTorch model code requires torch + GPU/CPU training infra; exercised by
+    # dedicated ML jobs, not the web test suite.
+    "apps/recommendations/ml/*",
+    "config/*",
+    "manage.py",
+    "*/apps.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "def __str__",
+]
