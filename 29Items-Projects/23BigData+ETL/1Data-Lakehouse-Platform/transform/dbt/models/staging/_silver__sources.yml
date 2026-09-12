@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      Curated, validated Delta tables owned by Spark jobs (data-platform/).
+      dbt READS Silver and WRITES Gold marts — never the other way around.
+    database: delta # Trino catalog (dbt maps database → catalog on Trino)
+    schema: silver
+    tables:
+      - name: orders
+        description: Deduplicated order events (one row per order_id, latest state).
+        loaded_at_field: ingested_at
+        freshness:
+          warn_after: { count: 26, period: hour }
+          error_after: { count: 48, period: hour }
+        columns:
+          - name: order_id
+            description: Business key (UUID from the producer).
+          - name: customer_id
+          - name: order_ts
+            description: Event time (UTC).
+          - name: status
+          - name: amount
+          - name: currency
+          - name: event_date
+            description: Partition column, derived from order_ts.

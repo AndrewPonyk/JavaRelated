@@ -1,0 +1,135 @@
+# CI — lint, test, and build each part of the monorepo, path-filtered so only
+# what changed runs. All four leaf jobs are branch-protection required checks.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      streaming: ${{ steps.filter.outputs.streaming }}
+      api: ${{ steps.filter.outputs.api }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      ml: ${{ steps.filter.outputs.ml }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            streaming:
+              - 'streaming/**'
+              - 'kafka/**'
+            api:
+              - 'services/analytics-api/**'
+              - 'migrations/**'
+            frontend:
+              - 'frontend/**'
+            ml:
+              - 'ml/**'
+            terraform:
+              - 'infra/terraform/**'
+
+  streaming:
+    needs: changes
+    if: needs.changes.outputs.streaming == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      # verify = unit tests (Surefire) + integration tests *IT (Failsafe/Testcontainers)
+      - name: Build & test Flink jobs
+        run: mvn -B -f streaming/pom.xml verify
+      - name: Upload job jars
+        uses: actions/upload-artifact@v4
+        with:
+          name: flink-jars
+          path: streaming/*/target/*-SNAPSHOT.jar
+          retention-days: 7
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build & test analytics-api
+        run: mvn -B -f services/analytics-api/pom.xml verify
+
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test --if-present
+      - run: npm run build
+
+  ml:
+    needs: changes
+    if: needs.changes.outputs.ml == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ml/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+
+  terraform:
+    needs: changes
+    if: needs.changes.outputs.terraform == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '~1.9'
+      - name: fmt check
+        run: terraform -chdir=infra/terraform fmt -check -recursive
+      - name: validate modules & envs
+        run: |
+          for dir in infra/terraform/envs/*/; do
+            echo "── validating $dir"
+            terraform -chdir="$dir" init -backend=false -input=false >/dev/null
+            terraform -chdir="$dir" validate
+          done
+      # TODO: add tflint + checkov/tfsec once the module set stabilizes

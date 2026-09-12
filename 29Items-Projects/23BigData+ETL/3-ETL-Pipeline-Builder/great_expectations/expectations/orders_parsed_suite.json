@@ -1,0 +1,47 @@
+{
+  "expectation_suite_name": "orders_parsed_suite",
+  "data_asset_type": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "ORDER_ID"
+      },
+      "meta": {
+        "notes": "Producer contract: every order export row carries order_id."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "CUSTOMER_ID",
+        "mostly": 0.99
+      },
+      "meta": {
+        "notes": "Guest checkouts may lack customer_id; alert past 1%."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "AMOUNT",
+        "min_value": 0,
+        "max_value": 1000000
+      },
+      "meta": {
+        "notes": "Negative or absurd amounts indicate a producer regression, not real orders."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "ORDERED_AT"
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.0"
+  }
+}

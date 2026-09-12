@@ -1,0 +1,17 @@
+function(jsengine_apply_default_options target_name)
+    if(MSVC)
+        target_compile_options(${target_name} PRIVATE /W4 /permissive-)
+    else()
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+
+    if(JSENGINE_ENABLE_SANITIZERS AND NOT MSVC)
+        target_compile_options(${target_name} PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
+        target_link_options(${target_name} PRIVATE -fsanitize=address,undefined)
+    endif()
+
+    if(JSENGINE_ENABLE_COVERAGE AND NOT MSVC)
+        target_compile_options(${target_name} PRIVATE --coverage -O0 -g)
+        target_link_options(${target_name} PRIVATE --coverage)
+    endif()
+endfunction()

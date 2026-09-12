@@ -1,0 +1,65 @@
+{
+  "expectation_suite_name": "marts_metrics_suite",
+  "data_asset_type": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1
+      },
+      "meta": {
+        "notes": "An empty mart after a build is a pipeline failure."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "METRIC_DATE"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "METRIC_VALUE"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "METRIC_VALUE",
+        "min_value": 0
+      },
+      "meta": {
+        "notes": "Mirrors the dbt singular test assert_metrics_non_negative — defense in depth at publish time."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {
+        "column": "METRIC_NAME",
+        "value_set": [
+          "orders_count",
+          "revenue_total",
+          "avg_order_value",
+          "checkout_error_rate"
+        ]
+      },
+      "meta": {
+        "notes": "Batch metric catalog — extend together with dbt seed metric_definitions.csv."
+      }
+    },
+    {
+      "expectation_type": "expect_compound_columns_to_be_unique",
+      "kwargs": {
+        "column_list": ["METRIC_DATE", "METRIC_NAME"]
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.0"
+  }
+}

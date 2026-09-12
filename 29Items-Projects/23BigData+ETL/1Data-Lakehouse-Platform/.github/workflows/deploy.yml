@@ -1,0 +1,117 @@
+# Deploy — publish immutable artifacts, then promote dev → staging → prod.
+# Auth: GitHub OIDC → per-environment AWS role. No long-lived AWS keys.
+#
+# Per-environment configuration lives in GitHub *environment* variables
+# (Settings → Environments → <env> → variables), so this file contains no
+# account-specific values:
+#   AWS_REGION, DEPLOY_ROLE_ARN, ECR_REGISTRY, ARTIFACTS_BUCKET, MWAA_BUCKET,
+#   CONSOLE_BUCKET, CLOUDFRONT_DISTRIBUTION_ID, ECS_CLUSTER, ECS_SERVICE,
+#   DATABASE_URL_SECRET_ID, API_BASE_URL
+# Prod additionally carries a required-reviewers protection rule.
+name: Deploy
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write # OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event.inputs.environment || 'dev' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }} # approval gates live here
+    env:
+      RELEASE: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # --- Infrastructure first: everything else deploys onto it ---
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.5"
+      - name: Terraform apply
+        run: |
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          terraform -chdir=infra/terraform init \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="key=lakehouse/$ENV.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}"
+          terraform -chdir=infra/terraform apply -auto-approve -var-file="envs/$ENV.tfvars"
+
+      # --- Spark package: wheel + entrypoint → artifacts bucket ---
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Publish Spark artifacts
+        run: |
+          pip install build
+          python -m build --wheel data-platform
+          aws s3 cp data-platform/dist/*.whl \
+            "s3://${{ vars.ARTIFACTS_BUCKET }}/wheels/$RELEASE/lakehouse.whl"
+          aws s3 cp data-platform/lakehouse/run_module.py \
+            "s3://${{ vars.ARTIFACTS_BUCKET }}/entrypoints/run_module.py"
+
+      # --- Catalog DB migrations (before API rollout; expand→migrate→contract) ---
+      - name: Apply database migrations
+        run: |
+          pip install alembic "sqlalchemy>=2.0" "psycopg[binary]"
+          export DATABASE_URL="$(aws secretsmanager get-secret-value \
+            --secret-id "${{ vars.DATABASE_URL_SECRET_ID }}" \
+            --query SecretString --output text)"
+          alembic upgrade head
+
+      # --- API image → ECR, then roll the ECS service ---
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, push and roll out the API
+        run: |
+          IMAGE="${{ vars.ECR_REGISTRY }}/lakehouse/catalog-api"
+          docker build -f services/api/Dockerfile -t "$IMAGE:$GITHUB_SHA" .
+          docker tag "$IMAGE:$GITHUB_SHA" "$IMAGE:live-${{ github.event.inputs.environment || 'dev' }}"
+          docker push "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:live-${{ github.event.inputs.environment || 'dev' }}"
+          # Task definition pins the mutable live-<env> tag; force a rolling restart.
+          aws ecs update-service --cluster "${{ vars.ECS_CLUSTER }}" \
+            --service "${{ vars.ECS_SERVICE }}" --force-new-deployment
+          aws ecs wait services-stable --cluster "${{ vars.ECS_CLUSTER }}" \
+            --services "${{ vars.ECS_SERVICE }}"
+
+      # --- Airflow: DAGs + dbt bundle → MWAA bucket ---
+      - name: Sync orchestration bundle
+        run: |
+          aws s3 sync orchestration/airflow/dags "s3://${{ vars.MWAA_BUCKET }}/dags" --delete
+          aws s3 sync transform/dbt "s3://${{ vars.MWAA_BUCKET }}/dbt" --delete \
+            --exclude "target/*" --exclude "dbt_packages/*" --exclude "profiles/profiles.yml"
+
+      # --- Frontend: static bundle → S3 + CloudFront invalidation ---
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build and publish the Console
+        run: |
+          npm install --no-audit --no-fund
+          VITE_API_BASE_URL="${{ vars.API_BASE_URL }}" npm run build
+          aws s3 sync dist "s3://${{ vars.CONSOLE_BUCKET }}" --delete
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"
+        working-directory: frontend
+
+      # --- Smoke gate: a failed probe fails the deploy (and blocks promotion) ---
+      - name: Post-deploy smoke checks
+        run: |
+          curl -fsS "${{ vars.API_BASE_URL }}/healthz"
+          curl -fsS "${{ vars.API_BASE_URL }}/readyz"
+          curl -fsS "${{ vars.API_BASE_URL }}/api/v1/datasets?limit=1" >/dev/null

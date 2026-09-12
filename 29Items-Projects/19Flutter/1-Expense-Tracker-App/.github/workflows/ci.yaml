@@ -1,0 +1,88 @@
+# Fast PR gate — format -> analyze -> test -> build web (docs/TECH-NOTES.md §3.1).
+#
+# Target time: < 4 min. No signing secrets, no macOS runner — that is Codemagic's
+# job (codemagic.yaml). This workflow only proves the commit compiles and passes
+# tests; it never produces a store-shippable artifact.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.35.x'
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Formatting is not a review topic; the machine decides (TECH-NOTES §3.1).
+      - run: dart format --output=none --set-exit-if-changed .
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    needs: format
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Infos are real signal under this repo's strict analysis_options.yaml —
+      # do not soften this to get a build green (TECH-NOTES §3.1).
+      - run: flutter analyze --fatal-infos --fatal-warnings
+
+  test:
+    name: Test + coverage
+    runs-on: ubuntu-latest
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Unit + widget tests with per-layer coverage thresholds
+        run: |
+          chmod +x scripts/coverage.sh
+          ./scripts/coverage.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lcov-report
+          path: coverage/lcov.info
+          retention-days: 14
+
+  build-web:
+    name: Build web (compile proof)
+    runs-on: ubuntu-latest
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Cheap compile proof only — web is a dev-velocity target, not a shipping
+      # platform (docs/TECH-NOTES.md §3.3). This never gets deployed anywhere.
+      - run: flutter build web --dart-define-from-file=.env.example

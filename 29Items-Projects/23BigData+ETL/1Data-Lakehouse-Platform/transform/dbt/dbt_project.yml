@@ -1,0 +1,22 @@
+name: lakehouse_marts
+version: "0.1.0"
+config-version: 2
+
+profile: trino_lakehouse
+
+model-paths: ["models"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+target-path: target
+clean-targets: [target, dbt_packages]
+
+models:
+  lakehouse_marts:
+    staging:
+      # Views: zero storage, always fresh; they only rename/cast Silver.
+      +materialized: view
+    marts:
+      # Tables in Gold; move heavy marts to incremental (merge) as they grow.
+      +materialized: table

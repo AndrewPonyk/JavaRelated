@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: fct_business_metrics_daily
+    description: >
+      System-of-record daily business metrics. The streaming hot store approximates these
+      in real time; this table is what dashboards reconcile against and what history
+      queries in the API read.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [metric_date, metric_name]
+    columns:
+      - name: metric_date
+        tests: [not_null]
+      - name: metric_name
+        description: Must exist in the metric catalog seed.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('metric_definitions')
+              field: metric_name
+      - name: metric_value
+        tests: [not_null]
+
+  - name: dim_customers
+    description: One row per customer with lifetime aggregates and segment.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+      - name: customer_segment
+        tests:
+          - accepted_values:
+              values: [new, repeat, vip]

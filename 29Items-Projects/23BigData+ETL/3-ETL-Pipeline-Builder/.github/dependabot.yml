@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule: {interval: weekly}
+    # great-expectations stays on 0.18.x until the deliberate GX 1.x migration
+    ignore:
+      - dependency-name: great-expectations
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: pip
+    directory: "/api"
+    schedule: {interval: weekly}
+
+  - package-ecosystem: pip
+    directory: "/streaming"
+    schedule: {interval: weekly}
+
+  - package-ecosystem: pip
+    directory: "/airflow"
+    schedule: {interval: weekly}
+
+  - package-ecosystem: npm
+    directory: "/frontend"
+    schedule: {interval: weekly}
+    groups:
+      angular:
+        patterns: ["@angular*"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: {interval: weekly}
+
+  - package-ecosystem: terraform
+    directory: "/infrastructure/environments/dev"
+    schedule: {interval: weekly}

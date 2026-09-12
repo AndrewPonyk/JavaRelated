@@ -1,0 +1,58 @@
+{
+  "id": "0001",
+  "description": "ISM lifecycle for log indices: hot (rollover) -> warm (force-merge) -> delete. Retention: 30d (TODO: env-specific via tfvars-templated policies).",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/_plugins/_ism/policies/la-logs-rollover",
+      "body": {
+        "policy": {
+          "description": "la-logs rollover + retention",
+          "default_state": "hot",
+          "states": [
+            {
+              "name": "hot",
+              "actions": [
+                {
+                  "rollover": {
+                    "min_size": "30gb",
+                    "min_index_age": "1d"
+                  }
+                }
+              ],
+              "transitions": [
+                {
+                  "state_name": "warm",
+                  "conditions": { "min_index_age": "3d" }
+                }
+              ]
+            },
+            {
+              "name": "warm",
+              "actions": [
+                { "replica_count": { "number_of_replicas": 1 } },
+                { "force_merge": { "max_num_segments": 1 } }
+              ],
+              "transitions": [
+                {
+                  "state_name": "delete",
+                  "conditions": { "min_index_age": "30d" }
+                }
+              ]
+            },
+            {
+              "name": "delete",
+              "actions": [ { "delete": {} } ]
+            }
+          ],
+          "ism_template": [
+            {
+              "index_patterns": ["la-logs-*"],
+              "priority": 100
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

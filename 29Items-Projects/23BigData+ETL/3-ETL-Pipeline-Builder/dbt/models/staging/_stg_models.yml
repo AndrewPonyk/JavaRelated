@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: One row per order (latest load wins). Typed, deduped view over raw landing.
+    columns:
+      - name: order_id
+        description: Business key from the source system.
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: [placed, paid, shipped, cancelled, refunded]
+      - name: order_amount
+        description: Order total in currency_code units.
+        tests: [not_null]
+      - name: ordered_at
+        tests: [not_null]
+
+  - name: stg_stream_events
+    description: One row per streaming event (deduped on event_id).
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: [order_placed, checkout_failed, order_cancelled]
+      - name: event_at
+        tests: [not_null]

@@ -1,0 +1,14 @@
+# Keep build contexts lean (api, frontend, spark images build from repo root)
+.git
+**/__pycache__
+**/.pytest_cache
+.ruff_cache
+.mypy_cache
+frontend/node_modules
+frontend/dist
+transform/dbt/target
+transform/dbt/dbt_packages
+.lake
+.env
+*.md
+!README.md

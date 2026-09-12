@@ -1,0 +1,57 @@
+name: cd
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # OIDC federation into AWS deploy roles — no static keys
+  contents: read
+
+env:
+  AWS_REGION: eu-central-1
+
+jobs:
+  build-push:
+    name: build & push ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api, streaming, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: build & push (immutable SHA tag)
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/${{ vars.ECR_NAMESPACE }}/${{ matrix.service == 'streaming' && 'processor' || matrix.service }}:${GITHUB_SHA}"
+          docker build -t "$IMAGE" "${{ matrix.service }}"
+          docker push "$IMAGE"
+
+  # Artifact promotion: the SAME SHA-tagged images move dev → staging → prod;
+  # staging/production apply their GitHub-environment protection rules.
+  deploy-dev:
+    needs: build-push
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: dev
+    secrets: inherit
+
+  deploy-staging:
+    needs: deploy-dev
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
+    secrets: inherit
+
+  deploy-prod:
+    needs: deploy-staging
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+    secrets: inherit

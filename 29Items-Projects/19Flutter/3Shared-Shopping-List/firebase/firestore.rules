@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isListMember(listId) {
+      return isAuthenticated() && 
+        request.auth.uid in get(/databases/$(database)/documents/shopping_lists/$(listId)).data.memberUids;
+    }
+    
+    function isListOwner(listId) {
+      return isAuthenticated() && 
+        request.auth.uid == get(/databases/$(database)/documents/shopping_lists/$(listId)).data.ownerUid;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isUser(userId);
+      allow delete: if false; // Deletions handled via account closure flow
+    }
+    
+    // Shopping Lists
+    match /shopping_lists/{listId} {
+      // Members can read list metadata
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.memberUids || 
+        resource.data.ownerUid == request.auth.uid
+      );
+      
+      // Any authenticated user can create a new list where they are owner & member
+      allow create: if isAuthenticated() && 
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.auth.uid in request.resource.data.memberUids &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100;
+        
+      // Only members can update list (editors can update stats, only owners can change membership)
+      allow update: if isAuthenticated() && (
+        request.auth.uid in resource.data.memberUids
+      );
+      
+      // Only owner can delete list
+      allow delete: if isListOwner(listId);
+      
+      // Items Subcollection
+      match /items/{itemId} {
+        // Members of the parent list can read items in real-time
+        allow read: if isListMember(listId);
+        
+        // Members can create items with valid fields
+        allow create: if isListMember(listId) &&
+          request.resource.data.name is string &&
+          request.resource.data.name.size() > 0 &&
+          request.resource.data.quantity is number &&
+          request.resource.data.quantity > 0 &&
+          request.resource.data.isGotIt is bool &&
+          request.resource.data.addedByUid == request.auth.uid;
+          
+        // Members can update item status (e.g. toggle isGotIt, edit quantity)
+        allow update: if isListMember(listId) &&
+          request.resource.data.quantity is number &&
+          request.resource.data.quantity > 0;
+          
+        // Members can delete items
+        allow delete: if isListMember(listId);
+      }
+    }
+    
+    // Invitations (Read permitted if authenticated, mutations controlled via Cloud Functions)
+    match /invitations/{invitationToken} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions can mint or consume invitations
+    }
+    
+    // Templates
+    match /staple_templates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}

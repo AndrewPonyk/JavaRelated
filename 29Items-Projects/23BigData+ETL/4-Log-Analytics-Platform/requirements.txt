@@ -1,0 +1,17 @@
+# Runtime dependencies for the Python services (gateway, api, alerting) and shared code.
+# Spark itself is intentionally NOT here — see requirements-spark.txt.
+# TODO: generate a hash-pinned lock (pip-tools/uv) once dependency set stabilizes.
+
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+pydantic>=2.6,<3
+pydantic-settings>=2.2,<3
+aiokafka>=0.10,<1
+opensearch-py>=2.4,<3        # NOT elasticsearch-py: >=7.14 refuses to talk to OpenSearch
+httpx>=0.27,<1
+PyYAML>=6.0,<7
+redis>=5.0,<6
+scikit-learn>=1.4,<2
+joblib>=1.3,<2
+pandas>=2.1,<3
+numpy>=1.26,<3

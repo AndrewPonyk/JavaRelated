@@ -1,0 +1,16 @@
+build/
+.cache/
+.env
+*.user
+*.swp
+*.swo
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.sqlite
+compile_commands.json

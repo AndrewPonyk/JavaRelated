@@ -1,0 +1,17 @@
+[package]
+name = "transpiler-parser"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[dependencies]
+lalrpop-util.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+transpiler-core = { path = "../transpiler-core" }
+
+[build-dependencies]
+lalrpop.workspace = true

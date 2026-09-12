@@ -1,0 +1,96 @@
+# Local development stack.
+#   Core (default):        kafka + redis                → scripts/bootstrap_local.sh
+#   Apps:                  --profile apps               → api + processor + frontend
+#   Orchestration:         --profile airflow            → Airflow standalone on :8080
+name: etl-pipeline-builder
+
+services:
+  kafka:
+    image: apache/kafka:3.7.0
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092 # alerts-feed consumer
+      CORS_ORIGINS: http://localhost:4200,http://localhost:8081
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    profiles: [apps]
+
+  processor:
+    build: ./streaming
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: [apps]
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+    profiles: [apps]
+
+  airflow:
+    image: apache/airflow:2.9.3-python3.11
+    command: standalone
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      # Dev convenience only — bake providers into airflow/Dockerfile for anything durable.
+      _PIP_ADDITIONAL_REQUIREMENTS: "apache-airflow-providers-amazon apache-airflow-providers-snowflake"
+      DBT_PROJECT_DIR: /opt/project/dbt
+      DBT_PROFILES_DIR: /opt/project/dbt/profiles
+      GE_ROOT_DIR: /opt/project/great_expectations
+      PROJECT_ROOT: /opt/project
+      REDIS_URL: redis://redis:6379/0 # cache warmer + watchdog + model publish
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./dbt:/opt/project/dbt
+      - ./great_expectations:/opt/project/great_expectations
+      - ./scripts:/opt/project/scripts
+    profiles: [airflow]

@@ -1,0 +1,44 @@
+{
+  "id": "0005",
+  "description": "Fired alerts — the audit trail and the data behind triage dashboards.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/_index_template/la-alerts",
+      "body": {
+        "index_patterns": ["la-alerts*"],
+        "priority": 200,
+        "template": {
+          "settings": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0
+          },
+          "mappings": {
+            "dynamic": false,
+            "properties": {
+              "@timestamp": { "type": "date" },
+              "id":         { "type": "keyword" },
+              "rule_id":    { "type": "keyword" },
+              "severity":   { "type": "keyword" },
+              "source":     { "type": "keyword" },
+              "service":    { "type": "keyword" },
+              "title":      { "type": "text" },
+              "description": { "type": "text" },
+              "dedup_key":  { "type": "keyword" },
+              "context":    { "type": "flat_object" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/la-alerts-000001",
+      "body": {
+        "aliases": {
+          "la-alerts": { "is_write_index": true }
+        }
+      }
+    }
+  ]
+}

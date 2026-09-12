@@ -1,0 +1,77 @@
+# Shared Python tooling configuration for the monorepo.
+# Each component keeps a unique import root (app, processor, jobs, common)
+# so one pytest/mypy invocation covers everything without collisions.
+
+[project]
+name = "etl-pipeline-builder"
+version = "0.1.0"
+description = "Real-time business metrics + governed batch ELT (Airflow, dbt, Snowflake, MSK)"
+requires-python = ">=3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["api", "streaming", "glue", "airflow/dags"]
+extend-exclude = ["frontend", "infrastructure", "dbt"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "SIM", # simplify
+  "C4",  # comprehensions
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency-injection idiom: Depends()/Query() in defaults is intended.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "processor", "jobs", "common"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = "api:streaming:glue"
+warn_unused_ignores = true
+no_implicit_optional = true
+
+# redis-py types every command as `Awaitable[X] | X` (one class serves sync and
+# async); awaiting them is correct at runtime but trips mypy's misc check.
+[[tool.mypy.overrides]]
+module = [
+  "app.services.alert_service",
+  "app.services.pipeline_service",
+  "app.services.metrics_service",
+  "processor.model_reloader",
+  "processor.sinks.redis_sink",
+]
+disable_error_code = ["misc"]
+
+[tool.pytest.ini_options]
+testpaths = ["api/tests", "streaming/tests", "glue/tests", "airflow/tests"]
+pythonpath = ["api", "streaming", "glue", "airflow/dags"]
+addopts = "-q -m 'not glue and not integration'"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+  "glue: requires a local Spark runtime (run inside a Linux container / CI)",
+  "integration: requires the docker compose stack (kafka + redis) on localhost",
+]
+
+[tool.coverage.run]
+source = ["api/app", "streaming/processor"]
+omit = [
+  # Entrypoint wiring (signal handlers, task orchestration) — exercised
+  # end-to-end by scripts/smoke_e2e.sh in the CI integration job.
+  "streaming/processor/main.py",
+]
+
+[tool.coverage.report]
+skip_empty = true
+show_missing = true

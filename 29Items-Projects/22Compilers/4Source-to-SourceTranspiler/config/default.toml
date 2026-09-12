@@ -1,0 +1,10 @@
+[server]
+host = "0.0.0.0"
+port = 8080
+
+[compiler]
+max_source_bytes = 1048576
+incremental_cache_dir = ".cache/transpiler"
+
+[security]
+cors_allowed_origins = ["http://localhost:5173"]

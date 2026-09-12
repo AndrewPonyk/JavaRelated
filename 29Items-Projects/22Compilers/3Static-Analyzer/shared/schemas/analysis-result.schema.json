@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://static-analyzer.local/schemas/analysis-result.schema.json",
+  "title": "AnalysisRead",
+  "type": "object",
+  "required": [
+    "id",
+    "project_name",
+    "source_path",
+    "rule_pack",
+    "status",
+    "findings",
+    "ast_facts",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "project_name": { "type": "string" },
+    "source_path": { "type": "string" },
+    "compile_commands_path": { "type": ["string", "null"] },
+    "rule_pack": { "type": "string" },
+    "status": { "enum": ["queued", "running", "completed", "failed"] },
+    "error_message": { "type": ["string", "null"] },
+    "ast_facts": {
+      "type": "object",
+      "required": ["schemaVersion", "sourcePath", "functions", "calls", "variables", "controlFlow"],
+      "properties": {
+        "schemaVersion": { "type": "string" },
+        "sourcePath": { "type": "string" },
+        "functions": { "type": "array" },
+        "calls": { "type": "array" },
+        "variables": { "type": "array" },
+        "controlFlow": { "type": "array" }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule_id", "severity", "message", "file_path", "line", "column", "evidence"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "rule_id": { "type": "string" },
+          "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+          "message": { "type": "string" },
+          "file_path": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "column": { "type": "integer", "minimum": 1 },
+          "evidence": { "type": "object" }
+        }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

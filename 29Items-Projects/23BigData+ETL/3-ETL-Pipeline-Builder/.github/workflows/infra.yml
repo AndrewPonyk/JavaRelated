@@ -1,0 +1,88 @@
+name: infra
+
+on:
+  pull_request:
+    paths: ["infrastructure/**"]
+  push:
+    branches: [master, main]
+    paths: ["infrastructure/**"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to plan/apply
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write # plan output comment
+
+env:
+  AWS_REGION: eu-central-1
+  TF_ENV: ${{ github.event.inputs.environment || 'dev' }}
+
+jobs:
+  plan:
+    name: terraform plan (${{ github.event.inputs.environment || 'dev' }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure/environments/${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.*"
+      - name: init (remote state)
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}" \
+            -backend-config="key=${TF_ENV}/terraform.tfstate" \
+            -backend-config="region=${AWS_REGION}" \
+            -backend-config="dynamodb_table=terraform-locks" \
+            -backend-config="encrypt=true"
+      - run: terraform plan -input=false -out=tfplan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ env.TF_ENV }}
+          path: infrastructure/environments/${{ env.TF_ENV }}/tfplan
+          retention-days: 5
+
+  apply:
+    name: terraform apply (${{ github.event.inputs.environment || 'dev' }})
+    if: github.event_name != 'pull_request'
+    needs: plan
+    runs-on: ubuntu-latest
+    # dev applies from master; staging/prod applies require the environment approval
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    defaults:
+      run:
+        working-directory: infrastructure/environments/${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.*"
+      - uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ env.TF_ENV }}
+          path: infrastructure/environments/${{ env.TF_ENV }}
+      - name: init (remote state)
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TFSTATE_BUCKET }}" \
+            -backend-config="key=${TF_ENV}/terraform.tfstate" \
+            -backend-config="region=${AWS_REGION}" \
+            -backend-config="dynamodb_table=terraform-locks" \
+            -backend-config="encrypt=true"
+      - run: terraform apply -input=false tfplan

@@ -1,0 +1,26 @@
+# Pre-commit hooks — install with: pre-commit install
+# Runs the cheap checks locally; CI (.github/workflows/ci.yml) is authoritative.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Terraform formatting is enforced in CI (terraform fmt -check); add
+  # https://github.com/antonbabenko/pre-commit-terraform here if every dev
+  # machine has the terraform binary available.

@@ -1,0 +1,34 @@
+{
+  "expectation_suite_name": "raw_orders_suite",
+  "data_asset_type": null,
+  "expectations": [
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 1
+      },
+      "meta": {
+        "notes": "An empty load for a scheduled day is a pipeline failure, not a quiet day."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "PAYLOAD"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "_LOADED_AT"
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.0",
+    "notes": "TODO(Phase 2): add unstructured-payload checks via expect_column_values_to_match_json_schema on PAYLOAD (order_id present, amount >= 0), and volume anomaly checks vs. trailing 7-day row counts."
+  }
+}

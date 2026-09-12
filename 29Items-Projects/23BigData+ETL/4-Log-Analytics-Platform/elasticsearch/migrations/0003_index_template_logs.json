@@ -1,0 +1,29 @@
+{
+  "id": "0003",
+  "description": "Index template for la-logs-* and bootstrap of the first rollover index behind the write alias. NOTE: rollover_alias must match the alias — TECH-NOTES pitfall #7.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/_index_template/la-logs",
+      "body": {
+        "index_patterns": ["la-logs-*"],
+        "priority": 200,
+        "composed_of": ["la-logs-settings", "la-logs-mappings"],
+        "template": {
+          "settings": {
+            "plugins.index_state_management.rollover_alias": "la-logs"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/la-logs-000001",
+      "body": {
+        "aliases": {
+          "la-logs": { "is_write_index": true }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# PySpark is provided by the cluster (EMR Serverless 7.x ships Spark 3.5) in prod.
+# Install this file only for local development, CI integration tests, and the spark image.
+# The version MUST match the --packages coordinate in scripts/submit_spark_job.sh.
+pyspark==3.5.1
+# Arrow serialization for pandas-on-Spark ops (mapInPandas in anomaly_scoring) —
+# EMR ships it; local/CI/spark-image must install it (TECH-NOTES pitfall #15).
+pyarrow>=15,<21

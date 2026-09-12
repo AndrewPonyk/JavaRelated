@@ -1,0 +1,13 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pydantic-settings==2.9.1
+sqlalchemy==2.0.40
+psycopg[binary]==3.2.7
+geoalchemy2==0.17.1
+PyJWT==2.10.1
+email-validator==2.2.0
+python-multipart==0.0.20
+pytest==8.3.5
+pytest-cov==6.1.1
+httpx==0.28.1
+ruff==0.11.7

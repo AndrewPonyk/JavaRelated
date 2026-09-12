@@ -1,0 +1,42 @@
+name: etl_pipeline_builder
+version: "0.1.0"
+profile: etl_pipeline_builder
+require-dbt-version: [">=1.8.0", "<2.0.0"]
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+
+target-path: target
+clean-targets: [target, dbt_packages]
+
+vars:
+  # Watermark for incremental backfills; override with --vars on full loads.
+  metrics_start_date: "2026-01-01"
+
+models:
+  etl_pipeline_builder:
+    +persist_docs:
+      relation: true
+      columns: true
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: ephemeral
+    marts:
+      +schema: marts
+      +materialized: table
+      # Serving grant applied on build so the API/BI role can read marts.
+      +grants:
+        select: ["reporter"]
+
+seeds:
+  etl_pipeline_builder:
+    +schema: seeds
+    metric_definitions:
+      +column_types:
+        alert_threshold: double

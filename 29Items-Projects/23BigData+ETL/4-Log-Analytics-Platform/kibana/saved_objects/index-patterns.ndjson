@@ -1,0 +1,4 @@
+{"attributes":{"title":"la-logs*","timeFieldName":"@timestamp"},"id":"la-logs","references":[],"type":"index-pattern","version":"1"}
+{"attributes":{"title":"la-anomalies*","timeFieldName":"window_start"},"id":"la-anomalies","references":[],"type":"index-pattern","version":"1"}
+{"attributes":{"title":"la-alerts*","timeFieldName":"@timestamp"},"id":"la-alerts","references":[],"type":"index-pattern","version":"1"}
+{"exportedCount":3,"missingRefCount":0,"missingReferences":[]}

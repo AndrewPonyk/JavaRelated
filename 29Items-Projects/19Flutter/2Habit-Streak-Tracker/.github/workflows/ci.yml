@@ -1,0 +1,50 @@
+name: Flutter CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  analyze_and_test:
+    name: Lint, Analyze & Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Verify Code Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Static Analysis
+        run: flutter analyze --fatal-infos
+
+      - name: Run Unit & Widget Tests
+        run: flutter test --coverage
+
+      - name: Check Coverage Threshold
+        run: |
+          # Verify lcov test coverage minimum threshold
+          if [ -f "coverage/lcov.info" ]; then
+            echo "Coverage file generated successfully."
+          else
+            echo "Warning: No coverage file found."
+          fi

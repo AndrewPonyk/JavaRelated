@@ -1,0 +1,30 @@
+# Auto-provisioned datasources for the local Grafana (mirrors Amazon Managed Grafana setup).
+apiVersion: 1
+
+datasources:
+  - name: RTAP Elasticsearch
+    uid: rtap-es
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    isDefault: true
+    editable: true
+    jsonData:
+      # Exact time field + index pattern matter — see TECH-NOTES §3.6.14
+      index: "metrics-aggregates-*"
+      timeField: "windowStart"
+
+  - name: RTAP PostgreSQL
+    uid: rtap-pg
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: ${POSTGRES_USER}
+    editable: true
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD} # local only — AWS uses a read-only role + Secrets Manager
+    jsonData:
+      database: ${POSTGRES_DB}
+      sslmode: disable
+      postgresVersion: 1600
+      # TODO(ops): switch to the grafana_ro role once created (V001 footer)

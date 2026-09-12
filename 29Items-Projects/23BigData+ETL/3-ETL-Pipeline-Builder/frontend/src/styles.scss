@@ -1,0 +1,94 @@
+/* Global styles — deliberately minimal; component styles stay inline.
+   Viz role tokens follow the dataviz palette (dark-surface validated steps):
+   marks reference roles, text wears text tokens, status colors are reserved. */
+:root {
+  --bg: #0f1420;
+  --panel: #1a2130;
+  --border: #2a3347;
+  --text: #e8ecf4;
+  --muted: #8b94a7;
+  --accent: #3987e5;      /* series-1, dark-surface step (≥3:1 on panel) */
+  --viz-line: #5b657a;    /* de-emphasis hue for sparkline trend */
+  --ok: #38c172;
+  --warn: #f6ad37;
+  --crit: #ef5753;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+input,
+textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  width: 100%;
+}
+
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.field-error {
+  color: var(--crit);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}

@@ -1,0 +1,85 @@
+# Tag validation + changelog draft (docs/TECH-NOTES.md §3.5).
+#
+# Runs when an annotated release tag is pushed (`v1.2.0`) — validates the tag
+# format and that it matches pubspec.yaml's version, then drafts a changelog
+# from conventional commits since the previous tag. It never builds or signs
+# anything: Codemagic reacts to the same tag independently for that.
+name: Release tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  validate:
+    name: Validate tag matches pubspec version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check tag is well-formed semver
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "error: tag '$tag' is not of the form vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          echo "TAG_VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      - name: Check tag matches pubspec.yaml version
+        run: |
+          # pubspec's version is "1.2.3+4" — the tag names only the MAJOR.MINOR.PATCH
+          # part; the build number is Codemagic's $PROJECT_BUILD_NUMBER, not ours to
+          # pin here (TECH-NOTES §3.1 "Build numbering" — stores reject duplicate
+          # build numbers, and hand-editing this on a release branch will collide).
+          pubspec_version=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          if [[ "$pubspec_version" != "$TAG_VERSION" ]]; then
+            echo "error: tag v$TAG_VERSION does not match pubspec.yaml version $pubspec_version" >&2
+            exit 1
+          fi
+
+  changelog:
+    name: Draft changelog from conventional commits
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find previous tag
+        id: prev
+        run: |
+          current="${GITHUB_REF#refs/tags/}"
+          previous=$(git describe --tags --abbrev=0 "${current}^" 2>/dev/null || echo "")
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog draft
+        run: |
+          current="${GITHUB_REF#refs/tags/}"
+          range="${{ steps.prev.outputs.previous }}..$current"
+          [[ -z "${{ steps.prev.outputs.previous }}" ]] && range="$current"
+
+          {
+            echo "# $current"
+            echo
+            echo "## Features"
+            git log "$range" --pretty=format:'- %s (%h)' --grep='^feat' -i || true
+            echo
+            echo "## Fixes"
+            git log "$range" --pretty=format:'- %s (%h)' --grep='^fix' -i || true
+            echo
+            echo "## Other"
+            git log "$range" --pretty=format:'- %s (%h)' --invert-grep --grep='^feat\|^fix' -i || true
+          } > CHANGELOG_DRAFT.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: CHANGELOG_DRAFT.md
+          draft: true
+          generate_release_notes: false

@@ -1,0 +1,79 @@
+# Great Expectations project config — pinned to GX 0.18.x (pre-1.0 API).
+# Migrating to GX 1.x is a deliberate later task (breaking changes), not a dep bump.
+config_version: 3.0
+
+plugins_directory: plugins/
+
+stores:
+  expectations_store:
+    class_name: ExpectationsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: expectations/
+
+  validations_store:
+    class_name: ValidationsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/validations/
+      # Cloud envs switch to TupleS3StoreBackend → s3://<artifacts-bucket>/ge/validations
+      # (structured results additionally land in RAW.METADATA.DATA_QUALITY_RESULTS
+      # via common/validation.py).
+
+  checkpoint_store:
+    class_name: CheckpointStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: checkpoints/
+
+  evaluation_parameter_store:
+    class_name: EvaluationParameterStore
+
+expectations_store_name: expectations_store
+validations_store_name: validations_store
+checkpoint_store_name: checkpoint_store
+evaluation_parameter_store_name: evaluation_parameter_store
+
+data_docs_sites:
+  local_site:
+    class_name: SiteBuilder
+    show_how_to_buttons: false
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/data_docs/local_site/
+    site_index_builder:
+      class_name: DefaultSiteIndexBuilder
+  # Cloud envs add an s3_site publishing Data Docs to the artifacts bucket.
+
+anonymous_usage_statistics:
+  enabled: false
+
+# Fluent datasources. Credentials come from the environment (${VAR}
+# substitution) — never hardcode.
+fluent_datasources:
+  snowflake_raw:
+    type: snowflake
+    connection_string: "snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/RAW/ORDERS?warehouse=LOAD_WH&role=LOADER"
+    assets:
+      orders_raw:
+        type: table
+        table_name: ORDERS_RAW
+      # VARIANT payloads can't be asserted on directly — validate a parsed
+      # projection so contract checks (ids present, amounts sane) are SQL-native.
+      orders_parsed:
+        type: query
+        query: >
+          select
+            payload:order_id::string        as order_id,
+            payload:customer_id::string     as customer_id,
+            payload:amount::number(18, 2)   as amount,
+            payload:created_at::timestamp_ntz as ordered_at
+          from raw.orders.orders_raw
+
+  snowflake_marts:
+    type: snowflake
+    connection_string: "snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/ANALYTICS/MARTS?warehouse=TRANSFORM_WH&role=TRANSFORMER"
+    assets:
+      fct_business_metrics_daily:
+        type: table
+        table_name: FCT_BUSINESS_METRICS_DAILY

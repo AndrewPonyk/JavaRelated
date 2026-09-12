@@ -1,0 +1,9 @@
+# Review routing. TODO: replace placeholder teams with real GitHub teams.
+*                       @your-org/platform-team
+/streaming/             @your-org/streaming-team
+/services/              @your-org/backend-team
+/frontend/              @your-org/frontend-team
+/infra/                 @your-org/platform-team
+/migrations/            @your-org/backend-team @your-org/streaming-team
+/kafka/topics.yaml      @your-org/streaming-team @your-org/platform-team
+/docs/                  @your-org/platform-team

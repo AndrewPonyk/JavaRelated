@@ -1,0 +1,11 @@
+build/
+out/
+.cache/
+.plang/
+.env
+*.user
+*.swp
+*.swo
+*.log
+compile_commands.json
+CMakeUserPresets.json

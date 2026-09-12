@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage*
+.coverage-data/
+.ruff_cache/
+node_modules/
+dist/
+build/
+coverage/
+static_analyzer.db
+test_static_analyzer.db
+.DS_Store

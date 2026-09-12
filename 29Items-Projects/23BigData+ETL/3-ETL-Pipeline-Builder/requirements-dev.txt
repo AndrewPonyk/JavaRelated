@@ -1,0 +1,33 @@
+# Development / CI toolchain for the Python components.
+#   pip install -r requirements-dev.txt
+
+# Lint & type-check
+ruff~=0.5.7
+mypy~=1.11
+
+# Test
+pytest~=8.3
+pytest-cov~=5.0
+pytest-asyncio~=0.25
+
+# Needed to import/unit-test api/ and streaming/ without containers
+fastapi~=0.112
+uvicorn[standard]~=0.30
+httpx~=0.27
+redis~=5.0
+pydantic~=2.8
+pydantic-settings~=2.4
+aiokafka~=0.11
+
+# SQL lint for dbt models
+sqlfluff~=3.1
+
+# ── Optional heavyweight extras (install on demand) ─────────────────────────
+# dbt:            pip install "dbt-snowflake~=1.8"
+# schemachange:   pip install "schemachange~=3.7"
+# Great Expectations (pinned to the pre-1.0 API used by this repo):
+#                 pip install "great-expectations==0.18.*"
+# Airflow for DAG integrity tests (use the constraints file!):
+#   pip install "apache-airflow[amazon,snowflake]==2.9.3" \
+#     --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.9.3/constraints-3.11.txt
+# Glue-job tests (Linux only): pip install "pyspark~=3.4"

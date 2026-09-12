@@ -1,0 +1,47 @@
+{
+  "id": "0004",
+  "description": "Anomaly scores per (service, window) from the Isolation Forest scoring job. TODO: attach a lighter ISM policy (90d retention) once volumes are known.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/_index_template/la-anomalies",
+      "body": {
+        "index_patterns": ["la-anomalies-*"],
+        "priority": 200,
+        "template": {
+          "settings": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0
+          },
+          "mappings": {
+            "dynamic": false,
+            "properties": {
+              "@timestamp":    { "type": "date" },
+              "window_start":  { "type": "date" },
+              "window_end":    { "type": "date" },
+              "service":       { "type": "keyword" },
+              "score":         { "type": "float" },
+              "is_anomaly":    { "type": "boolean" },
+              "model_version": { "type": "keyword" },
+              "log_count":         { "type": "float" },
+              "error_count":       { "type": "float" },
+              "error_ratio":       { "type": "float" },
+              "warn_ratio":        { "type": "float" },
+              "unique_messages":   { "type": "float" },
+              "avg_message_len":   { "type": "float" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/la-anomalies-000001",
+      "body": {
+        "aliases": {
+          "la-anomalies": { "is_write_index": true }
+        }
+      }
+    }
+  ]
+}

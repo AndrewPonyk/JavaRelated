@@ -1,0 +1,64 @@
+# Declarative threshold alert rules.
+# Loaded by the pattern-detection Spark job and the alerting engine (LA_RULES_PATH).
+# Managed at runtime via the alert-rules CRUD API in Phase 2; this file is the seed set.
+#
+# Fields: id (unique), name, metric, op (gt|gte|lt|lte), threshold, window (30s|5m|1h),
+#         severity (info|warning|critical), channels ([log|slack|pagerduty]), enabled.
+
+rules:
+  - id: high-error-ratio
+    name: High error ratio
+    description: More than 5% of a service's logs are ERROR/FATAL over 5 minutes.
+    metric: error_ratio
+    op: gt
+    threshold: 0.05
+    window: 5m
+    severity: warning
+    channels: [log, slack]
+
+  - id: error-burst
+    name: Error burst
+    description: Absolute error spike — 100+ errors within one minute.
+    metric: error_count
+    op: gte
+    threshold: 100
+    window: 1m
+    severity: critical
+    channels: [log, slack, pagerduty]
+
+  - id: log-flood
+    name: Log flood
+    description: A service is emitting 50k+ lines/minute (runaway loop or debug left on).
+    metric: log_count
+    op: gt
+    threshold: 50000
+    window: 1m
+    severity: warning
+    channels: [log, slack]
+
+  # anomaly_score rules are evaluated by the alerting engine (not the Spark job).
+  # When several match one anomaly, the highest-threshold rule wins — one alert,
+  # most severe interpretation.
+  - id: ml-anomaly-warning
+    name: ML anomaly
+    description: Isolation Forest flagged unusual logging behavior (score >= 0.8).
+    metric: anomaly_score
+    op: gte
+    threshold: 0.8
+    window: 1m
+    severity: warning
+    channels: [log, slack]
+
+  - id: ml-anomaly-critical
+    name: ML anomaly (near-certain)
+    description: Isolation Forest score >= 0.95 — drop everything.
+    metric: anomaly_score
+    op: gte
+    threshold: 0.95
+    window: 1m
+    severity: critical
+    channels: [log, slack, pagerduty]
+
+  # "Service went silent" detection is built into the alerting engine
+  # (LA_SILENT_SERVICE_CHECK_SECONDS / LA_SILENT_SERVICE_AFTER_MINUTES) — windowed
+  # aggregations cannot see the absence of data, a periodic OpenSearch query can.

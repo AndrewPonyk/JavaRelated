@@ -1,0 +1,13 @@
+{
+  "name": "indoor-mapping-app",
+  "private": true,
+  "workspaces": [
+    "services/api",
+    "packages/shared"
+  ],
+  "scripts": {
+    "lint": "npm --workspace services/api run lint",
+    "test": "npm --workspace services/api test",
+    "build": "npm --workspace services/api run build"
+  }
+}

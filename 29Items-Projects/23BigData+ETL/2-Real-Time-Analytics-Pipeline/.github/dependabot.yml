@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /streaming
+    schedule: { interval: weekly }
+    groups:
+      flink: { patterns: ["org.apache.flink*"] }
+  - package-ecosystem: maven
+    directory: /services/analytics-api
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule: { interval: weekly }
+  - package-ecosystem: pip
+    directory: /ml
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: /infra/terraform
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

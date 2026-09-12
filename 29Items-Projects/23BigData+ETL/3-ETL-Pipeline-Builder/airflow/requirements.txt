@@ -1,0 +1,13 @@
+# Installed into MWAA (via S3 requirements.txt) and the local Airflow image.
+# Do NOT pin apache-airflow itself here — the platform provides it.
+apache-airflow-providers-amazon>=8.24.0
+apache-airflow-providers-snowflake>=5.6.0
+apache-airflow-providers-common-sql>=1.14.0
+
+# Great Expectations for the validation gates (pinned to the pre-1.0 API).
+great-expectations==0.18.*
+
+# NOTE: dbt is intentionally NOT installed into Airflow — it conflicts with MWAA
+# pins. The dbt step runs as an ECS task (EcsRunTaskOperator) in cloud envs; the
+# BashOperator in etl_daily_batch_dag is the local-dev path only.
+# TODO(Phase 2): astronomer-cosmos if we adopt task-per-model dbt rendering.

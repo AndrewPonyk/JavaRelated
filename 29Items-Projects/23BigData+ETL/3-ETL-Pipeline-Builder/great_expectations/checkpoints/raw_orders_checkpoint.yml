@@ -1,0 +1,28 @@
+# Gate 1 of the write–audit–publish flow: validates the RAW orders landing
+# right after COPY INTO, before dbt is allowed to run (see etl_daily_batch_dag).
+# Two validations: the physical landing table + the parsed payload contract.
+name: raw_orders_checkpoint
+config_version: 1.0
+class_name: Checkpoint
+run_name_template: "%Y%m%d-%H%M%S-raw-orders"
+
+validations:
+  - batch_request:
+      datasource_name: snowflake_raw
+      data_asset_name: orders_raw
+    expectation_suite_name: raw_orders_suite
+  - batch_request:
+      datasource_name: snowflake_raw
+      data_asset_name: orders_parsed
+    expectation_suite_name: orders_parsed_suite
+
+action_list:
+  - name: store_validation_result
+    action:
+      class_name: StoreValidationResultAction
+  - name: update_data_docs
+    action:
+      class_name: UpdateDataDocsAction
+# Structured outcomes are persisted to RAW.METADATA.DATA_QUALITY_RESULTS by the
+# Airflow runner (common/validation.py); SNS fan-out on failure comes from the
+# task's on_failure_callback — no duplicate notification action needed here.

@@ -1,0 +1,14 @@
+version: 1
+format: json
+level: debug
+sinks:
+  - type: stderr
+    enabled: true
+loggers:
+  frontend.lex: debug
+  frontend.parse: debug
+  semantics.infer: info
+  backend.codegen: info
+  runtime.jit: info
+  pkg.resolve: info
+  api.registry: info

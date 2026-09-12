@@ -1,0 +1,134 @@
+# Deploy: schema migrations → ECS services → Spark streaming jobs → smoke test.
+# dev deploys automatically from main; staging/prod are manual + environment-approval gated.
+#
+# Per-environment GitHub variables (from `terraform output`):
+#   AWS_DEPLOY_ROLE_ARN, AWS_REGION, OPENSEARCH_URL, ECS_CLUSTER, ECR_REGISTRY,
+#   EMR_APP_ID, EMR_JOB_ROLE_ARN, ARTIFACTS_BUCKET, API_BASE_URL
+name: Deploy
+
+on:
+  push:
+    branches: [main]        # → dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+      image_tag:
+        description: Image tag to deploy (e.g. sha-abc123); rollback = older tag
+        required: true
+        default: latest
+
+concurrency:
+  group: deploy-${{ inputs.environment || 'dev' }}
+  cancel-in-progress: false   # never cancel a mid-flight deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev' }}   # env protection rules gate staging/prod
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag || format('sha-{0}', github.sha) }}
+      TARGET_ENV: ${{ inputs.environment || 'dev' }}
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      EMR_APP_ID: ${{ vars.EMR_APP_ID }}
+      ARTIFACTS_BUCKET: ${{ vars.ARTIFACTS_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install httpx
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # 1) Schema first — additive-only migrations, safe for still-running old code.
+      #    (Runner must reach the domain: public endpoint w/ IP allowlist in dev, or a
+      #    self-hosted runner / CodeBuild bridge inside the VPC for private domains.)
+      - name: Apply OpenSearch migrations
+        run: python scripts/es_migrate.py --url "${{ vars.OPENSEARCH_URL }}"
+
+      # 2) Stateless services: register a new task-definition revision with the new
+      #    image, then roll each service to it.
+      - name: Update ECS services
+        run: |
+          set -euo pipefail
+          IMAGE="${{ vars.ECR_REGISTRY }}/log-analytics-app:${IMAGE_TAG}"
+          for svc in gateway api alerting; do
+            SERVICE="log-analytics-$svc"
+            echo "── $SERVICE → $IMAGE"
+            CURRENT_TD=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$SERVICE" \
+              --query 'services[0].taskDefinition' --output text)
+            aws ecs describe-task-definition --task-definition "$CURRENT_TD" \
+              --query 'taskDefinition' > td.json
+            jq --arg IMG "$IMAGE" '
+              .containerDefinitions[0].image = $IMG
+              | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+                    .compatibilities, .registeredAt, .registeredBy)' td.json > td-new.json
+            NEW_TD=$(aws ecs register-task-definition --cli-input-json file://td-new.json \
+              --query 'taskDefinition.taskDefinitionArn' --output text)
+            aws ecs update-service --cluster "$ECS_CLUSTER" --service "$SERVICE" \
+              --task-definition "$NEW_TD" >/dev/null
+          done
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" \
+            --services log-analytics-gateway log-analytics-api log-analytics-alerting
+
+      # 3) Streaming jobs: ship code to S3, then restart runs from their checkpoints.
+      - name: Package & upload Spark sources
+        run: |
+          set -euo pipefail
+          zip -qr spark_src.zip src config
+          aws s3 cp spark_src.zip "s3://$ARTIFACTS_BUCKET/spark/$IMAGE_TAG/spark_src.zip"
+          for job in enrich_and_index pattern_detection anomaly_scoring; do
+            aws s3 cp "src/log_analytics/streaming/jobs/$job.py" \
+              "s3://$ARTIFACTS_BUCKET/spark/$IMAGE_TAG/jobs/$job.py"
+          done
+
+      - name: Restart EMR Serverless streaming jobs
+        run: |
+          set -euo pipefail
+          # Graceful stop: cancel running job runs; new runs resume from S3 checkpoints.
+          RUNNING=$(aws emr-serverless list-job-runs --application-id "$EMR_APP_ID" \
+            --states RUNNING --query 'jobRuns[].id' --output text)
+          for run_id in $RUNNING; do
+            echo "cancelling job run $run_id"
+            aws emr-serverless cancel-job-run --application-id "$EMR_APP_ID" \
+              --job-run-id "$run_id" >/dev/null
+          done
+          for job in enrich_and_index pattern_detection anomaly_scoring; do
+            echo "── starting $job"
+            aws emr-serverless start-job-run \
+              --application-id "$EMR_APP_ID" \
+              --execution-role-arn "${{ vars.EMR_JOB_ROLE_ARN }}" \
+              --name "$job-$IMAGE_TAG" \
+              --mode STREAMING \
+              --retry-policy '{"maxFailedAttemptsPerHour": 4}' \
+              --job-driver "{
+                \"sparkSubmit\": {
+                  \"entryPoint\": \"s3://$ARTIFACTS_BUCKET/spark/$IMAGE_TAG/jobs/$job.py\",
+                  \"sparkSubmitParameters\": \"--py-files s3://$ARTIFACTS_BUCKET/spark/$IMAGE_TAG/spark_src.zip --conf spark.emr-serverless.driverEnv.LA_APP_ENV=$TARGET_ENV --conf spark.executorEnv.LA_APP_ENV=$TARGET_ENV\"
+                }
+              }" >/dev/null
+          done
+
+      # 4) Trust nothing — verify.
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          curl -sf "${{ vars.API_BASE_URL }}/healthz"
+          curl -sf "${{ vars.API_BASE_URL }}/readyz"
+          # Logs flowed within the last 5 minutes?
+          COUNT=$(curl -sf "${{ vars.OPENSEARCH_URL }}/la-logs/_count" \
+            -H 'Content-Type: application/json' \
+            -d '{"query":{"range":{"@timestamp":{"gte":"now-5m"}}}}' | jq .count)
+          echo "docs indexed in the last 5 minutes: $COUNT"

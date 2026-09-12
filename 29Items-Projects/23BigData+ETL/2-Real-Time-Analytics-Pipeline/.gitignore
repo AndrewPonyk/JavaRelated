@@ -1,0 +1,42 @@
+# ── Secrets & local config ──────────────────────────────
+.env
+*.local
+*.pem
+.claude/
+
+# ── Java / Maven ────────────────────────────────────────
+target/
+*.class
+*.jar
+!.mvn/wrapper/*.jar
+.mvn/timing.properties
+
+# ── Node / frontend ─────────────────────────────────────
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+.venv/
+
+# ── Terraform ───────────────────────────────────────────
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# ── Flink / local runtime ───────────────────────────────
+checkpoints/
+savepoints/
+
+# ── IDE / OS ────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

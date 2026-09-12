@@ -1,0 +1,65 @@
+# Terraform — plan on PRs touching infra/**, apply on main per environment.
+# State: S3 backend per env (see infra/terraform/envs/*/backend.tf).
+name: Terraform
+
+on:
+  pull_request:
+    paths: ['infra/terraform/**']
+  push:
+    branches: [main, master]
+    paths: ['infra/terraform/**']
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write # plan output as PR comment
+
+env:
+  AWS_REGION: eu-central-1
+
+jobs:
+  plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev] # add staging/prod once their backends are bootstrapped
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '~1.9'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_ROLE_ARN }} # TODO: read-only plan role
+          aws-region: ${{ env.AWS_REGION }}
+      - name: terraform plan (${{ matrix.env }})
+        working-directory: infra/terraform/envs/${{ matrix.env }}
+        run: |
+          terraform init -input=false
+          terraform plan -input=false -var-file=${{ matrix.env }}.tfvars -out=tfplan
+      # TODO: post `terraform show -no-color tfplan` as a sticky PR comment
+      #       (e.g. actions/github-script or a dedicated plan-comment action)
+
+  apply:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        env: [dev] # staging/prod applies gated by their GitHub environments
+    environment: ${{ matrix.env }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '~1.9'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: terraform apply (${{ matrix.env }})
+        working-directory: infra/terraform/envs/${{ matrix.env }}
+        run: |
+          terraform init -input=false
+          terraform apply -input=false -auto-approve -var-file=${{ matrix.env }}.tfvars

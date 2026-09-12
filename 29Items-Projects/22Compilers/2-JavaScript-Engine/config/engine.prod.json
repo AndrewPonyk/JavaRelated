@@ -1,0 +1,16 @@
+{
+  "jit": {
+    "enabled": true,
+    "hotLoopThreshold": 1000
+  },
+  "gc": {
+    "maxHeapMb": 64,
+    "nurseryMb": 4,
+    "incrementalMarking": true
+  },
+  "debug": {
+    "enabled": false,
+    "bindHost": "127.0.0.1",
+    "bindPort": 0
+  }
+}

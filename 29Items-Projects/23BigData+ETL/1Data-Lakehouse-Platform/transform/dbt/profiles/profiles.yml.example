@@ -1,0 +1,29 @@
+# Copy to profiles.yml (gitignored). Entirely env_var-driven so the same file
+# works locally, in CI (dbt parse), and inside Airflow.
+trino_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      host: "{{ env_var('TRINO_HOST', 'localhost') }}"
+      port: "{{ env_var('TRINO_PORT', '8081') | as_number }}"
+      user: "{{ env_var('TRINO_USER', 'dbt') }}"
+      catalog: "{{ env_var('TRINO_CATALOG', 'delta') }}"
+      schema: analytics
+      http_scheme: http
+      threads: 4
+    prod:
+      type: trino
+      host: "{{ env_var('TRINO_HOST') }}"
+      port: 443
+      user: "{{ env_var('TRINO_USER') }}"
+      catalog: delta
+      schema: analytics
+      http_scheme: https
+      threads: 8
+      # Service-account JWT issued by the IdP; injected by Airflow from
+      # Secrets Manager (never stored in the bundle).
+      auth: jwt
+      jwt_token: "{{ env_var('TRINO_JWT_TOKEN') }}"
+      session_properties:
+        query_max_run_time: 30m

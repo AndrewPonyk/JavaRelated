@@ -1,0 +1,38 @@
+{
+  "index_patterns": ["metrics-aggregates-*"],
+  "priority": 200,
+  "_meta": {
+    "owner": "rtap",
+    "notes": [
+      "Documents are written by flink-aggregation-job with _id = MetricAggregate.documentId() — idempotent upserts make the at-least-once sink effectively-once.",
+      "dimensions uses 'flattened' so producer-controlled tag keys can NEVER explode the mapping (TECH-NOTES 3.6.5). On AWS OpenSearch rename the type to 'flat_object'.",
+      "dynamic:false — unknown fields are stored in _source but never mapped.",
+      "priority 200: stock ES 8 ships a built-in 'metrics' template (metrics-*-*) at priority 100 — equal priorities on overlapping patterns are rejected.",
+      "TODO(phase-3): ILM/ISM policy — rollover daily, delete after 30d; date-suffixed indices."
+    ]
+  },
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index": {
+        "refresh_interval": "1s"
+      }
+    },
+    "mappings": {
+      "dynamic": false,
+      "properties": {
+        "metricKey":   { "type": "keyword" },
+        "windowSize":  { "type": "keyword" },
+        "windowStart": { "type": "date", "format": "epoch_millis" },
+        "windowEnd":   { "type": "date", "format": "epoch_millis" },
+        "count":       { "type": "long" },
+        "sum":         { "type": "double" },
+        "min":         { "type": "double" },
+        "max":         { "type": "double" },
+        "avg":         { "type": "double" },
+        "dimensions":  { "type": "flattened" }
+      }
+    }
+  }
+}

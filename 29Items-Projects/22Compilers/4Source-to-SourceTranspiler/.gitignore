@@ -1,0 +1,10 @@
+/target/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/.cache/
+/.env
+/*.log
+*.wasm
+*.wasm.d.ts
+*.tsbuildinfo

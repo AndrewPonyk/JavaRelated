@@ -1,0 +1,9 @@
+services:
+  jsengine:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    command: ["sh", "-lc", "cmake --preset debug && cmake --build --preset debug && ctest --test-dir build/debug --output-on-failure"]

@@ -1,0 +1,133 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  python-quality:
+    name: python lint + unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy api streaming glue
+      - name: unit tests (api + streaming; glue/dags auto-skip here)
+        run: pytest --cov --cov-report=term-missing
+
+  airflow-dags:
+    name: DAG integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11" # match MWAA runtime
+          cache: pip
+      - name: install airflow (constraints-pinned) + providers
+        run: |
+          pip install "apache-airflow[amazon,common.sql]==2.9.3" \
+            --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.9.3/constraints-3.11.txt"
+          pip install pytest
+      - run: pytest airflow/tests -q
+
+  glue-tests:
+    name: glue transforms (spark)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install pytest "pyspark~=3.4"
+      - run: pytest glue/tests -q -m glue -o addopts=""
+
+  dbt:
+    name: dbt parse + sql lint
+    runs-on: ubuntu-latest
+    env:
+      DBT_TARGET: ci
+      SNOWFLAKE_ACCOUNT: ci-placeholder
+      SNOWFLAKE_USER: ci
+      SNOWFLAKE_PASSWORD: ci
+      PR_NUMBER: ${{ github.event.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install "dbt-snowflake~=1.8" "sqlfluff~=3.1"
+      - run: sqlfluff lint dbt/models
+      - run: dbt deps --project-dir dbt
+      - name: dbt parse (compile check without a warehouse connection)
+        run: dbt parse --project-dir dbt --profiles-dir dbt/profiles
+      # TODO(Phase 2): Slim CI — dbt build --select state:modified+ into a
+      # PR-scoped schema against the real dev account (needs secrets).
+
+  frontend:
+    name: frontend lint + test + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci || npm install # lockfile generated on first install
+      - run: npm run lint
+      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - run: npm run build
+
+  terraform:
+    name: terraform fmt + validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.*"
+      - run: terraform fmt -check -recursive infrastructure
+      - name: validate (dev root, no backend)
+        working-directory: infrastructure/environments/dev
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  integration:
+    name: e2e smoke (compose stack)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install aiokafka
+      - name: start kafka + redis and create topics
+        run: bash scripts/bootstrap_local.sh
+      - name: build + start api and processor
+        run: docker compose --profile apps up -d --build api processor
+      - name: run the smoke suite
+        run: bash scripts/smoke_e2e.sh
+      - name: stack logs on failure
+        if: failure()
+        run: docker compose logs api processor kafka

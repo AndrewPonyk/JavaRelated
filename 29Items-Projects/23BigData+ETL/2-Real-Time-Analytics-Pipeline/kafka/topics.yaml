@@ -1,0 +1,40 @@
+# Source of truth for Kafka topics — reviewed like schema changes.
+# Local creation: scripts/create-topics.sh (RF=1 on the single-broker compose stack).
+# AWS MSK: provisioned declaratively in CD (Terraform kafka provider / CLI step) with
+#          replication_factor: 3 and min.insync.replicas: 2.
+# MUST stay in sync with KafkaConfig.java (streaming/flink-common).
+
+topics:
+  - name: events.raw.v1
+    partitions: 12            # unit of scale — Flink source parallelism ≤ this
+    key: entity id            # even spread; windows re-key by eventType downstream
+    retention.ms: 604800000   # 7d — doubles as the replay horizon (Kappa)
+    notes: raw business events, producers use acks=all + idempotence
+
+  - name: events.raw.dlq.v1
+    partitions: 3
+    retention.ms: 1209600000  # 14d — time to notice + replay
+    notes: undeserializable payloads wrapped in the error envelope (ARCHITECTURE §2.6)
+
+  - name: events.raw.late.v1
+    partitions: 3
+    retention.ms: 604800000
+    notes: events behind the watermark (side output); alert if ratio > 0.1%
+
+  - name: metrics.aggregates.v1
+    partitions: 12
+    key: metricKey
+    retention.ms: 259200000   # 3d — ES/PG are the serving stores, Kafka is transport
+    notes: TRANSACTIONAL producer (exactly-once) — consumers MUST use read_committed
+
+  - name: alerts.anomalies.v1
+    partitions: 3
+    key: metricKey
+    retention.ms: 2592000000  # 30d
+    notes: transactional; consumed by analytics-api (PG history + SSE push)
+
+  - name: ml.model-updates.v1
+    partitions: 1
+    cleanup.policy: compact   # latest model params per metricKey win
+    key: metricKey
+    notes: broadcast into flink-anomaly-job (seasonal baselines / thresholds)

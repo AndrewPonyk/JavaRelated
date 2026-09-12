@@ -1,0 +1,42 @@
+# Committed on purpose: every credential comes from the environment
+# (see .env.example). Select with DBT_TARGET or --target.
+etl_pipeline_builder:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'ANALYTICS') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORM_WH') }}"
+      schema: "dev_{{ env_var('USER', 'local') }}"   # per-developer sandbox schemas
+      threads: 4
+      query_tag: dbt-dev
+
+    ci:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'ci-placeholder') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'ci') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'ci') }}"
+      role: TRANSFORMER
+      database: ANALYTICS
+      warehouse: TRANSFORM_WH
+      schema: "ci_pr_{{ env_var('PR_NUMBER', '0') }}"  # PR-scoped schema for Slim CI
+      threads: 4
+      query_tag: dbt-ci
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      # TODO(prod): switch to key-pair auth:
+      #   private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: TRANSFORMER
+      database: ANALYTICS
+      warehouse: TRANSFORM_WH
+      schema: analytics          # base schema; custom schemas via generate_schema_name
+      threads: 8
+      query_tag: dbt-prod

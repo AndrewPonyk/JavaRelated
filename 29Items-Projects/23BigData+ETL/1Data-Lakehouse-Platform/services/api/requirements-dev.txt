@@ -1,0 +1,4 @@
+# Test/dev tooling on top of the runtime dependencies.
+-r requirements.txt
+pytest==8.2.2
+pytest-cov>=5.0

@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "log-analytics-platform"
+version = "0.1.0"
+description = "Centralized log analytics: Kafka ingestion, Spark Streaming processing, OpenSearch storage, Isolation Forest anomaly detection."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "aiokafka>=0.10",
+  "opensearch-py>=2.4",
+  "httpx>=0.27",
+  "PyYAML>=6.0",
+  "redis>=5.0",
+  "scikit-learn>=1.4",
+  "joblib>=1.3",
+  "pandas>=2.1",
+  "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "ruff>=0.4",
+  "mypy>=1.9",
+  "pre-commit>=3.6",
+  "types-PyYAML",
+]
+spark = [
+  # Provided by EMR Serverless at runtime; needed locally & in CI only.
+  "pyspark==3.5.1",
+]
+aws = [
+  "boto3>=1.34",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ── Ruff: lint + format ──────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = [
+  "SIM108",  # ternary is not always clearer
+  "RUF001",  # intentional unicode in user-facing strings (en dashes, emoji)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "E402"]  # E402: imports after pytest.importorskip
+"src/log_analytics/streaming/**" = ["N812"]  # `functions as F` is the PySpark idiom
+
+# ── Mypy ─────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "src"
+packages = ["log_analytics"]
+ignore_missing_imports = true   # pyspark/opensearchpy/etc. lack stubs
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+# ── Pytest ───────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+pythonpath = ["src", "scripts"]
+testpaths = ["tests"]
+# Default run = unit only; CI overrides with `-m integration` / `-m e2e`.
+addopts = "-ra -m 'not integration and not e2e'"
+markers = [
+  "integration: needs live Kafka/OpenSearch (docker compose up)",
+  "e2e: needs the full pipeline running",
+]
+
+# ── Coverage ─────────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["src/log_analytics"]
+omit = ["src/log_analytics/streaming/*"]  # Spark shells are exercised by integration/e2e tiers
+
+[tool.coverage.report]
+precision = 1
+show_missing = true

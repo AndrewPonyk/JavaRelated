@@ -1,0 +1,7 @@
+metric_name,display_name,unit,aggregation,alert_threshold,owner
+orders_count,Orders,count,sum,,growth-team
+revenue_total,Revenue,EUR,sum,,finance-team
+avg_order_value,Avg order value,EUR,avg,,finance-team
+checkout_error_rate,Checkout error rate,ratio,avg,0.05,platform-team
+orders_per_second,Orders / sec (live),count_per_s,rate,,growth-team
+revenue_per_second,Revenue / sec (live),EUR_per_s,rate,,finance-team

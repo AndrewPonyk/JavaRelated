@@ -1,0 +1,178 @@
+:root {
+  color: #17202a;
+  background: #f7f9fb;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  min-height: 100vh;
+}
+
+.map-surface {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #dce7ef;
+}
+
+.leaflet-map,
+.deck-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.dataset-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-left: 1px solid #d8e0e7;
+  background: #ffffff;
+  overflow-y: auto;
+}
+
+.dataset-panel h1 {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.dataset-panel p {
+  margin: 6px 0 0;
+  color: #50606f;
+}
+
+.status {
+  padding: 10px 12px;
+  border: 1px solid #cad6df;
+  border-radius: 6px;
+  background: #f4f8fb;
+}
+
+.status-error {
+  border-color: #d66c5d;
+  color: #8b2d22;
+  background: #fff1ee;
+}
+
+.control-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.control-grid input,
+.control-grid select,
+.field-label select {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #c7d2da;
+  border-radius: 6px;
+  color: #17202a;
+  background: #ffffff;
+}
+
+.field-label {
+  display: grid;
+  gap: 6px;
+  color: #364757;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #2f6f73;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #2f6f73;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metrics-grid span {
+  padding: 10px;
+  border: 1px solid #d8e0e7;
+  border-radius: 6px;
+  background: #f8fafb;
+  font-weight: 700;
+}
+
+.dataset-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.dataset-list li {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #d8e0e7;
+  border-radius: 6px;
+}
+
+.dataset-list li.selected {
+  border-color: #2f6f73;
+  box-shadow: inset 3px 0 0 #2f6f73;
+}
+
+.dataset-list span {
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #2f6f73;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.empty-state {
+  color: #50606f;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .map-surface {
+    min-height: 58vh;
+  }
+
+  .dataset-panel {
+    border-left: 0;
+    border-top: 1px solid #d8e0e7;
+  }
+}

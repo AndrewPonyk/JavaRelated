@@ -1,0 +1,19 @@
+[sqlfluff]
+dialect = snowflake
+templater = jinja
+max_line_length = 120
+# ST06: column order preference; AM04 fires on VARIANT-path selects
+exclude_rules = ST06, AM04
+
+[sqlfluff:indentation]
+indented_ctes = False
+tab_space_size = 4
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower

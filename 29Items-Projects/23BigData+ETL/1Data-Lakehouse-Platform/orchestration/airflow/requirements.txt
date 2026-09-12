@@ -1,0 +1,7 @@
+# Airflow worker dependencies — keep pinned to the MWAA image (Airflow 2.9.x).
+# apache-airflow itself is provided by MWAA; listed here for local parity only.
+apache-airflow-providers-amazon==8.24.0
+dbt-core==1.8.3
+dbt-trino==1.8.1
+# The lakehouse wheel is NOT installed in Airflow — Spark code runs on EMR,
+# Airflow only submits jobs (keep the scheduler lean).

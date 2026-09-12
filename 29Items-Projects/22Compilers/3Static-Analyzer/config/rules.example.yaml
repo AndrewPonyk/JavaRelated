@@ -1,0 +1,24 @@
+rulePacks:
+  default:
+    description: Baseline quality and security checks for C/C++ projects.
+    rules:
+      - id: security.unsafe-call
+        enabled: true
+        severity: high
+        description: Flags unsafe C/C++ library calls that commonly lead to memory corruption or command injection.
+      - id: bug.null-dereference
+        enabled: true
+        severity: high
+        description: Tracks local null assignments and reports later pointer dereferences on the same path.
+      - id: quality.unreachable-code
+        enabled: true
+        severity: medium
+        description: Reports statements that appear after terminal control-flow statements in the same block.
+      - id: security.tainted-command
+        enabled: true
+        severity: critical
+        description: Tracks simple tainted input assignments into command execution sinks.
+      - id: analysis.path-feasible
+        enabled: true
+        severity: info
+        description: Uses Z3 to confirm simple numeric branch conditions are satisfiable.

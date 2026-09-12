@@ -1,0 +1,312 @@
+# Local development stack — the full pipeline, turn-key:
+#   infra (Kafka KRaft · Flink · Elasticsearch · PostgreSQL · Grafana)
+#   + init one-shots (topics, index templates)
+#   + the analytics API, the React dev server, and Flink job submitters.
+#
+# Quickstart:   make all        (builds jars, starts everything, submits jobs)
+# or manually:  make build-streaming build-api && docker compose up -d
+# The job submitters and analytics-api need the locally built jars (mounted in) —
+# they print instructions instead of crashing when jars are missing.
+name: rtap
+
+services:
+  # ── Kafka (KRaft, single node) ─────────────────────────────────────────────
+  kafka:
+    image: apache/kafka:3.8.1
+    container_name: rtap-kafka
+    ports:
+      - "29092:29092" # host listener (seed script / API running on the host)
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      # Exactly-once: broker ceiling for producer transaction timeouts (Flink sink uses 10m).
+      KAFKA_TRANSACTION_MAX_TIMEOUT_MS: "900000"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+
+  kafka-init: # one-shot: creates topics from scripts/create-topics.sh (mirrors kafka/topics.yaml)
+    image: apache/kafka:3.8.1
+    container_name: rtap-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      INSIDE_KAFKA_CONTAINER: "1"
+    volumes:
+      - ./scripts/create-topics.sh:/create-topics.sh:ro
+    entrypoint: ["bash", "/create-topics.sh"]
+    restart: "no"
+
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:v1.0.0
+    container_name: rtap-kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: rtap-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  # ── Flink session cluster ──────────────────────────────────────────────────
+  flink-init: # one-shot: named volumes are created root-owned; the flink user needs them
+    image: flink:1.20-java17
+    container_name: rtap-flink-init
+    user: root
+    volumes:
+      - flink_checkpoints:/opt/flink/checkpoints
+      - flink_savepoints:/opt/flink/savepoints
+    entrypoint: ["bash", "-c", "chown -R flink:flink /opt/flink/checkpoints /opt/flink/savepoints"]
+    restart: "no"
+
+  flink-jobmanager:
+    image: flink:1.20-java17
+    container_name: rtap-flink-jm
+    command: jobmanager
+    ports:
+      - "8081:8081" # Flink web UI
+    environment:
+      # Local defaults; on AWS these come from the Managed Flink app config (Terraform).
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: flink-jobmanager
+        state.backend.type: rocksdb
+        state.backend.incremental: true
+        state.checkpoints.dir: file:///opt/flink/checkpoints
+        state.savepoints.dir: file:///opt/flink/savepoints
+        execution.checkpointing.interval: 10s
+        execution.checkpointing.mode: EXACTLY_ONCE
+        rest.flamegraph.enabled: true
+    volumes:
+      - ./streaming:/opt/rtap/streaming:ro
+      - flink_checkpoints:/opt/flink/checkpoints
+      - flink_savepoints:/opt/flink/savepoints
+    depends_on:
+      kafka:
+        condition: service_healthy
+      flink-init:
+        condition: service_completed_successfully
+
+  flink-taskmanager:
+    image: flink:1.20-java17
+    container_name: rtap-flink-tm
+    command: taskmanager
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 8
+        taskmanager.memory.process.size: 1728m
+        state.backend.type: rocksdb
+        state.backend.incremental: true
+        state.checkpoints.dir: file:///opt/flink/checkpoints
+    volumes:
+      - ./streaming:/opt/rtap/streaming:ro
+      - flink_checkpoints:/opt/flink/checkpoints
+    depends_on:
+      flink-jobmanager:
+        condition: service_started
+      flink-init:
+        condition: service_completed_successfully
+
+  # One-shots: submit the jobs once the jars exist (make build-streaming).
+  # Re-running `docker compose up` is safe — a running job is detected and skipped.
+  job-aggregation:
+    image: flink:1.20-java17
+    container_name: rtap-job-aggregation
+    depends_on:
+      flink-jobmanager:
+        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./streaming:/opt/rtap/streaming:ro
+    restart: "no"
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        JAR=/opt/rtap/streaming/flink-aggregation-job/target/flink-aggregation-job-0.1.0-SNAPSHOT.jar
+        if [ ! -f "$$JAR" ]; then echo "⚠ jar missing — run: make build-streaming && docker compose up -d job-aggregation"; exit 0; fi
+        sleep 5
+        if flink list -m flink-jobmanager:8081 -r 2>/dev/null | grep -q rtap-metrics-aggregation; then
+          echo "rtap-metrics-aggregation already running"; exit 0; fi
+        exec flink run -d -m flink-jobmanager:8081 "$$JAR" \
+          --kafka.bootstrap.servers kafka:9092 \
+          --enable-es-sink true --elasticsearch.url http://elasticsearch:9200 \
+          --enable-pg-sink true --postgres.url jdbc:postgresql://postgres:5432/analytics \
+          --postgres.user $${POSTGRES_USER:-analytics} --postgres.password $${POSTGRES_PASSWORD:-analytics_local_pw}
+
+  job-anomaly:
+    image: flink:1.20-java17
+    container_name: rtap-job-anomaly
+    depends_on:
+      flink-jobmanager:
+        condition: service_started
+      kafka-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./streaming:/opt/rtap/streaming:ro
+    restart: "no"
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        JAR=/opt/rtap/streaming/flink-anomaly-job/target/flink-anomaly-job-0.1.0-SNAPSHOT.jar
+        if [ ! -f "$$JAR" ]; then echo "⚠ jar missing — run: make build-streaming && docker compose up -d job-anomaly"; exit 0; fi
+        sleep 5
+        if flink list -m flink-jobmanager:8081 -r 2>/dev/null | grep -q rtap-anomaly-detection; then
+          echo "rtap-anomaly-detection already running"; exit 0; fi
+        exec flink run -d -m flink-jobmanager:8081 "$$JAR" \
+          --kafka.bootstrap.servers kafka:9092 \
+          --detector.warmup.windows 20
+
+  # ── Stores ─────────────────────────────────────────────────────────────────
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: rtap-elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false" # local only — AWS OpenSearch uses IAM + TLS
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  es-init: # one-shot: installs the index templates (flattened dimensions etc.)
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: rtap-es-init
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./elasticsearch/index-templates:/templates:ro
+    restart: "no"
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        for t in metrics-aggregates anomaly-alerts; do
+          curl -fsS -X PUT "http://elasticsearch:9200/_index_template/$$t" \
+            -H 'Content-Type: application/json' --data-binary "@/templates/$$t.json" \
+            && echo " ← installed template $$t"
+        done
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: rtap-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-analytics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-analytics_local_pw}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Schema is applied by Flyway (analytics-api) from ./migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-analytics} -d ${POSTGRES_DB:-analytics}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # ── Serving ────────────────────────────────────────────────────────────────
+  analytics-api:
+    image: eclipse-temurin:21-jre
+    container_name: rtap-analytics-api
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-analytics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-analytics_local_pw}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      FLYWAY_ENABLED: "true"
+      MIGRATIONS_DIR: /migrations
+    volumes:
+      - ./services/analytics-api/target:/app/target:ro
+      - ./migrations:/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        JAR=$$(ls /app/target/analytics-api-*-SNAPSHOT.jar 2>/dev/null | head -1)
+        if [ -z "$$JAR" ]; then
+          echo "⚠ analytics-api jar missing — run: make build-api && docker compose restart analytics-api"
+          sleep infinity
+        fi
+        exec java -XX:MaxRAMPercentage=75.0 -jar "$$JAR"
+
+  frontend:
+    image: node:22-alpine
+    container_name: rtap-frontend
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    environment:
+      RTAP_PROXY_TARGET: http://analytics-api:8080 # server-side dev-proxy target (browser stays same-origin)
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "npm ci && npm run dev"
+    depends_on:
+      - analytics-api
+
+  # ── Dashboards ─────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: rtap-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin_local_pw}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      POSTGRES_USER: ${POSTGRES_USER:-analytics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-analytics_local_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-analytics}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  es_data:
+  grafana_data:
+  flink_checkpoints:
+  flink_savepoints:
+  frontend_node_modules:

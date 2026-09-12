@@ -1,0 +1,12 @@
+# Catalog & governance API — runtime dependencies (the Docker image installs
+# exactly this file; test tooling lives in requirements-dev.txt).
+fastapi==0.111.1
+uvicorn[standard]==0.30.3
+sqlalchemy>=2.0.31,<2.1
+psycopg[binary]==3.2.1
+pydantic-settings==2.3.4
+alembic==1.13.2
+trino==0.329.0
+httpx==0.27.0          # readiness probe of Trino
+PyJWT[crypto]==2.13.0  # JWKS-based JWT verification
+kafka-python>=2.2      # audit fan-out to platform.audit.v1

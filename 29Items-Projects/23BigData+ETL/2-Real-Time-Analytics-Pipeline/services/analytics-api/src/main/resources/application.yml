@@ -1,0 +1,71 @@
+# Analytics API configuration.
+# Locally: values come from your shell / .env (mvn spring-boot:run does NOT auto-load .env —
+# export vars or use your IDE's env file support). On AWS: ECS task env from SSM/Secrets Manager.
+
+server:
+  port: ${API_PORT:8080}
+  compression:
+    enabled: true # aggregate series compress ~10:1; SSE streams are exempt by content type
+    mime-types: application/json,text/html,text/css,application/javascript
+    min-response-size: 2KB
+
+spring:
+  application:
+    name: analytics-api
+  mvc:
+    problemdetails:
+      enabled: true # RFC 7807 for framework-raised errors too
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:analytics}
+    username: ${POSTGRES_USER:analytics}
+    password: ${POSTGRES_PASSWORD:analytics_local_pw}
+    hikari:
+      maximum-pool-size: 10
+
+  flyway:
+    # Applied at startup locally/dev; in prod migrations run as an explicit CD step
+    # (TECH-NOTES §3.3) and this stays false.
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: filesystem:${MIGRATIONS_DIR:../../migrations}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    consumer:
+      group-id: analytics-api
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: latest
+      properties:
+        # Upstream sinks are transactional — reading uncommitted data would break
+        # exactly-once at the last hop (docs/TECH-NOTES.md §3.6.2).
+        isolation.level: read_committed
+
+rtap:
+  kafka:
+    enabled: ${KAFKA_LISTENERS_ENABLED:true} # false → API serves queries without a broker
+  elasticsearch:
+    enabled: ${ES_QUERIES_ENABLED:true}
+    url: ${ELASTICSEARCH_URL:http://localhost:9200}
+    hot-window: ${ES_HOT_WINDOW:PT24H} # ranges ending inside this window hit ES first
+  topics:
+    aggregates: metrics.aggregates.v1
+    alerts: alerts.anomalies.v1
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html # live API docs; spec at /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true # /actuator/health/{liveness,readiness} for ECS/ALB
+
+logging:
+  level:
+    com.rtap: INFO

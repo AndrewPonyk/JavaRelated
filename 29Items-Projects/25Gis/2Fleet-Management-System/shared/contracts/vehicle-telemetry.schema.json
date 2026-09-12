@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet-management.local/contracts/vehicle-telemetry.schema.json",
+  "title": "VehicleTelemetryEvent",
+  "type": "object",
+  "required": ["event_id", "vehicle_id", "recorded_at", "latitude", "longitude"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "vehicle_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "latitude": {
+      "type": "number",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "longitude": {
+      "type": "number",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "speed_kph": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "heading_degrees": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 359.99
+    }
+  },
+  "additionalProperties": true
+}

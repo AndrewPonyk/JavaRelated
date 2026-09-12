@@ -1,0 +1,44 @@
+# Root tooling configuration for the whole monorepo.
+# Deployable Python components own their dependencies:
+#   data-platform/pyproject.toml   (package `lakehouse`)
+#   services/api/requirements.txt  (FastAPI service)
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["frontend", "infra", "migrations/versions"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "SIM", # simplify
+]
+ignore = [
+  "E501", # long lines: formatter handles them; docs/SQL strings may exceed
+  "B008", # `Depends(...)` in argument defaults is the FastAPI DI idiom
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["lakehouse", "app"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true   # pyspark/airflow stubs are incomplete
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = [
+  "data-platform/tests",
+  "services/api/tests",
+  "orchestration/airflow/tests",
+]
+# Make packages importable without installing them (works in CI and locally)
+pythonpath = ["data-platform", "services/api"]
+markers = [
+  "spark: requires a local SparkSession (slow; run with -m spark)",
+]

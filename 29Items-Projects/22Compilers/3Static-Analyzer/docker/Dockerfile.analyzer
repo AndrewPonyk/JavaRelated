@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends cmake clang libclang-dev llvm-dev build-essential \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY analyzer/libtooling /workspace/analyzer/libtooling
+WORKDIR /workspace/analyzer/libtooling
+RUN cmake -S . -B build && cmake --build build
+
+ENTRYPOINT ["./build/static-analyzer"]

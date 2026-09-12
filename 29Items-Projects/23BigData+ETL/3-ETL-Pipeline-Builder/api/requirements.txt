@@ -1,0 +1,14 @@
+fastapi~=0.112
+uvicorn[standard]~=0.30
+pydantic~=2.8
+pydantic-settings~=2.4
+redis~=5.0
+
+# Alerts feed: background consumer of alerts.anomaly.v1
+aiokafka~=0.11
+
+# Auth (AUTH_MODE=jwt): HS256 / RS256-via-JWKS
+PyJWT[crypto]~=2.8
+
+# History queries against Snowflake marts (SERVE_WH, REPORTER role):
+snowflake-connector-python~=3.11

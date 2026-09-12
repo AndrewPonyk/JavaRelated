@@ -1,0 +1,43 @@
+{
+  "id": "0002",
+  "description": "Shared component templates for log indices. dynamic:false + flat_object attributes = no mapping explosion from arbitrary producer fields.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/_component_template/la-logs-settings",
+      "body": {
+        "template": {
+          "settings": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "refresh_interval": "5s"
+          }
+        }
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/_component_template/la-logs-mappings",
+      "body": {
+        "template": {
+          "mappings": {
+            "dynamic": false,
+            "properties": {
+              "@timestamp":  { "type": "date" },
+              "ingest_time": { "type": "date" },
+              "service":     { "type": "keyword" },
+              "env":         { "type": "keyword" },
+              "level":       { "type": "keyword" },
+              "message":     { "type": "text" },
+              "host":        { "type": "keyword" },
+              "trace_id":    { "type": "keyword" },
+              "span_id":     { "type": "keyword" },
+              "template_id": { "type": "keyword" },
+              "attributes":  { "type": "flat_object" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

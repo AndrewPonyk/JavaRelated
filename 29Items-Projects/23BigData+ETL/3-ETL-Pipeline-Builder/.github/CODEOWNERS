@@ -1,0 +1,9 @@
+# Default owners
+*                       @data-platform-team
+
+# Risky surfaces require the owning team's review
+/migrations/            @data-platform-team @dba-guild
+/infrastructure/        @platform-infra
+/dbt/models/marts/      @analytics-engineering
+/streaming/processor/anomaly/  @ml-platform
+/.github/workflows/     @platform-infra

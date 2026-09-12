@@ -1,0 +1,12 @@
+# Localisation config — currently drives currency/date formatting via `intl`
+# (lib/core/utils/money.dart, date_range.dart) rather than full ARB-based UI string
+# translation, since the app ships English-only UI text for now (PROJECT-PLAN.md
+# Phase 3). Kept as a real l10n.yaml so `flutter gen-l10n` and locale-aware
+# NumberFormat/DateFormat calls agree on the same source-of-truth locale list, and
+# so adding ARB-based UI translation later is a config change, not a new setup.
+
+arb-dir: lib/l10n/arb
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false

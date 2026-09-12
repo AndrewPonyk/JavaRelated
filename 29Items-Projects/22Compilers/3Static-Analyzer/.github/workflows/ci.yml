@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r backend/requirements.txt ruff
+      - run: ruff check --no-cache backend
+      - run: mkdir -p .coverage-data && PYTHONPATH=backend coverage run -m pytest backend/tests
+      - run: coverage report
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - working-directory: frontend
+        run: npm ci
+      - working-directory: frontend
+        run: npm audit --audit-level=moderate
+      - working-directory: frontend
+        run: npm run lint
+      - working-directory: frontend
+        run: npm test
+      - working-directory: frontend
+        run: npm run build
+
+  analyzer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y cmake clang libclang-dev llvm-dev build-essential
+      - working-directory: analyzer/libtooling
+        run: cmake -S . -B build
+      - working-directory: analyzer/libtooling
+        run: cmake --build build
+      - working-directory: analyzer/libtooling
+        run: ctest --test-dir build --output-on-failure
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config
+      - run: docker compose build backend frontend

@@ -1,0 +1,88 @@
+workflows:
+  # ----------------------------------------------------------------------------
+  # Android Dev & QA Build -> Firebase App Distribution
+  # ----------------------------------------------------------------------------
+  android-firebase-app-distribution:
+    name: Android QA Build to Firebase App Distribution
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      flutter: 3.24.x
+      groups:
+        - firebase_credentials # Secure group containing FIREBASE_SERVICE_ACCOUNT_KEY
+        - google_play_credentials
+      vars:
+        FIREBASE_APP_ID: "1:1234567890:android:abc123def456"
+        TESTER_GROUPS: "internal-qa,household-beta"
+    triggering:
+      events:
+        - push
+      branches:
+        - main
+        - develop
+    scripts:
+      - name: Get Flutter dependencies
+        script: |
+          flutter packages pub get
+
+      - name: Static Code Analysis & Linting
+        script: |
+          flutter analyze --no-fatal-warnings
+          dart format --output=none --set-exit-if-changed .
+
+      - name: Run Unit & BLoC Tests with Coverage
+        script: |
+          flutter test --coverage
+
+      - name: Build Android APK
+        script: |
+          flutter build apk --release --dart-define-from-file=.env.example
+
+      - name: Distribute to Firebase App Distribution
+        script: |
+          # Install Firebase CLI
+          npm install -g firebase-tools
+          
+          # Deploy APK to Firebase App Distribution
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+            --app "$FIREBASE_APP_ID" \
+            --groups "$TESTER_GROUPS" \
+            --release-notes "Automated CI build from commit $CM_COMMIT" \
+            --token "$FIREBASE_TOKEN"
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+
+  # ----------------------------------------------------------------------------
+  # iOS TestFlight & Firebase Distribution
+  # ----------------------------------------------------------------------------
+  ios-app-distribution:
+    name: iOS Build to TestFlight & Firebase
+    max_build_duration: 45
+    instance_type: mac_mini_m2
+    environment:
+      flutter: 3.24.x
+      groups:
+        - app_store_credentials
+        - firebase_credentials
+      vars:
+        BUNDLE_ID: "com.household.sharedshoppinglist"
+    triggering:
+      events:
+        - tag
+    scripts:
+      - name: Install dependencies & CocoaPods
+        script: |
+          flutter packages pub get
+          cd ios && pod install && cd ..
+
+      - name: Run Tests
+        script: |
+          flutter test
+
+      - name: Build iOS IPA
+        script: |
+          flutter build ipa --release --export-options-plist=$HOME/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa

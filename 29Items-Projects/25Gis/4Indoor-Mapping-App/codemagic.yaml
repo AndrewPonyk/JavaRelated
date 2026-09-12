@@ -1,0 +1,31 @@
+workflows:
+  flutter-dev:
+    name: Flutter Dev Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      groups:
+        - indoor_mapping_dev
+    scripts:
+      - name: Install Flutter dependencies
+        working_directory: apps/mobile
+        script: flutter pub get
+      - name: Analyze
+        working_directory: apps/mobile
+        script: flutter analyze
+      - name: Test
+        working_directory: apps/mobile
+        script: flutter test
+      - name: Build Android debug
+        working_directory: apps/mobile
+        script: >
+          flutter build apk --debug
+          --dart-define=MOBILE_API_BASE_URL=$MOBILE_API_BASE_URL
+          --dart-define=MAPBOX_ACCESS_TOKEN=$MAPBOX_ACCESS_TOKEN
+    artifacts:
+      - apps/mobile/build/**/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - mobile-team@example.com

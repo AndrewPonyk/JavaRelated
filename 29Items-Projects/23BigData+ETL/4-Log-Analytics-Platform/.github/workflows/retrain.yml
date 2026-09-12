@@ -1,0 +1,103 @@
+# Scheduled anomaly-model retraining (PROJECT-PLAN Phase 3).
+#
+# Weekly: pull the last N days of history from OpenSearch, fit + evaluate on a
+# time-ordered holdout (ml/train.py), publish to the S3 registry, and move the
+# `latest` pointer — the scoring job hot-reloads within LA_MODEL_REFRESH_SECONDS,
+# no restart needed.
+#
+# Drift guard: after publishing, the job FAILS (visibly, without unpublishing) when the
+# holdout looks unhealthy — >15% of held-out windows scoring ≥0.8 means the "normal"
+# baseline is drifting or the training window contained an incident. On-call response:
+# runbook 5 in docs/RUNBOOKS.md (roll the pointer back / retrain on a clean window).
+# Champion/challenger rollout remains a Phase-3 open item.
+#
+# Per-environment GitHub variables (same set as deploy.yml):
+#   AWS_DEPLOY_ROLE_ARN, AWS_REGION, OPENSEARCH_URL, ARTIFACTS_BUCKET
+name: Retrain anomaly model
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"       # Mondays 03:00 UTC → dev registry
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Which environment's data + registry
+        type: choice
+        options: [dev, staging, prod]
+        required: true
+      days:
+        description: Days of log history to train on
+        required: true
+        default: "7"
+
+concurrency:
+  group: retrain-${{ inputs.environment || 'dev' }}
+  cancel-in-progress: false
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev' }}
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      DAYS: ${{ inputs.days || '7' }}
+      MAX_HOLDOUT_RATE_ABOVE_0_8: "0.15"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements.txt boto3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Train and publish
+        env:
+          PYTHONPATH: src
+          LA_OPENSEARCH_URL: ${{ vars.OPENSEARCH_URL }}
+        run: |
+          set -euo pipefail
+          FROM_TS=$(date -u -d "-${DAYS} days" +%Y-%m-%dT%H:%M:%SZ)
+          python -m log_analytics.ml.train \
+            --source opensearch \
+            --from "$FROM_TS" \
+            --registry "s3://${{ vars.ARTIFACTS_BUCKET }}/models" \
+            | tee train.out
+
+      - name: Drift guard on the holdout
+        run: |
+          set -euo pipefail
+          python - <<'EOF'
+          import ast, os, sys
+
+          with open("train.out", encoding="utf-8") as fh:
+              lines = fh.read().splitlines()
+          metrics_line = next(line for line in lines if line.startswith("holdout metrics:"))
+          metrics = ast.literal_eval(metrics_line.removeprefix("holdout metrics:").strip())
+
+          rate = metrics["holdout_rate_above_0_8"]
+          limit = float(os.environ["MAX_HOLDOUT_RATE_ABOVE_0_8"])
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary:
+              with open(summary, "a", encoding="utf-8") as fh:
+                  fh.write("### Holdout metrics\n")
+                  fh.writelines(f"- **{k}**: {v}\n" for k, v in metrics.items())
+
+          if rate > limit:
+              print(
+                  f"::error::{rate:.1%} of held-out windows score >=0.8 (limit {limit:.0%}) - "
+                  "baseline drift or incident-contaminated training window. "
+                  "See docs/RUNBOOKS.md runbook 5 (model rollback)."
+              )
+              sys.exit(1)
+          print(f"holdout healthy: {rate:.1%} of windows >=0.8 (limit {limit:.0%})")
+          EOF

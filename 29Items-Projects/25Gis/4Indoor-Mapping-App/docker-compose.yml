@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-indoor_mapping}
+      POSTGRES_USER: ${POSTGRES_USER:-indoor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-indoor}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./services/api
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+      DATABASE_URL: postgres://${POSTGRES_USER:-indoor}:${POSTGRES_PASSWORD:-indoor}@db:5432/${POSTGRES_DB:-indoor_mapping}
+      REQUIRE_FIREBASE_AUTH: ${REQUIRE_FIREBASE_AUTH:-false}
+      REQUIRE_HTTPS: ${REQUIRE_HTTPS:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      PGSSLMODE: ${PGSSLMODE:-disable}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - '8080:8080'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgis-data:

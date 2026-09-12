@@ -1,0 +1,267 @@
+/* Lakehouse Console — single stylesheet, responsive, no framework. */
+
+:root {
+  --bg: #f7f7f8;
+  --panel: #ffffff;
+  --border: #e2e2e6;
+  --text: #1c1c21;
+  --muted: #6b6b76;
+  --accent: #2456a6;
+  --danger: #b00020;
+  --bronze: #b08d57;
+  --silver: #8a9ba8;
+  --gold: #c9a227;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.45;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+}
+
+.app-header p {
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.toolbar .spacer {
+  margin-left: auto;
+}
+
+button {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+button.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  color: var(--accent);
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+table.data th,
+table.data td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+table.data thead th {
+  border-bottom: 2px solid var(--border);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-block;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.badge.bronze { background: var(--bronze); }
+.badge.silver { background: var(--silver); }
+.badge.gold { background: var(--gold); }
+
+.mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.error-banner {
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: #fdf1f3;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+/* --- Forms --- */
+
+form.dataset-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+form.dataset-form .full {
+  grid-column: 1 / -1;
+}
+
+form.dataset-form label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+form.dataset-form input,
+form.dataset-form select,
+form.dataset-form textarea {
+  font: inherit;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+form.dataset-form .field-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
+form.dataset-form .actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* --- Detail view --- */
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+dl.meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  row-gap: 6px;
+}
+
+dl.meta dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+dl.meta dd {
+  margin: 0;
+}
+
+.preview-scroll {
+  overflow-x: auto;
+}
+
+/* --- Responsive: stack panels, card-ify the catalog table --- */
+
+@media (max-width: 720px) {
+  form.dataset-form,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  table.catalog thead {
+    display: none;
+  }
+
+  table.catalog tr {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: var(--panel);
+  }
+
+  table.catalog td {
+    display: flex;
+    gap: 8px;
+    border: none;
+    padding: 6px 10px;
+  }
+
+  table.catalog td::before {
+    content: attr(data-label);
+    flex: 0 0 90px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+}

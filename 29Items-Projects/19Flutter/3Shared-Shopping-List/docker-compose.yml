@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  firebase-emulators:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shared-shopping-firebase-emulators
+    ports:
+      - "4000:4000" # Firebase Emulator UI Dashboard
+      - "8080:8080" # Cloud Firestore Emulator
+      - "9099:9099" # Firebase Authentication Emulator
+      - "5001:5001" # Cloud Functions Emulator
+    volumes:
+      - ./firebase:/app/firebase
+      - ./firebase.json:/app/firebase.json
+    environment:
+      - APP_ENV=dev
+      - FIREBASE_PROJECT_ID=shopping-list-dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped

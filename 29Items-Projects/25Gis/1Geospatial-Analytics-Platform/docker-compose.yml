@@ -1,0 +1,102 @@
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-gis} -d $${POSTGRES_DB:-geospatial}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.26.x
+    environment:
+      GEOSERVER_ADMIN_USER: ${GEOSERVER_ADMIN_USER:?Set GEOSERVER_ADMIN_USER in .env}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:?Set GEOSERVER_ADMIN_PASSWORD in .env}
+    ports:
+      - "8080:8080"
+    volumes:
+      - geoserver_data:/opt/geoserver_data
+      - ./geoserver/workspaces:/opt/geoserver_data/workspaces:ro
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  geoserver-init:
+    image: curlimages/curl:8.8.0
+    environment:
+      GEOSERVER_ADMIN_USER: ${GEOSERVER_ADMIN_USER:?Set GEOSERVER_ADMIN_USER in .env}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:?Set GEOSERVER_ADMIN_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    command:
+      - sh
+      - -c
+      - |
+        until curl -fsS -u "$$GEOSERVER_ADMIN_USER:$$GEOSERVER_ADMIN_PASSWORD" http://geoserver:8080/geoserver/rest/about/version >/dev/null; do sleep 5; done
+        curl -fsS -u "$$GEOSERVER_ADMIN_USER:$$GEOSERVER_ADMIN_PASSWORD" -XPOST -H "Content-Type: text/xml" --data "<workspace><name>geospatial</name></workspace>" http://geoserver:8080/geoserver/rest/workspaces || true
+        curl -fsS -u "$$GEOSERVER_ADMIN_USER:$$GEOSERVER_ADMIN_PASSWORD" -XPOST -H "Content-Type: text/xml" --data "<dataStore><name>postgis</name><type>PostGIS</type><enabled>true</enabled><connectionParameters><entry key=\"host\">postgis</entry><entry key=\"port\">5432</entry><entry key=\"database\">$$POSTGRES_DB</entry><entry key=\"schema\">public</entry><entry key=\"user\">$$POSTGRES_USER</entry><entry key=\"passwd\">$$POSTGRES_PASSWORD</entry><entry key=\"dbtype\">postgis</entry></connectionParameters></dataStore>" http://geoserver:8080/geoserver/rest/workspaces/geospatial/datastores || true
+    depends_on:
+      geoserver:
+        condition: service_started
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      APP_NAME: ${APP_NAME:-Geospatial Analytics Platform}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      GEOSERVER_PUBLIC_URL: ${GEOSERVER_PUBLIC_URL:-http://localhost:8080/geoserver}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173"]}
+      AUTH_ENABLED: ${AUTH_ENABLED:-false}
+      JWT_ISSUER: ${JWT_ISSUER:-http://localhost:8000}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-geospatial-platform}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      ENFORCE_HTTPS: ${ENFORCE_HTTPS:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+        VITE_GEOSERVER_URL: ${VITE_GEOSERVER_URL:-http://localhost:8080/geoserver}
+        VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN:-}
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+      VITE_GEOSERVER_URL: ${VITE_GEOSERVER_URL:-http://localhost:8080/geoserver}
+      VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN:-}
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/health >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  geoserver_data:

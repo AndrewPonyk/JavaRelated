@@ -1,0 +1,203 @@
+# Local development stack — mirrors the AWS topology (MSK / OpenSearch / ElastiCache).
+#
+#   docker compose up -d kafka opensearch dashboards redis   # infra only (default profile)
+#   docker compose --profile app up -d                       # + init (migrations/topics) + services
+#   docker compose --profile pipeline up -d                  # + the three Spark streaming jobs
+#   docker compose --profile elastic up -d elasticsearch kibana   # vanilla Elastic alternative
+#
+# The anomaly job needs a model in ./models first:
+#   python -m log_analytics.ml.train --source synthetic
+#
+# NOTE: ports for the elastic profile are shifted (9201/5602) so both stacks can coexist.
+
+name: log-analytics-platform
+
+x-app-env: &app-env
+  LA_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  LA_OPENSEARCH_URL: http://opensearch:9200
+  LA_REDIS_URL: redis://redis:6379/0
+  LA_RULES_BACKEND: opensearch
+
+services:
+  # ── Kafka (KRaft single node) ──────────────────────────────────────────────
+  kafka:
+    image: apache/kafka:3.8.0
+    ports:
+      - "29092:29092"            # host access; in-network clients use kafka:9092
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"   # convenience only; real topics via the init service
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+
+  # ── OpenSearch + Dashboards (matches AWS prod) ─────────────────────────────
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    ports:
+      - "9200:9200"
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"          # local only — NEVER in shared envs
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.17.1
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  # ── Redis (alert dedup) ────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # ── One-shot bootstrap: search schema + Kafka topics ───────────────────────
+  init:
+    profiles: ["app", "pipeline"]
+    build: { context: ., dockerfile: docker/app.Dockerfile }
+    command: sh -c "python scripts/es_migrate.py --url http://opensearch:9200 && python scripts/create_kafka_topics.py --bootstrap kafka:9092"
+    environment: *app-env
+    depends_on:
+      kafka: { condition: service_healthy }
+      opensearch: { condition: service_healthy }
+    restart: "no"
+
+  # ── Application services (profile: app) ───────────────────────────────────
+  gateway:
+    profiles: ["app"]
+    build: { context: ., dockerfile: docker/app.Dockerfile }
+    command: uvicorn log_analytics.ingestion.gateway:app --host 0.0.0.0 --port 8080
+    ports: ["8080:8080"]
+    environment: *app-env
+    depends_on:
+      init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2).status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  api:
+    profiles: ["app"]
+    build: { context: ., dockerfile: docker/app.Dockerfile }
+    # default CMD = query/admin API on :8000
+    ports: ["8000:8000"]
+    environment: *app-env
+    depends_on:
+      init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2).status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  alerting:
+    profiles: ["app"]
+    build: { context: ., dockerfile: docker/app.Dockerfile }
+    command: python -m log_analytics.alerting.engine
+    environment: *app-env
+    # Kafka-consumer daemon, no HTTP — the image's /healthz check doesn't apply.
+    healthcheck:
+      disable: true
+    depends_on:
+      init: { condition: service_completed_successfully }
+      redis: { condition: service_started }
+
+  # ── Spark streaming jobs (profile: pipeline) ───────────────────────────────
+  # Windows note: this is THE supported way to run the pipeline on a Windows dev box.
+  spark-enrich:
+    profiles: ["pipeline"]
+    build: { context: ., dockerfile: docker/spark.Dockerfile }
+    environment:
+      <<: *app-env
+      SPARK_JOB: enrich_and_index
+      LA_SPARK_CHECKPOINT_DIR: /checkpoints
+      LA_STARTING_OFFSETS: earliest   # first run drains the backlog; checkpoints rule thereafter
+    volumes:
+      - spark-ivy:/opt/app/.ivy2
+      - spark-checkpoints:/checkpoints
+    depends_on:
+      init: { condition: service_completed_successfully }
+
+  spark-patterns:
+    profiles: ["pipeline"]
+    build: { context: ., dockerfile: docker/spark.Dockerfile }
+    environment:
+      <<: *app-env
+      SPARK_JOB: pattern_detection
+      LA_SPARK_CHECKPOINT_DIR: /checkpoints
+      LA_RULES_PATH: /opt/app/config/alert_rules.yaml
+      LA_STARTING_OFFSETS: earliest
+    volumes:
+      - spark-ivy:/opt/app/.ivy2
+      - spark-checkpoints:/checkpoints
+    depends_on:
+      init: { condition: service_completed_successfully }
+
+  spark-anomaly:
+    profiles: ["pipeline"]
+    build: { context: ., dockerfile: docker/spark.Dockerfile }
+    environment:
+      <<: *app-env
+      SPARK_JOB: anomaly_scoring
+      LA_SPARK_CHECKPOINT_DIR: /checkpoints
+      LA_MODEL_REGISTRY_URI: /models
+      LA_STARTING_OFFSETS: earliest
+    volumes:
+      - spark-ivy:/opt/app/.ivy2
+      - spark-checkpoints:/checkpoints
+      - ./models:/models:ro       # train first: python -m log_analytics.ml.train --source synthetic
+    depends_on:
+      init: { condition: service_completed_successfully }
+
+  # ── Optional: vanilla Elastic stack (profile: elastic) ─────────────────────
+  # For teams comparing against upstream ES/Kibana. Remember: mappings use OpenSearch's
+  # `flat_object` — see TECH-NOTES pitfall #2.
+  elasticsearch:
+    profiles: ["elastic"]
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
+    ports:
+      - "9201:9200"
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+  kibana:
+    profiles: ["elastic"]
+    image: docker.elastic.co/kibana/kibana:8.15.1
+    ports:
+      - "5602:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+volumes:
+  opensearch-data:
+  spark-ivy:
+  spark-checkpoints:

@@ -1,0 +1,32 @@
+{
+  "id": "0006",
+  "description": "Storage for alert-rule CRUD (admin API, Phase 2 OpenSearchAlertRuleRepository). Strict mapping: rules are structured config, not logs.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/la-alert-rules",
+      "body": {
+        "settings": {
+          "number_of_shards": 1,
+          "number_of_replicas": 0
+        },
+        "mappings": {
+          "dynamic": "strict",
+          "properties": {
+            "name":        { "type": "keyword" },
+            "description": { "type": "text" },
+            "metric":      { "type": "keyword" },
+            "op":          { "type": "keyword" },
+            "threshold":   { "type": "float" },
+            "window":      { "type": "keyword" },
+            "severity":    { "type": "keyword" },
+            "channels":    { "type": "keyword" },
+            "enabled":     { "type": "boolean" },
+            "created_at":  { "type": "date" },
+            "updated_at":  { "type": "date" }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+.git
+.venv
+node_modules
+frontend/node_modules
+frontend/dist
+.coverage-data
+.coverage*
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+static_analyzer.db
+test_static_analyzer.db

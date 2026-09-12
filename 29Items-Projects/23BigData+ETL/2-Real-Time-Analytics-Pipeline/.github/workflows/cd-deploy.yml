@@ -1,0 +1,118 @@
+# CD — build artifacts ONCE (keyed by git SHA), then promote the same set
+# dev → staging → prod. Auth is GitHub OIDC → per-env IAM role: no static keys.
+#
+# Flink deploys are savepoint-based: stop-with-savepoint → point the Managed Flink
+# app at the new jar → restore. See docs/TECH-NOTES.md §3.3.
+name: CD
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deploy target
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write # OIDC federation to AWS
+  contents: read
+
+env:
+  AWS_REGION: eu-central-1 # TODO: single source with Terraform (repo variable)
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21', cache: maven }
+      - name: Build Flink job jars (JDK 17 target via maven.compiler.release)
+        run: mvn -B -f streaming/pom.xml -DskipTests package
+      - name: Build API jar
+        run: mvn -B -f services/analytics-api/pom.xml -DskipTests package
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - name: Build frontend bundle
+        working-directory: frontend
+        run: npm ci && npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rtap-${{ github.sha }}
+          retention-days: 30
+          path: |
+            streaming/*/target/*-SNAPSHOT.jar
+            services/analytics-api/target/*.jar
+            frontend/dist/**
+
+  deploy-dev:
+    needs: build-artifacts
+    if: github.event_name == 'push' || inputs.environment == 'dev'
+    runs-on: ubuntu-latest
+    environment: dev # per-env vars/secrets + protection rules live on the GitHub environment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: rtap-${{ github.sha }}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }} # TODO: set on the dev environment
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload Flink jars to artifacts bucket (keyed by SHA)
+        run: |
+          aws s3 cp streaming/flink-aggregation-job/target/ \
+            "s3://${{ vars.ARTIFACTS_BUCKET }}/flink/${{ github.sha }}/" \
+            --recursive --exclude "*" --include "*-SNAPSHOT.jar"
+          aws s3 cp streaming/flink-anomaly-job/target/ \
+            "s3://${{ vars.ARTIFACTS_BUCKET }}/flink/${{ github.sha }}/" \
+            --recursive --exclude "*" --include "*-SNAPSHOT.jar"
+
+      - name: Deploy Flink apps (savepoint-based)
+        run: |
+          # TODO: for each Managed Flink app:
+          #   aws kinesisanalyticsv2 stop-application  --application-name rtap-dev-aggregation --force false   (savepoint)
+          #   aws kinesisanalyticsv2 update-application ... --application-configuration-update (new S3 file key)
+          #   aws kinesisanalyticsv2 start-application --restore from latest snapshot
+          echo "TODO: wire Managed Flink update once infra/terraform/envs/dev is applied"
+
+      - name: Build & push API image, roll ECS service
+        run: |
+          # TODO after ECR/ECS exist:
+          #   aws ecr get-login-password | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+          #   docker build -t "$ECR_REGISTRY/rtap-analytics-api:${{ github.sha }}" services/analytics-api
+          #   docker push "$ECR_REGISTRY/rtap-analytics-api:${{ github.sha }}"
+          #   aws ecs update-service --cluster rtap-dev --service analytics-api --force-new-deployment
+          echo "TODO: wire ECR/ECS deploy"
+
+      - name: Publish frontend (S3 + CloudFront invalidation)
+        run: |
+          # TODO after the SPA bucket/distribution exist:
+          #   aws s3 sync frontend/dist "s3://${{ vars.SPA_BUCKET }}" --delete
+          #   aws cloudfront create-invalidation --distribution-id "${{ vars.CF_DISTRIBUTION_ID }}" --paths "/index.html"
+          echo "TODO: wire SPA publish"
+
+      - name: Smoke test
+        run: |
+          # TODO: curl -fs "https://api.dev.rtap.example.com/actuator/health"
+          echo "TODO: smoke checks (API health, SSE handshake, ES index freshness)"
+
+  deploy-staging:
+    needs: deploy-dev
+    if: github.event_name == 'push' || inputs.environment == 'staging'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - run: echo "TODO — mirror of deploy-dev against staging + Playwright E2E smoke suite"
+
+  deploy-prod:
+    needs: deploy-staging
+    if: github.event_name == 'push' || inputs.environment == 'prod'
+    runs-on: ubuntu-latest
+    environment: production # requires manual approval (GitHub environment protection)
+    steps:
+      - run: echo "TODO — promotion of the SAME ${{ github.sha }} artifacts; savepoint deploy + verified rollback path"

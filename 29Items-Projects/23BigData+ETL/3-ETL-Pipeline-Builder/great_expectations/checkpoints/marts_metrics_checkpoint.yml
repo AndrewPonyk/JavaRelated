@@ -1,0 +1,20 @@
+# Gate 2 of write–audit–publish: validates the business-facing mart after
+# dbt build, before lineage export / cache warm declare the run published.
+name: marts_metrics_checkpoint
+config_version: 1.0
+class_name: Checkpoint
+run_name_template: "%Y%m%d-%H%M%S-marts-metrics"
+
+validations:
+  - batch_request:
+      datasource_name: snowflake_marts
+      data_asset_name: fct_business_metrics_daily
+    expectation_suite_name: marts_metrics_suite
+
+action_list:
+  - name: store_validation_result
+    action:
+      class_name: StoreValidationResultAction
+  - name: update_data_docs
+    action:
+      class_name: UpdateDataDocsAction

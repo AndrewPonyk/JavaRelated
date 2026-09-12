@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Parent POM for the Flink streaming jobs.
+  Java 17 · Flink 1.20 (LTS — supported by Amazon Managed Flink; 2.x migration is ADR-tracked).
+  Job modules produce shaded "fat" jars with flink-* runtime deps `provided`.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.rtap</groupId>
+  <artifactId>streaming-parent</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>RTAP :: Streaming Parent</name>
+
+  <modules>
+    <module>flink-common</module>
+    <module>flink-aggregation-job</module>
+    <module>flink-anomaly-job</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <flink.version>1.20.0</flink.version>
+    <!-- Externalized connectors are versioned <connector>-<flink-minor> -->
+    <flink.kafka.connector.version>3.3.0-1.20</flink.kafka.connector.version>
+    <jackson.version>2.17.2</jackson.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <postgresql.version>42.7.4</postgresql.version>
+    <msk.iam.version>2.2.0</msk.iam.version>
+    <kda.runtime.version>1.2.0</kda.runtime.version>
+    <junit.version>5.10.2</junit.version>
+    <assertj.version>3.26.3</assertj.version>
+    <testcontainers.version>1.20.4</testcontainers.version>
+    <awaitility.version>4.2.2</awaitility.version>
+
+    <!-- Same add-opens flink-dist ships in its launch scripts — needed to run the
+         in-JVM MiniCluster on JDK 17+ (Java-serialized source elements & internals). -->
+    <flink.test.jvm.args>
+      --add-opens=java.base/java.util=ALL-UNNAMED
+      --add-opens=java.base/java.lang=ALL-UNNAMED
+      --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+      --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+      --add-opens=java.base/java.io=ALL-UNNAMED
+      --add-opens=java.base/java.net=ALL-UNNAMED
+      --add-opens=java.base/java.nio=ALL-UNNAMED
+      --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+      --add-opens=java.base/java.time=ALL-UNNAMED
+      --add-opens=java.base/java.text=ALL-UNNAMED
+      --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+      --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+      --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED
+    </flink.test.jvm.args>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Keep jackson-core/annotations aligned with databind — flink-connector-kafka
+           drags in an older jackson-core otherwise (NoSuchMethodError at runtime). -->
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.rtap</groupId>
+        <artifactId>flink-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-streaming-java</artifactId>
+        <version>${flink.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-clients</artifactId>
+        <version>${flink.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-connector-kafka</artifactId>
+        <version>${flink.kafka.connector.version}</version>
+      </dependency>
+      <!-- Externalized connectors no longer pull this in; bundled (child-first
+           classloading makes the shaded copy win safely on any cluster). -->
+      <dependency>
+        <groupId>org.apache.flink</groupId>
+        <artifactId>flink-connector-base</artifactId>
+        <version>${flink.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+      <!-- MSK IAM auth — activated via `-kafka.security msk-iam` (KafkaConfig) -->
+      <dependency>
+        <groupId>software.amazon.msk</groupId>
+        <artifactId>aws-msk-iam-auth</artifactId>
+        <version>${msk.iam.version}</version>
+      </dependency>
+      <!-- Amazon Managed Flink runtime properties (no-op elsewhere — JobParams) -->
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-kinesisanalytics-runtime</artifactId>
+        <version>${kda.runtime.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>${awaitility.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- Test-time log binding — without one, Flink task failures in ITs are invisible -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.13.0</version>
+        </plugin>
+        <!-- Job modules bind shade:shade on package and set mainClass via ${job.main.class} -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.5.3</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals><goal>shade</goal></goals>
+              <configuration>
+                <createDependencyReducedPom>false</createDependencyReducedPom>
+                <filters>
+                  <filter>
+                    <artifact>*:*</artifact>
+                    <excludes>
+                      <exclude>META-INF/*.SF</exclude>
+                      <exclude>META-INF/*.DSA</exclude>
+                      <exclude>META-INF/*.RSA</exclude>
+                    </excludes>
+                  </filter>
+                </filters>
+                <transformers>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <mainClass>${job.main.class}</mainClass>
+                  </transformer>
+                </transformers>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- @{argLine} keeps the jacoco agent; add-opens = what flink-dist scripts
+               set for the JVM — required to run Flink in-JVM on JDK 17+ -->
+          <argLine>@{argLine} ${flink.test.jvm.args}</argLine>
+        </configuration>
+      </plugin>
+      <!-- Integration tests (*IT) — Testcontainers-backed; they self-skip when Docker
+           is unavailable (JUnit assumptions), so `mvn verify` stays green everywhere. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <argLine>@{argLine} ${flink.test.jvm.args} -Dorg.slf4j.simpleLogger.defaultLogLevel=warn</argLine>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+          <execution>
+            <id>prepare-agent-it</id>
+            <goals><goal>prepare-agent-integration</goal></goals>
+            <configuration>
+              <!-- append ITs into the same exec file so one report/check sees both -->
+              <destFile>${project.build.directory}/jacoco.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals><goal>report</goal></goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>verify</phase>
+            <goals><goal>check</goal></goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.70</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

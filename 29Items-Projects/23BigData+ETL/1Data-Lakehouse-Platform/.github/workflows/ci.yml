@@ -1,0 +1,115 @@
+# CI — lint → test → build. Runs on every PR; no AWS credentials here.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main] # adjust if the default branch differs
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "22"
+
+jobs:
+  python-quality:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff==0.5.5
+      - run: ruff check .
+      - run: ruff format --check .
+
+  python-tests:
+    name: Fast tests + coverage gate (no Spark)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r services/api/requirements-dev.txt
+      # `lakehouse` and `app` are importable via pythonpath (root pyproject.toml)
+      - run: pytest -m "not spark" --cov=app --cov-report=term --cov-fail-under=70
+
+  spark-tests:
+    name: Spark transformation tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: pip install -e "./data-platform[dev]"
+      - run: pytest -m spark
+
+  dags-validate:
+    name: Airflow DAG integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: >
+          pip install "apache-airflow==2.9.3" "apache-airflow-providers-amazon==8.24.0" pytest
+          --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.9.3/constraints-3.11.txt"
+      - run: pytest orchestration/airflow/tests -p no:cacheprovider
+
+  dbt-parse:
+    name: dbt parse (no warehouse needed)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install "dbt-trino~=1.8.0"
+      - run: cp profiles/profiles.yml.example profiles/profiles.yml
+        working-directory: transform/dbt
+      - run: dbt deps && dbt parse --profiles-dir profiles
+        working-directory: transform/dbt
+
+  frontend:
+    name: Frontend lint + test + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install --no-audit --no-fund
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  terraform:
+    name: Terraform fmt + validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.5"
+      - run: terraform fmt -check -recursive infra/terraform
+      - run: terraform -chdir=infra/terraform init -backend=false
+      - run: terraform -chdir=infra/terraform validate

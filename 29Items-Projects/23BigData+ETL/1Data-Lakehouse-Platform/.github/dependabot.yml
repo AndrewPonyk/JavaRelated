@@ -1,0 +1,42 @@
+# Automated dependency updates — the production answer to "keep dependencies
+# patched". Grouped weekly PRs; CI gates every bump.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /services/api
+    schedule:
+      interval: weekly
+    groups:
+      api-dependencies:
+        patterns: ["*"]
+
+  - package-ecosystem: pip
+    directory: /data-platform
+    schedule:
+      interval: weekly
+    groups:
+      spark-dependencies:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    groups:
+      frontend-dependencies:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /services/api
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly

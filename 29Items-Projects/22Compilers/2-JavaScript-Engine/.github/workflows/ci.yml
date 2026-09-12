@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { cc: gcc, cxx: g++ }
+          - { cc: clang, cxx: clang++ }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build clang-tidy clang-format gcovr libsqlite3-dev sqlite3
+
+      - name: Check formatting
+        run: find include src tests \( -name '*.h' -o -name '*.cpp' \) | xargs clang-format --dry-run --Werror
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=${{ matrix.compiler.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cxx }}
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Coverage
+        if: matrix.compiler.cc == 'gcc'
+        run: |
+          cmake --preset coverage -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+          cmake --build --preset coverage --parallel
+          ctest --test-dir build/coverage --output-on-failure
+          gcovr --root . --filter 'src' --filter 'include' --exclude 'tests' --fail-under-line 80 --print-summary

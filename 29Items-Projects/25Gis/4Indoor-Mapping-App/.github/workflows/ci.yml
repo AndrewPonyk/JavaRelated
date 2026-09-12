@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: indoor_mapping
+          POSTGRES_USER: indoor
+          POSTGRES_PASSWORD: indoor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U indoor -d indoor_mapping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Apply migrations
+        run: psql "$DATABASE_URL" -f migrations/001_initial_postgis_schema.sql
+        env:
+          DATABASE_URL: postgres://indoor:indoor@localhost:5432/indoor_mapping
+      - name: Lint API
+        run: npm --workspace services/api run lint
+      - name: Test API
+        run: npm --workspace services/api test
+        env:
+          DATABASE_URL: postgres://indoor:indoor@localhost:5432/indoor_mapping
+      - name: Build API
+        run: npm --workspace services/api run build
+
+  mobile:
+    name: Flutter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Test
+        working-directory: apps/mobile
+        run: flutter test

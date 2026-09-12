@@ -1,0 +1,112 @@
+grammar;
+
+use transpiler_core::{
+    BinaryOperator, Expression, Parameter, Program, Statement, TypeAnnotation,
+};
+
+pub Program: Program = {
+    <body:Statement*> => Program { body },
+};
+
+Statement: Statement = {
+    "let" <name:Identifier> <type_annotation:TypeAnnotation?> "=" <value:Expression> ";" => {
+        Statement::Variable { mutable: true, name, type_annotation, value }
+    },
+    "const" <name:Identifier> <type_annotation:TypeAnnotation?> "=" <value:Expression> ";" => {
+        Statement::Variable { mutable: false, name, type_annotation, value }
+    },
+    "function" <name:Identifier> "(" <params:ParameterList> ")" <return_type:TypeAnnotation?> "{" <body:Statement*> "}" => {
+        Statement::Function { name, params, return_type, body }
+    },
+    "return" <value:Expression?> ";" => Statement::Return(value),
+    <expr:Expression> ";" => Statement::Expression(expr),
+    ";" => Statement::Empty,
+};
+
+TypeAnnotation: TypeAnnotation = {
+    ":" <name:TypeName> => TypeAnnotation::new(name),
+};
+
+TypeName: String = {
+    <name:Identifier> => name,
+    <base:Identifier> "[" "]" => format!("{base}[]"),
+};
+
+ParameterList: Vec<Parameter> = {
+    => Vec::new(),
+    <first:Parameter> <rest:("," <Parameter>)*> => {
+        let mut values = vec![first];
+        values.extend(rest);
+        values
+    },
+};
+
+Parameter: Parameter = {
+    <name:Identifier> <type_annotation:TypeAnnotation?> => Parameter { name, type_annotation },
+};
+
+Expression: Expression = Additive;
+
+Additive: Expression = {
+    <left:Additive> "+" <right:Multiplicative> => Expression::Binary {
+        op: BinaryOperator::Add,
+        left: Box::new(left),
+        right: Box::new(right),
+    },
+    <left:Additive> "-" <right:Multiplicative> => Expression::Binary {
+        op: BinaryOperator::Subtract,
+        left: Box::new(left),
+        right: Box::new(right),
+    },
+    Multiplicative,
+};
+
+Multiplicative: Expression = {
+    <left:Multiplicative> "*" <right:Call> => Expression::Binary {
+        op: BinaryOperator::Multiply,
+        left: Box::new(left),
+        right: Box::new(right),
+    },
+    <left:Multiplicative> "/" <right:Call> => Expression::Binary {
+        op: BinaryOperator::Divide,
+        left: Box::new(left),
+        right: Box::new(right),
+    },
+    Call,
+};
+
+Call: Expression = {
+    <name:Identifier> "(" <args:ArgumentList> ")" => Expression::Call { callee: name, args },
+    <name:Identifier> "!" "(" <args:ArgumentList> ")" => Expression::MacroCall { name, args },
+    Primary,
+};
+
+ArgumentList: Vec<Expression> = {
+    => Vec::new(),
+    <first:Expression> <rest:("," <Expression>)*> => {
+        let mut values = vec![first];
+        values.extend(rest);
+        values
+    },
+};
+
+Primary: Expression = {
+    <value:Number> => Expression::Number(value),
+    <value:StringLiteral> => Expression::String(value),
+    "true" => Expression::Boolean(true),
+    "false" => Expression::Boolean(false),
+    <name:Identifier> => Expression::Identifier(name),
+    "(" <Expression> ")",
+};
+
+Number: f64 = {
+    r"[0-9]+(\.[0-9]+)?" => <>.parse().expect("lexer accepted invalid numeric literal"),
+};
+
+StringLiteral: String = {
+    r#""([^"\\]|\\.)*""# => serde_json::from_str(<>).expect("lexer accepted invalid string literal"),
+};
+
+Identifier: String = {
+    r"[A-Za-z_][A-Za-z0-9_]*" => <>.to_string(),
+};

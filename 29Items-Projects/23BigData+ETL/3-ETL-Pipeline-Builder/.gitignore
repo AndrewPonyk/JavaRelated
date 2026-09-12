@@ -1,0 +1,54 @@
+# ── Python ──────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ── Node / Angular ──────────────────────
+node_modules/
+frontend/dist/
+frontend/.angular/
+npm-debug.log*
+
+# ── dbt ─────────────────────────────────
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# ── Great Expectations ──────────────────
+great_expectations/uncommitted/
+great_expectations/plugins/
+
+# ── Airflow (local) ─────────────────────
+airflow/logs/
+airflow/airflow.db
+airflow/webserver_config.py
+
+# ── Terraform ───────────────────────────
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+
+# ── Secrets & local config ──────────────
+.env
+*.pem
+*.p8
+
+# ── OS / editor ─────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ── Generated artifacts ─────────────────
+docs/lineage/

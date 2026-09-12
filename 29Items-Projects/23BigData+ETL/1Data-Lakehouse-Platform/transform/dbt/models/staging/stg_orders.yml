@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Cleaned order events ready for mart consumption (cancellations excluded).
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: amount
+        tests: [not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: [created, paid, shipped]
+      - name: currency
+        tests:
+          - accepted_values:
+              values: [EUR, USD]

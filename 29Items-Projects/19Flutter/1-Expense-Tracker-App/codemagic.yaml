@@ -1,0 +1,135 @@
+# Codemagic — signed builds + store publishing (docs/TECH-NOTES.md §3.1, §3.3).
+#
+# This is the primary CI/CD pipeline. GitHub Actions (.github/workflows/ci.yaml)
+# is the fast PR gate with no signing secrets; this pipeline runs on `main`
+# merges and version tags, needs macOS for iOS, and is the only place that ever
+# produces a store-shippable artifact. Android and iOS build in parallel from
+# the same commit, then publish behind a manual approval + staged rollout —
+# never auto-promote a mobile release to 100% (TECH-NOTES §3.3 "Rollback
+# reality": you cannot recall an installed binary).
+
+workflows:
+  android-release:
+    name: Android — build, sign, publish (internal -> staged rollout)
+    max_build_duration: 30
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'v*.*.*'
+          include: true
+          source: tag
+    environment:
+      groups:
+        - android_signing
+        - fx_api
+      flutter: stable
+      android_signing:
+        - keystore_reference
+      vars:
+        PACKAGE_NAME: 'com.example.expense_tracker'
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Analyze
+        script: flutter analyze --fatal-infos --fatal-warnings
+      - name: Test
+        script: flutter test
+      - name: Build signed .aab
+        script: |
+          flutter build appbundle \
+            --release \
+            --build-name="${CM_TAG#v}" \
+            --build-number="$PROJECT_BUILD_NUMBER" \
+            --dart-define-from-file=.env.prod
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - flutter_drive.log
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        # Production is a MANUAL follow-up: promote internal -> production with
+        # `rollout_fraction` from the Play Console (or a second, human-triggered
+        # workflow) once QA on real devices signs off. Never scripted here —
+        # that is the manual-approval gate (TECH-NOTES §3.1 stage graph).
+
+  ios-release:
+    name: iOS — build, sign, publish (TestFlight)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'v*.*.*'
+          include: true
+          source: tag
+    environment:
+      groups:
+        - ios_signing
+        - fx_api
+      flutter: stable
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.example.expenseTracker
+      vars:
+        XCODE_WORKSPACE: 'Runner.xcworkspace'
+        XCODE_SCHEME: 'Runner'
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Analyze
+        script: flutter analyze --fatal-infos --fatal-warnings
+      - name: Test
+        script: flutter test
+      - name: Set up code signing
+        script: keychain initialize && app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+      - name: Build signed .ipa
+        script: |
+          flutter build ipa \
+            --release \
+            --build-name="${CM_TAG#v}" \
+            --build-number="$PROJECT_BUILD_NUMBER" \
+            --dart-define-from-file=.env.prod \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        # App Store production submission stays a manual step in App Store
+        # Connect after TestFlight QA — phased release is on by default there
+        # (TECH-NOTES §3.3 "Platform specifics"), matching the manual-approval
+        # gate on the Android side.
+
+  pr-smoke:
+    name: PR smoke build (nightly / manual only — not on every PR, see ci.yaml)
+    max_build_duration: 20
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    environment:
+      flutter: stable
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Analyze
+        script: flutter analyze --fatal-infos --fatal-warnings
+      - name: Test with coverage
+        script: |
+          chmod +x scripts/coverage.sh
+          ./scripts/coverage.sh
+    artifacts:
+      - coverage/lcov.info
+
+# Env var groups referenced above (android_signing, ios_signing, fx_api) are
+# configured in the Codemagic UI, not in this file — the repo itself never
+# holds a signing key or a real FX_API_KEY (docs/.env.example, TECH-NOTES §3.4).

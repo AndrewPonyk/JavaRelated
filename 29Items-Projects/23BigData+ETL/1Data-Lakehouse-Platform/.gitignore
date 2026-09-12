@@ -1,0 +1,58 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# --- Environments & secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- dbt ---
+transform/dbt/target/
+transform/dbt/dbt_packages/
+transform/dbt/logs/
+transform/dbt/profiles/profiles.yml
+
+# --- Airflow (local runs) ---
+orchestration/airflow/logs/
+airflow.db
+webserver_config.py
+standalone_admin_password.txt
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+
+# --- Spark / Delta local artifacts ---
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+.lake/
+infra/docker/spark/wheels/*.whl
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,16 @@
+{
+  "level": "info",
+  "sinks": [
+    {
+      "type": "stderr",
+      "format": "text"
+    }
+  ],
+  "categories": {
+    "compiler": "info",
+    "vm": "info",
+    "gc": "warn",
+    "jit": "info",
+    "debug": "info"
+  }
+}

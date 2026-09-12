@@ -1,0 +1,35 @@
+{
+  "index_patterns": ["anomaly-alerts-*"],
+  "priority": 200,
+  "_meta": {
+    "owner": "rtap",
+    "notes": [
+      "Optional search index for alert exploration/Grafana; PostgreSQL remains the workflow source of truth.",
+      "_id = alertId (idempotent upsert on replay)."
+    ]
+  },
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": false,
+      "properties": {
+        "alertId":      { "type": "keyword" },
+        "metricKey":    { "type": "keyword" },
+        "detector":     { "type": "keyword" },
+        "modelVersion": { "type": "keyword" },
+        "severity":     { "type": "keyword" },
+        "score":        { "type": "double" },
+        "threshold":    { "type": "double" },
+        "observed":     { "type": "double" },
+        "expected":     { "type": "double" },
+        "windowStart":  { "type": "date", "format": "epoch_millis" },
+        "windowEnd":    { "type": "date", "format": "epoch_millis" },
+        "detectedAt":   { "type": "date", "format": "epoch_millis" },
+        "dimensions":   { "type": "flattened" }
+      }
+    }
+  }
+}

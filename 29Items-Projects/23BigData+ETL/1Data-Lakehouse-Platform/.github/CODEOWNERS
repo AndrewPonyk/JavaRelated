@@ -1,0 +1,10 @@
+# Route reviews to the owning team. Order matters — last match wins.
+*                       @lakehouse/platform-team
+/data-platform/         @lakehouse/data-engineering
+/orchestration/         @lakehouse/data-engineering
+/transform/dbt/         @lakehouse/analytics-engineering
+/services/api/          @lakehouse/platform-team
+/frontend/              @lakehouse/platform-team
+/migrations/            @lakehouse/platform-team @lakehouse/data-engineering
+/infra/                 @lakehouse/platform-team
+/docs/adr/              @lakehouse/architecture-guild

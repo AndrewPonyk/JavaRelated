@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: raw_orders
+    description: Batch-landed order exports (COPY INTO from the S3 lake).
+    database: raw
+    schema: orders
+    loader: airflow (etl_daily_batch)
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 26, period: hour}
+      error_after: {count: 48, period: hour}
+    tables:
+      - name: orders_raw
+        description: Append-only VARIANT landing table; deduped in stg_orders.
+
+  - name: raw_events
+    description: Streaming events via MSK Connect (Snowpipe Streaming).
+    database: raw
+    schema: events
+    loaded_at_field: _ingested_at
+    freshness:
+      warn_after: {count: 15, period: minute}
+      error_after: {count: 2, period: hour}
+    tables:
+      - name: stream_events
+        description: Kafka events.orders.v1 envelope in record_content (VARIANT).
