@@ -1,0 +1,97 @@
+# Local development stack. Usage:
+#   docker compose up -d          -> infrastructure + API
+#   docker compose --profile web up -d   -> also the nginx-built frontend
+# Frontend dev is nicer via `cd frontend && npm run dev` (HMR + /api proxy).
+
+services:
+  elasticsearch:
+    build: ./infrastructure/docker/elasticsearch # stock image + optional LTR plugin
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false # dev only — never in cloud environments
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: search
+      POSTGRES_PASSWORD: search
+      POSTGRES_DB: search
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U search"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      ENVIRONMENT: dev
+      DEBUG: "true"
+      DATABASE_URL: postgresql+asyncpg://search:search@postgres:5432/search
+      ES_URL: http://elasticsearch:9200
+      REDIS_URL: redis://redis:6379/0
+      LTR_MODE: "off"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/srv/app # hot reload in dev
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    healthcheck:
+      # slim image has no curl; stdlib does the job
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    profiles: ["web"]
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  esdata:
+  pgdata:

@@ -1,0 +1,20 @@
+# syntax=docker/dockerfile:1
+# Build-time / training image. Includes torch + onnx (heavy) and is used ONLY for the
+# offline pipeline: training, ONNX export, and the docker-compose model bootstrap.
+# The serving image (Dockerfile) stays slim and never installs torch.
+FROM python:3.12-slim AS trainer
+
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PYTHONPATH=/workspace/backend
+WORKDIR /workspace
+
+# CPU-only torch keeps the image as small as possible for a training/bootstrap job.
+COPY backend/requirements.txt backend/requirements-dev.txt /tmp/req/
+RUN pip install --upgrade pip \
+    && pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1 \
+    && pip install -r /tmp/req/requirements-dev.txt
+
+COPY backend /workspace/backend
+COPY scripts /workspace/scripts
+
+# Default: bootstrap a small model artifact into /models (override as needed).
+CMD ["python", "scripts/bootstrap_model.py", "--out", "/models", "--arch", "small", "--epochs", "2"]

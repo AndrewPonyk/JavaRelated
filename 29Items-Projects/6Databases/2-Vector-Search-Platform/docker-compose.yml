@@ -1,0 +1,99 @@
+# Full stack: `docker compose up` builds + runs API + web + Postgres(pgvector) + Redis.
+#   docker compose up --build
+# Optional external backends (Weaviate, Milvus) live behind the "backends" profile:
+#   docker compose --profile backends up --build
+name: vector-search-platform
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: vsp
+      POSTGRES_PASSWORD: vsp
+      POSTGRES_DB: vsp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vsp"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  api:
+    build: ./backend
+    # Run migrations, then serve. pgvector is the default backend here.
+    command: >-
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://vsp:vsp@postgres:5432/vsp
+      REDIS_URL: redis://redis:6379/0
+      DEFAULT_BACKEND: pgvector
+      # 'hashing' keeps the container fully offline. Switch to 'auto' or
+      # 'sentence-transformers' to use real embeddings (downloads the model).
+      EMBEDDING_PROVIDER: hashing
+      # Demo secret. APP_ENV=production refuses to boot with a default/blank key —
+      # in a real deploy inject this from AWS Secrets Manager / SSM.
+      API_KEY: local-demo-secret-not-for-prod
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://api:8000/api/v1
+      BACKEND_API_KEY: local-demo-secret-not-for-prod
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # ── Optional external vector backends (profile: backends) ──
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.25.5
+    profiles: ["backends"]
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  milvus:
+    image: milvusdb/milvus:v2.4.5
+    profiles: ["backends"]
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "true"
+      COMMON_STORAGETYPE: "local"
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+
+volumes:
+  pgdata:
+  weaviate_data:
+  milvus_data:

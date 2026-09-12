@@ -1,0 +1,35 @@
+server:
+  port: 8084
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/problem+json,text/plain
+    min-response-size: 1024
+
+spring:
+  application:
+    name: search-service
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
+    username: ${ELASTICSEARCH_USERNAME:}
+    password: ${ELASTICSEARCH_PASSWORD:}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: search-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: com.shopflow.common.event.ProductUpdatedEvent
+        spring.json.trusted.packages: com.shopflow.common.event
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+logging:
+  level:
+    com.shopflow: INFO

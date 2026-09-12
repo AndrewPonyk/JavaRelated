@@ -1,0 +1,53 @@
+# Production/staging overlay — images come from the GitLab Container Registry.
+# Server usage (as done by ci/deploy.gitlab-ci.yml over SSH):
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile app up -d --wait
+#
+# Required in the server-side .env: IMAGE_TAG, CI_REGISTRY_IMAGE, plus app secrets.
+# Scale note (docs/TECH-NOTES.md §3.3): move Cassandra to dedicated hosts once
+# a single droplet saturates; it should not share a box with the API under
+# real production load.
+
+services:
+  backend:
+    image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG:-latest}
+    build: null
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_FORMAT: json
+
+  anomaly-worker:
+    image: ${CI_REGISTRY_IMAGE}/worker:${IMAGE_TAG:-latest}
+    build: null
+    restart: unless-stopped
+    environment:
+      LOG_FORMAT: json
+
+  downsampler:
+    image: ${CI_REGISTRY_IMAGE}/worker:${IMAGE_TAG:-latest}
+    build: null
+    restart: unless-stopped
+    environment:
+      LOG_FORMAT: json
+
+  frontend:
+    image: ${CI_REGISTRY_IMAGE}/frontend:${IMAGE_TAG:-latest}
+    build: null
+    restart: unless-stopped
+    ports:
+      - "80:80"   # TLS terminates at the DO Load Balancer in front of this
+
+  cassandra:
+    restart: unless-stopped
+    environment:
+      MAX_HEAP_SIZE: null   # let cassandra size itself on prod hardware
+      HEAP_NEWSIZE: null
+
+  redis:
+    restart: unless-stopped
+
+  influxdb:
+    restart: unless-stopped
+
+  grafana:
+    restart: unless-stopped

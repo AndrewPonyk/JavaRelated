@@ -1,0 +1,13 @@
+# Streamlit app configuration.
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#2E86DE"
+font = "sans serif"

@@ -1,0 +1,23 @@
+# --- Dev / test / training dependencies ---
+-r requirements.txt
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+httpx==0.28.1
+fakeredis==2.26.2
+
+# Linting / typing
+ruff==0.8.4
+mypy==1.14.0
+
+# Training & ONNX export (heavy — NOT shipped in the serving image)
+torch==2.5.1
+onnx==1.17.0
+scikit-learn==1.6.0
+
+# Optional: transfer-learning weights from HuggingFace CLIP.
+# The native ViT in app/ml/model.py trains without this; install only if you call
+# ViTMultiLabelClassifier.load_pretrained_clip().
+# transformers==4.47.1

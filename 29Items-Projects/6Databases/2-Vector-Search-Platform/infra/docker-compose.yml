@@ -1,0 +1,60 @@
+# Local dev stack: the full backend matrix on one machine.
+#   docker compose -f infra/docker-compose.yml up -d
+name: vector-search-platform
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: vsp
+      POSTGRES_PASSWORD: vsp
+      POSTGRES_DB: vsp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vsp"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.25.5
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  # Milvus standalone bundles etcd + minio internally (v2.4+ lite/standalone).
+  milvus:
+    image: milvusdb/milvus:v2.4.5
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_USE_EMBED: "true"
+      COMMON_STORAGETYPE: "local"
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+
+volumes:
+  pgdata:
+  weaviate_data:
+  milvus_data:

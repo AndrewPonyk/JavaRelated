@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+.coverage.*
+.coverage_data/
+.coverage_run/
+.ruff_cache/
+*.pyc
+target/
+*.class
+*.jar
+dist/
+build/
+.idea/
+.vscode/

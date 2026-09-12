@@ -1,0 +1,4 @@
+# No external dependencies required — stdlib only.
+# Optional:
+# python-dotenv>=1.0.0   # for .env file loading
+# pytest>=8.0            # for running tests

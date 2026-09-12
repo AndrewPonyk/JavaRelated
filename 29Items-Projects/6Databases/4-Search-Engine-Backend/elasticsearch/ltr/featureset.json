@@ -1,0 +1,58 @@
+{
+  "featureset": {
+    "name": "products_features",
+    "features": [
+      {
+        "name": "name_bm25",
+        "params": ["keywords"],
+        "template_language": "mustache",
+        "template": { "match": { "name": "{{keywords}}" } }
+      },
+      {
+        "name": "brand_bm25",
+        "params": ["keywords"],
+        "template_language": "mustache",
+        "template": { "match": { "brand.text": "{{keywords}}" } }
+      },
+      {
+        "name": "description_bm25",
+        "params": ["keywords"],
+        "template_language": "mustache",
+        "template": { "match": { "description": "{{keywords}}" } }
+      },
+      {
+        "name": "name_phrase",
+        "params": ["keywords"],
+        "template_language": "mustache",
+        "template": { "match_phrase": { "name": { "query": "{{keywords}}", "slop": 2 } } }
+      },
+      {
+        "name": "popularity",
+        "params": [],
+        "template_language": "mustache",
+        "template": {
+          "rank_feature": { "field": "popularity", "log": { "scaling_factor": 4 } }
+        }
+      },
+      {
+        "name": "price",
+        "params": [],
+        "template_language": "mustache",
+        "template": {
+          "function_score": {
+            "field_value_factor": { "field": "price", "missing": 0 },
+            "query": { "match_all": {} }
+          }
+        }
+      },
+      {
+        "name": "in_stock",
+        "params": [],
+        "template_language": "mustache",
+        "template": {
+          "constant_score": { "filter": { "term": { "in_stock": true } }, "boost": 1 }
+        }
+      }
+    ]
+  }
+}

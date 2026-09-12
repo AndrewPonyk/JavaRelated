@@ -1,0 +1,27 @@
+server:
+  port: 8086
+  shutdown: graceful
+
+spring:
+  application:
+    name: realtime-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: realtime-service
+      auto-offset-reset: latest      # live updates only; history is irrelevant here
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # order.events + product.events — dispatch by the producer __TypeId__ header.
+        spring.json.trusted.packages: com.shopflow.common.event
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+logging:
+  level:
+    com.shopflow: INFO

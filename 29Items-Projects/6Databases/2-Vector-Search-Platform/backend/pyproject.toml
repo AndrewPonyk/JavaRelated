@@ -1,0 +1,57 @@
+[project]
+name = "vector-search-platform"
+version = "0.1.0"
+description = "Comparative vector database search + recall@k benchmarking (FastAPI)."
+requires-python = ">=3.12"
+readme = "../README.md"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+# ── Ruff (lint + format) ─────────────────────────────────
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "ASYNC", "RUF"]
+ignore = ["B008"]  # FastAPI uses function calls (Depends/Security) in defaults by design.
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["SLF001"]           # tests may touch private members
+"migrations/*" = ["E501", "N999"]
+
+# ── mypy (type-check) ────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+ignore_missing_imports = true    # vendor SDKs (pinecone/weaviate/milvus) ship partial stubs
+files = ["app"]
+
+# ── pytest ───────────────────────────────────────────────
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q --strict-markers"
+markers = [
+    "integration: tests that require docker-compose backends",
+]
+
+# ── coverage ─────────────────────────────────────────────
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/main.py", "*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70

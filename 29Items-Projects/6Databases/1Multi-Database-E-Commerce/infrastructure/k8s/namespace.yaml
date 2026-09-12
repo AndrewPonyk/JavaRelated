@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shopflow
+  labels:
+    app.kubernetes.io/part-of: shopflow
+    istio-injection: enabled   # mTLS via the mesh (see ARCHITECTURE 2.5)

@@ -1,0 +1,31 @@
+# Stage: lint — fast fail, runs on every MR and main.
+
+lint:backend:
+  stage: lint
+  image: $PYTHON_IMAGE
+  cache:
+    key:
+      files: [backend/pyproject.toml]
+    paths: [.cache/pip]
+  before_script:
+    - pip install --quiet ruff mypy pydantic pydantic-settings fastapi
+  script:
+    - cd backend
+    - ruff check app tests
+    - ruff format --check app tests
+    - mypy app
+
+lint:frontend:
+  stage: lint
+  image: $NODE_IMAGE
+  cache:
+    key:
+      files: [frontend/package-lock.json]
+    paths: [.cache/npm]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npx prettier --check "src/**/*.{ts,tsx}"
+    - npm run lint
+    - npx tsc --noEmit

@@ -1,0 +1,68 @@
+name: deploy
+
+# Deploy the backend to ECS on merge to the default branch.
+# Auth uses GitHub OIDC -> AWS IAM role (no long-lived AWS keys stored in GitHub).
+on:
+  push:
+    branches: [master, main]
+    paths: ["backend/**", "infra/**", ".github/workflows/deploy.yml"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: vsp-backend
+  ECS_CLUSTER: vsp-cluster
+  ECS_SERVICE: vsp-backend
+  TASK_DEF: infra/ecs/task-definition.json
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}   # gated approvals per env
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::000000000000:role/vsp-github-deploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push image (tagged by SHA)
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          IMAGE="$REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+          docker build -t "$IMAGE" backend
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Render task definition with new image
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.TASK_DEF }}
+          container-name: api
+          image: ${{ env.IMAGE }}
+
+      - name: Deploy to ECS (wait for stable)
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

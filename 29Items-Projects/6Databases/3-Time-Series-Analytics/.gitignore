@@ -1,0 +1,41 @@
+# --- secrets / env ---
+.env
+.env.*
+!.env.example
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- node / frontend ---
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# --- docker / data volumes (if bind-mounted locally) ---
+.volumes/
+*.local.yml
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- ML artifacts ---
+models/
+*.pkl

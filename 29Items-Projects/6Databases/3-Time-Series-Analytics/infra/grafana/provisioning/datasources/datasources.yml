@@ -1,0 +1,24 @@
+# Grafana datasource provisioning — mounted read-only by docker-compose.
+# Values come from container env (see grafana service in docker-compose.yml).
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB (platform metrics)
+    uid: tsa-influxdb
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET
+      tlsSkipVerify: true # dev only; TODO prod: proper TLS
+    secureJsonData:
+      token: $INFLUXDB_TOKEN
+
+  # TODO Phase 2 (optional): JSON API / Infinity datasource pointing at the
+  # FastAPI backend for device-metric panels queried straight from Cassandra:
+  # - name: TSA API
+  #   type: yesoreyeram-infinity-datasource
+  #   url: http://backend:8000/api/v1

@@ -1,0 +1,35 @@
+# --- Core API ---------------------------------------------------------------
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+pydantic-settings==2.3.4
+# HS256 service-token verification uses the stdlib (no dependency). Add
+# python-jose only when wiring the production OIDC (RS256/JWKS) verifier:
+#   python-jose[cryptography]==3.3.0
+
+# --- Numerics (drift detectors, A/B significance) ---------------------------
+numpy==1.26.4
+scipy==1.13.1
+
+# --- Persistence ------------------------------------------------------------
+sqlalchemy[asyncio]==2.0.31
+aiosqlite==0.20.0                 # async driver (dev/test default)
+asyncpg==0.29.0                    # async driver (prod Postgres)
+psycopg[binary]==3.2.1            # sync driver (alembic migrations)
+alembic==1.13.2
+redis==5.0.7
+
+# --- ML platform ------------------------------------------------------------
+mlflow==2.14.1
+scikit-learn==1.5.0
+xgboost==2.0.3
+# NOTE: torch / tensorflow / tpot are heavy and framework-specific.
+# Install them in dedicated training/serving images, NOT this base API image:
+#   torch==2.3.1
+#   tensorflow==2.16.1
+#   tpot==0.12.2
+
+# --- AWS / orchestration ----------------------------------------------------
+boto3==1.34.131
+sagemaker==2.224.1
+kfp==2.7.0                         # Kubeflow Pipelines SDK

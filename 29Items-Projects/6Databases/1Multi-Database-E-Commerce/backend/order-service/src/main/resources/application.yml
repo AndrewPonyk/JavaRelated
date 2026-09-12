@@ -1,0 +1,64 @@
+server:
+  port: 8083
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/problem+json,text/plain
+    min-response-size: 1024
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${ORACLE_JDBC_URL:jdbc:oracle:thin:@//localhost:1521/FREEPDB1}
+    username: ${ORACLE_USER:shopflow}
+    password: ${ORACLE_PASSWORD:change-me-oracle}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: validate          # schema is owned by Flyway, never by Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        default_schema: SHOPFLOW
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: SHOPFLOW
+    baseline-on-migrate: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  pattern:
+    # include traceId/spanId for correlation across services
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+  level:
+    com.shopflow: INFO

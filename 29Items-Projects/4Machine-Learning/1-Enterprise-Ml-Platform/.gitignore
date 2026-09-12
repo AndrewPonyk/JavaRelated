@@ -1,0 +1,55 @@
+# --- Secrets / env ----------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- Node / frontend --------------------------------------------------------
+node_modules/
+frontend/dist/
+*.local
+
+# --- Local databases --------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+_smoke.db
+_persist_check.db
+
+# --- ML artifacts (versioned in MLflow/S3/DVC, never in git) ----------------
+mlruns/
+*.ckpt
+*.pt
+*.pth
+*.h5
+*.onnx
+*.pkl
+*.joblib
+data/
+datasets/
+
+# --- IaC / cloud ------------------------------------------------------------
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# --- Editors / OS -----------------------------------------------------------
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

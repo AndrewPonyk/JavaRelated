@@ -1,0 +1,19 @@
+# Optional dictConfig-style logging overrides per environment.
+# The app defaults to structured JSON (see backend/src/core/logging.py); this
+# file documents how to override levels without code changes.
+version: 1
+disable_existing_loggers: false
+formatters:
+  json:
+    format: "%(asctime)s %(levelname)s %(name)s %(message)s"
+loggers:
+  src.services:
+    level: INFO
+  src.ml:
+    level: INFO
+  sqlalchemy.engine:
+    level: WARNING
+  uvicorn.access:
+    level: WARNING
+root:
+  level: INFO

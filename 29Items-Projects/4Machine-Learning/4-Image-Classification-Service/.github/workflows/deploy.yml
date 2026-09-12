@@ -1,0 +1,97 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Workload Identity Federation — no long-lived JSON keys.
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  AR_REPO: ${{ vars.AR_REPO }} # Artifact Registry repo name
+  SERVICE: image-classification-service
+
+jobs:
+  build-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - id: meta
+        name: Compute image tag
+        run: |
+          IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/${SERVICE}:${GITHUB_SHA}"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push backend
+        run: |
+          docker build -t "${{ steps.meta.outputs.image }}" ./backend
+          docker push "${{ steps.meta.outputs.image }}"
+
+  deploy-staging:
+    name: Deploy to staging
+    needs: build-push
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy revision (staging)
+        run: |
+          gcloud run deploy ${SERVICE}-staging \
+            --image="${{ needs.build-push.outputs.image }}" \
+            --region="${GCP_REGION}" \
+            --platform=managed \
+            --min-instances=1 \
+            --allow-unauthenticated
+      - name: Smoke test
+        run: |
+          URL=$(gcloud run services describe ${SERVICE}-staging --region="${GCP_REGION}" --format='value(status.url)')
+          ./scripts/smoke_test.sh "$URL"
+
+  deploy-prod:
+    name: Deploy to production
+    needs: [build-push, deploy-staging]
+    runs-on: ubuntu-latest
+    environment: production # configure a required reviewer for the manual gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy canary (10%) then promote
+        run: |
+          gcloud run deploy ${SERVICE} \
+            --image="${{ needs.build-push.outputs.image }}" \
+            --region="${GCP_REGION}" \
+            --platform=managed \
+            --min-instances=1 \
+            --no-traffic --tag=canary
+          gcloud run services update-traffic ${SERVICE} \
+            --region="${GCP_REGION}" --to-tags=canary=10
+          # TODO: gate on metrics, then: --to-latest (100%)

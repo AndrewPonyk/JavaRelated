@@ -1,0 +1,6 @@
+services:
+  greedy:
+    build: .
+    env_file:
+      - .env.example
+    command: python -m greedy_algorithms

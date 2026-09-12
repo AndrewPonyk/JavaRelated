@@ -1,0 +1,48 @@
+# Local development stack — runs the full app end-to-end with the `local` RAG backend,
+# so `docker compose up` works with NO AWS/Pinecone/Claude credentials required.
+#
+# To exercise the production path instead, build the image with the bedrock extra
+# (see backend/Dockerfile) and set RAG_BACKEND=bedrock + the cloud env vars.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: docintel
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: ./backend
+    environment:
+      APP_ENV: development
+      # Local-first defaults — no cloud needed.
+      RAG_BACKEND: local
+      STORAGE_BACKEND: local
+      INGEST_MODE: inline
+      LOCAL_STORAGE_DIR: /data/documents
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/docintel
+    ports:
+      - "8000:8000"
+    volumes:
+      - docdata:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Apply migrations, then serve.
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  pgdata:
+  docdata:

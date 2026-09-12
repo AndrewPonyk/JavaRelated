@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "string-algorithms"
+version = "0.1.0"
+description = "Console demos for classic string algorithms."
+requires-python = ">=3.10"
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["python"]
+testpaths = ["tests"]

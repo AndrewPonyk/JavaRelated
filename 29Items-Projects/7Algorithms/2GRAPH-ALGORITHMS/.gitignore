@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.coverage*
+htmlcov/
+data/*.db
+*.db
+*.db-journal
+target/
+*.class
+.idea/
+.vscode/
+.github/

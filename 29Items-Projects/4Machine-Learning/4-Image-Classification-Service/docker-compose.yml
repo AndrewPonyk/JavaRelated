@@ -1,0 +1,75 @@
+# Local development stack: model bootstrap + api + redis + postgres + frontend.
+# Usage: docker compose up --build
+#
+# `model-init` runs once to produce a working ONNX model into the shared `models`
+# volume, then exits; `api` waits for it to finish so the service starts ready.
+services:
+  model-init:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.train
+    volumes:
+      - models:/models
+    # Re-run with `docker compose run --rm model-init` to refresh the model.
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ics
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      APP_ENV: development
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/ics
+      MODEL_PATH: /models/vit_clip_v1.onnx
+      LABELS_PATH: /models/labels.json
+      THRESHOLDS_PATH: /models/thresholds.json
+      API_KEYS: devkey1
+      JWT_SECRET: dev-secret-change-me
+    volumes:
+      - models:/models:ro
+    depends_on:
+      model-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:8080"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  models:

@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python package
+        run: python -m pip install -e ".[dev]"
+      - name: Lint Python
+        run: ruff check src/python tests/python
+      - name: Test Python
+        run: |
+          coverage run --data-file="$RUNNER_TEMP/geometry.coverage" -m pytest
+          coverage report --data-file="$RUNNER_TEMP/geometry.coverage" --fail-under=80 --show-missing
+
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+          cache: maven
+      - name: Test Java
+        working-directory: src/java
+        run: mvn --batch-mode test

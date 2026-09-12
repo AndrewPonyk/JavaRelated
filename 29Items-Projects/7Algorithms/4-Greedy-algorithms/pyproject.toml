@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "greedy-algorithms"
+version = "1.0.0"
+description = "Greedy algorithm demonstrations in Python with matching Java examples."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115", "uvicorn>=0.30"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+greedy-demo = "greedy_algorithms.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+pythonpath = ["python"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

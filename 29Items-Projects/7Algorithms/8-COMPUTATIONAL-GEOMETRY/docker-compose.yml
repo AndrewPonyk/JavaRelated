@@ -1,0 +1,12 @@
+services:
+  python-demo:
+    build:
+      context: .
+      dockerfile: docker/python.Dockerfile
+    working_dir: /workspace
+
+  java-demo:
+    build:
+      context: .
+      dockerfile: docker/java.Dockerfile
+    working_dir: /workspace/src/java

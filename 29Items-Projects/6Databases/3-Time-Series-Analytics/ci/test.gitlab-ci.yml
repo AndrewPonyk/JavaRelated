@@ -1,0 +1,65 @@
+# Stage: test — unit + API tests always (fast, no databases);
+# integration tests against REAL Cassandra/Redis as GitLab services.
+
+test:backend:
+  stage: test
+  image: $PYTHON_IMAGE
+  cache:
+    key:
+      files: [backend/pyproject.toml]
+    paths: [.cache/pip]
+  before_script:
+    - cd backend
+    - pip install --quiet -e .[dev]
+  script:
+    # requires_stack tests self-skip here (no services attached)
+    - python -m pytest tests -q --cov=app --cov-report=term
+      --cov-report=xml:coverage.xml --cov-fail-under=70
+  coverage: '/TOTAL.*\s+(\d+%)/'
+  artifacts:
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: backend/coverage.xml
+
+test:backend:integration:
+  stage: test
+  image: $PYTHON_IMAGE
+  services:
+    - name: cassandra:5.0
+      alias: cassandra
+    - name: redis:7-alpine
+      alias: redis
+  variables:
+    CASSANDRA_CONTACT_POINTS: cassandra
+    REDIS_URL: redis://redis:6379/0
+    TSA_STACK_RETRIES: "30"   # Cassandra boots slowly; fixture waits it out
+    # Service containers get modest resources on shared runners:
+    MAX_HEAP_SIZE: 512M
+    HEAP_NEWSIZE: 128M
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  before_script:
+    - cd backend
+    - pip install --quiet -e .[dev]
+  script:
+    - python -m pytest tests/integration -q -m requires_stack
+
+test:frontend:
+  stage: test
+  image: $NODE_IMAGE
+  cache:
+    key:
+      files: [frontend/package-lock.json]
+    paths: [.cache/npm]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm test
+    - npm run build   # a production build IS a test
+  artifacts:
+    paths: [frontend/dist]
+    expire_in: 1 day

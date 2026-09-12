@@ -1,0 +1,18 @@
+# Product synonyms (Solr format). One rule per line; '#' starts a comment.
+# Uploaded as the ES synonyms set "products-synonyms" by scripts/create_indexes.py.
+# Because the analyzer uses search-time synonym_graph, edits here go live via a
+# `PUT _synonyms/products-synonyms` — no reindex required (TECH-NOTES §3.6 #3).
+#
+# Equivalent terms (bidirectional):
+tv, television, telly
+laptop, notebook
+headphones, earphones, headset
+sofa, couch
+sneakers, trainers, running shoes
+smartphone, mobile phone, cell phone
+fridge, refrigerator
+usb stick, flash drive, thumb drive
+
+# One-way expansions (specific => also match general):
+xm5 => xm5, wh-1000xm5
+macbook => macbook, apple laptop

@@ -1,0 +1,26 @@
+{
+  "_comment": "Template for a SageMaker real-time endpoint config used by the unified serving layer. Values are filled by the deploy step (CD / serving_service).",
+  "EndpointConfigName": "emlp-<model-name>-<version>",
+  "ProductionVariants": [
+    {
+      "VariantName": "champion",
+      "ModelName": "emlp-<model-name>-<version>",
+      "InstanceType": "ml.m5.large",
+      "InitialInstanceCount": 1,
+      "InitialVariantWeight": 0.9
+    },
+    {
+      "VariantName": "challenger",
+      "ModelName": "emlp-<model-name>-<challenger-version>",
+      "InstanceType": "ml.m5.large",
+      "InitialInstanceCount": 1,
+      "InitialVariantWeight": 0.1
+    }
+  ],
+  "DataCaptureConfig": {
+    "EnableCapture": true,
+    "InitialSamplingPercentage": 20,
+    "DestinationS3Uri": "s3://enterprise-ml-artifacts/data-capture/",
+    "_comment": "Captured payloads feed the drift detection baseline/comparison."
+  }
+}

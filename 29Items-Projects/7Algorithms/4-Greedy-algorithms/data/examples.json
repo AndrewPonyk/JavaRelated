@@ -1,0 +1,36 @@
+{
+  "activities": [
+    {"name": "A1", "start": 1, "finish": 4},
+    {"name": "A2", "start": 3, "finish": 5},
+    {"name": "A3", "start": 0, "finish": 6},
+    {"name": "A4", "start": 5, "finish": 7},
+    {"name": "A5", "start": 8, "finish": 9},
+    {"name": "A6", "start": 5, "finish": 9}
+  ],
+  "knapsack": {
+    "capacity": 50,
+    "items": [
+      {"name": "Gold", "value": 60, "weight": 10},
+      {"name": "Silver", "value": 100, "weight": 20},
+      {"name": "Bronze", "value": 120, "weight": 30}
+    ]
+  },
+  "jobs": [
+    {"name": "J1", "deadline": 2, "profit": 100},
+    {"name": "J2", "deadline": 1, "profit": 19},
+    {"name": "J3", "deadline": 2, "profit": 27},
+    {"name": "J4", "deadline": 1, "profit": 25},
+    {"name": "J5", "deadline": 3, "profit": 15}
+  ],
+  "text": "greedy algorithms",
+  "graph": {
+    "vertices": 4,
+    "edges": [
+      {"from": 0, "to": 1, "weight": 10},
+      {"from": 0, "to": 2, "weight": 6},
+      {"from": 0, "to": 3, "weight": 5},
+      {"from": 1, "to": 3, "weight": 15},
+      {"from": 2, "to": 3, "weight": 4}
+    ]
+  }
+}

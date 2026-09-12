@@ -1,0 +1,9 @@
+geometry:
+  epsilon: 1.0e-9
+  include_collinear_hull_points: false
+  point_in_polygon_boundary_mode: boundary
+
+demos:
+  dataset: default
+  output_style: table
+  enable_visualization: false

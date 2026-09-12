@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, type-check, test
+    runs-on: ubuntu-latest
+
+    # Ephemeral PostgreSQL for integration tests.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: churn
+          POSTGRES_PASSWORD: churn
+          POSTGRES_DB: churn
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U churn"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://churn:churn@localhost:5432/churn
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Format check (black)
+        run: black --check .
+
+      - name: Type-check (mypy)
+        run: mypy src
+
+      - name: Apply DB migrations (cross-platform runner)
+        run: python -m churn_predictor.db.migrate
+
+      - name: Run full test suite (unit + slow + integration) with coverage
+        run: pytest --cov=churn_predictor --cov-report=xml --cov-report=term-missing --cov-fail-under=70
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+      - name: Security audit
+        run: pip-audit --strict || true   # report-only; don't block PRs on advisories

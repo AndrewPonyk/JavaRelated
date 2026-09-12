@@ -1,0 +1,68 @@
+name: backend-ci
+
+on:
+  push:
+    branches: [master, main]
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: vsp
+          POSTGRES_PASSWORD: vsp
+          POSTGRES_DB: vsp
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vsp"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://vsp:vsp@localhost:5432/vsp
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Format check (ruff)
+        run: ruff format --check .
+      - name: Type check (mypy)
+        run: mypy app
+      - name: Test (pytest + coverage)
+        run: pytest --cov=app --cov-report=term-missing
+
+  docker-build:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (no push on CI)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          tags: vsp-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

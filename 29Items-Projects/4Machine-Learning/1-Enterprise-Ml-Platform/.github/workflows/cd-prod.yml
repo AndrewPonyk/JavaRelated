@@ -1,0 +1,41 @@
+name: CD · Production
+
+# Gated production release: triggered by a semver tag and a manual approval on
+# the protected `production` environment.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-prod:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    environment: production   # requires manual approval (configure in repo settings)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PROD_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Promote images (retag ECR by release version)
+        run: |
+          echo "TODO retag the SHA images validated in staging as ${{ github.ref_name }}"
+
+      - name: Run DB migrations (expand/contract, backward-compatible)
+        run: |
+          echo "TODO alembic upgrade head"
+
+      - name: Canary rollout
+        run: |
+          echo "TODO Argo Rollouts canary 10% -> analysis -> 100% (auto-rollback on regression)"
+
+      - name: Post-deploy verification
+        run: |
+          echo "TODO synthetic checks + SLO guardrail validation"

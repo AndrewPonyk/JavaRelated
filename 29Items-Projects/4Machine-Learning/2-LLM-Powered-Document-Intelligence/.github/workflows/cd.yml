@@ -1,0 +1,52 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # OIDC federation to AWS — no long-lived keys
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: doc-intelligence-backend
+
+jobs:
+  deploy:
+    name: Build → Push → Migrate → Deploy
+    runs-on: ubuntu-latest
+    environment: dev # promotion to staging/prod is gated by environment approvals
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        working-directory: backend
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Run DB migrations (one-off ECS task)
+        run: |
+          echo "TODO: aws ecs run-task ... 'alembic upgrade head' and wait for completion"
+
+      - name: Deploy API + worker (ECS, blue/green)
+        run: |
+          echo "TODO: render task def with $IMAGE, deploy via CodeDeploy, run smoke tests"
+
+      - name: Smoke test
+        run: |
+          echo "TODO: curl the new task set /api/v1/health and fail the deploy on non-200"

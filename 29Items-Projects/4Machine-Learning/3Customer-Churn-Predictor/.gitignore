@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Data & model artifacts (do not commit large binaries / customer data)
+data/raw/*
+data/processed/*
+models/artifacts/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!models/artifacts/.gitkeep
+*.joblib
+*.pkl
+
+# Optuna / experiment tracking
+*.db
+optuna_studies/
+
+# CatBoost training logs
+catboost_info/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

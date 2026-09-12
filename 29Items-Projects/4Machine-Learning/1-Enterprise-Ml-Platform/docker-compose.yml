@@ -1,0 +1,53 @@
+# Local development stack: API + MLflow + Postgres + Redis.
+# Brings up everything a data scientist needs to run the platform end-to-end
+# without touching AWS. `docker compose up` then visit http://localhost:8000/docs
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mluser
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: mlplatform
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mluser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.14.1
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri postgresql+psycopg://mluser:changeme@postgres:5432/mlplatform
+      --default-artifact-root /mlruns
+    ports: ["5000:5000"]
+    volumes: ["mlruns:/mlruns"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: ./backend
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mluser:changeme@postgres:5432/mlplatform
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      REDIS_URL: redis://redis:6379/0
+    ports: ["8000:8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mlflow:
+        condition: service_started
+
+volumes:
+  pgdata:
+  mlruns:

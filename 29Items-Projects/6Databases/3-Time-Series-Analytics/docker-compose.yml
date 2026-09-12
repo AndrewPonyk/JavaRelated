@@ -1,0 +1,144 @@
+# Local development stack.
+#   Data plane only:   docker compose up -d cassandra redis influxdb grafana
+#   Everything:        docker compose --profile app up -d --build
+# Reads variables from ./.env (copy from .env.example).
+
+name: tsa
+
+services:
+  cassandra:
+    image: cassandra:5.0
+    ports:
+      - "9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: tsa-dev
+      # Keep the dev footprint small; remove for realistic perf testing.
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+      - ./backend/migrations/cassandra:/migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 90s   # first boot is slow — do not panic early
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-ttl"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:-changeme-influx}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-tsa}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-platform_metrics}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-changeme-dev-token}
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme}
+      # Consumed by infra/grafana/provisioning/datasources/datasources.yml
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-tsa}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-platform_metrics}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-changeme-dev-token}
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      influxdb:
+        condition: service_healthy
+
+  # ---- application services (profile: app) ----------------------------------
+
+  backend:
+    build:
+      context: ./backend
+      target: api
+    profiles: ["app"]
+    env_file: .env
+    environment:
+      CASSANDRA_CONTACT_POINTS: cassandra
+      REDIS_URL: redis://redis:6379/0
+      INFLUXDB_URL: http://influxdb:8086
+    ports:
+      - "8000:8000"
+    depends_on:
+      cassandra:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u; u.urlopen('http://localhost:8000/api/v1/health/live')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  anomaly-worker:
+    build:
+      context: ./backend
+      target: worker   # includes Prophet; z-score fallback exists regardless
+    profiles: ["app"]
+    command: ["python", "-m", "app.workers.anomaly_worker"]
+    env_file: .env
+    environment:
+      CASSANDRA_CONTACT_POINTS: cassandra
+      REDIS_URL: redis://redis:6379/0
+      INFLUXDB_URL: http://influxdb:8086
+    depends_on:
+      cassandra:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  downsampler:
+    build:
+      context: ./backend
+      target: worker
+    profiles: ["app"]
+    command: ["python", "-m", "app.workers.downsampler"]
+    env_file: .env
+    environment:
+      CASSANDRA_CONTACT_POINTS: cassandra
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    profiles: ["app"]
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - backend
+
+volumes:
+  cassandra-data:
+  influxdb-data:
+  grafana-data:

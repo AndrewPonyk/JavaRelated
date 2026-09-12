@@ -1,0 +1,10 @@
+# Production RAG backend: Claude on Amazon Bedrock + Pinecone via LangChain + LangSmith.
+# Install on top of the base set:  pip install -r requirements-bedrock.txt
+# Enable with RAG_BACKEND=bedrock (and STORAGE_BACKEND=s3, INGEST_MODE=queue).
+-r requirements.txt
+langchain>=0.3
+langchain-core>=0.3
+langchain-aws>=0.2
+langchain-pinecone>=0.2
+langsmith>=0.1
+pinecone>=5.0

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "divide-conquer-algorithms"
+version = "1.0.0"
+description = "Educational divide-and-conquer algorithms in Python."
+requires-python = ">=3.11"
+
+[tool.setuptools]
+package-dir = {"" = "src/main/python"}
+
+[tool.setuptools.packages.find]
+where = ["src/main/python"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/test/python"]
+pythonpath = ["src/main/python"]
+addopts = [
+    "-p",
+    "no:cacheprovider",
+    "-p",
+    "no:asyncio",
+]
+
+[tool.coverage.run]
+data_file = "target/.coverage"
+source = ["src/main/python/divide_conquer"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

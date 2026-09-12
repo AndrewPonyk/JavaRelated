@@ -1,0 +1,58 @@
+# Local end-to-end dev: PostgreSQL + one-shot trainer + Streamlit app.
+# Usage: docker compose up --build
+#
+# Flow: db starts → trainer waits for db, applies migrations, seeds synthetic
+# data, and trains a model into the shared ./models volume → app starts once the
+# trainer completes successfully, loading that model.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: churn
+      POSTGRES_PASSWORD: churn
+      POSTGRES_DB: churn
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U churn"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  trainer:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg://churn:churn@db:5432/churn
+      MODEL_ARTIFACT_PATH: models/artifacts/model.joblib
+      # Keep the demo bootstrap fast; raise for a stronger model.
+      OPTUNA_N_TRIALS: "10"
+      CV_FOLDS: "3"
+    command: python -m churn_predictor.bootstrap
+    volumes:
+      - ./models:/app/models
+    restart: "no"
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+      trainer:
+        condition: service_completed_successfully
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+psycopg://churn:churn@db:5432/churn
+      MODEL_ARTIFACT_PATH: models/artifacts/model.joblib
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models   # read the model the trainer produced
+
+volumes:
+  pgdata:

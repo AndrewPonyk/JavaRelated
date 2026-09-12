@@ -1,0 +1,10 @@
+.git/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+target/
+src/java/target/
+*.pyc
+dist/
+build/

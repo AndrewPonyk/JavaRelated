@@ -1,0 +1,149 @@
+// =====================================================================
+// ShopFlow CI/CD — declarative Jenkins pipeline.
+// lint → test → build → integration (Testcontainers) → image scan/push → deploy.
+// Branch strategy: develop→DEV (auto), release/*→STAGING, main→PROD (canary).
+// =====================================================================
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 60, unit: 'MINUTES')
+    }
+
+    environment {
+        AWS_REGION   = 'eu-central-1'
+        ECR_REGISTRY = credentials('shopflow-ecr-registry')
+        IMAGE_TAG    = "${env.GIT_COMMIT.take(12)}"
+        JAVA_HOME    = tool name: 'jdk-21'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Lint & Static Analysis') {
+            parallel {
+                stage('Backend') {
+                    steps {
+                        dir('backend') {
+                            // Checkstyle is advisory (failOnViolation=false); run `mvnw spotless:apply` locally to auto-format.
+                            sh './mvnw -q -B checkstyle:check'
+                        }
+                    }
+                }
+                stage('Frontend') {
+                    steps {
+                        dir('frontend') {
+                            sh 'npm ci && npm run lint && npm run typecheck'
+                        }
+                    }
+                }
+                stage('Python') {
+                    steps {
+                        dir('ml-service') {
+                            sh 'pip install ruff && ruff check .'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            parallel {
+                stage('Backend') {
+                    steps { dir('backend') { sh './mvnw -q test' } }
+                    post { always { junit '**/target/surefire-reports/*.xml' } }
+                }
+                stage('ML') {
+                    steps { dir('ml-service') { sh 'pip install -r requirements.txt && pytest -q' } }
+                }
+            }
+        }
+
+        stage('Build & Integration Tests') {
+            // Testcontainers spins real Oracle/Mongo/Redis/ES/Kafka/Neo4j.
+            steps {
+                dir('backend') { sh './mvnw -q verify' }
+                dir('frontend') { sh 'npm run build' }
+            }
+            post { always { jacoco execPattern: '**/target/jacoco.exec' } }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                withSonarQubeEnv('shopflow-sonar') {
+                    dir('backend') { sh './mvnw -q sonar:sonar' }
+                }
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build, Scan & Push Images') {
+            steps {
+                script {
+                    def services = [
+                        'api-gateway', 'auth-service', 'catalog-service', 'order-service',
+                        'search-service', 'recommendation-service', 'realtime-service',
+                    ]
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    // Java services build from the backend/ reactor context.
+                    services.each { svc ->
+                        sh "docker build -f backend/${svc}/Dockerfile -t ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG} ./backend"
+                        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG}"
+                        sh "docker push ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG}"
+                    }
+                    // ml-service and frontend build from their own contexts.
+                    ['ml-service', 'frontend'].each { svc ->
+                        sh "docker build -t ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG} ./${svc}"
+                        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG}"
+                        sh "docker push ${ECR_REGISTRY}/shopflow/${svc}:${IMAGE_TAG}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy DEV') {
+            when { branch 'develop' }
+            steps { deployTo('dev') }
+        }
+
+        stage('Deploy STAGING') {
+            when { branch pattern: 'release/.*', comparator: 'REGEXP' }
+            steps { deployTo('staging') }
+        }
+
+        stage('Deploy PROD (canary)') {
+            when { branch 'main' }
+            steps {
+                input message: 'Promote to production?', ok: 'Deploy'
+                deployTo('prod')
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Build failed — notifying #shopflow-ci'
+            // slackSend channel: '#shopflow-ci', color: 'danger', message: "Build ${env.BUILD_URL} failed"
+        }
+        always { cleanWs() }
+    }
+}
+
+// Helm-based deploy; PROD uses Argo Rollouts canary (see TECH-NOTES 3.3).
+void deployTo(String envName) {
+    sh """
+        aws eks update-kubeconfig --name shopflow-eks-${envName} --region ${AWS_REGION}
+        helm upgrade --install shopflow ./infrastructure/helm \
+            --namespace shopflow --create-namespace \
+            --values ./infrastructure/helm/values-${envName}.yaml \
+            --set global.imageTag=${IMAGE_TAG} \
+            --wait --timeout 10m
+    """
+}

@@ -1,0 +1,43 @@
+name: Deploy
+
+# Streamlit Community Cloud auto-redeploys on push to main. This workflow owns
+# the migration gate and a post-deploy smoke test so prod never drifts from the
+# schema the code expects.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  migrate-and-verify:
+    name: Migrate prod DB & smoke-test
+    runs-on: ubuntu-latest
+    environment: production          # scoped secrets + optional required reviewers
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Apply forward-only migrations to production
+        env:
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: |
+          for f in migrations/*.sql; do
+            echo "Applying $f"
+            psql "$PROD_DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Wait for Streamlit Cloud redeploy
+        run: sleep 60   # give Cloud time to pick up the new commit
+
+      - name: Smoke test (HTTP 200 on app root)
+        env:
+          APP_URL: ${{ secrets.STREAMLIT_APP_URL }}
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL")
+          echo "App responded with HTTP $code"
+          test "$code" = "200"
+
+  # NOTE: build/push of an optional self-hosting image would go here, gated on a tag.

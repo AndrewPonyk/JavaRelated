@@ -1,0 +1,36 @@
+# Public ingress via the AWS Load Balancer Controller (ALB). Only the gateway
+# is exposed; all other services are ClusterIP behind the mesh.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shopflow-ingress
+  namespace: shopflow
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+spec:
+  rules:
+    - host: api.shopflow.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+    - host: shopflow.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

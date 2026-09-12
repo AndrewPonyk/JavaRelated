@@ -1,0 +1,56 @@
+# ---- Java / Maven ----
+target/
+*.class
+*.jar
+!**/maven-wrapper.jar
+*.war
+hs_err_pid*
+.mvn/timing.properties
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+dist/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ---- Env & secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---- Terraform ----
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!*.tfvars.example
+
+# ---- IDE / OS ----
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---- Build / coverage ----
+coverage/
+*.lcov
+.scannerwork/
+logs/
+*.log

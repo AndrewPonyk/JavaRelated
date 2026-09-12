@@ -1,0 +1,75 @@
+name: Deploy — Staging
+
+# One-time setup (repo Settings → Secrets and variables → Actions):
+#   vars:    GCP_PROJECT_ID, GCP_WIF_PROVIDER, GCP_DEPLOY_SA, STAGING_API_URL
+#   secrets: STAGING_ES_URL, STAGING_ES_API_KEY
+# GCP resources (Cloud Run services/jobs, Secret Manager entries) are provisioned
+# by infrastructure/terraform — this workflow only promotes images and assets.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # Workload Identity Federation — no service-account keys
+
+env:
+  REGION: europe-west1
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REPO: europe-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/search
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build & push API image
+        run: |
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+          docker build -t ${REPO}/search-api:${GITHUB_SHA} backend
+          docker push ${REPO}/search-api:${GITHUB_SHA}
+
+      - name: Run database migrations (Cloud Run Job)
+        run: |
+          gcloud run jobs update search-migrate-staging --region ${REGION} \
+            --image ${REPO}/search-api:${GITHUB_SHA}
+          gcloud run jobs execute search-migrate-staging --region ${REGION} --wait
+
+      - name: Update search assets (synonyms set + index bootstrap)
+        run: |
+          pip install "elasticsearch>=8.14,<9"
+          python scripts/create_indexes.py \
+            --es-url "${{ secrets.STAGING_ES_URL }}" --api-key "${{ secrets.STAGING_ES_API_KEY }}"
+
+      - name: Deploy API to Cloud Run
+        run: |
+          gcloud run deploy search-api-staging \
+            --region ${REGION} \
+            --image ${REPO}/search-api:${GITHUB_SHA} \
+            --set-env-vars ENVIRONMENT=staging,LTR_MODE=off \
+            --set-secrets DATABASE_URL=staging-database-url:latest,ES_API_KEY=staging-es-api-key:latest,ADMIN_API_KEY=staging-admin-api-key:latest
+
+      - name: Build & deploy frontend (Cloud Storage + CDN)
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          VITE_API_BASE_URL="${{ vars.STAGING_API_URL }}/api/v1" npm run build
+          gsutil -m rsync -r -d dist "gs://search-web-staging-${PROJECT_ID}"
+          gcloud compute url-maps invalidate-cdn-cache search-web-staging-lb --path "/*" --async
+
+      - name: Smoke test
+        run: |
+          curl -fsS "${{ vars.STAGING_API_URL }}/readyz"
+          curl -fsS "${{ vars.STAGING_API_URL }}/api/v1/search?q=headphones" >/dev/null

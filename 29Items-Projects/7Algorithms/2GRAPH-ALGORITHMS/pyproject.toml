@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]
+pythonpath = ["python"]
+addopts = "-p no:cacheprovider"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+cache-dir = "target/ruff-cache"

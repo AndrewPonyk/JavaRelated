@@ -1,0 +1,9 @@
+# Copy to prod.tfvars and adjust. Apply with:
+#   terraform apply -var-file=envs/prod.tfvars
+environment        = "prod"
+aws_region         = "eu-central-1"
+eks_cluster_name   = "shopflow-eks-prod"
+node_instance_types = ["m6i.large"]
+node_min_size      = 3
+node_max_size      = 12
+node_desired_size  = 4

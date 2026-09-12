@@ -1,0 +1,23 @@
+# Java
+target/
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+.coverage*
+coverage/.coverage*
+coverage-data/.coverage*
+htmlcov/
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store

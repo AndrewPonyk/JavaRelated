@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:change-me-redis}
+  cloud:
+    gateway:
+      default-filters:
+        # Distributed token-bucket rate limit (Redis), keyed per client.
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 20
+            redis-rate-limiter.burstCapacity: 40
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "${CORS_ALLOWED_ORIGINS:http://localhost:3000}"
+            allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: catalog
+          uri: ${CATALOG_URI:http://localhost:8082}
+          predicates: [Path=/api/v1/products/**]
+        - id: orders
+          uri: ${ORDER_URI:http://localhost:8083}
+          predicates: [Path=/api/v1/orders/**]
+        - id: search
+          uri: ${SEARCH_URI:http://localhost:8084}
+          predicates: [Path=/api/v1/search/**]
+        - id: recommendations
+          uri: ${RECO_URI:http://localhost:8085}
+          predicates: [Path=/api/v1/recommendations/**]
+        - id: auth
+          uri: ${AUTH_URI:http://localhost:8081}
+          predicates: [Path=/api/v1/auth/**]
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,gateway

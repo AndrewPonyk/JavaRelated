@@ -1,0 +1,17 @@
+# Runtime dependencies (pinned for Streamlit Cloud reproducibility).
+# Keep in sync with [project.dependencies] in pyproject.toml.
+# Pin exact versions before deploying; ranges shown for clarity.
+streamlit>=1.36,<2.0
+pandas>=2.2,<3.0
+numpy>=1.26,<3.0
+scikit-learn>=1.5,<2.0
+xgboost>=2.1,<3.0
+lightgbm>=4.4,<5.0
+catboost>=1.2,<2.0
+optuna>=3.6,<4.0
+shap>=0.46,<1.0
+joblib>=1.4,<2.0
+SQLAlchemy>=2.0,<3.0
+psycopg[binary]>=3.2,<4.0
+pydantic>=2.7,<3.0
+pydantic-settings>=2.3,<3.0

@@ -1,0 +1,61 @@
+# Platform API deployment + service. Stateless, horizontally scalable.
+# Secrets are injected from AWS Secrets Manager via External Secrets Operator
+# (referenced here as a plain secretRef placeholder).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emlp-api
+  labels: { app: emlp-api }
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: emlp-api }
+  template:
+    metadata:
+      labels: { app: emlp-api }
+    spec:
+      serviceAccountName: emlp-api   # IRSA-bound role (S3/SageMaker/Secrets)
+      containers:
+        - name: api
+          image: <ECR_REGISTRY>/emlp-backend:latest   # set by CD to the SHA tag
+          ports: [{ containerPort: 8000 }]
+          envFrom:
+            - secretRef: { name: emlp-api-secrets }
+          readinessProbe:
+            httpGet: { path: /ready, port: 8000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits: { cpu: "1", memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emlp-api
+spec:
+  selector: { app: emlp-api }
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: emlp-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: emlp-api
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 65 }

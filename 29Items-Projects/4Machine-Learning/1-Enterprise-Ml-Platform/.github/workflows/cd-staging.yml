@@ -1,0 +1,43 @@
+name: CD · Staging
+
+on:
+  push:
+    branches: [main]
+
+# Authenticate to AWS via GitHub OIDC — no long-lived cloud keys in the repo.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-staging:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_STAGING_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push images
+        run: |
+          echo "TODO: docker build + push backend/frontend tagged ${{ github.sha }} to ECR"
+
+      - name: Run DB migrations (pre-deploy)
+        run: |
+          echo "TODO run 'alembic upgrade head' as a one-off ECS/K8s job"
+
+      - name: Deploy to EKS (staging)
+        run: |
+          echo "TODO helm upgrade --install / kubectl apply with image tag ${{ github.sha }}"
+
+      - name: Smoke test
+        run: |
+          echo "TODO curl staging /health and run Playwright critical-path E2E"

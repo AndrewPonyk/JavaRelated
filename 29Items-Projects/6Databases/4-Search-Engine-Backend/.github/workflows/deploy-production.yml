@@ -1,0 +1,83 @@
+name: Deploy — Production
+
+# Gated by the 'production' GitHub environment (required reviewers configured in
+# repo settings). Deploys promote the image already built and smoke-tested on
+# staging — production never rebuilds from source.
+# Setup: vars GCP_PROJECT_ID / GCP_WIF_PROVIDER / GCP_DEPLOY_SA / PROD_API_URL,
+#        secrets PROD_ES_URL / PROD_ES_API_KEY.
+
+on:
+  release:
+    types: [published] # tag vX.Y.Z → release → gated deploy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: europe-west1
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REPO: europe-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/search
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      # Promote the sha this tag points at — the exact image staging validated.
+      - name: Tag release image
+        run: |
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+          gcloud artifacts docker tags add \
+            ${REPO}/search-api:${GITHUB_SHA} \
+            ${REPO}/search-api:${GITHUB_REF_NAME}
+
+      - name: Run database migrations (Cloud Run Job)
+        run: |
+          gcloud run jobs update search-migrate-prod --region ${REGION} \
+            --image ${REPO}/search-api:${GITHUB_REF_NAME}
+          gcloud run jobs execute search-migrate-prod --region ${REGION} --wait
+
+      - name: Update search assets (synonyms set + index bootstrap)
+        run: |
+          pip install "elasticsearch>=8.14,<9"
+          python scripts/create_indexes.py \
+            --es-url "${{ secrets.PROD_ES_URL }}" --api-key "${{ secrets.PROD_ES_API_KEY }}"
+
+      - name: Canary deploy (10% traffic)
+        run: |
+          gcloud run deploy search-api \
+            --region ${REGION} \
+            --image ${REPO}/search-api:${GITHUB_REF_NAME} \
+            --no-traffic --tag canary \
+            --set-env-vars ENVIRONMENT=prod \
+            --set-secrets DATABASE_URL=prod-database-url:latest,ES_API_KEY=prod-es-api-key:latest,ADMIN_API_KEY=prod-admin-api-key:latest
+          gcloud run services update-traffic search-api --region ${REGION} \
+            --to-tags canary=10
+
+      - name: Verify canary, then promote to 100%
+        run: |
+          sleep 60  # let the canary take real traffic before judging it
+          curl -fsS "${{ vars.PROD_API_URL }}/readyz"
+          ERRORS=$(gcloud logging read \
+            'resource.type=cloud_run_revision AND resource.labels.service_name=search-api AND severity>=ERROR AND labels."run.googleapis.com/traffic_tag"=canary' \
+            --freshness=5m --format='value(timestamp)' --limit=10 | wc -l)
+          if [ "$ERRORS" -gt 3 ]; then
+            echo "Canary error budget exceeded ($ERRORS errors) — rolling back"
+            gcloud run services update-traffic search-api --region ${REGION} --to-tags canary=0
+            exit 1
+          fi
+          gcloud run services update-traffic search-api --region ${REGION} --to-latest
+          # Manual rollback if needed later:
+          #   gcloud run services update-traffic search-api --to-revisions <PREVIOUS>=100

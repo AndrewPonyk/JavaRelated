@@ -1,0 +1,27 @@
+# Java
+target/
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.coverage*
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# Local environment
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store

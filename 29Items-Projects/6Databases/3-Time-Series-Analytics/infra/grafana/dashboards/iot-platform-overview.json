@@ -1,0 +1,76 @@
+{
+  "uid": "tsa-overview",
+  "title": "IoT Platform Overview",
+  "tags": ["tsa", "platform"],
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "utc",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Ingest rate (points accepted)",
+      "datasource": { "type": "influxdb", "uid": "tsa-influxdb" },
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#3987e5" },
+          "custom": { "lineWidth": 2, "fillOpacity": 0, "showPoints": "never" },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"platform_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"ingest\" and r._field == \"points\")\n  |> aggregateWindow(every: v.windowPeriod, fn: sum, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Anomalies found (last scan)",
+      "datasource": { "type": "influxdb", "uid": "tsa-influxdb" },
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#d03b3b" },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"platform_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"anomaly_worker\" and r._field == \"anomalies_found\")\n  |> last()"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Ingest write latency (ms)",
+      "datasource": { "type": "influxdb", "uid": "tsa-influxdb" },
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "#199e70" },
+          "custom": { "lineWidth": 2, "fillOpacity": 0, "showPoints": "never" },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"platform_metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"ingest\" and r._field == \"latency_ms\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
+        }
+      ]
+    }
+  ]
+}
