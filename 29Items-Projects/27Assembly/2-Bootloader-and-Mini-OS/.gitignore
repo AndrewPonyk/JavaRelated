@@ -1,0 +1,25 @@
+# Build output
+build/
+*.bin
+*.elf
+*.o
+*.img
+*.iso
+*.map
+*.lst
+
+# Local environment (copied from .env.example)
+.env
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Test binaries
+test_scheduler
+test_string
+test_ring_buffer

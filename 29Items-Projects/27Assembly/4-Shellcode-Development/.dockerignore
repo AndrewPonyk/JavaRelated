@@ -1,0 +1,12 @@
+# Exclude from the Docker build context (keeps it small; never ship secrets).
+.git
+bin/
+**/__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/

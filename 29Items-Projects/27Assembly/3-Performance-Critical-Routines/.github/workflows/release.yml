@@ -1,0 +1,41 @@
+name: release
+
+# Tag-triggered: package the library and publish a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # needed to create the Release and upload assets
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y nasm gcc
+
+      - name: Verify tag matches Makefile VERSION
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          mk=$(grep -m1 '^VERSION' Makefile | sed 's/.*:=[[:space:]]*//')
+          echo "tag=$tag makefile=$mk"
+          test "$tag" = "$mk" || { echo "::error::tag v$tag != Makefile VERSION $mk"; exit 1; }
+
+      - name: Build + test (release)
+        run: |
+          make lib BUILD=release CFLAGS_EXTRA=-Werror
+          make test BUILD=release
+
+      - name: Package
+        run: make package BUILD=release
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/perflib-*.tar.gz
+            dist/perflib-*.tar.gz.sha256
+          generate_release_notes: true

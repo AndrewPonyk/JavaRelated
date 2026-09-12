@@ -1,0 +1,21 @@
+# Kernel C style. Based on LLVM with 4-space indentation and a slightly wider
+# column limit to suit hardware-register comments.
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+ColumnLimit:     90
+PointerAlignment: Right
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: WithoutElse
+KeepEmptyLinesAtTheStartOfBlocks: false
+SpaceAfterCStyleCast: false
+SortIncludes:    false
+# Never reflow comment text: this codebase is teaching material with extensive
+# doc-comments, memory maps, and ASCII layouts that must keep their shape.
+ReflowComments:  false
+...

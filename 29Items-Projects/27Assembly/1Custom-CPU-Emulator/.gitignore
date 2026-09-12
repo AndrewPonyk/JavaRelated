@@ -1,0 +1,30 @@
+# Build output
+/build/
+*.o
+*.obj
+*.d
+*.a
+
+# Assembled guest fixtures and snapshots
+tests/programs/*.bin
+*.bin
+*.ces
+/snapshots/
+
+# Coverage
+*.gcno
+*.gcda
+*.gcov
+coverage.info
+/coverage/
+
+# Local environment (never commit real secrets/config)
+.env
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+compile_commands.json

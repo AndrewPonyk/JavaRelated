@@ -1,0 +1,33 @@
+# build outputs
+/build/
+/dist/
+/charts/
+
+# benchmark artifacts
+results.csv
+*.json
+!schema/*.json
+history.db
+
+# object / binary cruft
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.lst
+
+# local env / editors
+.env
+*.swp
+.vscode/
+.idea/
+.DS_Store
+
+# python tooling
+__pycache__/
+*.pyc
+.venv/

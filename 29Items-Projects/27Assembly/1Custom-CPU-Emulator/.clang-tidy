@@ -1,0 +1,20 @@
+# clang-tidy configuration for the emulator (C11).
+# Focused on real bugs, portability, and security-relevant patterns; cosmetic
+# naming checks are left off to avoid noise on idiomatic C.
+---
+Checks: >
+  clang-analyzer-*,
+  bugprone-*,
+  cert-*,
+  performance-*,
+  portability-*,
+  misc-*,
+  readability-misleading-indentation,
+  readability-non-const-parameter,
+  -bugprone-easily-swappable-parameters,
+  -cert-err33-c,
+  -misc-no-recursion
+
+WarningsAsErrors: ''
+HeaderFilterRegex: 'src/.*\.h$'
+FormatStyle: file

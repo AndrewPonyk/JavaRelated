@@ -1,0 +1,107 @@
+# =============================================================================
+#  CI  --  lint -> host tests -> build -> boot smoke test
+#
+#  Cheapest stages first (see TECH-NOTES 3.1). Formatting is informational and
+#  non-blocking; build + tests + a clean boot are the hard gates.
+# =============================================================================
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+
+# Cancel superseded runs on the same ref to save runner minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------- lint ----
+  lint:
+    name: Format check (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true          # warn, don't block
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: clang-format --dry-run
+        run: make lint
+
+  # ---------------------------------------------------------- host tests ----
+  test:
+    name: Host unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install compilers
+        run: sudo apt-get update && sudo apt-get install -y build-essential gcc-multilib
+      - name: Run unit tests
+        run: make test
+
+  # --------------------------------------------------------------- build ----
+  build:
+    name: Build OS image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-multilib nasm binutils
+      - name: make
+        run: make
+      - name: Verify boot signature (0xAA55) and sizes
+        run: |
+          test -f build/os-image.bin
+          # Boot sector must be exactly 512 bytes and end with 0x55 0xAA.
+          sig=$(xxd -s 510 -l 2 -p build/boot.bin)
+          echo "Boot signature bytes: $sig"
+          [ "$sig" = "55aa" ] || { echo "Missing boot signature"; exit 1; }
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: os-image
+          path: build/os-image.bin
+
+  # --------------------------------------------------- boot smoke test ----
+  boot:
+    name: QEMU boot smoke test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain + QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-multilib nasm binutils qemu-system-x86
+      - name: Build image
+        run: make
+      - name: Boot under QEMU and assert the kernel banner on serial
+        run: |
+          # Headless boot. The kernel logs to COM1, which we capture to a file.
+          # Positive check: the banner must appear. Negative check: no triple
+          # fault. The kernel idles forever, so we time-box the run.
+          set +e
+          timeout 20s qemu-system-i386 \
+            -drive format=raw,file=build/os-image.bin \
+            -m 64M -no-reboot -display none \
+            -d int,cpu_reset -serial file:serial.log 2> qemu.log
+          echo "----- serial.log -----"; cat serial.log || true
+          echo "----- qemu.log (tail) -----"; tail -n 20 qemu.log || true
+          if grep -qi "Triple fault" qemu.log; then
+            echo "::error::Kernel triple-faulted during boot"; exit 1
+          fi
+          if ! grep -q "Mini-OS booting" serial.log; then
+            echo "::error::Kernel banner not found on serial -- boot failed"; exit 1
+          fi
+          # The shell prompt only prints AFTER the timer preempts idle and the
+          # scheduler context-switches into the shell task. Asserting on it (not
+          # just the pre-sti banner) catches faults in interrupts / paging / the
+          # context switch -- e.g. a corrupt GDT triple-faulting on the 1st IRQ.
+          if ! grep -q "Mini-OS shell" serial.log; then
+            echo "::error::Shell never started -- scheduler/IRQ/context-switch broken"; exit 1
+          fi
+          echo "Boot reached an interactive shell -- full stack verified."

@@ -1,0 +1,22 @@
+# pyproject.toml — tooling configuration for the shellcode toolkit (Python scripts).
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]   # line length: shellcode comments/strings are naturally long
+
+[tool.ruff.lint.per-file-ignores]
+# exploit.py imports pwntools (with side effects) before other local imports.
+"src/scripts/exploit.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src/scripts"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80

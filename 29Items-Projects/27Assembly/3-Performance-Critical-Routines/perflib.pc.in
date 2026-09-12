@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: perflib
+Description: Hand-tuned x86-64/AVX2 performance-critical routines (matrix, string ops)
+Version: @VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lperflib

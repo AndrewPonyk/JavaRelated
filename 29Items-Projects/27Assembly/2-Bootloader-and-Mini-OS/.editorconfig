@@ -1,0 +1,28 @@
+# EditorConfig — consistent whitespace across editors (https://editorconfig.org)
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Assembly conventionally aligns operands; keep tabs out, width 4.
+[*.asm]
+indent_size = 4
+
+[*.{c,h}]
+indent_size = 4
+max_line_length = 90
+
+# Makefiles REQUIRE real tabs for recipe lines.
+[Makefile]
+indent_style = tab
+
+[*.{yml,yaml,md}]
+indent_size = 2
+
+[*.sh]
+indent_size = 4

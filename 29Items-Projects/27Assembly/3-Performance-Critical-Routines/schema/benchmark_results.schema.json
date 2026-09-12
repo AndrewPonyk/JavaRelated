@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://perflib.dev/schema/benchmark_results.schema.json",
+  "title": "perflib benchmark run",
+  "description": "One benchmark run: environment metadata plus an array of measured rows. This is the only formal data contract in the project — the compute data itself is ephemeral; the measurement is what persists.",
+  "type": "object",
+  "required": ["schema_version", "metadata", "results"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "SemVer of this result schema; consumers gate on the major."
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["timestamp", "library_version", "isa", "cpu", "compiler", "flags"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp":       { "type": "string", "format": "date-time" },
+        "library_version": { "type": "string", "examples": ["0.1.0"] },
+        "isa":             { "type": "string", "enum": ["scalar", "avx2", "avx512"] },
+        "cpu":             { "type": "string", "description": "CPUID brand string" },
+        "compiler":        { "type": "string", "examples": ["gcc 13.2.0", "clang 18.1.0"] },
+        "assembler":       { "type": "string", "examples": ["nasm 2.16.01"] },
+        "flags":           { "type": "string", "examples": ["-O3 -mavx2 -mfma"] },
+        "governor":        { "type": "string", "examples": ["performance"] },
+        "turbo_disabled":  { "type": "boolean" },
+        "pinned_core":     { "type": "integer", "minimum": 0 },
+        "git_commit":      { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+      }
+    },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/row" }
+    }
+  },
+  "$defs": {
+    "row": {
+      "type": "object",
+      "required": ["routine", "impl", "size", "ns_per_call", "throughput", "unit", "speedup"],
+      "additionalProperties": false,
+      "properties": {
+        "routine":     { "type": "string", "enum": ["saxpy", "sdot", "sgemm", "strlen", "memchr"] },
+        "impl":        { "type": "string", "enum": ["c", "avx2", "avx512"] },
+        "size":        { "type": "integer", "minimum": 0, "description": "n for vector/string ops; D for DxD sgemm" },
+        "ns_per_call": { "type": "number", "minimum": 0, "description": "median nanoseconds per single invocation" },
+        "throughput":  { "type": "number", "minimum": 0 },
+        "unit":        { "type": "string", "enum": ["GB/s", "GFLOP/s"] },
+        "speedup":     { "type": "number", "minimum": 0, "description": "ratio vs the C reference at the same size (1.0 for the C row)" },
+        "samples":     { "type": "integer", "minimum": 1, "description": "number of timed repeats behind the median" }
+      }
+    }
+  }
+}

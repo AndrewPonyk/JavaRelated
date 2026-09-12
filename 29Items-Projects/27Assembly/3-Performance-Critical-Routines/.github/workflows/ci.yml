@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------- lint ----
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y clang-format cppcheck shellcheck
+      - name: clang-format (advisory — reports diffs, does not fail the build)
+        run: |
+          files=$(find src include tests bench examples -name '*.c' -o -name '*.h')
+          clang-format --dry-run $files
+      - name: cppcheck
+        run: cppcheck --enable=warning,portability --std=c11 --error-exitcode=1 --inline-suppr -Iinclude src bench tests
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
+
+  # --------------------------------------------------------------- build ----
+  build-test:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+        build: [debug, release]
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y nasm ${{ matrix.cc }}
+      - name: Build library (warnings are errors)
+        run: make lib BUILD=${{ matrix.build }} CFLAGS_EXTRA=-Werror
+      - name: Build example + bench
+        run: make example bench BUILD=${{ matrix.build }}
+      - name: Run tests
+        run: make test BUILD=${{ matrix.build }}
+      - name: Run tests under ASan/UBSan (debug only)
+        if: matrix.build == 'debug'
+        run: make test BUILD=debug SANITIZE=1
+
+  # ------------------------------------------------- benchmark (informational)
+  # Hard regression gating belongs on a dedicated, frequency-pinned runner.
+  # On shared GitHub runners we only smoke-test that the harness runs and the
+  # AVX2 path is at least not slower than C.
+  bench-smoke:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y nasm gcc python3
+      - name: Check runner supports AVX2
+        id: caps
+        run: |
+          if grep -q avx2 /proc/cpuinfo; then echo "avx2=yes" >> "$GITHUB_OUTPUT";
+          else echo "avx2=no" >> "$GITHUB_OUTPUT"; echo "::warning::runner lacks AVX2, skipping bench"; fi
+      - name: Run benchmarks
+        if: steps.caps.outputs.avx2 == 'yes'
+        run: |
+          make run-bench BUILD=release > /dev/null
+          ./build/release/perflib_bench --suite all --repeats 11 --warmup 3 --out results.csv
+      - name: Upload results
+        if: steps.caps.outputs.avx2 == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: results.csv
+      # TODO: nightly job on self-hosted pinned runner loads results into the
+      # SQLite history (schema/results_history.sql) and fails on >5% regression.

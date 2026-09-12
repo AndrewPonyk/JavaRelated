@@ -1,0 +1,46 @@
+# =============================================================================
+#  docker-compose.yml  --  Build and run the whole OS with one command.
+#
+#  For a bare-metal kernel, "the full stack" is: build the image with the pinned
+#  toolchain, then boot it in QEMU. No KVM needed (QEMU uses TCG), so this runs
+#  unprivileged anywhere Docker does.
+#
+#    docker compose up                 # build + boot, serial console on stdout
+#    docker compose run --rm test      # build + run the host unit tests
+#    docker compose run --rm build     # just build build/os-image.bin
+# =============================================================================
+services:
+  # Default: build the image and boot it headless with COM1 on the terminal.
+  minios:
+    build: .
+    image: mini-os:latest
+    working_dir: /src
+    volumes:
+      - ./:/src
+    command: >
+      bash -lc "make &&
+      echo '--- booting Mini-OS in QEMU (Ctrl-A X to quit) ---' &&
+      qemu-system-i386 -drive format=raw,file=build/os-image.bin
+      -m 64M -no-reboot -nographic -serial mon:stdio"
+    tty: true
+    stdin_open: true
+
+  # Just produce the bootable image (build/os-image.bin) and exit.
+  build:
+    image: mini-os:latest
+    build: .
+    working_dir: /src
+    volumes:
+      - ./:/src
+    command: make
+    profiles: ["tools"]
+
+  # Run the host unit-test suites and exit non-zero on failure.
+  test:
+    image: mini-os:latest
+    build: .
+    working_dir: /src
+    volumes:
+      - ./:/src
+    command: make test
+    profiles: ["tools"]

@@ -1,0 +1,19 @@
+# clang-format — C style for perflib (close to K&R / Linux-ish, 4-space indent).
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+ColumnLimit:     90
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+AlignConsecutiveMacros: AcrossComments
+AlignTrailingComments: true
+PointerAlignment: Right
+SpaceAfterCStyleCast: false
+SortIncludes:    false
+KeepEmptyLinesAtTheStartOfBlocks: false
+IndentCaseLabels: false
