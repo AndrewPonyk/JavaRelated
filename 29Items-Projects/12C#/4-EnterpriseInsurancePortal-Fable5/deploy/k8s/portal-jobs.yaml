@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portal-jobs
+  labels: { app: portal-jobs }
+spec:
+  # Replicas can exceed 1 because jobs are idempotent and Hangfire takes
+  # distributed locks over SQL Server (TECH-NOTES.md pitfall #5).
+  replicas: 1
+  selector:
+    matchLabels: { app: portal-jobs }
+  template:
+    metadata:
+      labels: { app: portal-jobs }
+    spec:
+      containers:
+        - name: portal-jobs
+          image: insuranceacr.azurecr.io/portal-jobs:latest # tag pinned by kustomize in the pipeline
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef: { name: portal-config }
+            - secretRef: { name: portal-secrets }
+          env:
+            - name: Reports__OutputPath
+              value: /reports # Azure Blob (blobfuse CSI) mount
+          volumeMounts:
+            - name: reports
+              mountPath: /reports
+            - name: keyvault
+              mountPath: /mnt/secrets-store
+              readOnly: true
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+          resources:
+            requests: { cpu: 250m, memory: 256Mi }
+            limits: { cpu: "1", memory: 512Mi }
+      volumes:
+        - name: reports
+          persistentVolumeClaim:
+            claimName: regulatory-reports
+        - name: keyvault
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: portal-keyvault
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: regulatory-reports
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: azureblob-fuse-premium
+  resources:
+    requests:
+      storage: 5Gi

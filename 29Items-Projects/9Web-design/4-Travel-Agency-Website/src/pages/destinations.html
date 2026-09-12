@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Destinations | Northstar Travel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link href="/src/assets/css/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-semibold" href="/index.html">Northstar Travel</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/src/pages/destinations.html">Destinations</a></li>
+            <li class="nav-item"><a class="nav-link" href="/src/pages/tours.html">Tours</a></li>
+            <li class="nav-item"><a class="nav-link" href="/src/pages/about.html">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="/src/pages/contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="py-5">
+      <div class="container">
+        <div class="row g-4 align-items-center mb-4">
+          <div class="col-lg-6">
+            <p class="text-uppercase small fw-semibold text-primary mb-1">Destination map</p>
+            <h1 class="h2">Explore places we know well</h1>
+            <p class="text-secondary mb-0">Map markers show sample regions and anchor cities for featured itineraries.</p>
+          </div>
+        </div>
+        <div id="destinationMap" class="destination-map" data-source="/api/destinations" data-aos="fade-up"></div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>&copy; 2026 Northstar Travel</span>
+        <a href="/src/pages/contact.html">Start an inquiry</a>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js" defer></script>
+    <script src="/src/assets/js/map.js" defer></script>
+    <script src="/src/assets/js/main.js" defer></script>
+  </body>
+</html>

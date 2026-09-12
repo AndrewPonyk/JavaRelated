@@ -1,0 +1,25 @@
+# Reusable steps: React install → lint → test → type-check + build
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: 20.x
+
+  - script: npm ci
+    displayName: Install
+    workingDirectory: src/public-portal
+
+  - script: npm run lint
+    displayName: Lint (ESLint)
+    workingDirectory: src/public-portal
+
+  - script: npm test
+    displayName: Unit tests (Vitest)
+    workingDirectory: src/public-portal
+
+  - script: npm run build
+    displayName: Type-check + build
+    workingDirectory: src/public-portal
+
+  - publish: src/public-portal/dist
+    artifact: public-portal-dist
+    displayName: Publish build artifact

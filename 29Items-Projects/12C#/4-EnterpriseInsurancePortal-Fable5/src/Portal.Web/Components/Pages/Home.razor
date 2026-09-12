@@ -1,0 +1,61 @@
+@page "/"
+@inject PolicyApiClient Api
+
+<PageTitle>Dashboard</PageTitle>
+<h1>Broker Dashboard</h1>
+
+@if (error is not null)
+{
+    <div class="alert alert-danger" role="alert">@error <button @onclick="LoadAsync">Retry</button></div>
+}
+else if (!loaded)
+{
+    <p><em>Loading…</em></p>
+}
+else
+{
+    <div class="form-grid">
+        <div class="card"><h3>@customerCount</h3>Customers</div>
+        <div class="card"><h3>@openQuoteCount</h3>Open quotes</div>
+        <div class="card"><h3>@activePolicyCount</h3>Active policies</div>
+        <div class="card"><h3>@totalPremium.ToString("C0")</h3>Annual premium in force</div>
+    </div>
+    <p>
+        Issue a new quote under <a href="quotes">Quotes</a>, or manage existing business under
+        <a href="policies">Policies</a>.
+    </p>
+}
+
+@code {
+    private bool loaded;
+    private string? error;
+    private int customerCount;
+    private int openQuoteCount;
+    private int activePolicyCount;
+    private decimal totalPremium;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        error = null;
+        loaded = false;
+        try
+        {
+            var customers = await Api.GetCustomersAsync();
+            var quotes = await Api.GetQuotesAsync();
+            var policies = await Api.GetPoliciesAsync();
+
+            customerCount = customers.Count;
+            openQuoteCount = quotes.Count(q => q.Status == "Issued");
+            var active = policies.Where(p => p.Status == "Active").ToList();
+            activePolicyCount = active.Count;
+            totalPremium = active.Sum(p => p.AnnualPremium);
+            loaded = true;
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Could not load dashboard data: {ex.Message}";
+        }
+    }
+}

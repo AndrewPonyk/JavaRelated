@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "id": "starter-leek-tart",
+      "name": "Charred Leek Tart",
+      "category": "starters",
+      "description": "Flaky pastry, whipped goat cheese, smoked leek, herb oil.",
+      "price": "$16"
+    },
+    {
+      "id": "starter-crudo",
+      "name": "Sea Bass Crudo",
+      "category": "starters",
+      "description": "Citrus, fennel pollen, green olive, chilled cucumber.",
+      "price": "$18"
+    },
+    {
+      "id": "main-market-fish",
+      "name": "Market Fish",
+      "category": "mains",
+      "description": "Brown butter, spring vegetables, preserved lemon.",
+      "price": "$34"
+    },
+    {
+      "id": "main-short-rib",
+      "name": "Braised Short Rib",
+      "category": "mains",
+      "description": "Celery root puree, bitter greens, red wine jus.",
+      "price": "$38"
+    },
+    {
+      "id": "dessert-posset",
+      "name": "Citrus Posset",
+      "category": "desserts",
+      "description": "Blood orange, almond crumb, creme fraiche.",
+      "price": "$12"
+    },
+    {
+      "id": "drink-spritz",
+      "name": "Garden Spritz",
+      "category": "drinks",
+      "description": "Bergamot, basil, sparkling wine, mineral finish.",
+      "price": "$14"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,ts,tsx,js,jsx,razor,html,css}]
+indent_size = 2
+
+[*.cs]
+# Style enforced in CI via `dotnet format --verify-no-changes`
+dotnet_sort_system_directives_first = true
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+dotnet_style_require_accessibility_modifiers = always:warning
+dotnet_diagnostic.CA2007.severity = none  # ConfigureAwait not needed in ASP.NET Core

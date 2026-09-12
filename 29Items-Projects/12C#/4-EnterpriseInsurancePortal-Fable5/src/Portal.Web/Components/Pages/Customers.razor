@@ -1,0 +1,128 @@
+@page "/customers"
+@inject PolicyApiClient Api
+
+<PageTitle>Customers</PageTitle>
+<h1>Customers</h1>
+
+@if (notice is not null)
+{
+    <div class="alert alert-success">@notice</div>
+}
+@if (error is not null)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+<div class="card">
+    <h3>New customer</h3>
+    <EditForm Model="form" OnValidSubmit="CreateAsync" FormName="newCustomer">
+        <DataAnnotationsValidator />
+        <div class="form-grid">
+            <div>
+                <label for="firstName">First name</label>
+                <InputText id="firstName" @bind-Value="form.FirstName" />
+                <ValidationMessage For="() => form.FirstName" />
+            </div>
+            <div>
+                <label for="lastName">Last name</label>
+                <InputText id="lastName" @bind-Value="form.LastName" />
+                <ValidationMessage For="() => form.LastName" />
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <InputText id="email" @bind-Value="form.Email" type="email" />
+                <ValidationMessage For="() => form.Email" />
+            </div>
+            <div>
+                <label for="dob">Date of birth</label>
+                <InputDate id="dob" @bind-Value="form.DateOfBirth" />
+                <ValidationMessage For="() => form.DateOfBirth" />
+            </div>
+        </div>
+        <p><button type="submit" disabled="@saving">@(saving ? "Saving…" : "Create customer")</button></p>
+    </EditForm>
+</div>
+
+@if (customers is null)
+{
+    <p><em>Loading…</em></p>
+}
+else if (customers.Count == 0)
+{
+    <p>No customers yet — create the first one above.</p>
+}
+else
+{
+    <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Date of birth</th></tr></thead>
+        <tbody>
+            @foreach (var c in customers)
+            {
+                <tr>
+                    <td>@c.LastName, @c.FirstName</td>
+                    <td>@c.Email</td>
+                    <td>@c.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private sealed class CustomerForm
+    {
+        [Required, StringLength(100)]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required, StringLength(100)]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required, EmailAddress, StringLength(320)]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public DateOnly DateOfBirth { get; set; } = new(1990, 1, 1);
+    }
+
+    private CustomerForm form = new();
+    private IReadOnlyList<CustomerSummary>? customers;
+    private string? error;
+    private string? notice;
+    private bool saving;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        error = null;
+        try
+        {
+            customers = await Api.GetCustomersAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Could not load customers: {ex.Message}";
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        saving = true;
+        error = notice = null;
+        try
+        {
+            var created = await Api.CreateCustomerAsync(form.FirstName, form.LastName, form.Email, form.DateOfBirth);
+            notice = $"Customer {created.FirstName} {created.LastName} created.";
+            form = new CustomerForm();
+            await LoadAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

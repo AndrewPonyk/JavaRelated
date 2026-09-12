@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="750" viewBox="0 0 1000 750" role="img" aria-label="Dining room">
+  <rect width="1000" height="750" fill="#292524"/>
+  <rect y="430" width="1000" height="320" fill="#1c1917"/>
+  <circle cx="240" cy="170" r="82" fill="#fbbf24" opacity="0.65"/>
+  <circle cx="500" cy="150" r="95" fill="#fde68a" opacity="0.55"/>
+  <circle cx="760" cy="170" r="82" fill="#fbbf24" opacity="0.65"/>
+  <rect x="170" y="500" width="260" height="28" rx="14" fill="#a8a29e"/>
+  <rect x="570" y="500" width="260" height="28" rx="14" fill="#a8a29e"/>
+  <text x="500" y="680" fill="#fafaf9" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Dining Room</text>
+</svg>

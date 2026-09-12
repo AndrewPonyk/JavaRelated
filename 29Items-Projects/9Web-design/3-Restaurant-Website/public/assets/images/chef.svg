@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1100" viewBox="0 0 900 1100" role="img" aria-label="Chef plating a dish">
+  <rect width="900" height="1100" fill="#e7e5e4"/>
+  <rect x="80" y="120" width="740" height="860" rx="28" fill="#fafaf9"/>
+  <circle cx="450" cy="300" r="120" fill="#d6d3d1"/>
+  <rect x="300" y="430" width="300" height="420" rx="40" fill="#44403c"/>
+  <circle cx="450" cy="790" r="145" fill="#f5f5f4"/>
+  <circle cx="450" cy="790" r="82" fill="#f59e0b" opacity="0.8"/>
+  <path d="M330 762c85 70 160 70 240 0" fill="none" stroke="#292524" stroke-width="12" stroke-linecap="round"/>
+  <text x="450" y="1010" fill="#57534e" font-family="Arial, sans-serif" font-size="34" text-anchor="middle">Aster Table Chef</text>
+</svg>

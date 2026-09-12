@@ -1,0 +1,9 @@
+{
+  "name": "Marketing Website Builder Export",
+  "id": "marketing-website-builder-export",
+  "api": "1.0.0",
+  "main": "src/code.ts",
+  "ui": "src/ui.html",
+  "editorType": ["figma"]
+}
+

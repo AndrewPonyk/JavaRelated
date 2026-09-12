@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.28.3" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.66.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.67.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.12" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Policy.Domain\Policy.Domain.csproj" />
+    <ProjectReference Include="..\Policy.Infrastructure\Policy.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Shared\Portal.Shared.Contracts\Portal.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\Shared\Portal.Shared.Kafka\Portal.Shared.Kafka.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Client stubs generated from the rating service's contract -->
+    <Protobuf Include="..\Rating.Grpc\Protos\rating.proto" GrpcServices="Client" Link="Protos\rating.proto" />
+  </ItemGroup>
+</Project>

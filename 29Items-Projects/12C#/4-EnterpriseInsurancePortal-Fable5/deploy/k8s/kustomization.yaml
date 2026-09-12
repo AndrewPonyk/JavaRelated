@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - configmap.yaml
+  - secrets.yaml
+  - policy-api.yaml
+  - rating-grpc.yaml
+  - portal-web.yaml
+  - portal-jobs.yaml
+  - public-portal.yaml
+  - ingress.yaml
+# migration-job.yaml is applied separately by the pipeline *before* this kustomization.
+
+# The deploy pipeline pins all tags to the immutable CI build tag:
+#   kustomize edit set image insuranceacr.azurecr.io/policy-api:<tag> ...
+images:
+  - name: insuranceacr.azurecr.io/policy-api
+    newTag: latest
+  - name: insuranceacr.azurecr.io/rating-grpc
+    newTag: latest
+  - name: insuranceacr.azurecr.io/portal-web
+    newTag: latest
+  - name: insuranceacr.azurecr.io/portal-jobs
+    newTag: latest
+  - name: insuranceacr.azurecr.io/public-portal
+    newTag: latest

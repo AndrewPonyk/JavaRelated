@@ -1,0 +1,236 @@
+@page "/quotes"
+@inject PolicyApiClient Api
+@inject NavigationManager Nav
+
+<PageTitle>Quotes</PageTitle>
+<h1>Quotes</h1>
+
+@if (notice is not null)
+{
+    <div class="alert alert-success">@notice</div>
+}
+@if (error is not null)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+<div class="card">
+    <h3>Issue a quote</h3>
+    <EditForm Model="form" OnValidSubmit="CreateAsync" FormName="newQuote">
+        <DataAnnotationsValidator />
+        <div class="form-grid">
+            <div>
+                <label for="customer">Customer</label>
+                <InputSelect id="customer" @bind-Value="form.CustomerId">
+                    <option value="">— select —</option>
+                    @foreach (var c in customers ?? [])
+                    {
+                        <option value="@c.Id">@c.LastName, @c.FirstName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => form.CustomerId" />
+            </div>
+            <div>
+                <label for="product">Product</label>
+                <InputSelect id="product" @bind-Value="form.ProductCode">
+                    <option value="AUTO-STD">Auto — Standard</option>
+                    <option value="AUTO-PREM">Auto — Premium</option>
+                    <option value="HOME-STD">Home — Standard</option>
+                    <option value="HOME-PREM">Home — Premium</option>
+                    <option value="LIFE-TERM">Life — Term</option>
+                </InputSelect>
+            </div>
+            <div>
+                <label for="state">State</label>
+                <InputText id="state" @bind-Value="form.StateCode" maxlength="2" placeholder="e.g. CA" />
+                <ValidationMessage For="() => form.StateCode" />
+            </div>
+            <div>
+                <label for="driverAge">Driver age (auto)</label>
+                <InputNumber id="driverAge" @bind-Value="form.DriverAge" />
+            </div>
+            <div>
+                <label for="priorClaims">Prior claims</label>
+                <InputNumber id="priorClaims" @bind-Value="form.PriorClaims" />
+            </div>
+            <div>
+                <label for="vehicleValue">Vehicle value (auto)</label>
+                <InputNumber id="vehicleValue" @bind-Value="form.VehicleValue" />
+            </div>
+            <div>
+                <label for="propertyValue">Property value (home)</label>
+                <InputNumber id="propertyValue" @bind-Value="form.PropertyValue" />
+            </div>
+            <div>
+                <label for="smoker">Smoker (life)</label>
+                <InputSelect id="smoker" @bind-Value="form.Smoker">
+                    <option value="">n/a</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </InputSelect>
+            </div>
+        </div>
+        <p><button type="submit" disabled="@saving">@(saving ? "Rating…" : "Rate & issue quote")</button></p>
+    </EditForm>
+</div>
+
+@if (quotes is null)
+{
+    <p><em>Loading…</em></p>
+}
+else if (quotes.Count == 0)
+{
+    <p>No quotes yet — issue the first one above.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Issued</th><th>Product</th><th>State</th><th>Premium</th><th>Status</th><th>Expires</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var q in quotes)
+            {
+                <tr>
+                    <td>@q.IssuedAtUtc.ToString("yyyy-MM-dd")</td>
+                    <td>@q.ProductCode</td>
+                    <td>@q.StateCode</td>
+                    <td>@q.Premium.ToString("C")</td>
+                    <td><span class="badge badge-@q.Status.ToLowerInvariant()">@q.Status</span></td>
+                    <td>@q.ExpiresAtUtc.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @if (q.Status == "Issued")
+                        {
+                            <button @onclick="() => BindAsync(q.Id)" disabled="@saving">Bind</button>
+                            <button class="secondary" @onclick="() => DeclineAsync(q.Id)" disabled="@saving">Decline</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const string BrokerId = "BRK-001"; // replaced by the OIDC identity once interactive login is enabled
+
+    private sealed class QuoteForm
+    {
+        [Required(ErrorMessage = "Select a customer.")]
+        public Guid? CustomerId { get; set; }
+
+        public string ProductCode { get; set; } = "AUTO-STD";
+
+        [Required, RegularExpression("^[A-Za-z]{2}$", ErrorMessage = "Use a two-letter state code.")]
+        public string StateCode { get; set; } = "CA";
+
+        public int? DriverAge { get; set; }
+        public int? PriorClaims { get; set; }
+        public decimal? VehicleValue { get; set; }
+        public decimal? PropertyValue { get; set; }
+        public string Smoker { get; set; } = string.Empty;
+
+        public Dictionary<string, string> ToRiskFactors()
+        {
+            var factors = new Dictionary<string, string>();
+            if (DriverAge is { } age) { factors["driverAge"] = age.ToString(); }
+            if (PriorClaims is { } claims) { factors["priorClaims"] = claims.ToString(); }
+            if (VehicleValue is { } vehicle) { factors["vehicleValue"] = vehicle.ToString(System.Globalization.CultureInfo.InvariantCulture); }
+            if (PropertyValue is { } property) { factors["propertyValue"] = property.ToString(System.Globalization.CultureInfo.InvariantCulture); }
+            if (!string.IsNullOrEmpty(Smoker)) { factors["smoker"] = Smoker; }
+            return factors;
+        }
+    }
+
+    private QuoteForm form = new();
+    private IReadOnlyList<QuoteSummary>? quotes;
+    private IReadOnlyList<CustomerSummary>? customers;
+    private string? error;
+    private string? notice;
+    private bool saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            customers = await Api.GetCustomersAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Could not load customers: {ex.Message}";
+        }
+
+        await LoadQuotesAsync();
+    }
+
+    private async Task LoadQuotesAsync()
+    {
+        try
+        {
+            quotes = await Api.GetQuotesAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Could not load quotes: {ex.Message}";
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        saving = true;
+        error = notice = null;
+        try
+        {
+            var quote = await Api.CreateQuoteAsync(
+                form.CustomerId!.Value, BrokerId, form.ProductCode, form.StateCode, form.ToRiskFactors());
+            notice = $"Quote issued at {quote.Premium:C} (rate table {quote.RateTableVersion}), valid until {quote.ExpiresAtUtc:yyyy-MM-dd}.";
+            await LoadQuotesAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task BindAsync(Guid quoteId)
+    {
+        saving = true;
+        error = notice = null;
+        try
+        {
+            var policy = await Api.BindPolicyAsync(quoteId, BrokerId);
+            Nav.NavigateTo($"policies/{policy.Id}");
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+            saving = false;
+        }
+    }
+
+    private async Task DeclineAsync(Guid quoteId)
+    {
+        saving = true;
+        error = notice = null;
+        try
+        {
+            await Api.DeclineQuoteAsync(quoteId);
+            notice = "Quote declined.";
+            await LoadQuotesAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+}

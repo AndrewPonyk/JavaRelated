@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "Rating.Grpc";
+
+package rating.v1;
+
+// Premium rating engine. Contract changes are checked with `buf breaking` in CI.
+service RatingService {
+  rpc CalculatePremium (PremiumRequest) returns (PremiumResponse);
+}
+
+message PremiumRequest {
+  string product_code = 1;
+  string customer_id = 2;
+  string state_code = 3;
+  // Risk factors as key/value pairs to keep the contract stable as factors evolve.
+  map<string, string> risk_factors = 4;
+}
+
+message PremiumResponse {
+  // Decimals as string to avoid floating-point money. Parsed with InvariantCulture.
+  string annual_premium = 1;
+  string rate_table_version = 2;
+  repeated string applied_surcharges = 3;
+}

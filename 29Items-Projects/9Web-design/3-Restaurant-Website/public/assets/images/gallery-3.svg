@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="750" viewBox="0 0 1000 750" role="img" aria-label="Restaurant bar">
+  <rect width="1000" height="750" fill="#1c1917"/>
+  <rect x="0" y="460" width="1000" height="290" fill="#3f2f20"/>
+  <rect x="120" y="120" width="760" height="230" rx="18" fill="#57534e"/>
+  <rect x="180" y="170" width="90" height="140" rx="12" fill="#f59e0b" opacity="0.65"/>
+  <rect x="330" y="150" width="80" height="160" rx="12" fill="#84cc16" opacity="0.55"/>
+  <rect x="480" y="170" width="90" height="140" rx="12" fill="#f97316" opacity="0.6"/>
+  <rect x="640" y="140" width="75" height="170" rx="12" fill="#eab308" opacity="0.55"/>
+  <text x="500" y="650" fill="#fafaf9" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Restaurant Bar</text>
+</svg>

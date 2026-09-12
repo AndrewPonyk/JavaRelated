@@ -1,0 +1,49 @@
+services:
+  api:
+    build: .
+    command: sh -c "npm run db:setup && npm run api:dev"
+    ports:
+      - '4100:4100'
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-4100}
+      DATABASE_URL: postgres://${POSTGRES_USER:-design_system}:${POSTGRES_PASSWORD:-design_system}@postgres:5432/${POSTGRES_DB:-design_system}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
+      REQUIRE_HTTPS: ${REQUIRE_HTTPS:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      API_KEY: ${API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build: .
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - '5173:5173'
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4100}
+    depends_on:
+      - api
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-design_system}
+      POSTGRES_USER: ${POSTGRES_USER:-design_system}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-design_system}
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

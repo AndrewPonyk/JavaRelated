@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/marketing_builder
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      AUTH_SECRET: local-development-secret
+      DEMO_USER_EMAIL: demo@builder.local
+      FIGMA_PLUGIN_CLIENT_ID: local-figma-client
+      WEBFLOW_CLIENT_ID: local-webflow-client
+      WEBFLOW_CLIENT_SECRET: local-webflow-secret
+      ML_SUGGESTIONS_API_URL: http://app:3000/api/sites
+      VISUAL_REGRESSION_BASE_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: marketing_builder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d marketing_builder"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

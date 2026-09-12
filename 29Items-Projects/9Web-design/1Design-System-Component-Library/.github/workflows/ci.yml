@@ -1,0 +1,60 @@
+name: Design System CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run format
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit and accessibility tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Generate release notes
+        run: npm run release:notes
+
+      - name: Upload package build
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-system-dist
+          path: dist
+
+      - name: Upload Storybook
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-system-storybook
+          path: storybook-static
+
+      - name: Publish Chromatic baseline
+        if: ${{ env.CHROMATIC_PROJECT_TOKEN != '' }}
+        run: npm run chromatic

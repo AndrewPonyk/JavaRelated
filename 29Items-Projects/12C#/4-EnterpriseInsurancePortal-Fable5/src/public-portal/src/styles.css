@@ -1,0 +1,44 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f7fafc; color: #1a202c; }
+
+.shell { max-width: 860px; margin: 0 auto; padding: 1rem; min-height: 100vh; display: flex; flex-direction: column; }
+header { display: flex; align-items: center; justify-content: space-between; padding: .5rem 0 1rem; }
+header h1 { font-size: 1.4rem; margin: 0; color: #1a365d; }
+main { flex: 1; }
+footer { padding: 1.5rem 0; color: #718096; font-size: .85rem; text-align: center; }
+
+.card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 1.25rem; margin-bottom: 1.25rem; }
+.card.narrow { max-width: 420px; margin: 3rem auto; }
+.card h2 { margin-top: 0; font-size: 1.1rem; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid #e2e8f0; font-size: .92rem; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: #4a5568; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: #ebf8ff; }
+tbody tr.selected { background: #bee3f8; }
+
+.form-row { margin-bottom: .9rem; }
+label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+input { width: 100%; padding: .5rem .65rem; border: 1px solid #cbd5e0; border-radius: 5px; font-size: .95rem; }
+
+button { background: #2b6cb0; color: #fff; border: none; border-radius: 5px; padding: .55rem 1.1rem; font-size: .92rem; cursor: pointer; }
+button:hover { background: #2c5282; }
+button:disabled { background: #a0aec0; cursor: not-allowed; }
+button.link { background: none; color: #2b6cb0; padding: 0; text-decoration: underline; }
+
+.muted { color: #718096; }
+.error { color: #c53030; }
+.success { color: #276749; }
+ul.error { padding-left: 1.2rem; }
+
+.badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+.badge-active, .badge-approved, .badge-paid { background: #c6f6d5; color: #22543d; }
+.badge-cancelled, .badge-rejected { background: #fed7d7; color: #742a2a; }
+.badge-filed, .badge-underreview { background: #bee3f8; color: #2a4365; }
+.badge-lapsed, .badge-expired { background: #e2e8f0; color: #2d3748; }
+
+@media (max-width: 600px) {
+  th:nth-child(3), td:nth-child(3) { display: none; } /* hide effective date on phones */
+  .shell { padding: .5rem; }
+}

@@ -1,0 +1,30 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Policy.Infrastructure;
+
+namespace Policy.Api.Tests.TestInfra;
+
+/// <summary>
+/// In-memory SQLite database + IDbContextFactory for service-level unit tests.
+/// The connection stays open for the lifetime of the fixture (closing it drops the db).
+/// </summary>
+public sealed class SqliteDb : IDbContextFactory<PolicyDbContext>, IDisposable
+{
+    private readonly SqliteConnection _connection;
+    private readonly DbContextOptions<PolicyDbContext> _options;
+
+    public SqliteDb()
+    {
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+        _options = new DbContextOptionsBuilder<PolicyDbContext>()
+            .UseSqlite(_connection)
+            .Options;
+        using var db = CreateDbContext();
+        db.Database.EnsureCreated();
+    }
+
+    public PolicyDbContext CreateDbContext() => new(_options);
+
+    public void Dispose() => _connection.Dispose();
+}

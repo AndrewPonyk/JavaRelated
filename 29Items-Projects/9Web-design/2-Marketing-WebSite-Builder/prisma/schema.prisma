@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String
+  memberships Membership[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  memberships Membership[]
+  sites       Site[]
+  templates   BlockTemplate[]
+  experiments Experiment[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Membership {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           Role         @default(MARKETER)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([userId, organizationId])
+  @@index([organizationId, role])
+}
+
+model Site {
+  id             String             @id @default(cuid())
+  organizationId String
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  slug           String
+  status         SiteStatus         @default(DRAFT)
+  pages          Page[]
+  experiments    Experiment[]
+  conversionEvents ConversionEvent[]
+  suggestions    LayoutSuggestion[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  publishedAt    DateTime?
+
+  @@unique([organizationId, slug])
+  @@index([organizationId, status])
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title     String
+  slug      String
+  document  Json
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model BlockTemplate {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  category       BlockCategory
+  document       Json
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, category])
+}
+
+model Experiment {
+  id             String             @id @default(cuid())
+  organizationId String
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  siteId         String
+  site           Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name           String
+  status         ExperimentStatus   @default(DRAFT)
+  variants       ExperimentVariant[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([organizationId, status])
+  @@index([siteId])
+}
+
+model ExperimentVariant {
+  id           String     @id @default(cuid())
+  experimentId String
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  name         String
+  trafficShare Int
+  pageDocument Json
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([experimentId])
+}
+
+model ConversionEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  siteId         String
+  site           Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  pageSlug       String
+  eventName      String
+  source         String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([siteId, createdAt])
+  @@index([eventName])
+}
+
+model LayoutSuggestion {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title       String
+  rationale   String
+  confidence  Float
+  proposedDocument Json
+  createdAt   DateTime @default(now())
+
+  @@index([siteId, createdAt])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actorId        String?
+  actor          User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action         String
+  targetType     String
+  targetId       String
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([targetType, targetId])
+}
+
+enum Role {
+  OWNER
+  DEVELOPER
+  MARKETER
+  REVIEWER
+  VIEWER
+}
+
+enum SiteStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum BlockCategory {
+  HERO
+  CTA
+  PRICING
+  TESTIMONIALS
+  FORM
+  FAQ
+}
+
+enum ExperimentStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  COMPLETED
+}

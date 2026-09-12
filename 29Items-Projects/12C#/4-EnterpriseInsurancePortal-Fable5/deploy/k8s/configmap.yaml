@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portal-config
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  Database__MigrateOnStartup: "false" # migrations run as a Job before rollout
+  Rating__GrpcAddress: http://rating-grpc
+  Kafka__PolicyEventsTopic: policy-events
+  PolicyApi__BaseUrl: http://policy-api

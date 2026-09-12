@@ -1,0 +1,130 @@
+# Full local stack. From the repository root:
+#   docker compose -f deploy/docker/docker-compose.yml up --build
+#
+# Endpoints once up:
+#   Broker portal (Blazor) ..... http://localhost:5301
+#   Customer portal (React) .... http://localhost:5173
+#   Policy API (Swagger) ....... http://localhost:5101/swagger
+#   Hangfire dashboard ......... http://localhost:5401/hangfire
+name: insurance-portal
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQLSERVER_SA_PASSWORD:-ChangeMe_Local0nly!}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      retries: 12
+      start_period: 20s
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    ports:
+      - "9092:9092"
+    environment:
+      # KRaft single-node — no Zookeeper needed
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+  rating-grpc:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Rating.Grpc.Dockerfile
+    ports:
+      - "5201:8080"
+
+  policy-api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Policy.Api.Dockerfile
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rating-grpc:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development # enables Swagger UI; auth uses the Dev scheme
+      ConnectionStrings__PolicyDb: Server=sqlserver;Database=InsurancePortal;User Id=sa;Password=${SQLSERVER_SA_PASSWORD:-ChangeMe_Local0nly!};TrustServerCertificate=true
+      Database__MigrateOnStartup: "true"
+      Rating__GrpcAddress: http://rating-grpc:8080
+      Kafka__BootstrapServers: kafka:29092
+      Cors__AllowedOrigins__0: http://localhost:5173
+    ports:
+      - "5101:8080"
+
+  portal-web:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Portal.Web.Dockerfile
+    depends_on:
+      policy-api:
+        condition: service_started
+    environment:
+      PolicyApi__BaseUrl: http://policy-api:8080
+      Kafka__BootstrapServers: kafka:29092
+    ports:
+      - "5301:8080"
+
+  portal-jobs:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Portal.Jobs.Dockerfile
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rating-grpc:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development # opens the Hangfire dashboard locally
+      ConnectionStrings__PolicyDb: Server=sqlserver;Database=InsurancePortal;User Id=sa;Password=${SQLSERVER_SA_PASSWORD:-ChangeMe_Local0nly!};TrustServerCertificate=true
+      Rating__GrpcAddress: http://rating-grpc:8080
+      Reports__OutputPath: /app/reports
+    volumes:
+      - reports:/app/reports
+    ports:
+      - "5401:8080"
+
+  public-portal:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/public-portal.Dockerfile
+      args:
+        # The browser calls the API through the host-mapped port.
+        VITE_API_BASE_URL: http://localhost:5101
+    depends_on:
+      policy-api:
+        condition: service_started
+    ports:
+      - "5173:80"
+
+  # OIDC token service. Not on the local request path (the Dev auth scheme covers
+  # local development); staging/prod point Identity__Authority at this service.
+  identity:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Portal.Identity.Dockerfile
+    ports:
+      - "5001:8080"
+    profiles: ["identity"]
+
+volumes:
+  sqldata:
+  reports:

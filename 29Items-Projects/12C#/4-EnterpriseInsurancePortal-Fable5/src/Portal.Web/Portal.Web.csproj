@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <!-- Pins the transitive Azure SignalR dependency above GHSA-m5vv-6r4h-3vj9 / GHSA-x674-v45j-fwxw -->
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.12" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.25.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Portal.Shared.Contracts\Portal.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\Shared\Portal.Shared.Kafka\Portal.Shared.Kafka.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Amalfi Coast",
+    "region": "Europe",
+    "latitude": 40.6333,
+    "longitude": 14.6029,
+    "description": "Coastal villages, food experiences, and rail-connected city stays."
+  },
+  {
+    "name": "Kyoto",
+    "region": "Asia",
+    "latitude": 35.0116,
+    "longitude": 135.7681,
+    "description": "Cultural routes, gardens, temples, and traditional inns."
+  },
+  {
+    "name": "Patagonia",
+    "region": "Americas",
+    "latitude": -49.3315,
+    "longitude": -72.8863,
+    "description": "Active trekking routes with glacier and mountain lodge access."
+  },
+  {
+    "name": "Marrakesh",
+    "region": "Africa",
+    "latitude": 31.6295,
+    "longitude": -7.9811,
+    "description": "Historic medinas, desert extensions, and Atlas Mountain day trips."
+  }
+]

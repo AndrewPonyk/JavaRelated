@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="750" viewBox="0 0 1000 750" role="img" aria-label="Plated main course">
+  <rect width="1000" height="750" fill="#f5f5f4"/>
+  <circle cx="500" cy="360" r="260" fill="#e7e5e4"/>
+  <circle cx="500" cy="360" r="180" fill="#fafaf9"/>
+  <ellipse cx="500" cy="360" rx="145" ry="78" fill="#92400e"/>
+  <circle cx="390" cy="310" r="34" fill="#65a30d"/>
+  <circle cx="620" cy="405" r="30" fill="#f59e0b"/>
+  <path d="M360 430c88 52 190 48 280-8" fill="none" stroke="#44403c" stroke-width="14" stroke-linecap="round"/>
+  <text x="500" y="690" fill="#57534e" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Plated Main Course</text>
+</svg>

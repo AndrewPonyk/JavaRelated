@@ -1,0 +1,148 @@
+:root {
+  --color-ink: #1f2a37;
+  --color-muted: #64748b;
+  --color-primary: #0f766e;
+  --color-primary-dark: #115e59;
+  --color-surface: #f8fafc;
+  --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+body {
+  color: var(--color-ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-hover-bg: var(--color-primary-dark);
+  --bs-btn-hover-border-color: var(--color-primary-dark);
+}
+
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+.hero-home {
+  min-height: 76vh;
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.18)),
+    url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80") center/cover;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.text-white-75 {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.feature-tile,
+.metric-tile,
+.tour-card,
+.contact-form {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.feature-tile {
+  height: 100%;
+  padding: 1.5rem;
+}
+
+.feature-tile i {
+  color: var(--color-primary);
+  display: inline-block;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.metric-tile {
+  padding: 1.25rem;
+}
+
+.metric-tile strong {
+  display: block;
+  font-size: 2rem;
+}
+
+.metric-tile span {
+  color: var(--color-muted);
+}
+
+.tour-card {
+  height: 100%;
+  overflow: hidden;
+}
+
+.tour-card img {
+  aspect-ratio: 16 / 10;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.tour-card-body {
+  padding: 1rem;
+}
+
+.tour-meta {
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  gap: 0.75rem;
+}
+
+.destination-map {
+  border: 1px solid #dbe3ea;
+  border-radius: 8px;
+  height: min(64vh, 620px);
+  min-height: 420px;
+  overflow: hidden;
+}
+
+.contact-form {
+  padding: 1.5rem;
+}
+
+.form-status {
+  min-height: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.site-footer {
+  background: #0f172a;
+  color: #e5e7eb;
+  padding: 1.25rem 0;
+}
+
+.site-footer a {
+  color: #a7f3d0;
+}
+
+.loading-shell,
+.empty-state,
+.error-state {
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

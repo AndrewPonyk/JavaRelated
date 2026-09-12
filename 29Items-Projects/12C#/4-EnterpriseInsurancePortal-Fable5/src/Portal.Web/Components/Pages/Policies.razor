@@ -1,0 +1,103 @@
+@page "/policies"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject PolicyApiClient Api
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+
+<PageTitle>Policies</PageTitle>
+<h1>
+    Policies
+    @if (live)
+    {
+        <small><span class="live-dot"></span>live</small>
+    }
+</h1>
+
+@if (error is not null)
+{
+    <div class="alert alert-danger" role="alert">
+        @error <button @onclick="LoadAsync">Retry</button>
+    </div>
+}
+else if (policies is null)
+{
+    <p><em>Loading…</em></p>
+}
+else if (policies.Count == 0)
+{
+    <p>No policies yet. Bind a quote from the <a href="quotes">Quotes</a> page.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>Policy #</th><th>Premium</th><th>Effective</th><th>Expires</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var p in policies)
+            {
+                <tr>
+                    <td><a href="@($"policies/{p.Id}")">@p.PolicyNumber</a></td>
+                    <td>@p.AnnualPremium.ToString("C")</td>
+                    <td>@p.EffectiveDate.ToString("yyyy-MM-dd")</td>
+                    <td>@p.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                    <td><span class="badge badge-@p.Status.ToLowerInvariant()">@p.Status</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<PolicySummary>? policies;
+    private string? error;
+    private bool live;
+    private HubConnection? hub;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+
+        // Live refresh: the PolicyHub broadcasts whenever a policy event arrives on Kafka.
+        hub = new HubConnectionBuilder()
+            .WithUrl(Nav.ToAbsoluteUri("/hubs/policies"))
+            .WithAutomaticReconnect()
+            .Build();
+        hub.On<string>("PolicyUpdated", async _ =>
+        {
+            await LoadAsync();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hub.StartAsync();
+            live = true;
+        }
+        catch (Exception)
+        {
+            live = false; // the page still works without live updates
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        error = null;
+        try
+        {
+            policies = await Api.GetPoliciesAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Failed to load policies: {ex.Message}";
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hub is not null)
+        {
+            await hub.DisposeAsync();
+        }
+    }
+}

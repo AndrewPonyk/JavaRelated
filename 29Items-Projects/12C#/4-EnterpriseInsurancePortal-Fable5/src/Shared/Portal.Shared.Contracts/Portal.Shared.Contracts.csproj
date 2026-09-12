@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Event contracts and shared DTOs. Keep dependency-free; versioned additively
+       (add fields, never remove/rename) because Kafka consumers deploy independently. -->
+</Project>

@@ -1,0 +1,36 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(252 211 77);
+  outline-offset: 3px;
+}
+
+[data-reservation-status][data-state='error'] {
+  color: rgb(254 202 202);
+}
+
+[data-reservation-status][data-state='success'] {
+  color: rgb(187 247 208);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

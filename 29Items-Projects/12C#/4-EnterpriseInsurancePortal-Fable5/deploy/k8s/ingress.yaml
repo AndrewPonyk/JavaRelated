@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: insurance-portal
+  annotations:
+    # WebSocket support for Blazor Server / SignalR (TECH-NOTES.md pitfall #2)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # Session affinity for Blazor circuits
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "portal-affinity"
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - broker.example-insurance.com
+        - my.example-insurance.com
+        - api.example-insurance.com
+      secretName: portal-tls
+  rules:
+    - host: broker.example-insurance.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: portal-web, port: { number: 80 } }
+    - host: my.example-insurance.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: public-portal, port: { number: 80 } }
+    - host: api.example-insurance.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: policy-api, port: { number: 80 } }
+# rating-grpc is deliberately NOT routed here: it stays cluster-internal behind a
+# headless service with client-side gRPC load balancing (pitfall #6).

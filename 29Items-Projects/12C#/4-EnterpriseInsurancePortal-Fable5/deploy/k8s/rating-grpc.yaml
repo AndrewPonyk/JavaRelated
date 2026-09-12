@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rating-grpc
+  labels: { app: rating-grpc }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: rating-grpc }
+  template:
+    metadata:
+      labels: { app: rating-grpc }
+    spec:
+      containers:
+        - name: rating-grpc
+          image: insuranceacr.azurecr.io/rating-grpc:latest # tag pinned by kustomize in the pipeline
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom: { configMapKeyRef: { name: portal-config, key: ASPNETCORE_ENVIRONMENT } }
+          resources:
+            requests: { cpu: 500m, memory: 256Mi }
+            limits: { cpu: "2", memory: 512Mi }
+---
+# Headless service: gRPC clients (HTTP/2) resolve pod IPs via DNS and balance
+# per-call client-side, avoiding the L4 single-pod pinning problem (pitfall #6).
+# Cluster-internal only — never exposed through the ingress.
+apiVersion: v1
+kind: Service
+metadata:
+  name: rating-grpc
+spec:
+  clusterIP: None
+  selector: { app: rating-grpc }
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rating-grpc
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: rating-grpc }
+  minReplicas: 2
+  maxReplicas: 12
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 65 }

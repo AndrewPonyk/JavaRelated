@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+storybook-static
+package-lock.json
+src/styles/tokens.scss
+src/tokens/tailwind-theme.json

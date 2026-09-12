@@ -1,0 +1,7 @@
+node_modules
+coverage
+playwright-report
+test-results
+.git
+.netlify
+.env

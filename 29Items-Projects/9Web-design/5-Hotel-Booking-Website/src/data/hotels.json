@@ -1,0 +1,35 @@
+[
+  {
+    "id": "hotel-001",
+    "name": "Central Park Hotel",
+    "city": "New York",
+    "roomType": "standard",
+    "capacity": 2,
+    "pricePerNight": 180,
+    "amenities": ["Breakfast", "Wi-Fi", "Workspace"],
+    "coordinates": [40.7644, -73.9738],
+    "imageUrl": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "id": "hotel-002",
+    "name": "Harbor View Suites",
+    "city": "New York",
+    "roomType": "suite",
+    "capacity": 4,
+    "pricePerNight": 320,
+    "amenities": ["Kitchenette", "Bay view", "Concierge"],
+    "coordinates": [40.7061, -74.0086],
+    "imageUrl": "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "id": "hotel-003",
+    "name": "Midtown Business Inn",
+    "city": "New York",
+    "roomType": "deluxe",
+    "capacity": 3,
+    "pricePerNight": 240,
+    "amenities": ["Gym", "Late checkout", "Meeting rooms"],
+    "coordinates": [40.7549, -73.984],
+    "imageUrl": "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80"
+  }
+]

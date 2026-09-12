@@ -1,0 +1,30 @@
+{
+  "colors": {
+    "brand-primary": "var(--ds-color-brand-primary)",
+    "brand-secondary": "var(--ds-color-brand-secondary)",
+    "status-danger": "var(--ds-color-status-danger)",
+    "status-success": "var(--ds-color-status-success)",
+    "status-warning": "var(--ds-color-status-warning)",
+    "surface-default": "var(--ds-color-surface-default)",
+    "surface-subtle": "var(--ds-color-surface-subtle)",
+    "text-default": "var(--ds-color-text-default)",
+    "text-muted": "var(--ds-color-text-muted)"
+  },
+  "spacing": {
+    "component": "var(--ds-spacing-component)",
+    "lg": "var(--ds-spacing-lg)",
+    "sm": "var(--ds-spacing-sm)",
+    "xs": "var(--ds-spacing-xs)"
+  },
+  "borderRadius": {
+    "component": "var(--ds-radius-component)",
+    "sm": "var(--ds-radius-sm)"
+  },
+  "boxShadow": {
+    "component": "var(--ds-shadow-component)"
+  },
+  "zIndex": {
+    "modal": "var(--ds-z-index-modal)",
+    "toast": "var(--ds-z-index-toast)"
+  }
+}

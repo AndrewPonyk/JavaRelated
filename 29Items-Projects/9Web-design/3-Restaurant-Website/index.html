@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A modern restaurant website with menu previews, gallery, chef story, and reservations."
+    />
+    <meta property="og:title" content="Aster Table" />
+    <meta property="og:description" content="Seasonal dining, chef-led menus, and easy table reservations." />
+    <meta property="og:type" content="restaurant.restaurant" />
+    <title>Restaurant Website</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="/src/frontend/styles/input.css" />
+  </head>
+  <body class="bg-stone-950 text-stone-50 antialiased">
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-stone-950/80 backdrop-blur">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3" aria-label="Main navigation">
+        <a href="#home" class="text-lg font-semibold tracking-wide">Aster Table</a>
+        <button
+          class="rounded-md p-2 text-stone-100 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300 md:hidden"
+          data-nav-toggle
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="hidden items-center gap-6 text-sm md:flex" data-nav-menu>
+          <a class="hover:text-amber-200" href="#menu">Menu</a>
+          <a class="hover:text-amber-200" href="#story">Chef</a>
+          <a class="hover:text-amber-200" href="#gallery">Gallery</a>
+          <a class="rounded-md bg-amber-300 px-4 py-2 font-semibold text-stone-950 hover:bg-amber-200" href="#reservation">
+            Reserve
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="home">
+      <section class="relative flex min-h-screen items-center overflow-hidden pt-20">
+        <video
+          class="absolute inset-0 h-full w-full object-cover opacity-45"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="/assets/video/restaurant-hero.svg"
+          aria-hidden="true"
+        >
+          <source src="/assets/video/restaurant-hero.webm" type="video/webm" />
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/70 to-transparent"></div>
+        <div class="relative mx-auto w-full max-w-6xl px-4 py-24">
+          <p class="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Seasonal dining</p>
+          <h1 class="max-w-3xl text-5xl font-bold leading-tight text-white md:text-7xl">Aster Table</h1>
+          <p class="mt-5 max-w-xl text-lg leading-8 text-stone-200">
+            Ingredient-led cooking, a lively room, and reservations designed for effortless evenings.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="rounded-md bg-amber-300 px-5 py-3 font-semibold text-stone-950 hover:bg-amber-200" href="#reservation">
+              Book a table
+            </a>
+            <a class="rounded-md border border-white/30 px-5 py-3 font-semibold text-white hover:bg-white/10" href="#menu">
+              View menu
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="menu" class="bg-stone-50 py-20 text-stone-950">
+        <div class="mx-auto max-w-6xl px-4">
+          <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">Menu</p>
+              <h2 class="mt-2 text-3xl font-bold md:text-4xl">Seasonal favorites</h2>
+            </div>
+            <div class="flex flex-wrap gap-2" data-menu-filters aria-label="Menu categories"></div>
+          </div>
+          <div data-menu-preview class="min-h-48"></div>
+          <div class="mt-12">
+            <h3 class="mb-4 text-xl font-bold">Featured dishes</h3>
+            <div class="swiper" data-featured-menu-carousel>
+              <div class="swiper-wrapper" data-featured-menu-slides></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="story" class="bg-white py-20 text-stone-950">
+        <div class="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-[1fr_1.2fr] md:items-center">
+          <div class="aspect-[4/5] overflow-hidden rounded-lg bg-stone-200">
+            <img class="h-full w-full object-cover" src="/assets/images/chef.svg" alt="Chef plating a dish" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">Chef story</p>
+            <h2 class="mt-2 text-3xl font-bold md:text-4xl">Built around growers, fire, and restraint.</h2>
+            <p class="mt-5 leading-8 text-stone-700">
+              Our kitchen changes with the market, pairing local produce with clean technique and generous service.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="gallery" class="bg-stone-100 py-20 text-stone-950">
+        <div class="mx-auto max-w-6xl px-4">
+          <div class="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">Gallery</p>
+              <h2 class="mt-2 text-3xl font-bold md:text-4xl">The room and the plates</h2>
+            </div>
+            <div class="hidden gap-2 md:flex">
+              <button class="gallery-prev rounded-md border border-stone-300 p-2" aria-label="Previous slide">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <button class="gallery-next rounded-md border border-stone-300 p-2" aria-label="Next slide">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div class="swiper" data-gallery>
+            <div class="swiper-wrapper">
+              <button class="swiper-slide aspect-[4/3] overflow-hidden rounded-lg bg-stone-200" data-lightbox-src="/assets/images/gallery-1.svg">
+                <img class="h-full w-full object-cover" src="/assets/images/gallery-1.svg" alt="Dining room" />
+              </button>
+              <button class="swiper-slide aspect-[4/3] overflow-hidden rounded-lg bg-stone-200" data-lightbox-src="/assets/images/gallery-2.svg">
+                <img class="h-full w-full object-cover" src="/assets/images/gallery-2.svg" alt="Plated main course" />
+              </button>
+              <button class="swiper-slide aspect-[4/3] overflow-hidden rounded-lg bg-stone-200" data-lightbox-src="/assets/images/gallery-3.svg">
+                <img class="h-full w-full object-cover" src="/assets/images/gallery-3.svg" alt="Restaurant bar" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reservation" class="bg-stone-950 py-20 text-white">
+        <div class="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Reservations</p>
+            <h2 class="mt-2 text-3xl font-bold md:text-4xl">Plan your evening.</h2>
+            <p class="mt-5 leading-8 text-stone-300">Submit a request and the team will confirm availability.</p>
+          </div>
+          <form data-reservation-form novalidate class="grid gap-4 rounded-lg border border-white/10 bg-white/5 p-5">
+            <input type="text" name="company" class="hidden" tabindex="-1" autocomplete="off" />
+            <div class="grid gap-4 md:grid-cols-2">
+              <label class="grid gap-1">
+                <span class="text-sm text-stone-300">Name</span>
+                <input class="rounded-md border-white/10 bg-white text-stone-950" name="name" required />
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm text-stone-300">Email</span>
+                <input class="rounded-md border-white/10 bg-white text-stone-950" name="email" type="email" required />
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm text-stone-300">Date</span>
+                <input class="rounded-md border-white/10 bg-white text-stone-950" name="date" type="date" required />
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm text-stone-300">Party size</span>
+                <input class="rounded-md border-white/10 bg-white text-stone-950" name="partySize" type="number" min="1" max="12" required />
+              </label>
+            </div>
+            <label class="grid gap-1">
+              <span class="text-sm text-stone-300">Notes</span>
+              <textarea class="rounded-md border-white/10 bg-white text-stone-950" name="notes" rows="4"></textarea>
+            </label>
+            <p class="text-sm text-amber-100" data-reservation-status role="status"></p>
+            <button class="rounded-md bg-amber-300 px-5 py-3 font-semibold text-stone-950 hover:bg-amber-200" type="submit">
+              Request reservation
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <div class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/80 p-4" data-lightbox>
+      <button class="absolute right-4 top-4 rounded-md bg-white p-2 text-stone-950" data-lightbox-close aria-label="Close gallery image">
+        <i data-lucide="x"></i>
+      </button>
+      <img class="max-h-full max-w-full rounded-lg object-contain" data-lightbox-image alt="" />
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Aster Table",
+        "servesCuisine": "Seasonal Contemporary",
+        "acceptsReservations": true,
+        "url": "https://example.com"
+      }
+    </script>
+    <script type="module" src="/src/frontend/main.js"></script>
+  </body>
+</html>

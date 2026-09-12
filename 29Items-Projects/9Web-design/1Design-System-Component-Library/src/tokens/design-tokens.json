@@ -1,0 +1,122 @@
+{
+  "color": {
+    "brand": {
+      "primary": {
+        "value": "#265CFF",
+        "description": "Primary brand action color"
+      },
+      "secondary": {
+        "value": "#0F766E",
+        "description": "Secondary brand support color"
+      }
+    },
+    "surface": {
+      "default": {
+        "value": "#FFFFFF",
+        "description": "Default application surface"
+      },
+      "subtle": {
+        "value": "#F6F8FB",
+        "description": "Subtle background surface"
+      }
+    },
+    "text": {
+      "default": {
+        "value": "#172033",
+        "description": "Default readable text"
+      },
+      "muted": {
+        "value": "#5B6475",
+        "description": "Secondary text"
+      }
+    },
+    "status": {
+      "success": {
+        "value": "#1A7F37",
+        "description": "Success state"
+      },
+      "warning": {
+        "value": "#A15C00",
+        "description": "Warning state"
+      },
+      "danger": {
+        "value": "#C1121F",
+        "description": "Danger state"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "value": "0.25rem",
+      "description": "Extra small spacing"
+    },
+    "sm": {
+      "value": "0.5rem",
+      "description": "Small spacing"
+    },
+    "component": {
+      "value": "1rem",
+      "description": "Default component padding"
+    },
+    "lg": {
+      "value": "1.5rem",
+      "description": "Large spacing"
+    }
+  },
+  "typography": {
+    "fontSize": {
+      "body": {
+        "value": "1rem",
+        "description": "Default body text size"
+      },
+      "heading": {
+        "value": "1.25rem",
+        "description": "Compact heading size"
+      }
+    },
+    "lineHeight": {
+      "body": {
+        "value": "1.5",
+        "description": "Readable body line height"
+      }
+    }
+  },
+  "radius": {
+    "sm": {
+      "value": "0.25rem",
+      "description": "Small control radius"
+    },
+    "component": {
+      "value": "0.5rem",
+      "description": "Default component radius"
+    }
+  },
+  "shadow": {
+    "component": {
+      "value": "0 1px 3px rgba(23, 32, 51, 0.12)",
+      "description": "Default component elevation"
+    }
+  },
+  "motion": {
+    "duration": {
+      "fast": {
+        "value": "120ms",
+        "description": "Fast transition duration"
+      },
+      "normal": {
+        "value": "180ms",
+        "description": "Default transition duration"
+      }
+    }
+  },
+  "zIndex": {
+    "modal": {
+      "value": "1000",
+      "description": "Modal overlay stacking layer"
+    },
+    "toast": {
+      "value": "1100",
+      "description": "Toast notification stacking layer"
+    }
+  }
+}

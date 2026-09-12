@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "amalfi-rail-coast",
+    "title": "Amalfi Rail and Coast",
+    "region": "europe",
+    "regionLabel": "Europe",
+    "durationDays": 8,
+    "price": 3400,
+    "difficulty": "easy",
+    "featured": true,
+    "summary": "Rome, Naples, and Amalfi with private transfers and coastal day trips.",
+    "image": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "slug": "kyoto-culture-route",
+    "title": "Kyoto Culture Route",
+    "region": "asia",
+    "regionLabel": "Asia",
+    "durationDays": 9,
+    "price": 4200,
+    "difficulty": "moderate",
+    "featured": true,
+    "summary": "Temples, ryokan stays, tea experiences, and guided neighborhood walks.",
+    "image": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "slug": "patagonia-trek",
+    "title": "Patagonia Trek",
+    "region": "americas",
+    "regionLabel": "Americas",
+    "durationDays": 12,
+    "price": 5800,
+    "difficulty": "active",
+    "featured": true,
+    "summary": "A guided active itinerary through glaciers, lakes, and mountain lodges.",
+    "image": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "slug": "morocco-desert-cities",
+    "title": "Morocco Desert and Cities",
+    "region": "africa",
+    "regionLabel": "Africa",
+    "durationDays": 10,
+    "price": 3100,
+    "difficulty": "moderate",
+    "featured": false,
+    "summary": "Marrakesh, Fes, Atlas villages, and a Sahara camp experience.",
+    "image": "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "slug": "iceland-ring-road",
+    "title": "Iceland Ring Road",
+    "region": "europe",
+    "regionLabel": "Europe",
+    "durationDays": 7,
+    "price": 3900,
+    "difficulty": "easy",
+    "featured": false,
+    "summary": "Waterfalls, black sand beaches, glacier lagoons, and thermal pools.",
+    "image": "https://images.unsplash.com/photo-1504829857797-ddff29c27927?auto=format&fit=crop&w=900&q=80"
+  },
+  {
+    "slug": "thailand-island-reset",
+    "title": "Thailand Island Reset",
+    "region": "asia",
+    "regionLabel": "Asia",
+    "durationDays": 6,
+    "price": 2400,
+    "difficulty": "easy",
+    "featured": false,
+    "summary": "A relaxed beach itinerary with food tours and optional snorkeling days.",
+    "image": "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=80"
+  }
+]

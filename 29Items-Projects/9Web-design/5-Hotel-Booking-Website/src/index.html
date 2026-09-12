@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Responsive hotel booking website for browsing rooms, checking availability, and creating reservations."
+    />
+    <title>Hotel Booking Website</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header border-bottom">
+      <nav class="navbar navbar-expand-lg bg-white">
+        <div class="container">
+          <a class="navbar-brand fw-semibold" href="#">StayPilot</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNav"
+            aria-controls="mainNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="#rooms">Rooms</a></li>
+              <li class="nav-item"><a class="nav-link" href="#map">Map</a></li>
+              <li class="nav-item"><a class="nav-link" href="#booking">Book</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero-section">
+        <div class="container">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-6" data-aos="fade-up">
+              <h1 class="display-5 fw-bold">Find and book hotel rooms with clear availability.</h1>
+              <p class="lead text-secondary">
+                Search rooms, compare guest capacity, review amenities, and reserve a stay in one flow.
+              </p>
+            </div>
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+              <form id="booking-form" class="booking-panel" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="city">City</label>
+                    <input class="form-control" id="city" name="city" value="New York" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="checkIn">Check-in</label>
+                    <input class="form-control" id="checkIn" name="checkIn" type="date" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="checkOut">Check-out</label>
+                    <input class="form-control" id="checkOut" name="checkOut" type="date" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="guests">Guests</label>
+                    <input
+                      class="form-control"
+                      id="guests"
+                      name="guests"
+                      type="number"
+                      min="1"
+                      max="8"
+                      value="2"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="roomType">Room type</label>
+                    <select class="form-select" id="roomType" name="roomType" required>
+                      <option value="standard">Standard</option>
+                      <option value="deluxe">Deluxe</option>
+                      <option value="suite">Suite</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="guestName">Guest name</label>
+                    <input
+                      class="form-control"
+                      id="guestName"
+                      name="guestName"
+                      type="text"
+                      placeholder="Alex Morgan"
+                      required
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="guestEmail">Email</label>
+                    <input
+                      class="form-control"
+                      id="guestEmail"
+                      name="guestEmail"
+                      type="email"
+                      placeholder="guest@example.com"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="guestPhone">Phone</label>
+                    <input class="form-control" id="guestPhone" name="guestPhone" type="tel" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="specialRequests">Requests</label>
+                    <input class="form-control" id="specialRequests" name="specialRequests" type="text" />
+                  </div>
+                </div>
+                <div id="booking-status" class="small mt-3" role="status" aria-live="polite"></div>
+                <button class="btn btn-primary w-100 mt-3" type="submit">Check Availability</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="rooms" class="content-section">
+        <div class="container">
+          <div class="d-flex align-items-end justify-content-between gap-3 mb-3">
+            <div>
+              <h2 class="h3 mb-1">Available Rooms</h2>
+              <p class="text-secondary mb-0">Seed data renders immediately; API results replace it after search.</p>
+            </div>
+          </div>
+          <div id="hotel-results" class="row g-4"></div>
+        </div>
+      </section>
+
+      <section id="map" class="content-section bg-light">
+        <div class="container">
+          <h2 class="h3 mb-3">Hotel Map</h2>
+          <div id="hotel-map" class="hotel-map" aria-label="Hotel location map"></div>
+        </div>
+      </section>
+
+      <section id="gallery" class="content-section">
+        <div class="container">
+          <h2 class="h3 mb-3">Featured Stays</h2>
+          <div class="swiper hotel-swiper">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide gallery-slide gallery-slide-one">City View</div>
+              <div class="swiper-slide gallery-slide gallery-slide-two">Quiet Suite</div>
+              <div class="swiper-slide gallery-slide gallery-slide-three">Business Stay</div>
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin" class="content-section bg-light">
+        <div class="container" id="admin-dashboard">
+          <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+            <div>
+              <h2 class="h3 mb-1">Staff Admin</h2>
+              <p class="text-secondary mb-0">Manage room inventory and booking status.</p>
+            </div>
+            <div class="admin-token">
+              <label class="form-label" for="staffToken">Staff token</label>
+              <div class="input-group">
+                <input class="form-control" id="staffToken" type="password" placeholder="local-staff-token" />
+                <button class="btn btn-outline-primary" id="loadAdminData" type="button">Load</button>
+              </div>
+              <div id="admin-status" class="small text-muted mt-2" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <h3 class="h5">Rooms</h3>
+              <div class="table-responsive admin-table">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Hotel</th>
+                      <th>Room</th>
+                      <th>Type</th>
+                      <th>Guests</th>
+                      <th>Rate</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminRoomRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <h3 class="h5">Add Room</h3>
+              <form id="roomForm" class="admin-form">
+                <label class="form-label" for="roomHotelId">Hotel</label>
+                <select class="form-select mb-2" id="roomHotelId" name="hotelId" required></select>
+                <label class="form-label" for="roomNumber">Room number</label>
+                <input class="form-control mb-2" id="roomNumber" name="roomNumber" required />
+                <label class="form-label" for="adminRoomType">Type</label>
+                <select class="form-select mb-2" id="adminRoomType" name="roomType" required>
+                  <option value="standard">Standard</option>
+                  <option value="deluxe">Deluxe</option>
+                  <option value="suite">Suite</option>
+                </select>
+                <label class="form-label" for="adminCapacity">Capacity</label>
+                <input class="form-control mb-2" id="adminCapacity" name="capacity" type="number" min="1" max="12" required />
+                <label class="form-label" for="basePrice">Nightly rate</label>
+                <input class="form-control mb-2" id="basePrice" name="basePrice" type="number" min="0" step="1" required />
+                <label class="form-label" for="amenities">Amenities</label>
+                <input class="form-control mb-3" id="amenities" name="amenities" placeholder="Wi-Fi, Desk" />
+                <button class="btn btn-primary" type="submit">Create Room</button>
+              </form>
+            </div>
+            <div class="col-12">
+              <h3 class="h5">Bookings</h3>
+              <div class="table-responsive admin-table">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Guest</th>
+                      <th>Hotel</th>
+                      <th>Dates</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminBookingRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script type="module" src="./assets/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+# Reusable steps: .NET restore → format check → build → test (unit + integration) → coverage gate.
+# Integration tests run on in-memory SQLite, so no Docker is needed on the agent.
+steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: sdk
+      version: 8.0.x
+
+  - script: dotnet tool restore
+    displayName: Restore tools
+
+  - script: dotnet restore
+    displayName: Restore packages
+
+  - script: dotnet format --verify-no-changes --no-restore
+    displayName: Lint (dotnet format)
+
+  - script: dotnet build --no-restore -c Release
+    displayName: Build (warnings are errors via Directory.Build.props)
+
+  - script: >
+      dotnet test --no-build -c Release
+      --settings coverlet.runsettings
+      --collect:"XPlat Code Coverage"
+      --logger trx
+      --results-directory $(Agent.TempDirectory)/results
+    displayName: Test (unit + integration, all projects)
+
+  - task: PublishTestResults@2
+    condition: always()
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '$(Agent.TempDirectory)/results/**/*.trx'
+
+  # Coverage gate per TECH-NOTES.md §3.2: ≥70% line coverage on domain & service code.
+  - script: |
+      set -euo pipefail
+      dotnet tool install --global dotnet-reportgenerator-globaltool
+      reportgenerator \
+        -reports:"$(Agent.TempDirectory)/results/**/coverage.cobertura.xml" \
+        -targetdir:"$(Agent.TempDirectory)/coverage" \
+        -reporttypes:"Cobertura;TextSummary" \
+        -assemblyfilters:"+Policy.Domain;+Policy.Api;+Rating.Grpc;+Policy.Infrastructure" \
+        -classfilters:"-*.Migrations.*"
+      cat "$(Agent.TempDirectory)/coverage/Summary.txt"
+      line=$(grep -oP 'Line coverage: \K[0-9]+(\.[0-9]+)?' "$(Agent.TempDirectory)/coverage/Summary.txt" | head -1)
+      echo "Line coverage: ${line}%"
+      awk -v c="$line" 'BEGIN { exit (c >= 70) ? 0 : 1 }' || { echo "##vso[task.logissue type=error]Coverage ${line}% is below the 70% gate"; exit 1; }
+    displayName: Coverage gate (≥70% on core assemblies)
+
+  - task: PublishCodeCoverageResults@2
+    condition: always()
+    inputs:
+      summaryFileLocation: '$(Agent.TempDirectory)/coverage/Cobertura.xml'

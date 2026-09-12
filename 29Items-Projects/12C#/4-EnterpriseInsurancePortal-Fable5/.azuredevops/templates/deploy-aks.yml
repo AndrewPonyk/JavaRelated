@@ -1,0 +1,76 @@
+# Reusable deployment job: secrets manifest → EF migration Job → kustomize apply → smoke test.
+parameters:
+  - name: environment        # Azure DevOps environment (approvals live here)
+    type: string
+  - name: aksNamespace
+    type: string
+  - name: keyVaultName
+    type: string
+
+jobs:
+  - deployment: deploy
+    displayName: Deploy to ${{ parameters.environment }}
+    environment: ${{ parameters.environment }}
+    pool: { vmImage: ubuntu-latest }
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureCLI@2
+              displayName: Migrate database & roll out (${{ parameters.aksNamespace }})
+              inputs:
+                azureSubscription: insurance-azure
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -euo pipefail
+                  az aks get-credentials \
+                    --resource-group $(aksResourceGroup) \
+                    --name $(aksClusterName) \
+                    --overwrite-existing
+                  kubectl create namespace ${{ parameters.aksNamespace }} \
+                    --dry-run=client -o yaml | kubectl apply -f -
+
+                  # 1. Key Vault sync (env-specific values substituted, no secrets in git)
+                  export KEYVAULT_NAME="${{ parameters.keyVaultName }}"
+                  export AZURE_TENANT_ID="$(azureTenantId)"
+                  envsubst < deploy/k8s/secrets.yaml | kubectl apply -n ${{ parameters.aksNamespace }} -f -
+
+                  # 2. EF migrations as a Job, before any new pods (expand/contract contract)
+                  sed "s|policy-db-migrator:latest|policy-db-migrator:$(imageTag)|" deploy/k8s/migration-job.yaml \
+                    > /tmp/migration-job.yaml
+                  kubectl delete job policy-db-migrate -n ${{ parameters.aksNamespace }} --ignore-not-found
+                  kubectl apply -n ${{ parameters.aksNamespace }} -f /tmp/migration-job.yaml
+                  kubectl wait --for=condition=complete --timeout=300s \
+                    job/policy-db-migrate -n ${{ parameters.aksNamespace }}
+
+                  # 3. Pin every image to the immutable CI tag and apply
+                  cd deploy/k8s
+                  for img in policy-api rating-grpc portal-web portal-jobs public-portal; do
+                    kustomize edit set image "$(acrName).azurecr.io/$img:$(imageTag)"
+                  done
+                  kubectl apply -k . -n ${{ parameters.aksNamespace }}
+
+                  # 4. Wait for healthy rollouts
+                  for d in policy-api rating-grpc portal-web portal-jobs public-portal; do
+                    kubectl rollout status deployment/"$d" -n ${{ parameters.aksNamespace }} --timeout=300s
+                  done
+
+            - task: AzureCLI@2
+              displayName: Smoke tests
+              inputs:
+                azureSubscription: insurance-azure
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -euo pipefail
+                  az aks get-credentials \
+                    --resource-group $(aksResourceGroup) \
+                    --name $(aksClusterName) \
+                    --overwrite-existing
+                  # In-cluster checks: health endpoint + an authenticated read.
+                  kubectl run smoke-$(Build.BuildId) -n ${{ parameters.aksNamespace }} \
+                    --image=curlimages/curl:8.10.1 --restart=Never --rm -i --quiet -- \
+                    sh -c 'curl -fsS http://policy-api/healthz && echo && curl -fsS -o /dev/null -w "%{http_code}" http://portal-web/healthz'

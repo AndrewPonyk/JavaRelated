@@ -1,0 +1,121 @@
+:root {
+  --color-ink: #1f2933;
+  --color-muted: #607080;
+  --color-brand: #0f766e;
+  --color-brand-dark: #115e59;
+  --color-surface: #ffffff;
+  --color-soft: #f5f7f8;
+}
+
+body {
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+}
+
+.hero-section {
+  padding: 5rem 0 4rem;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72)),
+    url("https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80")
+      center/cover;
+}
+
+.booking-panel {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #d9e1e7;
+  border-radius: 8px;
+  box-shadow: 0 14px 36px rgba(31, 41, 51, 0.12);
+}
+
+.content-section {
+  padding: 4rem 0;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--color-brand);
+  --bs-btn-border-color: var(--color-brand);
+  --bs-btn-hover-bg: var(--color-brand-dark);
+  --bs-btn-hover-border-color: var(--color-brand-dark);
+}
+
+.hotel-card {
+  height: 100%;
+  border: 1px solid #d9e1e7;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.hotel-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.hotel-map {
+  min-height: 420px;
+  border: 1px solid #d9e1e7;
+  border-radius: 8px;
+}
+
+.hotel-swiper {
+  min-height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-token {
+  width: min(100%, 420px);
+}
+
+.admin-table,
+.admin-form {
+  padding: 1rem;
+  border: 1px solid #d9e1e7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.gallery-slide {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  background-position: center;
+  background-size: cover;
+}
+
+.gallery-slide-one {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
+    url("https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80");
+}
+
+.gallery-slide-two {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
+    url("https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80");
+}
+
+.gallery-slide-three {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
+    url("https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1200&q=80");
+}
+
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 3rem 0;
+  }
+
+  .content-section {
+    padding: 3rem 0;
+  }
+}

@@ -1,0 +1,24 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+artifacts/
+TestResults/
+
+# Node / React
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+appsettings.*.Local.json
+*.pfx
+
+# IDE
+.idea/
+*.swp
+.DS_Store

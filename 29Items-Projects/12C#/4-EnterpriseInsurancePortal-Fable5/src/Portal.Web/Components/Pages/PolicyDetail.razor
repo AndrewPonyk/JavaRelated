@@ -1,0 +1,220 @@
+@page "/policies/{Id:guid}"
+@inject PolicyApiClient Api
+
+<PageTitle>Policy</PageTitle>
+
+@if (notice is not null)
+{
+    <div class="alert alert-success">@notice</div>
+}
+@if (error is not null)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+@if (policy is null && error is null)
+{
+    <p><em>Loading…</em></p>
+}
+else if (policy is not null)
+{
+    <h1>@policy.PolicyNumber <span class="badge badge-@policy.Status.ToLowerInvariant()">@policy.Status</span></h1>
+
+    <div class="card">
+        <div class="form-grid">
+            <div><label>Customer</label>@policy.CustomerName</div>
+            <div><label>Annual premium</label>@policy.AnnualPremium.ToString("C")</div>
+            <div><label>Effective</label>@policy.EffectiveDate.ToString("yyyy-MM-dd")</div>
+            <div><label>Expires</label>@policy.ExpiryDate.ToString("yyyy-MM-dd")</div>
+        </div>
+        @if (policy.CancellationReason is not null)
+        {
+            <p><label>Cancellation reason</label> @policy.CancellationReason</p>
+        }
+        @if (policy.Status == "Active")
+        {
+            <div class="form-grid">
+                <div>
+                    <label for="cancelReason">Cancellation reason</label>
+                    <input id="cancelReason" @bind="cancelReason" placeholder="Required to cancel" />
+                </div>
+                <div style="align-self: end">
+                    <button class="danger" @onclick="CancelPolicyAsync" disabled="@busy">Cancel policy</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h2>Claims</h2>
+
+    @if (policy.Status == "Active")
+    {
+        <div class="card">
+            <h3>File a claim</h3>
+            <EditForm Model="claimForm" OnValidSubmit="FileClaimAsync" FormName="fileClaim">
+                <DataAnnotationsValidator />
+                <div class="form-grid">
+                    <div>
+                        <label for="description">Description</label>
+                        <InputText id="description" @bind-Value="claimForm.Description" />
+                        <ValidationMessage For="() => claimForm.Description" />
+                    </div>
+                    <div>
+                        <label for="amount">Claimed amount</label>
+                        <InputNumber id="amount" @bind-Value="claimForm.ClaimedAmount" />
+                        <ValidationMessage For="() => claimForm.ClaimedAmount" />
+                    </div>
+                    <div style="align-self: end">
+                        <button type="submit" disabled="@busy">File claim</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    }
+
+    @if (policy.Claims.Count == 0)
+    {
+        <p>No claims on this policy.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr><th>Filed</th><th>Description</th><th>Claimed</th><th>Approved</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var c in policy.Claims)
+                {
+                    <tr>
+                        <td>@c.FiledAtUtc.ToString("yyyy-MM-dd")</td>
+                        <td>@c.Description</td>
+                        <td>@c.ClaimedAmount.ToString("C")</td>
+                        <td>@(c.ApprovedAmount?.ToString("C") ?? "—")</td>
+                        <td><span class="badge badge-@c.Status.ToLowerInvariant()">@c.Status</span></td>
+                        <td>
+                            @if (c.Status == "Filed")
+                            {
+                                <button @onclick="() => ClaimActionAsync(c.Id, 'r')" disabled="@busy">Review</button>
+                            }
+                            else if (c.Status == "UnderReview")
+                            {
+                                <input style="width: 7rem" @bind="approvedAmount" placeholder="Amount" />
+                                <button @onclick="() => ClaimActionAsync(c.Id, 'a')" disabled="@busy">Approve</button>
+                                <button class="danger" @onclick="() => ClaimActionAsync(c.Id, 'x')" disabled="@busy">Reject</button>
+                            }
+                            else if (c.Status == "Approved")
+                            {
+                                <button @onclick="() => ClaimActionAsync(c.Id, 'p')" disabled="@busy">Mark paid</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private sealed class ClaimForm
+    {
+        [Required, StringLength(2000)]
+        public string Description { get; set; } = string.Empty;
+
+        [Required, Range(0.01, 10_000_000, ErrorMessage = "Enter a positive amount.")]
+        public decimal? ClaimedAmount { get; set; }
+    }
+
+    private PolicyDetailModel? policy;
+    private ClaimForm claimForm = new();
+    private string cancelReason = string.Empty;
+    private decimal? approvedAmount;
+    private string? error;
+    private string? notice;
+    private bool busy;
+
+    protected override Task OnParametersSetAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        error = null;
+        try
+        {
+            policy = await Api.GetPolicyAsync(Id);
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = $"Could not load the policy: {ex.Message}";
+        }
+    }
+
+    private async Task CancelPolicyAsync()
+    {
+        busy = true;
+        error = notice = null;
+        try
+        {
+            await Api.CancelPolicyAsync(Id, cancelReason);
+            notice = "Policy cancelled.";
+            await LoadAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task FileClaimAsync()
+    {
+        busy = true;
+        error = notice = null;
+        try
+        {
+            await Api.FileClaimAsync(Id, claimForm.Description, claimForm.ClaimedAmount!.Value);
+            notice = "Claim filed.";
+            claimForm = new ClaimForm();
+            await LoadAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task ClaimActionAsync(Guid claimId, char action)
+    {
+        busy = true;
+        error = notice = null;
+        try
+        {
+            var result = action switch
+            {
+                'r' => await Api.UpdateClaimStatusAsync(claimId, "review"),
+                'a' => await Api.UpdateClaimStatusAsync(claimId, "approve", approvedAmount),
+                'x' => await Api.UpdateClaimStatusAsync(claimId, "reject"),
+                _ => await Api.UpdateClaimStatusAsync(claimId, "pay"),
+            };
+            notice = $"Claim is now {result.Status}.";
+            approvedAmount = null;
+            await LoadAsync();
+        }
+        catch (Exception ex) when (ex is ApiException or HttpRequestException)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

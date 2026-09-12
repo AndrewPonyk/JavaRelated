@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.12" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Policy.Domain\Policy.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Portal.Shared.Kafka\Portal.Shared.Kafka.csproj" />
+  </ItemGroup>
+</Project>

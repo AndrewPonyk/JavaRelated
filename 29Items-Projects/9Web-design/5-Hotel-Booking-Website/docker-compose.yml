@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in your .env file}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in your .env file}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:?Set POSTGRES_USER in your .env file} -d ${POSTGRES_DB:?Set POSTGRES_DB in your .env file}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: development
+      PORT: 8888
+      DATABASE_URL: postgres://${POSTGRES_USER:?Set POSTGRES_USER in your .env file}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}@db:5432/${POSTGRES_DB:?Set POSTGRES_DB in your .env file}
+      STAFF_API_TOKEN: ${STAFF_API_TOKEN:?Set STAFF_API_TOKEN in your .env file}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in your .env file}
+      EMAIL_PROVIDER_API_KEY: ${EMAIL_PROVIDER_API_KEY:?Set EMAIL_PROVIDER_API_KEY in your .env file}
+    ports:
+      - "${APP_PORT:-8888}:8888"
+
+volumes:
+  postgres-data:

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Builder Export</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      button {
+        width: 100%;
+        border: 0;
+        border-radius: 6px;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+        padding: 10px 12px;
+      }
+
+      pre {
+        margin-top: 16px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="export">Export selection</button>
+    <pre id="output"></pre>
+    <script>
+      document.getElementById("export").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "export-selection" } }, "*");
+      };
+
+      window.onmessage = (event) => {
+        document.getElementById("output").textContent = JSON.stringify(
+          event.data.pluginMessage,
+          null,
+          2
+        );
+      };
+    </script>
+  </body>
+</html>
+

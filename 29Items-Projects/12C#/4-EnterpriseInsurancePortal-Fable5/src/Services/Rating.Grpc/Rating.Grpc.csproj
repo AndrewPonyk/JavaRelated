@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+    <PackageReference Include="Grpc.AspNetCore.HealthChecks" Version="2.66.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="Protos\rating.proto" GrpcServices="Server" />
+  </ItemGroup>
+</Project>

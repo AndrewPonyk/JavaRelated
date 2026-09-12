@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domain layer: entities and business rules only. No external dependencies by design. -->
+</Project>

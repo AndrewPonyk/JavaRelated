@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="Warm restaurant dining room">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1c1917"/>
+      <stop offset="0.55" stop-color="#3f2f20"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <rect x="0" y="650" width="1600" height="350" fill="#120f0c" opacity="0.85"/>
+  <circle cx="1130" cy="230" r="120" fill="#fcd34d" opacity="0.35"/>
+  <circle cx="1290" cy="250" r="80" fill="#fde68a" opacity="0.25"/>
+  <rect x="260" y="610" width="540" height="28" rx="14" fill="#f5f5f4" opacity="0.75"/>
+  <rect x="360" y="638" width="36" height="180" fill="#78716c"/>
+  <rect x="668" y="638" width="36" height="180" fill="#78716c"/>
+  <text x="260" y="515" fill="#fff7ed" font-family="Arial, sans-serif" font-size="72" font-weight="700">Aster Table</text>
+</svg>

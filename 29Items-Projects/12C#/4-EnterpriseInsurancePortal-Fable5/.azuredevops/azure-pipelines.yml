@@ -1,0 +1,98 @@
+# Enterprise Insurance Portal — main pipeline.
+# CI on every PR/main commit; CD promotes the SAME images dev → staging → prod.
+#
+# One-time Azure DevOps setup this pipeline expects:
+#   - Service connection 'insurance-azure' (workload identity federation — no secrets)
+#   - Environments 'insurance-dev', 'insurance-staging', 'insurance-prod'
+#     (manual-approval check configured on insurance-prod)
+#   - Variable group 'insurance-portal' providing: acrName, aksResourceGroup,
+#     aksClusterName, keyVaultNameDev/Staging/Prod, azureTenantId
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+variables:
+  - group: insurance-portal
+  - name: imageTag
+    value: $(Build.BuildId)-$(Build.SourceVersion)
+
+stages:
+  - stage: CI
+    displayName: Build & Test
+    jobs:
+      - job: dotnet
+        displayName: .NET build, lint, test
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - template: templates/dotnet-build.yml
+
+      - job: react
+        displayName: React lint, test, build
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - template: templates/react-build.yml
+
+      - job: images
+        displayName: Build & push container images
+        dependsOn: [dotnet, react]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: AzureCLI@2
+            displayName: Build & push all images (az acr build)
+            inputs:
+              azureSubscription: insurance-azure
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                for image in \
+                  "policy-api:deploy/docker/Policy.Api.Dockerfile" \
+                  "rating-grpc:deploy/docker/Rating.Grpc.Dockerfile" \
+                  "portal-web:deploy/docker/Portal.Web.Dockerfile" \
+                  "portal-jobs:deploy/docker/Portal.Jobs.Dockerfile" \
+                  "portal-identity:deploy/docker/Portal.Identity.Dockerfile" \
+                  "public-portal:deploy/docker/public-portal.Dockerfile" \
+                  "policy-db-migrator:deploy/docker/Migrations.Dockerfile"
+                do
+                  name="${image%%:*}"; dockerfile="${image#*:}"
+                  az acr build --registry $(acrName) \
+                    --image "$name:$(imageTag)" \
+                    --file "$dockerfile" .
+                done
+
+  - stage: Deploy_Dev
+    displayName: Deploy to Dev
+    dependsOn: CI
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - template: templates/deploy-aks.yml
+        parameters:
+          environment: insurance-dev
+          aksNamespace: insurance-dev
+          keyVaultName: $(keyVaultNameDev)
+
+  - stage: Deploy_Staging
+    displayName: Deploy to Staging
+    dependsOn: Deploy_Dev
+    jobs:
+      - template: templates/deploy-aks.yml
+        parameters:
+          environment: insurance-staging
+          aksNamespace: insurance-staging
+          keyVaultName: $(keyVaultNameStaging)
+
+  - stage: Deploy_Prod
+    displayName: Deploy to Production
+    dependsOn: Deploy_Staging
+    jobs:
+      # The manual approval gate lives on the 'insurance-prod' environment.
+      - template: templates/deploy-aks.yml
+        parameters:
+          environment: insurance-prod
+          aksNamespace: insurance-prod
+          keyVaultName: $(keyVaultNameProd)
