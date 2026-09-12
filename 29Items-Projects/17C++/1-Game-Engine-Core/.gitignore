@@ -1,0 +1,57 @@
+# ---- Build output ----
+/build/
+/out/
+/cmake-build-*/
+/install/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# ---- CMake ----
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+cmake_install.cmake
+compile_commands.json
+
+# ---- vcpkg ----
+/vcpkg_installed/
+.vcpkg-root
+
+# ---- Generated shaders ----
+*.spv
+
+# ---- Secrets / local env ----
+.env
+*.local
+
+# ---- ML artifacts (large; tracked via LFS or released separately) ----
+/tools/ml/data/
+/tools/ml/.venv/
+__pycache__/
+*.pyc
+
+# ---- IDE / editor ----
+.vs/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.user
+*.swp
+.DS_Store
+
+# ---- Test / profiling output ----
+Testing/
+/coverage/
+*.gcda
+*.gcno
+*.profraw
+*.trace

@@ -1,0 +1,86 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "CMAKE_EXPORT_COMPILE_COMMANDS": "ON" }
+    },
+    {
+      "name": "default",
+      "displayName": "Default (dependency-light, tests on)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "IMGPROC_BUILD_TESTS": "ON",
+        "IMGPROC_BUILD_CLI": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug + tests",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "IMGPROC_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "release-cuda",
+      "displayName": "Release with CUDA + benchmarks",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "IMGPROC_WITH_CUDA": "ON",
+        "IMGPROC_BUILD_BENCH": "ON"
+      }
+    },
+    {
+      "name": "onnx",
+      "displayName": "Release with ONNX Runtime backend",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "IMGPROC_WITH_ONNX": "ON"
+      }
+    },
+    {
+      "name": "full",
+      "displayName": "Everything (OpenCV + CUDA + ONNX + Python)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "IMGPROC_WITH_CUDA": "ON",
+        "IMGPROC_WITH_OPENCV": "ON",
+        "IMGPROC_WITH_ONNX": "ON",
+        "IMGPROC_BUILD_PYTHON": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "default", "configurePreset": "default" },
+    { "name": "debug", "configurePreset": "debug" },
+    { "name": "release-cuda", "configurePreset": "release-cuda" },
+    { "name": "onnx", "configurePreset": "onnx" }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "onnx",
+      "configurePreset": "onnx",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

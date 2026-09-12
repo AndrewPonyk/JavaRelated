@@ -1,0 +1,60 @@
+# ============================================================================
+#  docker-compose.yml — full stack.
+#    ml      : Python LSTM quant gRPC service (long-running).
+#    engine  : C++ trading engine; builds + runs tests in its image, then runs
+#              the deterministic simulation and writes the journal to ./var.
+#
+#  Usage:
+#    docker compose up --build       # build images (runs C++ tests) + run
+#    docker compose run --rm engine  # one-off engine run
+#
+#  The optional `oracle` profile starts Oracle XE for the production-style
+#  persistence backend (heavy, license-gated image):
+#    docker compose --profile oracle up
+# ============================================================================
+services:
+  ml:
+    build:
+      context: ./ml_service
+    image: rts-ml-service
+    container_name: rts-ml
+    ports:
+      - "50051:50051"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import grpc, prediction_pb2 as pb, prediction_pb2_grpc as g; g.QuantPredictorStub(grpc.insecure_channel('localhost:50051')).Health(pb.HealthRequest(), timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  engine:
+    build:
+      context: .
+    image: rts-trading-engine
+    container_name: rts-engine
+    depends_on:
+      ml:
+        condition: service_healthy
+    environment:
+      - TRADING_ENV=dev
+      - ML_GRPC_ENDPOINT=ml:50051
+    volumes:
+      - ./var:/app/var
+    restart: "no"
+
+  # Optional production persistence backend (enable with --profile oracle).
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: rts-oracle
+    profiles: ["oracle"]
+    environment:
+      # Sourced from the environment / .env; the default is an obvious throwaway
+      # for a local dev container only. Never commit real credentials.
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD:-changeme_dev_only}
+      - APP_USER=trading_app
+      - APP_USER_PASSWORD=${ORACLE_PASSWORD:-changeme_dev_only}
+    ports:
+      - "1521:1521"
+    volumes:
+      - ./db/migrations:/container-entrypoint-initdb.d:ro

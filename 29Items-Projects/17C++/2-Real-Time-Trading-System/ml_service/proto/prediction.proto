@@ -1,0 +1,44 @@
+// ============================================================================
+//  ml_service/proto/prediction.proto
+//  SINGLE SOURCE OF TRUTH is /proto/prediction.proto at the repo root. This
+//  copy is kept in sync for the Python codegen step (grpc_tools.protoc). In CI,
+//  a check fails the build if the two diverge.
+//  Note: in CI a check fails the build if this copy and /proto diverge.
+// ============================================================================
+syntax = "proto3";
+
+package rts.ml.v1;
+
+option cc_enable_arenas = true;
+
+message FeatureVector {
+  uint32 symbol_id    = 1;
+  int64  timestamp_ns = 2;
+  repeated float features = 3;
+}
+
+message PredictRequest {
+  string model_version = 1;
+  repeated FeatureVector windows = 2;
+}
+
+message Prediction {
+  uint32 symbol_id    = 1;
+  double signal       = 2;
+  double confidence   = 3;
+  int64  inference_ns = 4;
+}
+
+message PredictResponse {
+  string model_version = 1;
+  repeated Prediction predictions = 2;
+}
+
+message HealthRequest  {}
+message HealthResponse { bool ready = 1; string model_version = 2; }
+
+service QuantPredictor {
+  rpc Predict(PredictRequest) returns (PredictResponse);
+  rpc Health(HealthRequest)  returns (HealthResponse);
+  rpc PredictStream(stream PredictRequest) returns (stream PredictResponse);
+}

@@ -1,0 +1,14 @@
+# ml_service Python dependencies. Pin exact versions for reproducible builds.
+grpcio==1.62.1
+grpcio-tools==1.62.1
+protobuf==4.25.3
+numpy==1.26.4
+
+# Optional serving backends — only needed to run a real trained LSTM artifact.
+# The service works out of the box with the analytic momentum model.
+# onnxruntime==1.17.1     # recommended for low-latency inference
+# torch==2.2.1            # native PyTorch LSTM
+# tensorflow==2.16.1      # Keras LSTM
+
+# Dev / test
+pytest==8.1.1

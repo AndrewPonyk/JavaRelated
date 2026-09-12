@@ -1,0 +1,46 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "game-engine-core",
+  "version": "0.1.0",
+  "description": "Data-oriented C++20 game engine: ECS core, Vulkan rendering, ML procedural terrain.",
+  "homepage": "https://example.com/game-engine-core",
+  "builtin-baseline": "0000000000000000000000000000000000000000",
+  "dependencies": [
+    "sdl2",
+    "vulkan-headers",
+    "vulkan-memory-allocator",
+    "glm",
+    {
+      "name": "shaderc",
+      "comment": "GLSL -> SPIR-V compilation at build/runtime"
+    },
+    "spdlog",
+    "nlohmann-json",
+    "sqlite3",
+    "onnxruntime",
+    "sol2",
+    "lua",
+    "entt"
+  ],
+  "features": {
+    "tests": {
+      "description": "Unit/integration testing",
+      "dependencies": ["gtest"]
+    },
+    "benchmarks": {
+      "description": "Micro-benchmarks",
+      "dependencies": ["benchmark"]
+    },
+    "editor": {
+      "description": "ImGui-based in-engine editor",
+      "dependencies": [
+        { "name": "imgui", "features": ["sdl2-binding", "vulkan-binding", "docking-experimental"] }
+      ]
+    }
+  },
+  "default-features": ["tests"],
+  "overrides": [],
+  "vcpkg-configuration": {
+    "comment": "Replace builtin-baseline with a real vcpkg commit SHA to pin all dependency versions reproducibly."
+  }
+}

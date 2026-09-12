@@ -1,0 +1,107 @@
+// ============================================================================
+//  ci/Jenkinsfile — declarative pipeline for the Real-Time Trading System.
+//
+//  The default build is dependency-free (C++20 + CMake/Ninja), so CI needs only
+//  a compiler toolchain — no package manager. Optional production integrations
+//  (Boost/gRPC/Qt/Oracle/TBB) are built on dedicated agents that have those
+//  SDKs installed, behind the matching -DRTS_ENABLE_* flags.
+//
+//  Agent label 'cpp-builder' provides: g++ 13 (or clang 17), cmake >= 3.20,
+//  ninja, python3 + pip, docker.
+// ============================================================================
+pipeline {
+    agent { label 'cpp-builder' }
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 45, unit: 'MINUTES')
+    }
+
+    environment {
+        BUILD_DIR = 'build'
+    }
+
+    stages {
+        stage('Lint') {
+            steps {
+                sh 'clang-format --dry-run --Werror $(git ls-files "*.cpp" "*.hpp") || true'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh '''
+                    cmake -S . -B ${BUILD_DIR} -G Ninja \
+                        -DCMAKE_BUILD_TYPE=Release -DRTS_BUILD_TESTS=ON
+                    cmake --build ${BUILD_DIR} --parallel
+                    ctest --test-dir ${BUILD_DIR} --output-on-failure
+                '''
+            }
+        }
+
+        stage('Sanitizers') {
+            when { anyOf { branch 'develop'; branch 'main'; branch pattern: 'release/.*' } }
+            steps {
+                sh '''
+                    cmake -S . -B build-asan -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+                        -DRTS_BUILD_TESTS=ON \
+                        -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+                    cmake --build build-asan --parallel
+                    ctest --test-dir build-asan --output-on-failure
+                '''
+            }
+        }
+
+        stage('Smoke: run engine + backtest') {
+            steps {
+                sh '''
+                    ./${BUILD_DIR}/trading_engine config/trading_engine.yaml
+                    ./${BUILD_DIR}/backtest "" 5000
+                '''
+            }
+        }
+
+        stage('ML service') {
+            steps {
+                sh '''
+                    cd ml_service
+                    python3 -m venv .venv && . .venv/bin/activate
+                    pip install --quiet -r requirements.txt
+                    python -m grpc_tools.protoc -I proto \
+                        --python_out=. --grpc_python_out=. proto/prediction.proto
+                    python smoke_test.py
+                '''
+            }
+        }
+
+        stage('Docker images') {
+            when { anyOf { branch 'develop'; branch 'main'; branch pattern: 'release/.*' } }
+            steps {
+                sh 'docker build -t rts-trading-engine:${BUILD_NUMBER} .'
+                sh 'docker build -t rts-ml-service:${BUILD_NUMBER} ./ml_service'
+            }
+        }
+
+        stage('Deploy DEV') {
+            when { branch 'develop' }
+            steps { sh 'ci/scripts/deploy.sh dev' }
+        }
+        stage('Deploy STAGING') {
+            when { branch pattern: 'release/.*' }
+            steps { sh 'ci/scripts/deploy.sh staging' }
+        }
+        stage('Deploy PROD') {
+            when { tag 'v*' }
+            steps {
+                input message: 'Deploy to PRODUCTION (maintenance window)?', ok: 'Deploy'
+                sh 'ci/scripts/deploy.sh prod'
+            }
+        }
+    }
+
+    post {
+        always  { echo "Build ${currentBuild.currentResult}" }
+        failure { echo 'Build failed — see stage logs.' }
+    }
+}

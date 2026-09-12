@@ -1,0 +1,26 @@
+[build-system]
+requires = ["scikit-build-core>=0.8", "pybind11>=2.11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "imgproc"
+version = "0.1.0"
+description = "CUDA-accelerated computer-vision library (detection & tracking)"
+readme = "../../README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "imgproc maintainers" }]
+dependencies = ["numpy>=1.23"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.4"]
+
+[tool.scikit-build]
+# Point scikit-build-core at the repository's top-level CMake project.
+cmake.source-dir = "../.."
+cmake.args = ["-DIMGPROC_BUILD_TESTS=OFF", "-DIMGPROC_BUILD_CLI=OFF"]
+wheel.packages = ["imgproc"]
+
+[tool.cibuildwheel]
+build = "cp39-* cp310-* cp311-* cp312-*"
+# CUDA wheels are built in a separate, GPU-toolkit-equipped job.

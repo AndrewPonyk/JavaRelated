@@ -1,0 +1,36 @@
+# Game Engine Core — clang-tidy
+# Pragmatic for a performance-oriented C++20 engine: bugprone + perf + modern,
+# minus checks that fight data-oriented/low-level code.
+---
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  misc-*,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -misc-non-private-member-variables-in-classes,
+  -bugprone-easily-swappable-parameters
+
+WarningsAsErrors: 'bugprone-*,performance-*'
+HeaderFilterRegex: '.*/engine/.*'
+FormatStyle: file
+
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase,        value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,            value: CamelCase }
+  - { key: readability-identifier-naming.StructCase,           value: CamelCase }
+  - { key: readability-identifier-naming.FunctionCase,         value: camelBack }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,  value: _ }
+  - { key: readability-identifier-naming.EnumConstantCase,     value: CamelCase }
+  - { key: readability-identifier-naming.ConstexprVariableCase, value: CamelCase }

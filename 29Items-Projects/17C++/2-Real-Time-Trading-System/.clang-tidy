@@ -1,0 +1,31 @@
+# Real-Time Trading System — static analysis ruleset.
+# Focus: correctness, performance, and concurrency. Some opinionated checks are
+# disabled where they fight low-latency idioms (e.g. C-arrays in PODs).
+Checks: >
+  bugprone-*,
+  cert-*,
+  concurrency-*,
+  performance-*,
+  portability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-avoid-c-arrays,
+  -modernize-avoid-c-arrays
+
+WarningsAsErrors: 'bugprone-*,concurrency-*,cert-*'
+HeaderFilterRegex: '^src/.*\.(h|hpp)$'
+FormatStyle: file
+
+CheckOptions:
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: '_'
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack

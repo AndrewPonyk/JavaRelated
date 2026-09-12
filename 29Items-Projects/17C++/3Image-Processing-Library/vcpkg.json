@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "imgproc",
+  "version": "0.1.0",
+  "description": "CUDA-accelerated computer-vision library (detection & tracking)",
+  "homepage": "https://example.com/imgproc",
+  "dependencies": [
+    {
+      "name": "opencv4",
+      "features": ["dnn"]
+    },
+    "pybind11"
+  ],
+  "features": {
+    "tests": {
+      "description": "Build with GoogleTest",
+      "dependencies": ["gtest"]
+    },
+    "bench": {
+      "description": "Build with google/benchmark",
+      "dependencies": ["benchmark"]
+    },
+    "cuda": {
+      "description": "OpenCV CUDA modules (requires CUDA toolkit on the host)",
+      "dependencies": [{ "name": "opencv4", "features": ["cuda", "dnn"] }]
+    }
+  }
+}

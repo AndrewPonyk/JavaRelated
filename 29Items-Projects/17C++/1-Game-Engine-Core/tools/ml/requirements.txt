@@ -1,0 +1,8 @@
+# ML tooling for terrain model training/export (kept OUT of the engine runtime).
+# Pin exact versions in CI for reproducible model artifacts.
+torch>=2.2,<3.0
+numpy>=1.26,<2.2
+onnx>=1.15
+onnxruntime>=1.17        # for local verification of the exported model
+pillow>=10.0             # heightmap image I/O
+tqdm>=4.66               # training progress bars

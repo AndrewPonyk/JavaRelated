@@ -1,0 +1,18 @@
+# .clang-format — LLVM-derived house style for imgproc.
+BasedOnStyle: Google
+Language: Cpp
+Standard: c++20
+ColumnLimit: 90
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+NamespaceIndentation: None
+PointerAlignment: Left
+DerivePointerAlignment: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+BreakBeforeBraces: Attach
+IncludeBlocks: Regroup
+SortIncludes: CaseSensitive
+SeparateDefinitionBlocks: Always

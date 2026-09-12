@@ -1,0 +1,38 @@
+{
+  "_comment": "Shipped engine defaults. A per-user config in the OS user-data dir overrides this; CLI flags override that. See docs/TECH-NOTES.md §3.4.",
+  "window": {
+    "title": "Game Engine Core",
+    "width": 1280,
+    "height": 720,
+    "resizable": true,
+    "fullscreen": false
+  },
+  "renderer": {
+    "backend": "vulkan",
+    "vsync": true,
+    "framesInFlight": 3,
+    "validationLayers": false,
+    "msaaSamples": 4
+  },
+  "simulation": {
+    "fixedTimestepHz": 60,
+    "maxFrameTimeMs": 250
+  },
+  "jobs": {
+    "workerThreads": 0
+  },
+  "audio": {
+    "sampleRate": 48000,
+    "channels": 2,
+    "masterVolume": 1.0
+  },
+  "logging": {
+    "level": "info",
+    "fileSink": true,
+    "consoleSink": true
+  },
+  "procgen": {
+    "modelPath": "models/terrain_model.onnx",
+    "cacheEnabled": true
+  }
+}

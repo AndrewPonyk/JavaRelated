@@ -1,0 +1,10 @@
+build/
+build-*/
+var/
+.git/
+.ccache/
+**/__pycache__/
+**/*_pb2.py
+**/*_pb2_grpc.py
+*.log
+docs/

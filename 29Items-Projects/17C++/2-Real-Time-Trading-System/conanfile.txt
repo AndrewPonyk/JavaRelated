@@ -1,0 +1,30 @@
+# ============================================================================
+#  conanfile.txt — third-party dependency manifest.
+#  Pin exact versions; commit conan.lock for reproducible builds.
+#  Usage:
+#    conan install . --output-folder=build --build=missing \
+#       -s build_type=Release -s compiler.cppstd=20
+# ============================================================================
+[requires]
+boost/1.84.0
+onetbb/2021.12.0
+grpc/1.54.3
+protobuf/3.21.12
+gtest/1.14.0
+benchmark/1.8.3
+yaml-cpp/0.8.0
+fmt/10.2.1
+# qt/6.6.1                # large; install via system pkg or enable here for dashboard
+# NOTE: Oracle OCCI/Instant Client is not on Conan Center — vendor it and locate
+#       via cmake/FindOracle.cmake (license-gated download).
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+boost/*:header_only=False
+grpc/*:codegen=True
+
+[layout]
+cmake_layout

@@ -1,0 +1,50 @@
+# ============================================================================
+#  config/trading_engine.yaml
+#  Base engine configuration. Environment overlays (dev/staging/prod) and
+#  secrets are applied on top at startup. NEVER put real secrets in this file —
+#  passwords/keys come from Vault (referenced by name only).
+# ============================================================================
+environment: dev          # dev | staging | prod
+
+# Cores reserved (isolcpus) for pinned, busy-spinning trading threads.
+trading_cores: [2, 3, 4, 5]
+use_huge_pages: true
+log_level: INFO           # TRACE only in dev
+
+fix:
+  host: 127.0.0.1
+  port: 5001
+  sender_comp_id: TRADER1
+  target_comp_id: EXCHANGE
+  heartbeat_secs: 30
+  begin_string: FIX.4.4
+  # password: <from Vault: secret/fix/password>
+
+oracle:
+  host: localhost
+  port: 1521
+  service: TRADING
+  user: trading_app
+  # password: <from Vault: secret/oracle/app>
+  pool_min: 2
+  pool_max: 8
+
+ml:
+  enabled: true
+  grpc_endpoint: localhost:50051
+  model_version: lstm-v3
+  timeout_ms: 20          # advisory; never blocks trading
+
+risk:
+  max_order_qty: 10000
+  max_position_qty: 100000
+  max_notional: 5000000.0
+  price_collar_pct: 0.05  # reject limit prices > 5% through the reference
+
+disruptor:
+  ring_size: 1048576      # power of two
+  wait_strategy: busy_spin  # busy_spin | yield | block
+
+instruments:
+  - { symbol_id: 1, ticker: AAPL, venue: XNAS }
+  - { symbol_id: 2, ticker: ESZ5, venue: XCME }

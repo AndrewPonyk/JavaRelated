@@ -1,0 +1,60 @@
+# Build output
+build*/
+out/
+cmake-build-*/
+_deps/
+CMakeUserPresets.json
+
+# Local scratch / demo artifacts
+*.db
+sample.ppm
+annotated.ppm
+s.ppm
+
+# Package managers
+vcpkg_installed/
+conan/
+conanbuildinfo.*
+conan_toolchain.cmake
+
+# Generated
+generated/
+compile_commands.json
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.pdb
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+wheelhouse/
+.venv/
+venv/
+
+# Models & data (do not commit weights or large media)
+models/
+*.onnx
+*.engine
+*.trt
+*.pt
+*.weights
+# ...but DO keep the tiny ONNX test fixture used by the ONNX Runtime tests.
+!tests/data/*.onnx
+
+# Local config / secrets
+.env
+registry.db
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

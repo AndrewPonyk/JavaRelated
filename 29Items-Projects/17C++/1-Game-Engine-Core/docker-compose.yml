@@ -1,0 +1,24 @@
+# docker-compose for Game Engine Core.
+#
+# `docker compose up` builds the engine (running the full test suite as part of the
+# image build) and then runs the headless engine smoke test — i.e. it brings up the
+# whole stack end-to-end. A native game engine has no long-running server tier, so
+# this is the meaningful analogue of "compose up runs the application".
+#
+#   docker compose up --build       # build + test + run the engine (headless)
+#   docker compose run --rm tests   # just run the test suite
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: game-engine-core:dev
+    command: ["./build/bin/GameEngineCore", "--smoke-test"]
+
+  # Convenience service to run the test suite on its own.
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: game-engine-core:dev
+    command: ["ctest", "--test-dir", "build", "--output-on-failure"]

@@ -1,0 +1,30 @@
+# config/models.example.yaml
+# Model-zoo manifest consumed at startup to seed the model registry.
+# Copy to models.yaml and adjust. Artifact paths must resolve under
+# IMGPROC_MODEL_DIR (see .env.example).
+
+models:
+  - name: yolov8n
+    version: 1.3.0
+    backend: onnxruntime          # onnxruntime | opencv_dnn | tensorrt
+    artifact: yolov8n.onnx        # relative to IMGPROC_MODEL_DIR
+    sha256: "REPLACE_WITH_REAL_CHECKSUM"
+    input_shape: [1, 3, 640, 640]
+    score_threshold: 0.25
+    nms_iou_threshold: 0.45
+    labels: [person, bicycle, car, motorcycle, bus, truck]
+
+  - name: yolov8n-trt
+    version: 1.3.0
+    backend: tensorrt
+    artifact: yolov8n.engine
+    sha256: "REPLACE_WITH_REAL_CHECKSUM"
+    input_shape: [1, 3, 640, 640]
+    score_threshold: 0.30
+    nms_iou_threshold: 0.45
+    labels: [person, car]
+
+tracking:
+  iou_threshold: 0.3
+  max_age: 30
+  min_hits: 3

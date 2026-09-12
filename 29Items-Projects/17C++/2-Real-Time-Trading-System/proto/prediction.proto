@@ -1,0 +1,49 @@
+// ============================================================================
+//  proto/prediction.proto
+//  Contract between the C++ engine (client) and the Python LSTM service
+//  (server). Predictions are ADVISORY: the engine never blocks on this RPC.
+//
+//  Build: protoc --cpp_out / --grpc_out for the engine;
+//         python -m grpc_tools.protoc for the service (see ml_service/).
+// ============================================================================
+syntax = "proto3";
+
+package rts.ml.v1;
+
+option cc_enable_arenas = true;
+
+// A single feature vector for one instrument at one point in time.
+message FeatureVector {
+  uint32 symbol_id   = 1;
+  int64  timestamp_ns = 2;
+  repeated float features = 3;   // engineered: returns, imbalance, vol, etc.
+}
+
+message PredictRequest {
+  string model_version = 1;      // pin the model the engine expects
+  repeated FeatureVector windows = 2;  // LSTM consumes a sequence/batch
+}
+
+message Prediction {
+  uint32 symbol_id  = 1;
+  double signal     = 2;         // e.g. expected short-horizon return, [-1, 1]
+  double confidence = 3;         // [0, 1]
+  int64  inference_ns = 4;       // server-side latency, for monitoring
+}
+
+message PredictResponse {
+  string model_version = 1;
+  repeated Prediction predictions = 2;
+}
+
+// Health/version probe used by the engine's circuit breaker.
+message HealthRequest  {}
+message HealthResponse { bool ready = 1; string model_version = 2; }
+
+service QuantPredictor {
+  rpc Predict(PredictRequest) returns (PredictResponse);
+  rpc Health(HealthRequest)  returns (HealthResponse);
+
+  // Optional streaming variant for high-rate, low-overhead inference.
+  rpc PredictStream(stream PredictRequest) returns (stream PredictResponse);
+}

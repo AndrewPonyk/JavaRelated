@@ -1,0 +1,32 @@
+# Build output
+/build/
+/build-*/
+/cmake-build-*/
+out/
+
+# CMake / tooling artifacts
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+_deps/
+Testing/
+
+# Database files produced at runtime
+*.db
+*.db-wal
+*.db-shm
+/data/
+
+# Local environment overrides (never commit real secrets/config)
+.env
+
+# Editor / IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db

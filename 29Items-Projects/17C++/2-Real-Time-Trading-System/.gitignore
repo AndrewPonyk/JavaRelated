@@ -1,0 +1,55 @@
+# ---- Build output ----------------------------------------------------------
+build/
+build-*/
+cmake-build-*/
+dist/
+out/
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+
+# ---- CMake -----------------------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+compile_commands.json
+
+# ---- Conan -----------------------------------------------------------------
+.conan2/
+conan_toolchain.cmake
+conandeps*.cmake
+graph_info.json
+
+# ---- Caches / tooling ------------------------------------------------------
+.ccache/
+.cache/
+.idea/
+.vscode/
+*.user
+
+# ---- Secrets / local config (NEVER commit) ---------------------------------
+.env
+*.pem
+*.key
+secrets/
+
+# ---- Runtime artifacts -----------------------------------------------------
+var/
+*.log
+core
+core.*
+
+# ---- Python (ml_service) ---------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*_pb2.py
+*_pb2_grpc.py
+
+# ---- OS junk ---------------------------------------------------------------
+.DS_Store
+Thumbs.db

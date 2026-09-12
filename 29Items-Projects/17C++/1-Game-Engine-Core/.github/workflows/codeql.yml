@@ -1,0 +1,42 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  schedule:
+    - cron: "0 3 * * 1"   # weekly Monday 03:00 UTC
+
+jobs:
+  analyze:
+    name: Analyze (C/C++)
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: cpp
+          queries: security-and-quality
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build clang
+
+      - name: Configure & build (dependency-free, for analysis)
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+            -DENGINE_BUILD_TESTS=OFF \
+            -DENGINE_ENABLE_VULKAN=OFF -DENGINE_ENABLE_OPENGL=OFF
+          cmake --build build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:cpp"

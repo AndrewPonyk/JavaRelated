@@ -1,0 +1,15 @@
+.git
+build/
+out/
+cmake-build-*/
+install/
+vcpkg_installed/
+tools/ml/.venv/
+tools/ml/data/
+**/__pycache__/
+*.spv
+.env
+*.user
+.vs/
+.vscode/
+.idea/

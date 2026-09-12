@@ -1,0 +1,85 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      },
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    },
+    {
+      "name": "dev",
+      "displayName": "Developer (Debug, validation + sanitizers off)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ENGINE_BUILD_TESTS": "ON",
+        "ENGINE_BUILD_EDITOR": "ON"
+      }
+    },
+    {
+      "name": "dev-asan",
+      "displayName": "Developer + AddressSanitizer/UBSan",
+      "inherits": "dev",
+      "cacheVariables": { "ENGINE_ENABLE_SANITIZERS": "ON" }
+    },
+    {
+      "name": "release",
+      "displayName": "Optimized release (shippable)",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "ENGINE_BUILD_TESTS": "OFF",
+        "ENGINE_BUILD_EDITOR": "OFF"
+      }
+    },
+    {
+      "name": "ci-linux",
+      "displayName": "CI — Linux/Clang",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "ENGINE_BUILD_TESTS": "ON",
+        "ENGINE_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "ci-windows",
+      "displayName": "CI — Windows/MSVC",
+      "inherits": "base",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "cacheVariables": {
+        "ENGINE_BUILD_TESTS": "ON",
+        "ENGINE_WARNINGS_AS_ERRORS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "dev",         "configurePreset": "dev" },
+    { "name": "release",     "configurePreset": "release", "configuration": "Release" },
+    { "name": "ci-linux",    "configurePreset": "ci-linux" },
+    { "name": "ci-windows",  "configurePreset": "ci-windows", "configuration": "RelWithDebInfo" }
+  ],
+  "testPresets": [
+    {
+      "name": "ci-linux",
+      "configurePreset": "ci-linux",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": false }
+    },
+    {
+      "name": "ci-windows",
+      "configurePreset": "ci-windows",
+      "configuration": "RelWithDebInfo",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

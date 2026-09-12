@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/game-engine-core/scene.schema.json",
+  "title": "Game Engine Core — Scene (engine serialization format)",
+  "description": "Matches engine::scene::Scene::serialize/deserialize. Each entity carries a 'components' map keyed by component type name.",
+  "type": "object",
+  "required": ["name", "version", "entities"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["components"],
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "type": "object",
+            "properties": {
+              "Name": {
+                "type": "object",
+                "properties": { "value": { "type": "string" } }
+              },
+              "Transform": {
+                "type": "object",
+                "properties": {
+                  "position": { "$ref": "#/$defs/vec3" },
+                  "eulerDegrees": { "$ref": "#/$defs/vec3" },
+                  "scale": { "$ref": "#/$defs/vec3" }
+                }
+              },
+              "Camera": {
+                "type": "object",
+                "properties": {
+                  "fovDegrees": { "type": "number" },
+                  "nearPlane": { "type": "number" },
+                  "farPlane": { "type": "number" },
+                  "active": { "type": "boolean" }
+                }
+              },
+              "MeshRenderer": {
+                "type": "object",
+                "properties": {
+                  "mesh": { "$ref": "#/$defs/assetHandle" },
+                  "material": { "$ref": "#/$defs/assetHandle" },
+                  "visible": { "type": "boolean" }
+                }
+              },
+              "TerrainTileTag": {
+                "type": "object",
+                "properties": {
+                  "tileX": { "type": "integer" },
+                  "tileY": { "type": "integer" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "vec3": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "assetHandle": {
+      "type": "object",
+      "properties": { "id": { "type": "integer" }, "type": { "type": "integer" } }
+    }
+  }
+}

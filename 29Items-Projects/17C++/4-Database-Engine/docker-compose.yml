@@ -1,0 +1,31 @@
+# MiniDB is an embedded engine (a library + CLI), not a multi-service app, so
+# there is no long-running "stack" to bring up. Compose is still useful for a
+# reproducible build/test and an interactive shell:
+#
+#   docker compose build            # compiles the engine AND runs ctest (in the
+#                                   # Dockerfile build stage) — fails on any test
+#   docker compose run --rm shell   # interactive SQL shell on a persisted volume
+#   docker compose up tests         # one-shot: build image + print the CLI banner
+#
+services:
+  # Interactive REPL on a persisted data volume.
+  shell:
+    build:
+      context: .
+      target: runtime
+    image: minidb:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - minidb-data:/data
+
+  # One-shot smoke run (the image's build stage already ran the full test suite).
+  tests:
+    build:
+      context: .
+      target: build
+    image: minidb-build:latest
+    command: ["ctest", "--test-dir", "build", "--output-on-failure"]
+
+volumes:
+  minidb-data:

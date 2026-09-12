@@ -1,0 +1,46 @@
+# Game Engine Core — clang-format (LLVM-derived, 4-space, 100 col)
+---
+Language: Cpp
+BasedOnStyle: LLVM
+Standard: c++20
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+AccessModifierOffset: -4
+NamespaceIndentation: None
+FixNamespaceComments: true
+CompactNamespaces: false
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Attach
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLine
+
+IncludeBlocks: Regroup
+SortIncludes: CaseInsensitive
+IncludeCategories:
+  - Regex: '^"engine/'        # this project's public headers
+    Priority: 2
+  - Regex: '^<(vulkan|SDL|GL|glm|imgui)'  # third-party SDK headers
+    Priority: 3
+  - Regex: '^<.*\.h>'         # C system headers
+    Priority: 4
+  - Regex: '^<[^.]+>'         # C++ stdlib
+    Priority: 5
+  - Regex: '.*'               # local "..." headers
+    Priority: 1
+
+SpaceAfterCStyleCast: true
+SpacesBeforeTrailingComments: 1
+AlignAfterOpenBracket: Align
+AlignTrailingComments: true

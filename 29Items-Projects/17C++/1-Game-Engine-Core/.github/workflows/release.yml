@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]            # tag a release: v1.2.3 -> Steam 'default'
+  workflow_dispatch:        # manual: -> Steam 'development'
+
+permissions:
+  contents: write           # create the GitHub Release
+
+jobs:
+  package:
+    name: Package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2022, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true         # pull large game assets
+
+      - name: Set up vcpkg
+        uses: lukka/run-vcpkg@v11
+
+      - name: Install Ninja (Windows)
+        if: runner.os == 'Windows'
+        uses: seanmiddleditch/gha-setup-ninja@v5
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build clang libsdl2-dev libvulkan-dev
+
+      - name: Configure (release)
+        run: cmake --preset release
+
+      - name: Build
+        run: cmake --build --preset release
+
+      - name: Install (stage depot tree)
+        run: cmake --install build/release --prefix "${{ github.workspace }}/dist"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameEngineCore-${{ runner.os }}
+          path: dist/
+
+  steam-deploy:
+    name: Deploy to Steam
+    needs: package
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      # Branch selection: tag -> 'default' (public), manual -> 'development' (testers).
+      - name: Determine Steam branch
+        id: branch
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "steam_branch=default" >> "$GITHUB_OUTPUT"
+          else
+            echo "steam_branch=development" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload to Steam (steamcmd)
+        uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_BUILD_ACCOUNT }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ secrets.STEAM_APP_ID }}
+          buildDescription: ${{ github.ref_name }}
+          rootPath: dist
+          releaseBranch: ${{ steps.branch.outputs.steam_branch }}
+
+      - name: Create GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

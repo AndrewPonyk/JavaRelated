@@ -1,0 +1,27 @@
+{
+  "name": "Example Scene",
+  "version": 1,
+  "entities": [
+    {
+      "components": {
+        "Name": { "value": "Main Camera" },
+        "Transform": { "position": [0, 5, 12], "eulerDegrees": [-15, 0, 0], "scale": [1, 1, 1] },
+        "Camera": { "fovDegrees": 60, "nearPlane": 0.1, "farPlane": 1000, "active": true }
+      }
+    },
+    {
+      "components": {
+        "Name": { "value": "Player" },
+        "Transform": { "position": [0, 1, 0], "eulerDegrees": [0, 0, 0], "scale": [1, 1, 1] },
+        "MeshRenderer": { "mesh": { "id": 0, "type": 1 }, "material": { "id": 1, "type": 0 }, "visible": true }
+      }
+    },
+    {
+      "components": {
+        "Name": { "value": "Terrain Tile (0,0)" },
+        "Transform": { "position": [0, 0, 0], "eulerDegrees": [0, 0, 0], "scale": [1, 1, 1] },
+        "TerrainTileTag": { "tileX": 0, "tileY": 0 }
+      }
+    }
+  ]
+}
