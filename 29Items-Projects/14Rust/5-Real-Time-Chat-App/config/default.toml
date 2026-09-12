@@ -1,0 +1,17 @@
+# Documentation-only safe defaults. Runtime configuration is read from environment variables.
+host = "0.0.0.0"
+port = 8080
+static_dir = "frontend"
+database_max_connections = 10
+chat_channel_capacity = 256
+max_message_bytes = 4096
+max_connections_per_room = 500
+shutdown_timeout_seconds = 20
+session_ttl_hours = 24
+max_list_page_size = 100
+max_history_page_size = 100
+password_hash_concurrency = 4
+messages_per_minute = 60
+api_requests_per_minute = 300
+heartbeat_interval_seconds = 20
+heartbeat_timeout_seconds = 60

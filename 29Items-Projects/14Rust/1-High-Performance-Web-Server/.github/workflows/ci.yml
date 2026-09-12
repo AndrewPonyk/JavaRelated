@@ -1,0 +1,43 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-rust:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Rustfmt Check
+        run: cargo fmt -- --check
+        working-directory: ./backend
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+        working-directory: ./backend
+      - name: Run Tests
+        run: cargo test
+        working-directory: ./backend
+
+  test-ts:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: ./frontend
+      - name: Lint
+        run: npm run lint
+        working-directory: ./frontend

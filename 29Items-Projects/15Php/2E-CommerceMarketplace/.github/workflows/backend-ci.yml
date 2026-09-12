@@ -1,0 +1,102 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+  push:
+    branches: [main]
+    paths: ['backend/**']
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  quality:
+    name: Lint, static analysis & tests
+    runs-on: ubuntu-latest
+
+    # Real infra for integration tests (test pyramid — see docs/TECH-NOTES.md).
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: marketplace_test
+          POSTGRES_USER: marketplace
+          POSTGRES_PASSWORD: marketplace
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U marketplace"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      rabbitmq:
+        image: rabbitmq:3.13-alpine
+        ports: ['5672:5672']
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: 'false'
+          ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+        ports: ['9200:9200']
+
+    env:
+      DATABASE_URL: postgresql://marketplace:marketplace@localhost:5432/marketplace_test?serverVersion=16&charset=utf8
+      MESSENGER_TRANSPORT_DSN: amqp://marketplace:marketplace@localhost:5672/%2f/messages
+      ELASTICSEARCH_URL: http://localhost:9200
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, amqp, pdo_pgsql, intl
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+
+      - run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Code style (php-cs-fixer)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Static analysis (PHPStan L9)
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Architecture boundaries (Deptrac)
+        run: vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+
+      - name: Generate JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists --env=test
+
+      - name: Migrate test database
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Tests (unit + integration + functional)
+        run: vendor/bin/phpunit --coverage-text
+
+  image:
+    name: Build container image
+    needs: quality
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (smoke — push happens in deploy.yml)
+        run: docker build -t marketplace-api:${{ github.sha }} ./backend
+      - name: Scan image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: marketplace-api:${{ github.sha }}
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true

@@ -1,0 +1,66 @@
+security:
+    password_hashers:
+        App\Identity\Domain\Model\User:
+            algorithm: argon2id
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Identity\Domain\Model\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Login endpoint issues a JWT.
+        login:
+            pattern: ^/api/auth/login
+            stateless: true
+            json_login:
+                check_path: /api/auth/login
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            # Brute-force protection: Symfony's built-in login throttling rate-limits
+            # failed logins per IP + username (5 / minute). 429 on exhaustion.
+            login_throttling:
+                max_attempts: 5
+                interval: '1 minute'
+
+        # Public health & docs.
+        public:
+            pattern: ^/(health|api/docs)
+            security: false
+
+        # Everything else under /api requires a valid JWT.
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
+
+    # Role hierarchy: admins inherit seller & customer capabilities.
+    role_hierarchy:
+        ROLE_SELLER: [ROLE_CUSTOMER]
+        ROLE_ADMIN:  [ROLE_SELLER, ROLE_CUSTOMER]
+
+    access_control:
+        - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS }
+        - { path: ^/api/search, roles: PUBLIC_ACCESS }
+        - { path: ^/api/products/mine, roles: ROLE_SELLER }     # seller's own catalogue
+        - { path: ^/api/products, roles: PUBLIC_ACCESS, methods: [GET] }  # public browse
+        - { path: ^/api/products, roles: ROLE_SELLER }          # create/update/delete
+        - { path: ^/api/seller, roles: ROLE_SELLER }
+        - { path: ^/api/admin, roles: ROLE_ADMIN }
+        - { path: ^/api, roles: ROLE_CUSTOMER }
+
+when@test:
+    security:
+        password_hashers:
+            App\Identity\Domain\Model\User:
+                algorithm: auto
+                cost: 4               # speed up the test suite

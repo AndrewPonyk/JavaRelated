@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Money is mapped as a Doctrine embeddable so aggregates can hold a typed Money
+  value object while it persists as two scalar columns (prefixed per embed site,
+  e.g. price_amount_minor / price_currency on catalog_products).
+-->
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <embeddable name="App\Shared\Domain\ValueObject\Money">
+        <!-- integer maps to a PHP int (matches Money::$amountMinor). TODO: switch
+             to a bigint custom type if order totals can exceed 32-bit minor units. -->
+        <field name="amountMinor" type="integer" column="amount_minor"/>
+        <field name="currency" type="string" length="3" column="currency"/>
+    </embeddable>
+
+</doctrine-mapping>

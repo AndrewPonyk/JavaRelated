@@ -1,0 +1,45 @@
+# ---- PHP / Symfony ----
+/backend/vendor/
+/backend/var/
+/backend/.env.local
+/backend/.env.*.local
+/backend/public/bundles/
+/backend/config/jwt/
+/backend/.phpunit.result.cache
+/backend/.phpunit.cache/
+/backend/.php-cs-fixer.cache
+/backend/phpstan-baseline.neon
+# composer.lock IS committed (reproducible installs; CI/Docker `composer install`).
+/backend/composer.phar
+
+# ---- Node / React ----
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/*.local
+/frontend/coverage/
+
+# ---- Python ML service ----
+/ml-service/**/__pycache__/
+/ml-service/.venv/
+/ml-service/**/*.pyc
+/ml-service/.pytest_cache/
+/ml-service/model_artifacts/
+
+# ---- Env / secrets ----
+.env
+.env.local
+*.pem
+*.key
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Build / infra ----
+*.log
+/infra/**/.terraform/
+docker-compose.override.yml

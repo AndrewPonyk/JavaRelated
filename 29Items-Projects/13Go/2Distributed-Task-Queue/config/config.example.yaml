@@ -1,0 +1,19 @@
+app_env: development
+http_addr: ":8080"
+database_url: "postgres://task_queue:replace-with-local-postgres-password@localhost:5432/task_queue?sslmode=disable"
+redis:
+  addr: "localhost:6379"
+  password: ""
+nats:
+  url: "nats://localhost:4222"
+api:
+  key: "replace-with-local-api-key"
+  enforce_https: false
+database:
+  auto_migrate: true
+worker:
+  concurrency: 8
+shutdown:
+  timeout_seconds: 20
+metrics:
+  enabled: true

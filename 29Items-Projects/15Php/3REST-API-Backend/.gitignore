@@ -1,0 +1,30 @@
+# ── Secrets / env ─────────────────────────────────────
+.env
+*.env
+!.env.example
+
+# ── PHP / Laravel ─────────────────────────────────────
+/backend/vendor/
+/backend/storage/*.key
+/backend/storage/api-docs/
+/backend/database/*.sqlite
+/backend/database/*.sqlite-journal
+/backend/storage/logs/*
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/bootstrap/cache/*.php
+/backend/.phpunit.cache
+/backend/.phpunit.result.cache
+
+# ── Node / Vue ────────────────────────────────────────
+/frontend/node_modules/
+/frontend/dist/
+npm-debug.log*
+
+# ── Tooling / OS ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

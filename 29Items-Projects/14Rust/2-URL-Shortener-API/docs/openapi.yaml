@@ -1,0 +1,481 @@
+openapi: 3.0.3
+info:
+  title: URL Shortener API
+  version: 1.0.0
+  description: |
+    Creates and manages short links. Management operations use an admin token.
+    A custom code on the public creation route also requires that token.
+servers:
+  - url: http://localhost:8080
+    description: Local API
+tags:
+  - name: Operations
+  - name: URLs
+  - name: Redirects
+
+paths:
+  /health:
+    get:
+      tags: [Operations]
+      operationId: health
+      summary: Check service and database health
+      responses:
+        '200':
+          description: The API can query its database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: ok
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+  /api/v1/urls:
+    post:
+      tags: [URLs]
+      operationId: createUrl
+      summary: Create a short URL
+      description: |
+        Public when the server generates the code. When custom_code is present,
+        send a valid X-Admin-Token header.
+      parameters:
+        - $ref: '#/components/parameters/OptionalAdminToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUrlRequest'
+            examples:
+              generated:
+                summary: Server-generated code
+                value:
+                  long_url: https://example.com/articles/production
+              custom:
+                summary: Administrator-selected code
+                value:
+                  long_url: https://example.com/docs
+                  custom_code: docs
+                  expires_at: '2027-01-01T00:00:00Z'
+      responses:
+        '201':
+          description: Short URL created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Url'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+    get:
+      tags: [URLs]
+      operationId: listUrls
+      summary: List URL records
+      security:
+        - AdminToken: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: One page ordered by newest creation time, then ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UrlList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+  /api/v1/urls/{code}:
+    parameters:
+      - $ref: '#/components/parameters/Code'
+    get:
+      tags: [URLs]
+      operationId: getUrl
+      summary: Get URL metadata
+      security:
+        - AdminToken: []
+      responses:
+        '200':
+          description: URL metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Url'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+    put:
+      tags: [URLs]
+      operationId: updateUrl
+      summary: Replace URL metadata
+      security:
+        - AdminToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUrlRequest'
+            example:
+              long_url: https://example.org/new-destination
+              status: active
+              expires_at: null
+      responses:
+        '200':
+          description: Updated URL metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Url'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+    delete:
+      tags: [URLs]
+      operationId: deleteUrl
+      summary: Delete a short URL
+      security:
+        - AdminToken: []
+      responses:
+        '204':
+          description: URL deleted; the response has no body.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+  /{code}:
+    get:
+      tags: [Redirects]
+      operationId: followShortUrl
+      summary: Record a visit and redirect
+      description: Visit counts are incremented atomically before the response is returned.
+      parameters:
+        - $ref: '#/components/parameters/Code'
+      responses:
+        '302':
+          description: Redirect to the current destination.
+          headers:
+            Location:
+              required: true
+              description: Validated HTTP or HTTPS destination.
+              schema:
+                type: string
+                format: uri
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/Inactive'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+
+components:
+  securitySchemes:
+    AdminToken:
+      type: apiKey
+      in: header
+      name: X-Admin-Token
+      description: Secret management token configured by ADMIN_API_TOKEN (32-4096 printable ASCII characters without spaces).
+
+  parameters:
+    OptionalAdminToken:
+      name: X-Admin-Token
+      in: header
+      required: false
+      description: Required only when custom_code is supplied.
+      schema:
+        type: string
+        minLength: 32
+        maxLength: 4096
+    Code:
+      name: code
+      in: path
+      required: true
+      description: Case-sensitive short code. api and health are reserved.
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 32
+        pattern: '^[A-Za-z0-9_-]+$'
+        example: docs_2026
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        default: 1
+    PerPage:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+
+    CreateUrlRequest:
+      type: object
+      additionalProperties: false
+      required: [long_url]
+      properties:
+        long_url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 2048
+          description: Absolute HTTP or HTTPS URL, at most 2048 UTF-8 bytes, without embedded credentials, surrounding whitespace, or control characters.
+        custom_code:
+          type: string
+          nullable: true
+          minLength: 3
+          maxLength: 32
+          pattern: '^[A-Za-z0-9_-]+$'
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Must be in the future when provided.
+
+    UpdateUrlRequest:
+      type: object
+      additionalProperties: false
+      required: [long_url, status]
+      properties:
+        long_url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 2048
+          description: Absolute HTTP or HTTPS URL, at most 2048 UTF-8 bytes, without embedded credentials, surrounding whitespace, or control characters.
+        status:
+          type: string
+          enum: [active, disabled]
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Must be in the future when provided.
+
+    Url:
+      type: object
+      additionalProperties: false
+      required:
+        - short_code
+        - short_url
+        - long_url
+        - visit_count
+        - status
+        - created_at
+        - updated_at
+        - expires_at
+      properties:
+        short_code:
+          type: string
+          example: docs_2026
+        short_url:
+          type: string
+          format: uri
+          example: https://short.example/docs_2026
+        long_url:
+          type: string
+          format: uri
+          example: https://example.com/docs
+        visit_count:
+          type: integer
+          format: int64
+          minimum: 0
+          example: 12
+        status:
+          type: string
+          enum: [active, disabled]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    UrlList:
+      type: object
+      additionalProperties: false
+      required: [page, per_page, items]
+      properties:
+        page:
+          type: integer
+          format: int64
+          minimum: 1
+        per_page:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 100
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Url'
+
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - validation_error
+            - unauthorized
+            - not_found
+            - method_not_allowed
+            - conflict
+            - inactive
+            - rate_limit_exceeded
+            - internal_error
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Request body, path, query, URL, status, expiration, or pagination is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: validation_error
+            message: 'invalid request: long_url must be an absolute URL'
+    Unauthorized:
+      description: The management token is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: unauthorized
+            message: authentication required
+    NotFound:
+      description: The short URL or route does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: not_found
+            message: short URL not found
+    Conflict:
+      description: The requested custom code already exists or generated-code retries were exhausted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: conflict
+            message: short code already exists
+    Inactive:
+      description: The short URL is disabled or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: inactive
+            message: short URL is inactive
+    RateLimited:
+      description: The client exhausted its URL-creation allowance or the bounded in-process client table is full.
+      headers:
+        Retry-After:
+          required: true
+          description: Seconds until the current rate-limit window expires.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: rate_limit_exceeded
+            message: 'request rate limit exceeded; retry after 42 seconds'
+    InternalError:
+      description: An unexpected server or database failure occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: internal_error
+            message: internal server error
+    MethodNotAllowed:
+      description: The route exists but does not support the requested HTTP method.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: method_not_allowed
+            message: method not allowed

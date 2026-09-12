@@ -1,0 +1,67 @@
+# Local development stack. Mirrors the managed services used in Azure.
+# Production uses Azure Database for PostgreSQL, Azure Service Bus / RabbitMQ
+# add-on, and Elastic Cloud — this file is for local parity only.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-marketplace}
+      POSTGRES_USER: ${POSTGRES_USER:-marketplace}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marketplace}
+    ports: ["5432:5432"]
+    volumes: ["pg_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-marketplace}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-marketplace}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-marketplace}
+    ports: ["5672:5672", "15672:15672"]   # amqp + management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports: ["9200:9200"]
+    volumes: ["es_data:/usr/share/elasticsearch/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ml-service:
+    build: ./ml-service
+    environment:
+      MODEL_PATH: /app/model_artifacts/fraud_model.pkl
+    ports: ["8001:8001"]
+
+  # Backend & frontend are usually run on the host during dev (faster HMR / xdebug),
+  # but can be containerised by uncommenting the blocks below.
+  #
+  # backend:
+  #   build: ./backend
+  #   env_file: .env
+  #   depends_on: [postgres, rabbitmq, elasticsearch]
+  #   ports: ["8000:8000"]
+  #
+  # frontend:
+  #   build: ./frontend
+  #   ports: ["5173:5173"]
+
+volumes:
+  pg_data:
+  es_data:

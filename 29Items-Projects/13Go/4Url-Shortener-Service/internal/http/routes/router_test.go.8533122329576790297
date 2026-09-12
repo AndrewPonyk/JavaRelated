@@ -1,0 +1,163 @@
+package routes_test
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/example/url-shortener-service/internal/http/routes"
+	"github.com/example/url-shortener-service/internal/models"
+	"github.com/example/url-shortener-service/internal/qrcode"
+	"github.com/example/url-shortener-service/internal/service"
+)
+
+func TestRouterMainFlow(t *testing.T) {
+	repo := newRouteRepo()
+	svc := service.NewURLService(repo, newRouteCache(), "http://short.test")
+	router := routes.NewRouter(routes.Dependencies{
+		URLService:   svc,
+		QRGenerator:  qrcode.NewGenerator(),
+		Logger:       slog.New(slog.NewTextHandler(io.Discard, nil)),
+		AllowedCORS:  []string{"http://localhost:5173"},
+		PublicBaseURL: "http://short.test",
+	})
+
+	body := bytes.NewBufferString(`{"originalUrl":"https://example.com/page","customCode":"page"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/urls", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	require.Equal(t, http.StatusCreated, rec.Code)
+
+	var created models.URLResponse
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &created))
+	require.Equal(t, "page", created.ShortCode)
+
+	rec = httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/page", nil))
+	require.Equal(t, http.StatusFound, rec.Code)
+	require.Equal(t, "https://example.com/page", rec.Header().Get("Location"))
+
+	rec = httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/urls/page/analytics", nil))
+	require.Equal(t, http.StatusOK, rec.Code)
+
+	rec = httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/urls/page/qr", nil))
+	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, "image/png", rec.Header().Get("Content-Type"))
+}
+
+type routeRepo struct {
+	items  map[string]models.URL
+	clicks map[string][]service.ClickMetadata
+}
+
+func newRouteRepo() *routeRepo {
+	return &routeRepo{items: map[string]models.URL{}, clicks: map[string][]service.ClickMetadata{}}
+}
+
+func (r *routeRepo) Create(_ context.Context, item models.URL) (models.URL, error) {
+	if _, exists := r.items[item.ShortCode]; exists {
+		return models.URL{}, service.ErrConflict
+	}
+	item.ID = "route-test-id"
+	item.CreatedAt = time.Now().UTC()
+	item.UpdatedAt = item.CreatedAt
+	r.items[item.ShortCode] = item
+	return item, nil
+}
+
+func (r *routeRepo) GetByCode(_ context.Context, code string) (models.URL, error) {
+	item, exists := r.items[code]
+	if !exists {
+		return models.URL{}, service.ErrNotFound
+	}
+	return item, nil
+}
+
+func (r *routeRepo) List(_ context.Context, _ int) ([]models.URL, error) {
+	items := make([]models.URL, 0, len(r.items))
+	for _, item := range r.items {
+		items = append(items, item)
+	}
+	return items, nil
+}
+
+func (r *routeRepo) Update(_ context.Context, code string, req models.UpdateURLRequest) (models.URL, error) {
+	item, exists := r.items[code]
+	if !exists {
+		return models.URL{}, service.ErrNotFound
+	}
+	if req.OriginalURL != "" {
+		item.OriginalURL = req.OriginalURL
+	}
+	if req.Title != "" {
+		item.Title = req.Title
+	}
+	item.UpdatedAt = time.Now().UTC()
+	r.items[code] = item
+	return item, nil
+}
+
+func (r *routeRepo) Delete(_ context.Context, code string) error {
+	if _, exists := r.items[code]; !exists {
+		return service.ErrNotFound
+	}
+	delete(r.items, code)
+	return nil
+}
+
+func (r *routeRepo) RecordClick(_ context.Context, code string, metadata service.ClickMetadata) error {
+	r.clicks[code] = append(r.clicks[code], metadata)
+	return nil
+}
+
+func (r *routeRepo) Analytics(_ context.Context, code string) (models.AnalyticsSummary, error) {
+	return models.AnalyticsSummary{
+		ShortCode:   code,
+		TotalClicks: int64(len(r.clicks[code])),
+		ByReferrer:  map[string]int64{},
+		ByCountry:   map[string]int64{},
+		ByUserAgent: map[string]int64{},
+		ByBucket:    []models.AnalyticsBucket{},
+	}, nil
+}
+
+type routeCache struct {
+	items map[string]models.URL
+}
+
+func newRouteCache() *routeCache {
+	return &routeCache{items: map[string]models.URL{}}
+}
+
+func (c *routeCache) Get(_ context.Context, code string) (models.URL, error) {
+	item, exists := c.items[code]
+	if !exists {
+		return models.URL{}, service.ErrNotFound
+	}
+	return item, nil
+}
+
+func (c *routeCache) Set(_ context.Context, item models.URL) error {
+	c.items[item.ShortCode] = item
+	return nil
+}
+
+func (c *routeCache) Delete(_ context.Context, code string) error {
+	delete(c.items, code)
+	return nil
+}
+
+func (c *routeCache) RecordClick(_ context.Context, _ string, _ service.ClickMetadata) error {
+	return nil
+}

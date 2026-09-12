@@ -1,0 +1,41 @@
+services:
+  api:
+    build: .
+    environment:
+      BIND_ADDRESS: 0.0.0.0:8080
+      DATABASE_URL: /data/url_shortener.db
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
+      ADMIN_API_TOKEN: ${ADMIN_API_TOKEN:?Set ADMIN_API_TOKEN in .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      CREATION_RATE_WINDOW_SECONDS: ${CREATION_RATE_WINDOW_SECONDS:-60}
+      CREATION_RATE_LIMIT: ${CREATION_RATE_LIMIT:-30}
+      CREATION_RATE_MAX_CLIENTS: ${CREATION_RATE_MAX_CLIENTS:-10000}
+      TRUST_PROXY_HEADERS: "true"
+      ENABLE_HSTS: ${ENABLE_HSTS:-false}
+      RUST_LOG: ${RUST_LOG:-info}
+    ports: ["127.0.0.1:8080:8080"]
+    volumes: ["url-data:/data"]
+    init: true
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "busybox", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+  frontend:
+    build: ./frontend
+    ports: ["3000:8080"]
+    depends_on:
+      api: { condition: service_healthy }
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    restart: unless-stopped
+volumes:
+  url-data:

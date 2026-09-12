@@ -1,0 +1,48 @@
+# Routes are declared via PHP attributes on controllers in each context's
+# UI/Http directory. We import them per context to keep boundaries explicit.
+health:
+    resource: '../src/Shared/UI/Http/'
+    type: attribute
+    # no prefix — exposes /health/live and /health/ready
+
+identity:
+    resource: '../src/Identity/UI/Http/'
+    type: attribute
+    prefix: /api
+
+# The login check-path is handled by the json_login firewall (see security.yaml),
+# not a controller. A route must still exist so the router doesn't 404 before the
+# firewall authenticator runs (RouterListener fires before the firewall).
+identity_auth_login:
+    path: /api/auth/login
+    methods: [POST]
+
+catalog:
+    resource: '../src/Catalog/UI/Http/'
+    type: attribute
+    prefix: /api
+
+ordering:
+    resource: '../src/Ordering/UI/Http/'
+    type: attribute
+    prefix: /api
+
+search:
+    resource: '../src/Search/UI/Http/'
+    type: attribute
+    prefix: /api
+
+vendor:
+    resource: '../src/Vendor/UI/Http/'
+    type: attribute
+    prefix: /api
+
+payment:
+    resource: '../src/Payment/UI/Http/'
+    type: attribute
+    prefix: /api
+
+fraud_detection:
+    resource: '../src/FraudDetection/UI/Http/'
+    type: attribute
+    prefix: /api

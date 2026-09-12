@@ -1,0 +1,5 @@
+# Never put secrets here. Copy .env.example to .env for local credentials.
+environment = "development"
+log_format = "pretty"
+allowed_origins = ["http://localhost:8080"]
+secure_cookies = false

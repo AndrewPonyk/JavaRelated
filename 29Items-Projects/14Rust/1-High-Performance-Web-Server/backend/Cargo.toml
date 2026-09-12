@@ -1,0 +1,24 @@
+[package]
+name = "high-performance-web-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+dotenvy = "0.15"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+thiserror = "1.0"
+reqwest = { version = "0.11", features = ["json"] }
+
+# Database
+diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
+deadpool-diesel = { version = "0.5", features = ["postgres"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Redis
+redis = { version = "0.24", features = ["tokio-comp"] }
+deadpool-redis = "0.14"

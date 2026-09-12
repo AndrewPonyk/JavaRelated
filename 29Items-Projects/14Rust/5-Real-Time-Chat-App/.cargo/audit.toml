@@ -1,0 +1,4 @@
+[advisories]
+# `rsa` is present only in SQLx's lockfile metadata; `cargo tree -i rsa --target all`
+# confirms it is not compiled by this PostgreSQL-only feature set. No fixed release exists.
+ignore = ["RUSTSEC-2023-0071"]

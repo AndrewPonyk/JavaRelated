@@ -1,0 +1,57 @@
+framework:
+    messenger:
+        # Three logical buses: commands (1 handler, transactional), queries
+        # (1 handler, read-only), events (N handlers, async fan-out).
+        default_bus: command.bus
+        buses:
+            command.bus:
+                middleware:
+                    - validation
+                    - doctrine_transaction      # each command runs in a DB transaction
+            query.bus:
+                middleware:
+                    - validation
+            event.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: true     # events may have zero local subscribers
+                middleware:
+                    # Async consumers (projections, commission accrual, fraud, seller
+                    # onboarding) persist via the EntityManager; wrap each handled
+                    # event in a transaction so their writes are committed (the
+                    # command bus' transaction does not span async consumers).
+                    - doctrine_transaction
+
+        transports:
+            # Async fan-out to RabbitMQ for cross-context integration events.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 3
+                    max_delay: 0
+            # Poison messages land here for inspection / replay.
+            failed:
+                dsn: 'doctrine://default?queue_name=failed'
+
+        failure_transport: failed
+
+        routing:
+            # Integration (domain) events are handled asynchronously. Routing by the
+            # DomainEvent interface covers every event; the explicit entries below
+            # document the integration events that actually have cross-context
+            # subscribers today.
+            'App\Shared\Domain\Event\DomainEvent': async
+            'App\Catalog\Domain\Event\ProductCreated': async
+            'App\Catalog\Domain\Event\ProductPriceChanged': async
+            'App\Ordering\Domain\Event\OrderPlaced': async
+            'App\Identity\Domain\Event\UserRegistered': async
+            'App\Payment\Domain\Event\PaymentCaptured': async
+            'App\FraudDetection\Domain\Event\OrderFlagged': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'

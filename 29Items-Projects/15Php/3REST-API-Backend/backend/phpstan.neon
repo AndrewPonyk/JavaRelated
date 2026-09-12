@@ -1,0 +1,29 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - app
+        - database
+        - routes
+
+    # Laravel's magic (facades, models) is understood by Larastan.
+    checkModelProperties: true
+
+    # Eloquent relation/paginator return types are generic; we don't annotate
+    # every relation method with <TRelated, TDeclaring>. Disable only this
+    # over-pedantic check — all other level-6 analysis stays on.
+    checkGenericClassInNonGenericObjectType: false
+
+    ignoreErrors:
+        # JsonResource proxies undefined property access to its wrapped model
+        # (and Eloquent models expose attributes/relations dynamically), which
+        # static analysis cannot see.
+        - '#Access to an undefined property App\\Http\\Resources\\.*#'
+        - '#Access to an undefined property App\\Models\\.*#'
+
+        # False positive: OpenApi\Attributes\Tag IS declared IS_REPEATABLE, and
+        # the multiple #[OA\Tag] attributes generate all five tags correctly.
+        - '#Attribute class OpenApi\\Attributes\\Tag is not repeatable#'

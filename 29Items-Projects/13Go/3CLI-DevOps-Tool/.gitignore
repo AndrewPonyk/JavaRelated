@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+
+bin/
+dist/
+coverage.out
+*.test
+
+*.db
+*.sqlite
+*.sqlite3
+
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

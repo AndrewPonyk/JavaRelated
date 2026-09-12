@@ -1,0 +1,12 @@
+.env
+.env.local
+.DS_Store
+node_modules/
+dist/
+coverage/
+bin/
+tmp/
+*.log
+*.test
+*.out
+vendor/

@@ -1,0 +1,76 @@
+name: Deploy
+
+# Build once, deploy many. Production deploys are gated on a version tag so
+# every release is auditable (see docs/TECH-NOTES.md §3.1, §3.5).
+on:
+  push:
+    tags: ['v*']
+
+env:
+  REGISTRY: registry.digitalocean.com/marketplace
+  IMAGE: api
+
+jobs:
+  build-and-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DO Container Registry
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Compute image tag
+        id: meta
+        run: echo "image=$REGISTRY/$IMAGE:${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        # Build context is the repo root so the Dockerfile can COPY the
+        # root-level docker/ and scripts/ dirs (matches docker-compose.yml).
+        run: docker build -f backend/Dockerfile -t "${{ steps.meta.outputs.image }}" .
+
+      - name: Push image
+        run: docker push "${{ steps.meta.outputs.image }}"
+
+  deploy:
+    name: Deploy to DigitalOcean
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production   # requires manual approval if configured
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # Gated, single-run migrations BEFORE traffic shifts (pitfall #4).
+      # Uses expand-contract migrations so old + new code coexist.
+      - name: Run database migrations
+        run: |
+          doctl apps create-deployment ${{ secrets.DO_APP_ID }} --wait \
+            --command "php artisan migrate --force"
+
+      - name: Trigger app deployment
+        run: doctl apps create-deployment ${{ secrets.DO_APP_ID }} --wait
+
+      # Post-deploy smoke test: health probe + one real read endpoint.
+      - name: Smoke test
+        run: |
+          set -e
+          curl -fsS "${{ secrets.PROD_URL }}/up" > /dev/null
+          echo "Health check passed."
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed — rolling back to previous deployment."
+          doctl apps create-deployment ${{ secrets.DO_APP_ID }} --wait

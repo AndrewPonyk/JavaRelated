@@ -1,0 +1,305 @@
+openapi: 3.0.3
+info:
+  title: API Gateway & Service Mesh Admin API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+security:
+  - AdminApiKey: []
+paths:
+  /healthz:
+    get:
+      security: []
+      responses:
+        "200":
+          description: Health response
+  /readyz:
+    get:
+      security: []
+      responses:
+        "200":
+          description: Readiness response
+  /api/v1/tenants:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: List tenants
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantInput"
+      responses:
+        "201":
+          description: Tenant created
+  /api/v1/tenants/{id}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Tenant
+    put:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantInput"
+      responses:
+        "200":
+          description: Tenant updated
+    delete:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Tenant deleted
+  /api/v1/routes:
+    get:
+      parameters:
+        - name: tenantId
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: List routes
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteInput"
+      responses:
+        "201":
+          description: Route created
+  /api/v1/routes/resolve:
+    get:
+      parameters:
+        - name: tenantId
+          in: query
+          schema:
+            type: string
+        - name: host
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: method
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Matched route
+  /api/v1/routes/{id}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Route
+    put:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteInput"
+      responses:
+        "200":
+          description: Route updated
+    delete:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Route deleted
+  /api/v1/anomalies:
+    get:
+      parameters:
+        - name: tenantId
+          in: query
+          schema:
+            type: string
+        - name: routeId
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: List anomaly events
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnomalyEventInput"
+      responses:
+        "201":
+          description: Anomaly event created
+  /api/v1/anomalies/{id}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Anomaly event
+    put:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnomalyEventInput"
+      responses:
+        "200":
+          description: Anomaly event updated
+    delete:
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Anomaly event deleted
+  /api/v1/traffic/score:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrafficFeatures"
+      responses:
+        "200":
+          description: Anomaly decision
+components:
+  securitySchemes:
+    AdminApiKey:
+      type: apiKey
+      in: header
+      name: X-Admin-API-Key
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 250
+        default: 100
+    Offset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  schemas:
+    TenantInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended]
+    RouteInput:
+      type: object
+      required: [tenantId, name, host, pathPrefix, methods, upstreamService, upstreamProtocol]
+      properties:
+        tenantId:
+          type: string
+        name:
+          type: string
+        host:
+          type: string
+        pathPrefix:
+          type: string
+        methods:
+          type: array
+          items:
+            type: string
+        upstreamService:
+          type: string
+        upstreamProtocol:
+          type: string
+          enum: [http, grpc]
+        rateLimitPerMinute:
+          type: integer
+        requiredScopes:
+          type: array
+          items:
+            type: string
+        transformHeaders:
+          type: object
+          additionalProperties:
+            type: string
+        anomalyProtection:
+          type: boolean
+    AnomalyEventInput:
+      type: object
+      required: [routeId, tenantId, score, reason, features]
+      properties:
+        routeId:
+          type: string
+        tenantId:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+        reason:
+          type: string
+        features:
+          type: object
+    TrafficFeatures:
+      type: object
+      required: [routeId, tenantId]
+      properties:
+        routeId:
+          type: string
+        tenantId:
+          type: string
+        requestRate:
+          type: number
+        errorRate:
+          type: number
+        p95LatencyMs:
+          type: number
+        bytesPerSec:
+          type: number
+        deployVersion:
+          type: string

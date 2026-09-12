@@ -1,0 +1,30 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    handle_all_throwables: true
+
+    # Stateless API — no sessions; auth carried by JWT bearer tokens.
+    session: false
+
+    php_errors:
+        log: true
+
+    # Rate limiting for search (login throttling is configured on the firewall in
+    # security.yaml and manages its own limiter — see TECH-NOTES §3.6).
+    # lock_factory: null = best-effort, single-node limiting (no symfony/lock dep);
+    # in production back this with a distributed lock + cache store (e.g. Redis).
+    rate_limiter:
+        search:
+            policy: 'token_bucket'
+            limit: 60
+            rate: { interval: '1 minute', amount: 60 }
+            lock_factory: null
+
+when@test:
+    framework:
+        test: true   # enables the functional test client (WebTestCase)
+
+when@prod:
+    framework:
+        router:
+            strict_requirements: null

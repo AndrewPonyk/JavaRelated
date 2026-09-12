@@ -1,0 +1,50 @@
+{
+  "name": "@webassembly-image-editor/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "build:api": "esbuild server/standalone.ts --bundle --platform=node --format=esm --target=node22 --sourcemap --outfile=dist-server/standalone.mjs",
+    "dev": "vite",
+    "lint": "eslint src server api --ext .ts,.tsx --max-warnings 0",
+    "preview": "vite preview",
+    "serve:api": "tsx --env-file=../../.env.local server/standalone.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "jose": "6.2.3",
+    "onnxruntime-web": "1.27.0",
+    "pg": "8.22.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@playwright/test": "1.61.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.20.1",
+    "@types/pg": "^8.20.0",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
+    "@vitejs/plugin-react": "6.0.3",
+    "@vitest/coverage-v8": "4.1.10",
+    "esbuild": "^0.28.1",
+    "eslint": "8.57.1",
+    "eslint-plugin-react-hooks": "5.1.0",
+    "jsdom": "25.0.1",
+    "pg-mem": "3.0.14",
+    "tsx": "4.23.1",
+    "typescript": "5.7.2",
+    "vite": "8.1.5",
+    "vitest": "4.1.10"
+  }
+}

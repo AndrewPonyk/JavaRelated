@@ -1,0 +1,6 @@
+# Production values are supplied using Fly.io secrets/environment variables.
+environment = "production"
+log_format = "json"
+require_tls_origin = true
+run_migrations_before_traffic = true
+secure_cookies = true

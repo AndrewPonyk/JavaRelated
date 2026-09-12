@@ -1,0 +1,6 @@
+apps/web/public/wasm/
+apps/web/dist/
+apps/web/dist-server/
+coverage/
+target/
+package-lock.json

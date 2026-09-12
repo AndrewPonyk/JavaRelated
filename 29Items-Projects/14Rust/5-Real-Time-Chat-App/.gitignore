@@ -1,0 +1,21 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Test and tooling output
+/coverage/
+lcov.info
+.sqlx/
+

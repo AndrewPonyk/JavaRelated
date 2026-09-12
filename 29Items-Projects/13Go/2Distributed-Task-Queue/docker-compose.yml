@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file: .env.example
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-task_queue}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-replace-with-local-postgres-password}
+      POSTGRES_DB: ${POSTGRES_DB:-task_queue}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-task_queue} -d ${POSTGRES_DB:-task_queue}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  api:
+    build: .
+    command: ["/app/api"]
+    env_file: .env.example
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-task_queue}:${POSTGRES_PASSWORD:-replace-with-local-postgres-password}@postgres:5432/${POSTGRES_DB:-task_queue}?sslmode=disable
+      REDIS_ADDR: redis:6379
+      NATS_URL: nats://nats:4222
+      AUTO_MIGRATE: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    build: .
+    command: ["/app/worker"]
+    env_file: .env.example
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-task_queue}:${POSTGRES_PASSWORD:-replace-with-local-postgres-password}@postgres:5432/${POSTGRES_DB:-task_queue}?sslmode=disable
+      REDIS_ADDR: redis:6379
+      NATS_URL: nats://nats:4222
+      AUTO_MIGRATE: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
+  scheduler:
+    build: .
+    command: ["/app/scheduler"]
+    env_file: .env.example
+    environment:
+      REDIS_ADDR: redis:6379
+      NATS_URL: nats://nats:4222
+      AUTO_MIGRATE: "false"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres-data:

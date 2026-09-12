@@ -1,0 +1,20 @@
+app:
+  name: devopsctl
+  output: table
+
+database:
+  path: ./devopsctl.sqlite
+
+logging:
+  level: info
+
+aws:
+  region: us-east-1
+  profile: ""
+
+docker:
+  host: ""
+
+api:
+  bind_address: 127.0.0.1:8080
+  token: change-me-for-local-api

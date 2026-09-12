@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Copy .env.example to .env and set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Copy .env.example to .env and set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env and set POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - chat-postgres:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: development
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8080
+      DATABASE_URL: ${COMPOSE_DATABASE_URL:?Copy .env.example to .env and set COMPOSE_DATABASE_URL}
+      RUST_LOG: chat_backend=debug,tower_http=info
+      STATIC_DIR: /app/frontend
+      ALLOWED_ORIGINS: http://localhost:8080
+      SESSION_TTL_HOURS: 24
+      SECURE_COOKIES: "false"
+      MAX_LIST_PAGE_SIZE: 100
+      MAX_HISTORY_PAGE_SIZE: 100
+      PASSWORD_HASH_CONCURRENCY: 4
+      MESSAGES_PER_MINUTE: 60
+      API_REQUESTS_PER_MINUTE: 300
+      HEARTBEAT_INTERVAL_SECONDS: 20
+      HEARTBEAT_TIMEOUT_SECONDS: 60
+    ports:
+      - "127.0.0.1:8080:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8080/health/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  chat-postgres:

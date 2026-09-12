@@ -1,0 +1,17 @@
+parameters:
+    level: 9
+    paths:
+        - src
+        - tests
+    # PHPStan-Symfony needs the compiled container to understand the DI graph.
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+    # `new static()` in reconstituteFromHistory is suppressed inline at the call
+    # site (EventSourcedAggregateRoot::reconstituteFromHistory) — intentional for
+    # event-sourced aggregates.
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon

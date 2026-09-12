@@ -1,0 +1,43 @@
+{
+  "family": "distributed-task-queue-worker",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "containerDefinitions": [
+    {
+      "name": "worker",
+      "image": "distributed-task-queue:latest",
+      "command": ["/app/worker"],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "WORKER_CONCURRENCY",
+          "value": "16"
+        },
+        {
+          "name": "AUTO_MIGRATE",
+          "value": "false"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/database-url"
+        },
+        {
+          "name": "REDIS_ADDR",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/redis-addr"
+        },
+        {
+          "name": "NATS_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/nats-url"
+        }
+      ],
+      "essential": true
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Build artefacts re-created inside the image (keep the context small + clean).
+.git
+.github
+node_modules
+vendor
+public/build
+public/hot
+storage/app/*.sqlite
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+.env
+.env.backup
+.phpunit.result.cache
+.phpunit.cache
+
+# NOTE: tests/, phpunit.xml, and docs/ are intentionally kept — the image runs
+# the test suite for verification/CI.

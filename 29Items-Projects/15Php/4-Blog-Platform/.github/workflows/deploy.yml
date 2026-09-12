@@ -1,0 +1,27 @@
+name: Deploy
+
+# Deploy to Laravel Forge only after CI passes on main.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Forge (production)
+    runs-on: ubuntu-latest
+    # Guard: only run if the triggering CI run actually succeeded.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Trigger Forge deployment
+        # Forge exposes a per-site deploy webhook; the token lives in repo secrets.
+        run: |
+          curl -fsS -X POST "${{ secrets.FORGE_DEPLOY_WEBHOOK }}"
+
+      - name: Smoke test
+        run: |
+          # Give Forge a moment to finish the deploy script, then probe health.
+          sleep 30
+          curl -fsS "${{ secrets.PRODUCTION_URL }}/up" || exit 1

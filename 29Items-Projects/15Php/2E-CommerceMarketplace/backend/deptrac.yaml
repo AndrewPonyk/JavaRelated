@@ -1,0 +1,49 @@
+# Architectural fitness function: fail CI if bounded-context boundaries are
+# crossed illegally. Contexts may depend on Shared; cross-context coupling is
+# allowed ONLY where a context subscribes to another's published domain events
+# (integration events). No context may touch another's repositories/aggregates.
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Shared
+      collectors:
+        - { type: directory, value: src/Shared/.* }
+    - name: Catalog
+      collectors:
+        - { type: directory, value: src/Catalog/.* }
+    - name: Ordering
+      collectors:
+        - { type: directory, value: src/Ordering/.* }
+    - name: Search
+      collectors:
+        - { type: directory, value: src/Search/.* }
+    - name: Vendor
+      collectors:
+        - { type: directory, value: src/Vendor/.* }
+    - name: Payment
+      collectors:
+        - { type: directory, value: src/Payment/.* }
+    - name: FraudDetection
+      collectors:
+        - { type: directory, value: src/FraudDetection/.* }
+    - name: Identity
+      collectors:
+        - { type: directory, value: src/Identity/.* }
+
+  ruleset:
+    Shared: ~                                   # Shared depends on nothing internal
+    Catalog: [Shared]
+    Identity: [Shared]
+    # Process managers / subscribers couple to other contexts ONLY via their
+    # published integration events (the sanctioned cross-context channel):
+    Ordering: [Shared, Payment]                 # marks order PAID on PaymentCaptured
+    Payment: [Shared, FraudDetection]           # holds/lifts on fraud flag & review
+    Search: [Shared, Catalog]                   # indexes Catalog ProductCreated/PriceChanged
+    Vendor: [Shared, Ordering, Identity]        # commission on OrderPlaced; onboard on UserRegistered
+    FraudDetection: [Shared, Ordering]          # scores risk on OrderPlaced
+
+  # NOTE: integration events form a deliberate cycle (Ordering↔Payment↔FraudDetection)
+  # via the async event bus — acceptable for an event-driven modular monolith.
+  # TODO: tighten cross-context allowances to Domain\Event only (token: classlike)
+  #       so subscribers cannot reach into another context's aggregates/repos.

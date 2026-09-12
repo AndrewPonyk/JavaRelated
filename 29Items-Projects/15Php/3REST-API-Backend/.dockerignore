@@ -1,0 +1,15 @@
+# Keep the build context lean. App image only needs backend/ (minus vendor/env).
+.git
+.github
+docs
+**/node_modules
+backend/vendor
+backend/.env
+backend/.env.local-sqlite.bak
+backend/database/*.sqlite
+backend/database/*.sqlite-journal
+backend/.phpunit.cache
+backend/.phpunit.result.cache
+frontend/dist
+**/.DS_Store
+**/Thumbs.db

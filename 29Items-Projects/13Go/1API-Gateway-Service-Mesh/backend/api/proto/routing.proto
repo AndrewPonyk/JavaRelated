@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package gateway.routing.v1;
+
+option go_package = "github.com/example/api-gateway/backend/api/gen/routing/v1;routingv1";
+
+service RoutingService {
+  rpc ResolveRoute(ResolveRouteRequest) returns (ResolveRouteResponse);
+  rpc SubmitTrafficFeatures(SubmitTrafficFeaturesRequest) returns (SubmitTrafficFeaturesResponse);
+}
+
+message ResolveRouteRequest {
+  string host = 1;
+  string path = 2;
+  string method = 3;
+  string tenant_id = 4;
+}
+
+message ResolveRouteResponse {
+  string route_id = 1;
+  string upstream_service = 2;
+  string upstream_protocol = 3;
+  repeated string required_scopes = 4;
+}
+
+message SubmitTrafficFeaturesRequest {
+  string route_id = 1;
+  string tenant_id = 2;
+  double request_rate = 3;
+  double error_rate = 4;
+  double p95_latency_ms = 5;
+}
+
+message SubmitTrafficFeaturesResponse {
+  double anomaly_score = 1;
+  bool anomaly = 2;
+}

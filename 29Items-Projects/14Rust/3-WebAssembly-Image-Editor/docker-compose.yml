@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-image_editor}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?POSTGRES_ADMIN_PASSWORD is required}
+      DATABASE_USER: ${DATABASE_USER:-image_editor_app}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD is required}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations/001_create_presets.sql:/docker-entrypoint-initdb.d/001_create_presets.sql:ro
+      - ./database/migrations/002_add_pagination_indexes.sql:/docker-entrypoint-initdb.d/002_add_pagination_indexes.sql:ro
+      - ./database/docker-init/002_create_runtime_role.sh:/docker-entrypoint-initdb.d/003_create_runtime_role.sh:ro
+
+  api:
+    build:
+      context: .
+      target: api-runtime
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://${DATABASE_USER:-image_editor_app}:${DATABASE_PASSWORD}@db:5432/${POSTGRES_DB:-image_editor}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:${WEB_PORT:-8080}}
+      PRESET_API_RATE_LIMIT_PER_MINUTE: ${PRESET_API_RATE_LIMIT_PER_MINUTE:-60}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build:
+      context: .
+      target: runtime
+      args:
+        VITE_ENABLE_PRESET_API: 'true'
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '${WEB_PORT:-8080}:8080'
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:

@@ -1,0 +1,11 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+target
+coverage
+docs
+*.md
+!README.md
+

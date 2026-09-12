@@ -1,0 +1,92 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        # PostgreSQL 16. Typed identifiers via custom DBAL types; Money embedded.
+        profiling_collect_backtrace: '%kernel.debug%'
+        use_savepoints: true
+        types:
+            product_id: App\Catalog\Infrastructure\Persistence\Doctrine\ProductIdType
+
+    orm:
+        auto_generate_proxy_classes: '%kernel.debug%'
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: false
+
+        # One ORM mapping namespace per bounded context. Each context owns its
+        # tables; cross-context references are by id only (no FK across contexts).
+        mappings:
+            # Shared value objects mapped as embeddables (e.g. Money).
+            Shared:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Shared/Infrastructure/Persistence/Doctrine/mapping'
+                prefix: 'App\Shared\Domain\ValueObject'
+                alias: Shared
+            Catalog:
+                # XML mapping keeps the Catalog domain model 100% framework-free
+                # (no ORM attributes on the aggregate). The mapping lives in the
+                # Infrastructure layer where persistence concerns belong.
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Catalog/Infrastructure/Persistence/Doctrine/mapping'
+                prefix: 'App\Catalog\Domain\Model'
+                alias: Catalog
+            Ordering:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Ordering/Infrastructure/EventStore'
+                prefix: 'App\Ordering\Infrastructure\EventStore'
+                alias: Ordering
+            Vendor:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Vendor/Domain/Model'
+                prefix: 'App\Vendor\Domain\Model'
+                alias: Vendor
+            Identity:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Identity/Domain/Model'
+                prefix: 'App\Identity\Domain\Model'
+                alias: Identity
+            Payment:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Payment/Domain/Model'
+                prefix: 'App\Payment\Domain\Model'
+                alias: Payment
+            FraudDetection:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/FraudDetection/Domain/Model'
+                prefix: 'App\FraudDetection\Domain\Model'
+                alias: FraudDetection
+
+when@test:
+    doctrine:
+        dbal:
+            # Isolate test DB; dama/doctrine-test-bundle wraps each test in a rollback.
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

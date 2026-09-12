@@ -1,0 +1,64 @@
+{
+  "family": "distributed-task-queue-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "api",
+      "image": "distributed-task-queue:latest",
+      "command": ["/app/api"],
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "HTTP_ADDR",
+          "value": ":8080"
+        },
+        {
+          "name": "AUTO_MIGRATE",
+          "value": "true"
+        },
+        {
+          "name": "ENFORCE_HTTPS",
+          "value": "true"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/api-key"
+        },
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/database-url"
+        },
+        {
+          "name": "REDIS_ADDR",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/redis-addr"
+        },
+        {
+          "name": "NATS_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:111122223333:parameter/task-queue/nats-url"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 20
+      },
+      "essential": true
+    }
+  ]
+}

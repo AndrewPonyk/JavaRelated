@@ -1,0 +1,14 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - ineffassign
+    - errcheck
+    - misspell
+
+issues:
+  exclude-use-default: false

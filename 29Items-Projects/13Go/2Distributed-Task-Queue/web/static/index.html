@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Distributed Task Queue</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main>
+      <section class="toolbar">
+        <div>
+          <h1>Distributed Task Queue</h1>
+          <p>Development console for task submission and status inspection.</p>
+        </div>
+        <div class="toolbar-actions">
+          <label class="api-key">
+            API key
+            <input id="api-key" aria-label="X-API-Key">
+          </label>
+          <button id="refresh" type="button">Refresh</button>
+        </div>
+      </section>
+
+      <form id="task-form">
+        <label>
+          Task type
+          <select name="type" required>
+            <option value="example.email">Email</option>
+            <option value="example.webhook">Webhook</option>
+            <option value="example.report">Report</option>
+            <option value="example.fail_once">Fail once</option>
+            <option value="example.always_fail">Always fail</option>
+          </select>
+        </label>
+        <label>
+          Payload JSON
+          <textarea name="payload" rows="5">{"recipient":"user@example.com"}</textarea>
+        </label>
+        <div class="form-grid">
+          <label>
+            Max attempts
+            <input name="max_attempts" type="number" min="1" max="20" value="3">
+          </label>
+          <label>
+            Delay seconds
+            <input name="delay_seconds" type="number" min="0" value="0">
+          </label>
+          <label>
+            Timeout seconds
+            <input name="timeout_seconds" type="number" min="1" value="30">
+          </label>
+          <label>
+            Idempotency key
+            <input name="idempotency_key">
+          </label>
+        </div>
+        <button type="submit">Submit Task</button>
+        <p id="form-status" aria-live="polite"></p>
+      </form>
+
+      <section id="task-list" aria-live="polite"></section>
+    </main>
+
+    <script type="module">
+      import { TaskConsole } from "../components/TaskList.js";
+
+      const consoleView = new TaskConsole(document.querySelector("#task-list"));
+      const form = document.querySelector("#task-form");
+      const status = document.querySelector("#form-status");
+      const apiKey = document.querySelector("#api-key");
+
+      apiKey.value = consoleView.apiKey;
+      apiKey.addEventListener("input", () => consoleView.setAPIKey(apiKey.value));
+      document.querySelector("#refresh").addEventListener("click", () => consoleView.load());
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        status.textContent = "Submitting...";
+
+        try {
+          await consoleView.createTask(form);
+          status.textContent = "Task submitted.";
+        } catch (error) {
+          status.textContent = error.message;
+        }
+      });
+
+      consoleView.load();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,97 @@
+# Local development orchestration. Mirrors the production service topology
+# (web + worker + scheduler share one image; managed MySQL/Redis in prod).
+# See docs/TECH-NOTES.md §3.3–3.4.
+
+services:
+  # ── Nginx: TLS termination (prod) + reverse proxy to php-fpm ──────────────
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      # Host port configurable to avoid local collisions; defaults to 8080.
+      - "${NGINX_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./backend:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  # ── App: php-fpm (Laravel) ───────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: ./backend/.env
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ── Worker: processes the Redis queue (notifications, telemetry) ──────────
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: php artisan queue:work --tries=3 --backoff=10 --max-time=3600
+    env_file: ./backend/.env
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - app
+      - redis
+    restart: unless-stopped
+
+  # ── Scheduler: cron entry runs the Laravel scheduler each minute ──────────
+  scheduler:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"]
+    env_file: ./backend/.env
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - app
+
+  # ── MySQL 8 ──────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: marketplace
+      MYSQL_USER: app
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootsecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis 7 (cache · queue · session) ────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  # ── Node: Vite dev server for the SPA ────────────────────────────────────
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+
+volumes:
+  mysql-data:
+  redis-data:

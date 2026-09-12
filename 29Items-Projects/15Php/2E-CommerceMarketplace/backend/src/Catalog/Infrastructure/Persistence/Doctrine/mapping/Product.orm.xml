@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Doctrine mapping for the Product aggregate. Kept here, in Infrastructure, so the
+  domain model (App\Catalog\Domain\Model\Product) stays free of ORM attributes.
+  `id` is the UUID string; `price` is an embedded Money value object.
+-->
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Catalog\Domain\Model\Product" table="catalog_products">
+        <id name="id" type="product_id" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="sellerId" type="string" length="36" column="seller_id"/>
+        <field name="name" type="string" length="255" column="name"/>
+        <field name="description" type="text" column="description"/>
+        <field name="stock" type="integer" column="stock"/>
+        <field name="active" type="boolean" column="active"/>
+
+        <embedded name="price" class="App\Shared\Domain\ValueObject\Money" column-prefix="price_"/>
+
+        <indexes>
+            <index name="idx_catalog_products_seller" columns="seller_id"/>
+        </indexes>
+    </entity>
+
+</doctrine-mapping>

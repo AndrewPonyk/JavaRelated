@@ -1,0 +1,93 @@
+# Dependency Injection configuration.
+# Services are autowired & autoconfigured by namespace. Domain layers contain
+# pure logic and are generally NOT registered as services; adapters in
+# Infrastructure and controllers in UI are.
+
+parameters:
+    fraud.score_block_threshold: '%env(float:FRAUD_SCORE_BLOCK_THRESHOLD)%'
+    commission.default_rate_bps: '%env(int:DEFAULT_COMMISSION_RATE_BPS)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            # Globally bind the ES index prefix wherever a $indexPrefix arg appears.
+            string $indexPrefix: '%elasticsearch.index_prefix%'
+
+    # Every controller (all extend AbstractController) gets the controller tag so
+    # action arguments can be resolved from the container/request.
+    _instanceof:
+        Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
+            tags: ['controller.service_arguments']
+
+    # Register all classes as services, then exclude the pieces that are NOT
+    # services. The whole Domain layer is pure (entities, value objects, events,
+    # repository interfaces) and is excluded. NOTE: command/query *handlers* live
+    # in Application/{Command,Query} and MUST stay registered (Messenger needs
+    # them); the message DTOs beside them are created with `new` and never fetched
+    # from the container, so they are dropped automatically as unused services.
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+            - '../src/*/Domain/'
+            - '../src/Shared/Domain/'
+            - '../src/*/Application/DTO/'
+
+    # ---- Bus ports → Messenger adapters -----------------------------------
+    # Messenger auto-aliases "MessageBusInterface $commandBus" → the "command.bus".
+    App\Shared\Domain\Bus\Command\CommandBus: '@App\Shared\Infrastructure\Bus\MessengerCommandBus'
+    App\Shared\Domain\Bus\Query\QueryBus: '@App\Shared\Infrastructure\Bus\MessengerQueryBus'
+    App\Shared\Domain\Bus\Event\EventBus: '@App\Shared\Infrastructure\Bus\MessengerEventBus'
+
+    # ---- Port → adapter bindings (dependency inversion) -------------------
+    App\Catalog\Domain\Repository\ProductRepositoryInterface:
+        '@App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductRepository'
+
+    App\Identity\Domain\Repository\UserRepositoryInterface:
+        '@App\Identity\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
+
+    App\Ordering\Domain\Repository\OrderEventStoreInterface:
+        '@App\Ordering\Infrastructure\EventStore\DoctrineOrderEventStore'
+
+    App\Search\Application\Query\ProductSearchPort:
+        '@App\Search\Infrastructure\Elasticsearch\ElasticsearchProductSearch'
+
+    App\Vendor\Domain\Repository\CommissionLedgerRepository:
+        '@App\Vendor\Infrastructure\Persistence\Doctrine\DoctrineCommissionLedger'
+
+    App\Vendor\Domain\Repository\SellerRepository:
+        '@App\Vendor\Infrastructure\Persistence\Doctrine\DoctrineSellerRepository'
+
+    App\Payment\Domain\Repository\TransactionRepository:
+        '@App\Payment\Infrastructure\Persistence\Doctrine\DoctrineTransactionRepository'
+
+    App\Payment\Domain\Repository\PaymentHoldRepository:
+        '@App\Payment\Infrastructure\Persistence\Doctrine\DoctrinePaymentHoldRepository'
+
+    App\Payment\Domain\Gateway\PaymentGateway:
+        '@App\Payment\Infrastructure\Gateway\FakePaymentGateway'
+
+    App\FraudDetection\Domain\Repository\FraudAssessmentRepository:
+        '@App\FraudDetection\Infrastructure\Persistence\Doctrine\DoctrineFraudAssessmentRepository'
+
+    App\Vendor\Application\AccrueCommissionOnOrderPlaced:
+        arguments:
+            $defaultCommissionRateBps: '%commission.default_rate_bps%'
+
+    App\Vendor\Application\CreateSellerOnUserRegistered:
+        arguments:
+            $defaultCommissionRateBps: '%commission.default_rate_bps%'
+
+    # ---- Anti-corruption layer to the ML fraud micro-service --------------
+    App\FraudDetection\Application\FraudScorer: '@App\FraudDetection\Infrastructure\HttpFraudScorer'
+
+    App\FraudDetection\Infrastructure\HttpFraudScorer:
+        arguments:
+            $fraudServiceBaseUrl: '%env(FRAUD_SERVICE_URL)%'
+            $timeoutMs: '%env(int:FRAUD_SERVICE_TIMEOUT_MS)%'
+
+    App\FraudDetection\Application\AssessOrderRiskOnOrderPlaced:
+        arguments:
+            $blockThreshold: '%fraud.score_block_threshold%'

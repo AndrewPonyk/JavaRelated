@@ -1,0 +1,109 @@
+package main
+
+import (
+	"context"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	redisclient "github.com/redis/go-redis/v9"
+
+	"github.com/example/url-shortener-service/internal/config"
+	httproutes "github.com/example/url-shortener-service/internal/http/routes"
+	"github.com/example/url-shortener-service/internal/qrcode"
+	"github.com/example/url-shortener-service/internal/service"
+	"github.com/example/url-shortener-service/internal/store/postgres"
+	rediscache "github.com/example/url-shortener-service/internal/store/redis"
+)
+
+func main() {
+	ctx := context.Background()
+	cfg := config.Load()
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: cfg.LogLevel,
+	}))
+	if err := cfg.Validate(); err != nil {
+		logger.Error("invalid configuration", "error", err)
+		os.Exit(1)
+	}
+
+	pool, err := pgxpool.New(ctx, cfg.DatabaseURL)
+	if err != nil {
+		logger.Error("connect postgres", "error", err)
+		os.Exit(1)
+	}
+	defer pool.Close()
+	if err := pool.Ping(ctx); err != nil {
+		logger.Error("ping postgres", "error", err)
+		os.Exit(1)
+	}
+
+	redisClient := redisclient.NewClient(&redisclient.Options{
+		Addr:     cfg.RedisAddr,
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDB,
+	})
+	defer func() {
+		if closeErr := redisClient.Close(); closeErr != nil {
+			logger.Warn("close redis", "error", closeErr)
+		}
+	}()
+	if err := redisClient.Ping(ctx).Err(); err != nil {
+		logger.Error("ping redis", "error", err)
+		os.Exit(1)
+	}
+
+	urlRepo := postgres.NewURLRepository(pool)
+	urlCache := rediscache.NewURLCache(redisClient, 15*time.Minute)
+	rateLimiter := rediscache.NewRateLimiter(redisClient, int64(cfg.RateLimitPerMinute), time.Minute)
+	urlService := service.NewURLService(urlRepo, urlCache, cfg.PublicBaseURL)
+
+	router := httproutes.NewRouter(httproutes.Dependencies{
+		URLService:    urlService,
+		QRGenerator:   qrcode.NewGenerator(),
+		RateLimiter:   rateLimiter,
+		Logger:        logger,
+		AllowedCORS:   cfg.CORSAllowedOrigins,
+		AdminAPIKeys:  cfg.AdminAPIKeys,
+		PublicBaseURL: cfg.PublicBaseURL,
+		HealthCheck: func(ctx context.Context) error {
+			if err := pool.Ping(ctx); err != nil {
+				return err
+			}
+			return redisClient.Ping(ctx).Err()
+		},
+	})
+
+	server := &http.Server{
+		Addr:              cfg.HTTPAddr,
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	go func() {
+		logger.Info("api listening", "addr", cfg.HTTPAddr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("server failed", "error", err)
+			os.Exit(1)
+		}
+	}()
+
+	shutdownCtx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	<-shutdownCtx.Done()
+
+	gracefulCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.Shutdown(gracefulCtx); err != nil {
+		logger.Error("server shutdown", "error", err)
+		os.Exit(1)
+	}
+}

@@ -1,0 +1,7 @@
+doctrine_migrations:
+    # Where the migration classes live. Without this mapping the bundle reports
+    # "no registered migrations" and doctrine:migrations:migrate is a silent no-op,
+    # so a fresh deploy would come up with an empty schema.
+    migrations_paths:
+        'DoctrineMigrations': '%kernel.project_dir%/migrations'
+    enable_profiler: false

@@ -1,0 +1,35 @@
+# One-command local/CI stack: `docker compose up --build`
+# Serves the blog at http://localhost:8000 with a persistent SQLite volume.
+services:
+  app:
+    build:
+      context: .
+      target: app
+    ports:
+      - "8000:8000"
+    environment:
+      # NB: APP_ENV is intentionally NOT set here — the image's .env sets it to
+      # `local` for serving, and leaving it unset lets `php artisan test` detect
+      # the `testing` environment (phpunit.xml) when run via `docker compose run`.
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      # SQLite lives on a named volume so data survives `compose down`.
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /app/storage/app/database.sqlite
+      CACHE_STORE: database
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      # Seed demo content on first boot (set to false to skip).
+      SEED: "true"
+    volumes:
+      - blog-storage:/app/storage/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') ? 0 : 1);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  blog-storage:

@@ -1,0 +1,36 @@
+{
+  "name": "webassembly-image-editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy-first React image editor powered by Rust and WebAssembly",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "build": "npm run build:wasm && npm run build:web && npm run build:api",
+    "build:wasm": "wasm-pack build crates/image-processor --target web --release --out-dir ../../apps/web/public/wasm --out-name image_processor",
+    "build:web": "npm run build --workspace @webassembly-image-editor/web",
+    "build:api": "npm run build:api --workspace @webassembly-image-editor/web",
+    "api": "npm run serve:api --workspace @webassembly-image-editor/web",
+    "dev": "npm run dev --workspace @webassembly-image-editor/web",
+    "format": "prettier --write . && cargo fmt --all",
+    "format:check": "prettier --check . && cargo fmt --all -- --check",
+    "lint": "npm run lint --workspace @webassembly-image-editor/web && cargo clippy --workspace --all-targets -- -D warnings",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "npm run test --workspace @webassembly-image-editor/web && cargo test --workspace",
+    "test:coverage": "npm run test:coverage --workspace @webassembly-image-editor/web",
+    "test:e2e": "npm run test:e2e --workspace @webassembly-image-editor/web",
+    "typecheck": "npm run typecheck --workspace @webassembly-image-editor/web"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.5",
+    "vite": "8.1.5"
+  },
+  "engines": {
+    "node": ">=20.11",
+    "npm": ">=10"
+  },
+  "overrides": {
+    "vite": "8.1.5"
+  }
+}

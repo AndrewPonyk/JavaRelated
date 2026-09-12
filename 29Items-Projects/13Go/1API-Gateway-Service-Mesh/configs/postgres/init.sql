@@ -1,0 +1,2 @@
+-- Local development bootstrap.
+-- Schema migrations are mounted into the PostgreSQL container by docker-compose.yml.

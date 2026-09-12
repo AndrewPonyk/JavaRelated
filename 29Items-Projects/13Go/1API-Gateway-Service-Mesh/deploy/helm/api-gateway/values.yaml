@@ -1,0 +1,38 @@
+replicaCount: 2
+
+image:
+  repository: example/api-gateway-backend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+env:
+  APP_ENV: prod
+  HTTP_ADDR: ":8080"
+  DEFAULT_RATE_LIMIT_PER_MINUTE: "120"
+  AUTH_MODE: strict
+
+secretRefs:
+  adminApiKey:
+    name: api-gateway-secrets
+    key: ADMIN_API_KEY
+  databaseUrl:
+    name: api-gateway-secrets
+    key: DATABASE_URL
+  jwtSharedSecret:
+    name: api-gateway-secrets
+    key: JWT_SHARED_SECRET
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+serviceMonitor:
+  enabled: true

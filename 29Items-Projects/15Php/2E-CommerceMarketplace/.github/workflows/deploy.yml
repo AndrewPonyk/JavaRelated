@@ -1,0 +1,100 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]          # → deploy to dev automatically
+    tags: ['v*.*.*']          # → deploy to prod (gated by environment protection)
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+# OIDC federation to Azure — no long-lived cloud credentials stored in GitHub.
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGISTRY: ${{ vars.ACR_LOGIN_SERVER }}      # e.g. marketplaceacr.azurecr.io
+  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ env.IMAGE_TAG }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR login
+        run: az acr login --name ${{ vars.ACR_NAME }}
+
+      - name: Build & push images
+        run: |
+          for svc in backend frontend ml-service; do
+            img="$REGISTRY/marketplace-$svc:$IMAGE_TAG"
+            docker build -t "$img" "./$svc"
+            docker push "$img"
+          done
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # Selects dev for main, prod for a tag, or the manual input. The GitHub
+    # Environment provides approval gates + per-env secrets/vars.
+    environment: ${{ github.ref_type == 'tag' && 'prod' || (inputs.environment || 'dev') }}
+    steps:
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run DB migrations (pre-deploy job, must succeed before rollout)
+        run: |
+          az containerapp job start \
+            --name marketplace-migrate \
+            --resource-group "$RESOURCE_GROUP" \
+            --image "$REGISTRY/marketplace-backend:${{ needs.build-and-push.outputs.tag }}" \
+            --command "php" "bin/console" "doctrine:migrations:migrate" "--no-interaction"
+
+      - name: Deploy backend (api) — new revision
+        run: |
+          az containerapp update \
+            --name marketplace-api --resource-group "$RESOURCE_GROUP" \
+            --image "$REGISTRY/marketplace-backend:${{ needs.build-and-push.outputs.tag }}"
+
+      - name: Deploy worker (async consumers)
+        run: |
+          az containerapp update \
+            --name marketplace-worker --resource-group "$RESOURCE_GROUP" \
+            --image "$REGISTRY/marketplace-backend:${{ needs.build-and-push.outputs.tag }}"
+
+      - name: Deploy frontend
+        run: |
+          az containerapp update \
+            --name marketplace-frontend --resource-group "$RESOURCE_GROUP" \
+            --image "$REGISTRY/marketplace-frontend:${{ needs.build-and-push.outputs.tag }}"
+
+      - name: Deploy ml-service
+        run: |
+          az containerapp update \
+            --name marketplace-ml --resource-group "$RESOURCE_GROUP" \
+            --image "$REGISTRY/marketplace-ml-service:${{ needs.build-and-push.outputs.tag }}"
+
+      - name: Smoke test (readiness)
+        run: |
+          url="https://$(az containerapp show -n marketplace-api -g "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn -o tsv)"
+          curl -fsS "$url/health/ready" || (echo "Readiness failed" && exit 1)

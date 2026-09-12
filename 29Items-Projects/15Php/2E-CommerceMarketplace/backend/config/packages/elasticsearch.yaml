@@ -1,0 +1,14 @@
+# Elasticsearch client wiring (official elasticsearch/elasticsearch client — no
+# bundle, so we register the client as a service here). Used only by the Search
+# context's Infrastructure adapters.
+parameters:
+    elasticsearch.url: '%env(ELASTICSEARCH_URL)%'
+    elasticsearch.index_prefix: '%env(ELASTICSEARCH_INDEX_PREFIX)%'
+
+services:
+    # The Elasticsearch client (the Search Infrastructure services are autowired
+    # by the App\ glob in services.yaml; $indexPrefix is bound there).
+    Elastic\Elasticsearch\Client:
+        factory: ['App\Search\Infrastructure\Elasticsearch\ClientFactory', 'create']
+        arguments:
+            $url: '%elasticsearch.url%'

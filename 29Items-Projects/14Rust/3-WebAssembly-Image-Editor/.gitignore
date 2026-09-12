@@ -1,0 +1,31 @@
+# JavaScript
+node_modules/
+dist/
+dist-server/
+coverage/
+*.tsbuildinfo
+
+# Rust / wasm-pack
+target/
+apps/web/public/wasm/*
+!apps/web/public/wasm/.gitkeep
+
+# Environment and deployment
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Models are versioned outside ordinary Git; keep manifests and documentation.
+apps/web/public/models/*.onnx
+apps/web/public/models/*.ort
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test output
+playwright-report/
+test-results/

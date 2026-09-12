@@ -1,0 +1,14 @@
+services:
+  devopsctl:
+    build: .
+    image: cli-devops-tool:local
+    environment:
+      DEVOPSCTL_DB_PATH: /data/devopsctl.sqlite
+      DEVOPSCTL_LOG_LEVEL: info
+    volumes:
+      - devopsctl-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--help"]
+
+volumes:
+  devopsctl-data:
