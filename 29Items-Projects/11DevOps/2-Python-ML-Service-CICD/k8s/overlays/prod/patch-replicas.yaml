@@ -1,0 +1,8 @@
+# Prod: 3 replicas for the active (blue) deployment (HPA can scale 2-10).
+# Green stays at 0 - the CD pipeline scales it during blue-green rollouts.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-api-blue
+spec:
+  replicas: 3

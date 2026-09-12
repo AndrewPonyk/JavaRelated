@@ -1,0 +1,107 @@
+# =============================================================================
+# Job template: Terraform init/validate/plan + approval-gated apply.
+#
+# Intended for a dedicated infrastructure pipeline, e.g.:
+#
+#   stages:
+#     - stage: Terraform_Dev
+#       variables:
+#         - template: pipelines/variables/dev.yml
+#       jobs:
+#         - template: pipelines/templates/terraform.yml
+#           parameters:
+#             environment: dev
+#             serviceConnection: $(azureServiceConnection)
+#
+# The apply job targets the ADO environment "fraud-terraform-<env>"; add an
+# approval check on that environment to gate applies.
+# =============================================================================
+parameters:
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: workingDirectory
+    type: string
+    default: infra/terraform
+  - name: backendResourceGroup
+    type: string
+    default: rg-fraud-terraform-state
+  - name: backendStorageAccount
+    type: string
+    default: fraudtfstate
+  - name: backendContainer
+    type: string
+    default: tfstate
+
+jobs:
+  - job: terraform_plan_${{ parameters.environment }}
+    displayName: Terraform plan (${{ parameters.environment }})
+    steps:
+      - task: AzureCLI@2
+        displayName: terraform init, validate, plan
+        inputs:
+          azureSubscription: ${{ parameters.serviceConnection }}
+          scriptType: bash
+          scriptLocation: inlineScript
+          workingDirectory: ${{ parameters.workingDirectory }}
+          addSpnToEnvironment: true
+          inlineScript: |
+            set -euo pipefail
+            export ARM_CLIENT_ID="$servicePrincipalId"
+            export ARM_CLIENT_SECRET="$servicePrincipalKey"
+            export ARM_TENANT_ID="$tenantId"
+            ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+            export ARM_SUBSCRIPTION_ID
+            terraform init -input=false \
+              -backend-config="resource_group_name=${{ parameters.backendResourceGroup }}" \
+              -backend-config="storage_account_name=${{ parameters.backendStorageAccount }}" \
+              -backend-config="container_name=${{ parameters.backendContainer }}" \
+              -backend-config="key=fraud-detection-${{ parameters.environment }}.tfstate"
+            terraform validate
+            terraform plan -input=false \
+              -var-file="environments/${{ parameters.environment }}.tfvars" \
+              -out=tfplan
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish plan artifact
+        inputs:
+          targetPath: ${{ parameters.workingDirectory }}/tfplan
+          artifact: tfplan-${{ parameters.environment }}
+
+  - deployment: terraform_apply_${{ parameters.environment }}
+    displayName: Terraform apply (${{ parameters.environment }})
+    dependsOn: terraform_plan_${{ parameters.environment }}
+    # Approval check on this ADO environment gates the apply.
+    environment: fraud-terraform-${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - download: current
+              artifact: tfplan-${{ parameters.environment }}
+
+            - task: AzureCLI@2
+              displayName: terraform apply (saved plan)
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                workingDirectory: ${{ parameters.workingDirectory }}
+                addSpnToEnvironment: true
+                inlineScript: |
+                  set -euo pipefail
+                  export ARM_CLIENT_ID="$servicePrincipalId"
+                  export ARM_CLIENT_SECRET="$servicePrincipalKey"
+                  export ARM_TENANT_ID="$tenantId"
+                  ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+                  export ARM_SUBSCRIPTION_ID
+                  terraform init -input=false \
+                    -backend-config="resource_group_name=${{ parameters.backendResourceGroup }}" \
+                    -backend-config="storage_account_name=${{ parameters.backendStorageAccount }}" \
+                    -backend-config="container_name=${{ parameters.backendContainer }}" \
+                    -backend-config="key=fraud-detection-${{ parameters.environment }}.tfstate"
+                  cp "$(Pipeline.Workspace)/tfplan-${{ parameters.environment }}/tfplan" tfplan
+                  terraform apply -input=false tfplan

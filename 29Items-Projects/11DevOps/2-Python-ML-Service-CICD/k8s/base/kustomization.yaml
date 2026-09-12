@@ -1,0 +1,18 @@
+# Base kustomization for the fraud-detection API (blue-green on AKS).
+# Overlays (dev/staging/prod) reference this base and patch replicas,
+# image tags and FRAUD_ENVIRONMENT.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fraud-detection
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment-blue.yaml
+  - deployment-green.yaml
+  - service.yaml
+  - hpa.yaml
+  - ingress.yaml
+  - servicemonitor.yaml
+  - pdb.yaml

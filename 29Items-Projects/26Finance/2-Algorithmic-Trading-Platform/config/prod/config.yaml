@@ -1,0 +1,18 @@
+# Non-secret configuration for PROD (LIVE money). Secrets via Vault only.
+# Changes here touching `risk` require Risk-team sign-off (TECH-NOTES §3.1).
+log_level: INFO
+
+kafka_bootstrap_servers: kafka-prod-1:9092,kafka-prod-2:9092,kafka-prod-3:9092
+kafka_consumer_group: prod
+
+cors_allowed_origins:
+  - https://trading.internal
+
+risk:
+  max_position_qty: 2000
+  max_order_notional: 75000
+  max_daily_loss: 20000
+  kill_switch: false      # operational kill-switch toggled via API/ops, not git
+
+market_data:
+  feed: live

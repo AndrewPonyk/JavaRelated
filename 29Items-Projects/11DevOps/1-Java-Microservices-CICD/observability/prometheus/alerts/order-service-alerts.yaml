@@ -1,0 +1,58 @@
+# PrometheusRule for kube-prometheus-stack (apply in the monitoring namespace,
+# or ship with the chart later). Thresholds define the service's performance
+# budget: p95 < 500ms, 5xx < 5% — see ARCHITECTURE.md §2.4.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: order-service-alerts
+  labels:
+    release: kube-prometheus-stack   # must match the operator's ruleSelector
+spec:
+  groups:
+    - name: order-service.availability
+      rules:
+        - alert: OrderServiceHighErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{application="order-service", status=~"5.."}[5m]))
+              /
+            sum(rate(http_server_requests_seconds_count{application="order-service"}[5m])) > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "order-service 5xx ratio above 5% for 5 minutes"
+            description: "Error budget is burning. Check recent deploys first (kubectl argo rollouts / argocd history)."
+
+        - alert: OrderServiceP95LatencyHigh
+          expr: |
+            histogram_quantile(0.95,
+              sum by (le) (rate(http_server_requests_seconds_bucket{application="order-service"}[5m]))
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "order-service p95 latency above 500ms"
+            description: "Check DB (Hikari saturation, slow queries) and recent load changes."
+
+        - alert: OrderServicePodCrashLooping
+          expr: |
+            increase(kube_pod_container_status_restarts_total{container="order-service"}[15m]) > 3
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "order-service pods restarting repeatedly"
+            description: "Likely OOMKill or failing startup (migrations/schema validation). Inspect pod events and logs."
+
+    - name: order-service.dependencies
+      rules:
+        - alert: OrderServiceHikariPoolSaturated
+          expr: |
+            max(hikaricp_connections_pending{application="order-service"}) > 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Requests are queueing for DB connections"
+            description: "Pool exhausted: slow queries, undersized pool, or connection leak. Correlate with RDS metrics."

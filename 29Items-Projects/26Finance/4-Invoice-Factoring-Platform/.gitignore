@@ -1,0 +1,46 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+artifacts/
+TestResults/
+*.trx
+coverage*.xml
+coverage*.json
+[Cc]overage/
+
+# ---- Node / Frontend ----
+node_modules/
+dist/
+.vite/
+*.local
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# ---- Secrets & local config ----
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+*.pfx
+*.key
+secrets.json
+
+# ---- ML artifacts ----
+*.zip.model
+models/*.zip
+*.onnx
+
+# ---- IDE / OS ----
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# ---- Terraform / Bicep state ----
+*.tfstate
+*.tfstate.*
+.terraform/

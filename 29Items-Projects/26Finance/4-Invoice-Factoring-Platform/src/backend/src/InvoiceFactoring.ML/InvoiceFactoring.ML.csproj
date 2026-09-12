@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Credit-risk model (ML.NET + LightGBM). A pure library: defines the model schemas,
+    training pipeline, and inference wrapper. It does NOT reference Application/Domain —
+    Infrastructure adapts it to the ICreditScoringService port.
+  -->
+  <PropertyGroup>
+    <RootNamespace>InvoiceFactoring.ML</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML" />
+    <PackageReference Include="Microsoft.ML.LightGbm" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,78 @@
+# Local development stack.
+#   docker compose up -d --build                       → FULL stack: database + order-service (:8080)
+#   docker compose up -d postgres                      → just the database (run the app from the IDE)
+#   docker compose --profile observability up -d       → + Prometheus (:9090) & Grafana (:3000)
+#   docker compose --profile quality up -d             → + SonarQube (:9000, embedded DB, eval only)
+# If host port 5432 is taken, override: POSTGRES_PORT=15432 docker compose up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: orders-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-orders}
+      POSTGRES_USER: ${POSTGRES_USER:-orders}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-orders-local-pw}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  order-service:
+    build: ./services/order-service
+    container_name: order-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-orders}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-orders}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-orders-local-pw}
+    ports:
+      - "8080:8080"   # API
+      - "8081:8081"   # management (actuator: health, metrics, prometheus)
+
+  prometheus:
+    profiles: ["observability"]
+    image: prom/prometheus:v2.53.0
+    container_name: orders-prometheus
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # reach a service running on the host
+    ports:
+      - "9090:9090"
+
+  grafana:
+    profiles: ["observability"]
+    image: grafana/grafana:11.1.0
+    container_name: orders-grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+
+  sonarqube:
+    profiles: ["quality"]
+    image: sonarqube:community
+    container_name: orders-sonarqube
+    # Embedded H2 database — evaluation/local only, never production.
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonardata:/opt/sonarqube/data
+
+volumes:
+  pgdata:
+  sonardata:

@@ -1,0 +1,41 @@
+# Tears down the S3 + CloudFront preview when a PR closes (merged or not).
+name: PR Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  teardown-preview:
+    name: Teardown preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: pr-preview
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Delete preview objects + invalidate
+        run: bash scripts/teardown-pr-preview.sh "${{ github.event.number }}"
+        env:
+          PREVIEW_BUCKET: ${{ vars.PREVIEW_BUCKET }}
+          PREVIEW_CF_DISTRIBUTION_ID: ${{ vars.PREVIEW_CF_DISTRIBUTION_ID }}
+
+      - name: Update PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-preview
+          message: |
+            ### 🧹 Preview removed
+
+            The preview environment for this PR has been torn down.

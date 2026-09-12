@@ -1,0 +1,22 @@
+# Variable template: dev environment.
+variables:
+  environmentName: dev
+  resourceGroup: rg-fraud-detection-dev
+  aksCluster: fraud-aks-dev
+  aksNamespace: fraud-detection
+  imageRepository: fraud-detection-api
+  containerRegistry: frauddetectacr.azurecr.io
+  overlayPath: k8s/overlays/dev
+  # Service connection names as configured in Azure DevOps Project Settings.
+  aksServiceConnection: aks-fraud-detection-dev
+  azureServiceConnection: azure-fraud-detection-dev
+  # ADO environment used by deployment jobs (approval checks live there).
+  adoEnvironment: fraud-detection-dev
+  # Blue-green: color currently behind the fraud-api Service / color to deploy.
+  # In dev we simply roll the active color.
+  activeColor: blue
+  targetColor: blue
+  # NOTE: replace with the real MLflow tracking endpoint for dev.
+  mlflowTrackingUri: http://mlflow-dev.fraud-detection.internal:5000
+  # Azure ML workspace used by retraining / drift jobs.
+  amlWorkspace: mlw-fraud-detection-dev

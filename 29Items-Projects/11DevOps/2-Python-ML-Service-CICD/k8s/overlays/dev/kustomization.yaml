@@ -1,0 +1,49 @@
+# Dev overlay - 1 replica, dev image tag, FRAUD_ENVIRONMENT=dev.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: frauddetectacr.azurecr.io/fraud-detection-api
+    newTag: dev  # placeholder - the CD pipeline runs `kustomize edit set image ...:<build-tag>`
+
+patches:
+  - path: patch-replicas.yaml
+  # Per-environment config (base ConfigMap is a plain resource, so we patch
+  # rather than use configMapGenerator behavior:merge).
+  - patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: fraud-api-config
+      data:
+        FRAUD_ENVIRONMENT: "dev"
+        FRAUD_LOG_LEVEL: "DEBUG"
+  # Relax autoscaling in dev to match the single-replica footprint.
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: fraud-api-blue
+      spec:
+        minReplicas: 1
+        maxReplicas: 2
+  - patch: |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: fraud-api
+      spec:
+        rules:
+          - host: fraud-api.dev.example.com
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: fraud-api
+                      port:
+                        number: 80

@@ -1,0 +1,26 @@
+# HPA for the active (blue) deployment.
+# The green deployment is scaled explicitly by the CD pipeline during
+# blue-green rollouts and is intentionally NOT autoscaled here; after a
+# color flip the pipeline re-points/updates autoscaling for the new
+# active color.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fraud-api-blue
+  labels:
+    app: fraud-api
+    color: blue
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fraud-api-blue
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

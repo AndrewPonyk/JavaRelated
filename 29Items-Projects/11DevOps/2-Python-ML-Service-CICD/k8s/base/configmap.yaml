@@ -1,0 +1,26 @@
+# Non-secret runtime configuration for the fraud-detection API.
+# SECRETS (FRAUD_DATABASE_URL, API keys, etc.) live in the Secret
+# `fraud-api-secrets`, which is created out-of-band (Azure Key Vault /
+# CSI driver / pipeline) and is intentionally NOT committed to git.
+# Overlays patch FRAUD_ENVIRONMENT per environment.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fraud-api-config
+  labels:
+    app: fraud-api
+data:
+  FRAUD_ENVIRONMENT: "dev"
+  FRAUD_LOG_LEVEL: "INFO"
+  FRAUD_MLFLOW_TRACKING_URI: "http://mlflow.mlflow.svc.cluster.local:5000"
+  FRAUD_MODEL_DIR: "/app/models"
+  # Schema is managed by Alembic (entrypoint) in-cluster, not create_all.
+  FRAUD_DB_AUTO_CREATE: "false"
+  FRAUD_AB_TEST_ENABLED: "true"
+  FRAUD_AB_TRAFFIC_SPLIT: "10"
+  FRAUD_DRIFT_PSI_THRESHOLD: "0.2"
+  FRAUD_DRIFT_WINDOW_SIZE: "500"
+  FRAUD_DRIFT_MIN_ROWS: "50"
+  FRAUD_AUTO_RETRAIN_ON_DRIFT: "true"
+  FRAUD_RETRAIN_MIN_INTERVAL_MINUTES: "60"
+  FRAUD_TRAINING_SAMPLES: "20000"

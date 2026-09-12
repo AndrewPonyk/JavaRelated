@@ -1,0 +1,48 @@
+# Prometheus configuration for the fraud-detection stack.
+#
+# Used by docker-compose locally; the commented kubernetes_sd_configs block
+# shows the equivalent in-cluster (AKS) service discovery setup.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    service: fraud-detection-api
+
+rule_files:
+  - alerts.yml
+
+scrape_configs:
+  # Fraud Detection API (docker-compose network: service "api", app port 8000).
+  - job_name: fraud-api
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - api:8000
+        labels:
+          environment: local
+
+    # --- AKS / in-cluster service discovery (replace static_configs above) ---
+    # kubernetes_sd_configs:
+    #   - role: pod
+    #     namespaces:
+    #       names:
+    #         - fraud-detection
+    # relabel_configs:
+    #   - source_labels: [__meta_kubernetes_pod_label_app]
+    #     regex: fraud-api
+    #     action: keep
+    #   - source_labels: [__meta_kubernetes_pod_label_color]
+    #     target_label: color
+    #   - source_labels: [__meta_kubernetes_pod_name]
+    #     target_label: pod
+    #   - source_labels: [__address__]
+    #     regex: (.+?)(:\d+)?
+    #     replacement: ${1}:8000
+    #     target_label: __address__
+
+  # Prometheus self-monitoring.
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090

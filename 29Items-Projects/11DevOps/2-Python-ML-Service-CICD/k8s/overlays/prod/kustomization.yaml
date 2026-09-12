@@ -1,0 +1,40 @@
+# Prod overlay - 3 replicas, pinned image tag, FRAUD_ENVIRONMENT=prod.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: frauddetectacr.azurecr.io/fraud-detection-api
+    newTag: "1.0.0"  # placeholder - the CD pipeline pins the released tag via `kustomize edit set image`
+
+patches:
+  - path: patch-replicas.yaml
+  # Per-environment config (base ConfigMap is a plain resource, so we patch
+  # rather than use configMapGenerator behavior:merge).
+  - patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: fraud-api-config
+      data:
+        FRAUD_ENVIRONMENT: "prod"
+        FRAUD_LOG_LEVEL: "WARNING"
+  - patch: |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: fraud-api
+      spec:
+        rules:
+          - host: fraud-api.example.com
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: fraud-api
+                      port:
+                        number: 80

@@ -1,0 +1,33 @@
+# =============================================================================
+# Azure ML environment for training and drift-monitoring jobs.
+# Referenced by train-job.yml / drift-monitor-job.yml as
+#   azureml:fraud-train-env@latest
+#
+# Create/update:
+#   az ml environment create --file mlops/azureml/environment.yml \
+#     --resource-group rg-fraud-detection-dev \
+#     --workspace-name mlw-fraud-detection-dev
+# =============================================================================
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+name: fraud-train-env
+version: "1"
+description: Training and drift-check environment for the fraud-detection model.
+
+image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest
+
+conda_file:
+  name: fraud-train-env
+  channels:
+    - conda-forge
+  dependencies:
+    - python=3.12
+    - pip
+    - pip:
+        - mlflow>=2.14,<3
+        - azureml-mlflow>=1.56
+        - scikit-learn>=1.5,<2
+        - pandas>=2.2,<3
+        - numpy>=1.26,<3
+        - pydantic>=2.7,<3
+        - pydantic-settings>=2.3,<3
+        - structlog>=24.1

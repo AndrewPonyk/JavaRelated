@@ -1,0 +1,27 @@
+# Production unit for the strategy-engine (bare metal). Deployed by Ansible.
+# Secrets are provided via an EnvironmentFile written by the Vault agent (not in git).
+[Unit]
+Description=Algorithmic Trading Platform — Strategy Engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trading
+Group=trading
+WorkingDirectory=/opt/trading/strategy-engine
+EnvironmentFile=/run/secrets/strategy-engine.env
+Environment=ENV=prod
+Environment=SERVICE_NAME=strategy-engine
+ExecStart=/opt/trading/strategy-engine/.venv/bin/strategy-engine
+Restart=always
+RestartSec=5
+# Fail-closed hardening
+LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/trading
+
+[Install]
+WantedBy=multi-user.target

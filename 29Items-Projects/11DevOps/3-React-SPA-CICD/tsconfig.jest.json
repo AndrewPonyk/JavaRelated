@@ -1,0 +1,13 @@
+{
+  /* ts-jest compiles tests to CommonJS — see docs/TECH-NOTES.md §3.6 (import.meta pitfall). */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "types": ["jest", "node", "@testing-library/jest-dom"]
+  },
+  /* Unlike the app typecheck, ts-jest DOES compile test files and test infrastructure. */
+  "include": ["src", "mocks"],
+  "exclude": ["node_modules"]
+}

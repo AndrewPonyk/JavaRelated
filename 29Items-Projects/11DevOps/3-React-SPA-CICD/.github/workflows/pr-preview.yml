@@ -1,0 +1,76 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# PR Preview — deploys every PR to S3 + CloudFront under /pr-<n>/ and posts the
+# URL as a sticky comment. AWS auth is OIDC (no long-lived keys).
+# Teardown: pr-preview-cleanup.yml. Infra: infra/aws/pr-preview-stack.yml.
+# Docs: docs/TECH-NOTES.md §3.3, docs/adr/ADR-001.
+# ══════════════════════════════════════════════════════════════════════════════
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write # AWS OIDC federation
+  pull-requests: write # sticky preview comment
+
+jobs:
+  deploy-preview:
+    name: Deploy preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: pr-preview
+      url: https://${{ vars.PREVIEW_DOMAIN }}/pr-${{ github.event.number }}/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+
+      - name: Generate MSW service worker
+        run: npm run msw:init
+
+      # --base makes Vite emit asset URLs under the PR prefix; the router follows via
+      # basename = import.meta.env.BASE_URL (src/app/router.tsx). Dropping either breaks
+      # previews — docs/TECH-NOTES.md §3.6 #4.
+      - name: Build (preview, hermetic MSW)
+        run: npm run build -- --base "/pr-${{ github.event.number }}/"
+        env:
+          VITE_ENV_NAME: preview
+          VITE_API_BASE_URL: /api
+          VITE_ENABLE_MSW: 'true' # TODO: point previews at a shared dev API when one exists
+          VITE_GA_MEASUREMENT_ID: ''
+          VITE_APP_VERSION: ${{ github.sha }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Sync to S3 + invalidate CloudFront
+        id: deploy
+        run: bash scripts/deploy-pr-preview.sh "${{ github.event.number }}"
+        env:
+          PREVIEW_BUCKET: ${{ vars.PREVIEW_BUCKET }}
+          PREVIEW_CF_DISTRIBUTION_ID: ${{ vars.PREVIEW_CF_DISTRIBUTION_ID }}
+          PREVIEW_DOMAIN: ${{ vars.PREVIEW_DOMAIN }}
+
+      - name: Comment preview URL on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-preview
+          message: |
+            ### 🚀 Preview deployed
+
+            | | |
+            |---|---|
+            | **URL** | ${{ steps.deploy.outputs.url }} |
+            | **Commit** | `${{ github.event.pull_request.head.sha }}` |
+            | **Mode** | hermetic (MSW mock API) |
+
+            _Preview is torn down automatically when this PR closes._

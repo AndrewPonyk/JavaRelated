@@ -1,0 +1,138 @@
+# =============================================================================
+# Fraud Detection - model retraining pipeline (separate from the main CI/CD).
+#
+# Triggers:
+#   1. Manual: "Run pipeline" in the Azure DevOps UI (choose environment).
+#   2. REST (drift webhook): the drift monitor job
+#      (mlops/azureml/drift-monitor-job.yml) POSTs to the Azure DevOps Runs API
+#      when the PSI of any monitored feature exceeds the threshold:
+#
+#        POST https://dev.azure.com/{org}/{project}/_apis/pipelines/{pipelineId}/runs?api-version=7.1
+#        Authorization: Basic base64(":" + PAT)      # PAT scope: Build read & execute
+#        Content-Type: application/json
+#        {
+#          "resources": {"repositories": {"self": {"refName": "refs/heads/master"}}},
+#          "templateParameters": {"reason": "drift", "environment": "dev"}
+#        }
+#
+#      pipelineId = the definition id of THIS pipeline after it is imported.
+#
+# Flow: submit Azure ML training job -> await -> quality gates -> set MLflow
+# alias "challenger" on the new version -> kick the main CI/CD pipeline so
+# Deploy_Dev rolls the service (A/B split then routes traffic to challenger).
+# =============================================================================
+
+trigger: none
+pr: none
+
+parameters:
+  - name: environment
+    displayName: Target environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - staging
+      - prod
+  - name: reason
+    displayName: Retraining reason
+    type: string
+    default: manual
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - template: variables/${{ parameters.environment }}.yml
+
+jobs:
+  - job: submit_training
+    displayName: Submit Azure ML training job
+    steps:
+      - task: AzureCLI@2
+        displayName: az ml job create (train) and await completion
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            set -euo pipefail
+            echo "Retraining reason: ${{ parameters.reason }}"
+            az extension add --name ml --yes
+            # --stream blocks until the job finishes and mirrors its logs here,
+            # so this step both submits and awaits the training run.
+            az ml job create \
+              --file mlops/azureml/train-job.yml \
+              --resource-group $(resourceGroup) \
+              --workspace-name $(amlWorkspace) \
+              --stream
+
+  - job: quality_gates
+    displayName: Challenger quality gates
+    dependsOn: submit_training
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.12'
+      - script: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-ansi --with dev
+          pip install mlflow
+        displayName: Install dependencies
+      - script: |
+          # NOTE: real MLflow auth against the workspace tracking server
+          #       (azureml-mlflow + DefaultAzureCredential, or a token secret).
+          poetry run python -m fraud_detection.ml.evaluate \
+            --model-name fraud-detection \
+            --alias challenger \
+            --min-auc 0.85
+        displayName: Run evaluation gates on the freshly trained model
+        env:
+          FRAUD_MLFLOW_TRACKING_URI: $(mlflowTrackingUri)
+
+  - job: register_challenger
+    displayName: Point MLflow alias challenger at the new version
+    dependsOn: quality_gates
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.12'
+      - script: |
+          pip install mlflow
+          # NOTE: use the exact model version produced by the training job
+          #       (az ml job show / MLflow run tags) instead of "highest version".
+          python - <<'PY'
+          import os
+          import mlflow
+
+          client = mlflow.MlflowClient(tracking_uri=os.environ["MLFLOW_TRACKING_URI"])
+          versions = client.search_model_versions("name='fraud-detection'")
+          latest = max(int(v.version) for v in versions)
+          client.set_registered_model_alias("fraud-detection", "challenger", str(latest))
+          print(f"challenger -> fraud-detection v{latest}")
+          PY
+        displayName: Set challenger alias in MLflow
+        env:
+          MLFLOW_TRACKING_URI: $(mlflowTrackingUri)
+
+  - job: trigger_deploy
+    displayName: Kick main CI/CD pipeline (Deploy_Dev)
+    dependsOn: register_challenger
+    steps:
+      - script: |
+          set -euo pipefail
+          # NOTE: requires a PAT with Build (read & execute) scope stored as the
+          #       secret pipeline variable adoPat, plus real org/project names.
+          az extension add --name azure-devops --yes
+          az devops configure --defaults \
+            organization=https://dev.azure.com/YOUR_ORG \
+            project=YOUR_PROJECT
+          # Runs the main CI/CD pipeline on master; its Deploy_Dev stage rolls
+          # the API so the A/B router starts sending the configured traffic
+          # share (FRAUD_AB_TRAFFIC_SPLIT percent) to the new challenger.
+          az pipelines run --name fraud-detection-api --branch master
+        displayName: Trigger main pipeline via az pipelines run
+        env:
+          AZURE_DEVOPS_EXT_PAT: $(adoPat)

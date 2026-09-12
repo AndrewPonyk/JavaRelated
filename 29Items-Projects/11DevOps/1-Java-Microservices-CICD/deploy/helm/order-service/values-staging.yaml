@@ -1,0 +1,49 @@
+# Staging overlay — applied on top of values.yaml by the ArgoCD Application.
+# ci.yml (deploy-staging job) rewrites image.tag on every merge to main.
+
+image:
+  tag: "REPLACED_BY_CI"   # immutable git SHA, e.g. 4f9c2d…
+
+springProfile: staging
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 4
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # Actuator lives on the management port (8081) — point the target-group health
+    # check there. target-type=ip lets the controller open the pod SG for it.
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+    alb.ingress.kubernetes.io/healthcheck-port: "8081"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    # TODO: alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:...
+  hosts:
+    - host: orders-staging.example.com   # TODO: real staging domain
+      paths:
+        - path: /
+          pathType: Prefix
+
+serviceAccount:
+  annotations:
+    # TODO: real IRSA role for staging
+    eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/order-service-staging
+
+config:
+  # TODO: staging RDS endpoint
+  SPRING_DATASOURCE_URL: jdbc:postgresql://orders-staging.cluster-xxxx.eu-central-1.rds.amazonaws.com:5432/orders
+  DB_POOL_SIZE: "10"
+  # JWT enforcement switches on the moment this is set (see SecurityConfig):
+  # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://idp.example.com/realms/orders
+
+externalSecrets:
+  enabled: true
+  dataKey: orders/staging/db
+
+metrics:
+  serviceMonitor:
+    enabled: true

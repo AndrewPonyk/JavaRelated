@@ -1,0 +1,60 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Deploy Staging — every merge to main deploys to DigitalOcean App Platform
+# (spec: infra/digitalocean/app.staging.yaml), then runs @smoke E2E against it.
+# CI gates already ran on the PR; this workflow trusts them and focuses on delivery.
+# ══════════════════════════════════════════════════════════════════════════════
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false # never cancel a deploy mid-flight
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL || 'https://staging.portal.example.com' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # App Platform builds the static site itself from the spec (build_command + VITE_* envs
+      # defined there), so no local build step is required here.
+      - name: Deploy app spec to DigitalOcean
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app_spec_location: infra/digitalocean/app.staging.yaml
+
+  smoke:
+    name: Smoke tests vs staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [deploy]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run @smoke suite against staging
+        run: npm run test:e2e:smoke -- --project=chromium
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ vars.STAGING_URL || 'https://staging.portal.example.com' }}
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-smoke-report
+          path: playwright-report/
+          retention-days: 7
+      # Extension point: notify Slack/Teams on failure; auto-rollback via doctl if smoke fails.

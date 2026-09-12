@@ -1,0 +1,246 @@
+# CI: lint → unit tests + JaCoCo (>=80%) → SonarQube gate → risk score
+#     → (main only) Docker build → ECR push → Trivy scan → staging values bump (GitOps)
+#
+# Required repo configuration:
+#   vars:    AWS_REGION, AWS_ROLE_ARN (GitHub OIDC role), ECR_REPOSITORY, SONAR_HOST_URL
+#   secrets: SONAR_TOKEN
+# Sonar/AWS steps self-disable when configuration is missing, so the pipeline
+# stays green on forks and on day one.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  SERVICE_DIR: services/order-service
+  AWS_REGION: ${{ vars.AWS_REGION || 'eu-central-1' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'order-service' }}
+
+jobs:
+  build-test:
+    name: Build, test, coverage & Sonar gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history: Sonar new-code detection needs blame data
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Checkstyle is bound to the Maven `validate` phase, JaCoCo `check`
+      # (line coverage >= 80%) to `verify`, and the failsafe profile runs the
+      # Testcontainers integration tests (GitHub runners provide Docker) —
+      # one command runs every code gate.
+      - name: Maven verify (lint + unit & integration tests + coverage gate)
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: ./mvnw -B -ntp verify -Pintegration-tests
+
+      - name: Upload JaCoCo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: ${{ env.SERVICE_DIR }}/target/site/jacoco/
+          retention-days: 14
+
+      - name: Check Sonar configuration
+        id: sonar
+        run: echo "enabled=${{ secrets.SONAR_TOKEN != '' && vars.SONAR_HOST_URL != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: SonarQube scan (waits for quality gate)
+        if: steps.sonar.outputs.enabled == 'true'
+        working-directory: ${{ env.SERVICE_DIR }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        run: >
+          ./mvnw -B -ntp sonar:sonar
+          -Dsonar.projectKey=example.ecommerce:order-service
+          -Dsonar.host.url="$SONAR_HOST_URL"
+          -Dsonar.token="$SONAR_TOKEN"
+          -Dsonar.qualitygate.wait=true
+
+  risk-score:
+    name: Deployment risk score (ML)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write   # sticky risk comment on PRs
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Advisory on PRs; the blocking check happens in cd-production.yml.
+      - name: Score this change set
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            BASE=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+          fi
+          python tools/risk-score/risk_score.py --base "$BASE" --head HEAD --output json > risk.json
+          cat risk.json
+          {
+            echo "## 🎯 Deployment risk score"
+            python tools/risk-score/risk_score.py --base "$BASE" --head HEAD
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # One comment per PR, updated in place on every push (marker-based).
+      - name: Sticky PR comment with the risk score
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const risk = JSON.parse(fs.readFileSync('risk.json', 'utf8'));
+            const marker = '<!-- deployment-risk-score -->';
+            const f = risk.features;
+            const body = [
+              marker,
+              `### 🎯 Deployment risk: **${risk.score}** — ${risk.level} _(model: ${risk.model})_`,
+              '',
+              `> ${risk.recommendation}`,
+              '',
+              '| feature | value |',
+              '|---|---|',
+              `| lines +/− | +${f.lines_added} / −${f.lines_deleted} (${f.files_changed} files) |`,
+              `| touches migrations / helm / ci / build | ${f.touches_migrations} / ${f.touches_helm} / ${f.touches_ci} / ${f.touches_build} |`,
+              `| test share of diff | ${f.test_ratio} |`,
+            ].join('\n');
+            const {data: comments} = await github.rest.issues.listComments({
+              ...context.repo, issue_number: context.issue.number});
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({...context.repo, comment_id: existing.id, body});
+            } else {
+              await github.rest.issues.createComment({...context.repo, issue_number: context.issue.number, body});
+            }
+
+      - name: Upload risk report
+        uses: actions/upload-artifact@v4
+        with:
+          name: risk-score
+          path: risk.json
+          retention-days: 30
+
+  build-and-push:
+    name: Docker image → ECR + Trivy
+    runs-on: ubuntu-latest
+    needs: [build-test]
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      id-token: write   # OIDC federation to AWS — no static keys
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check AWS configuration
+        id: aws
+        run: echo "enabled=${{ vars.AWS_ROLE_ARN != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
+        if: steps.aws.outputs.enabled == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.aws.outputs.enabled == 'true'
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Immutable tag = full git SHA. Never deploy `latest`.
+      - name: Build and push image
+        if: steps.aws.outputs.enabled == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.SERVICE_DIR }}
+          push: true
+          provenance: false
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy vulnerability scan
+        if: steps.aws.outputs.enabled == 'true'
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      # Build-only fallback keeps the Docker stage exercised before AWS exists.
+      - name: Build image (no registry configured)
+        if: steps.aws.outputs.enabled != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.SERVICE_DIR }}
+          push: false
+          tags: order-service:${{ github.sha }}
+
+  deploy-staging:
+    name: GitOps bump → staging
+    runs-on: ubuntu-latest
+    needs: [build-and-push, risk-score]
+    if: github.event_name == 'push'
+    permissions:
+      contents: write   # pushes the values bump; use a GitHub App/PAT if main is push-protected
+    concurrency:
+      group: gitops-staging
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Bump staging image tag
+        run: |
+          yq -i '.image.tag = "${{ github.sha }}"' deploy/helm/order-service/values-staging.yaml
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/helm/order-service/values-staging.yaml
+          # [skip ci] prevents a build loop; ArgoCD picks the commit up and rolls staging.
+          git commit -m "chore(deploy): staging → order-service ${GITHUB_SHA:0:12} [skip ci]"
+          git pull --rebase origin "${{ github.ref_name }}"
+          git push
+
+      # Post-deploy verification once ArgoCD has synced staging. Enabled by setting
+      # the repo variable STAGING_URL (e.g. https://orders-staging.example.com).
+      # Strict variant for later: `argocd app wait order-service-staging --health`.
+      - name: Smoke test staging
+        if: vars.STAGING_URL != ''
+        run: |
+          echo "Waiting for staging to become ready (ArgoCD auto-sync ~3 min)…"
+          # Actuator is cluster-internal (management port); poll the public OpenAPI
+          # document, which is served on the API port through the ALB.
+          for i in $(seq 1 36); do
+            if curl -fsS "${{ vars.STAGING_URL }}/v3/api-docs" -o /dev/null; then
+              break
+            fi
+            sleep 10
+          done
+          BASE_URL="${{ vars.STAGING_URL }}" bash scripts/smoke-test.sh

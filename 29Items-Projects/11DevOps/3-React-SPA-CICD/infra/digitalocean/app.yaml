@@ -1,0 +1,40 @@
+# DigitalOcean App Platform spec — PRODUCTION
+# Deployed exclusively by .github/workflows/deploy-production.yml (digitalocean/app_action).
+# deploy_on_push is false on purpose: a deploy must always imply green CI gates.
+# Docs: docs/TECH-NOTES.md §3.3.
+name: customer-portal-prod
+region: fra
+
+static_sites:
+  - name: web
+    github:
+      repo: your-org/customer-portal-spa # TODO: real repo slug
+      branch: main
+      deploy_on_push: false
+    build_command: npm ci && npm run msw:init && npm run build
+    output_dir: dist
+    environment_slug: node-js
+    # SPA deep links: serve index.html for every unknown path (TECH-NOTES §3.6 #4).
+    catchall_document: index.html
+    envs:
+      - key: VITE_ENV_NAME
+        scope: BUILD_TIME
+        value: production
+      - key: VITE_API_BASE_URL
+        scope: BUILD_TIME
+        value: https://api.example.com # TODO: real production API URL
+      - key: VITE_ENABLE_MSW
+        scope: BUILD_TIME
+        value: 'false'
+      - key: VITE_GA_MEASUREMENT_ID
+        scope: BUILD_TIME
+        value: G-XXXXXXXXXX # TODO: production GA4 property
+      # VITE_APP_VERSION is best-effort here; the canonical version is the release tag.
+
+domains:
+  - domain: portal.example.com # TODO: real domain
+    type: PRIMARY
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED

@@ -1,0 +1,29 @@
+# Ingress for the fraud-detection API (NGINX ingress controller on AKS).
+# NOTE: enable TLS - provision a certificate (cert-manager ClusterIssuer or
+# Azure Key Vault) and uncomment the tls block below.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fraud-api
+  labels:
+    app: fraud-api
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+    # NOTE: cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #       - fraud-api.example.com
+  #     secretName: fraud-api-tls
+  rules:
+    - host: fraud-api.example.com  # placeholder - overridden per environment
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fraud-api
+                port:
+                  number: 80

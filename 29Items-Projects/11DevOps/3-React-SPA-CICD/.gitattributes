@@ -1,0 +1,11 @@
+# Normalize to LF in the repository — Windows dev vs Linux CI (docs/TECH-NOTES.md §3.6 #8).
+* text=auto eol=lf
+
+# Shell scripts MUST be LF or bash runners fail with "bad interpreter".
+*.sh text eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary

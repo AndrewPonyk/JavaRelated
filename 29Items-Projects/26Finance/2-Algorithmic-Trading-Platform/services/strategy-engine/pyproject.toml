@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strategy-engine"
+version = "0.1.0"
+description = "Asyncio host that turns market bars into trade signals"
+requires-python = ">=3.11"
+dependencies = [
+    "trading-common",      # local: pip install -e shared
+    "aiokafka>=0.10",
+    "numpy>=1.26",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "mypy>=1.10", "ruff>=0.5"]
+
+[project.scripts]
+strategy-engine = "strategy_engine.engine:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

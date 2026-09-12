@@ -1,0 +1,35 @@
+# DigitalOcean App Platform spec — STAGING
+# Deployed by .github/workflows/deploy-staging.yml on every merge to main.
+name: customer-portal-staging
+region: fra
+
+static_sites:
+  - name: web
+    github:
+      repo: your-org/customer-portal-spa # TODO: real repo slug
+      branch: main
+      deploy_on_push: false
+    build_command: npm ci && npm run msw:init && npm run build
+    output_dir: dist
+    environment_slug: node-js
+    catchall_document: index.html
+    envs:
+      - key: VITE_ENV_NAME
+        scope: BUILD_TIME
+        value: staging
+      - key: VITE_API_BASE_URL
+        scope: BUILD_TIME
+        value: https://staging-api.example.com # TODO: real staging API URL
+      - key: VITE_ENABLE_MSW
+        scope: BUILD_TIME
+        value: 'false'
+      - key: VITE_GA_MEASUREMENT_ID
+        scope: BUILD_TIME
+        value: G-YYYYYYYYYY # TODO: staging GA4 property (separate from prod!)
+
+domains:
+  - domain: staging.portal.example.com # TODO: real domain
+    type: PRIMARY
+
+alerts:
+  - rule: DEPLOYMENT_FAILED

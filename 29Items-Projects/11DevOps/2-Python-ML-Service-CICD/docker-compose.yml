@@ -1,0 +1,93 @@
+# Local development stack: API + PostgreSQL + MLflow + Prometheus + Grafana.
+# Usage: cp .env.example .env ; docker compose up --build
+services:
+  api:
+    build: .
+    image: fraud-detection-api:local
+    container_name: fraud-api
+    ports:
+      - "8000:8000"
+    env_file:
+      # Optional: sensible defaults are baked in below; copy .env.example to
+      # .env to customize.
+      - path: .env
+        required: false
+    environment:
+      # Override localhost defaults with in-network service hostnames.
+      FRAUD_DATABASE_URL: postgresql+psycopg2://fraud:fraud@db:5432/fraud
+      FRAUD_MLFLOW_TRACKING_URI: http://mlflow:5000
+      FRAUD_MODEL_DIR: /app/models
+      # First boot: train and register an initial champion automatically.
+      FRAUD_BOOTSTRAP_MODEL: "true"
+    volumes:
+      - model-store:/app/models
+    depends_on:
+      db:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: fraud-db
+    environment:
+      # Dev-only credentials for the local stack. Real environments use
+      # Key Vault-sourced secrets (Secret fraud-api-secrets on AKS).
+      POSTGRES_USER: ${POSTGRES_USER:-fraud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fraud}
+      POSTGRES_DB: ${POSTGRES_DB:-fraud}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-fraud} -d $${POSTGRES_DB:-fraud}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: fraud-mlflow
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow.db
+    working_dir: /mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fraud-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fraud-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      # Dev-only credentials for the local Grafana instance.
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  model-store:
+  mlflow-data:
+  prometheus-data:
+  grafana-data:

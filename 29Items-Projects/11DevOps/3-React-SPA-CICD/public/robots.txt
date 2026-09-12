@@ -1,0 +1,9 @@
+# Production policy: the portal is behind auth; only the marketing site should be indexed.
+# Note for staging/previews: they should serve Disallow: / — DO static sites can't vary
+# this file per env, so bake it per build or use the container path's headers.
+# (Lighthouse's SEO category is not asserted for this app for exactly this reason —
+# see .lighthouserc.json and docs/TECH-NOTES.md.)
+User-agent: *
+Allow: /$
+Disallow: /settings
+Disallow: /login

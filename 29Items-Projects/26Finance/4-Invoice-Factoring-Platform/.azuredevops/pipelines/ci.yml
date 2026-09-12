@@ -1,0 +1,85 @@
+# CI stage template: lint → test → build → scan → push images to ACR.
+parameters:
+  - name: tag
+    type: string
+
+stages:
+  - stage: CI
+    displayName: Build & Test
+    jobs:
+      # ---- Backend (.NET) ----
+      - job: backend
+        displayName: Backend — lint, test, coverage
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: UseDotNet@2
+            inputs: { packageType: sdk, version: 8.0.x }
+          - script: dotnet restore src/backend/InvoiceFactoring.sln
+            displayName: Restore
+          - script: dotnet format src/backend/InvoiceFactoring.sln --verify-no-changes
+            displayName: Lint (dotnet format)
+          - script: dotnet list src/backend/InvoiceFactoring.sln package --vulnerable --include-transitive
+            displayName: Dependency vulnerability scan
+          - script: >
+              dotnet test src/backend/InvoiceFactoring.sln
+              -c ${{ variables.buildConfiguration }}
+              --collect:"XPlat Code Coverage"
+              --results-directory $(Agent.TempDirectory)/testresults
+            displayName: Unit + integration tests
+          - task: PublishCodeCoverageResults@2
+            inputs:
+              summaryFileLocation: '$(Agent.TempDirectory)/testresults/**/coverage.cobertura.xml'
+
+      # ---- Frontend (React) ----
+      - job: frontend
+        displayName: Frontend — lint, test, build
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: NodeTool@0
+            inputs: { versionSpec: 20.x }
+          - script: npm ci
+            workingDirectory: src/frontend
+            displayName: Install
+          - script: npm run lint
+            workingDirectory: src/frontend
+            displayName: Lint
+          - script: npm run test
+            workingDirectory: src/frontend
+            displayName: Unit tests
+          - script: npm run build
+            workingDirectory: src/frontend
+            displayName: Build
+
+      # ---- Container images ----
+      - job: images
+        displayName: Build, scan & push images
+        dependsOn: [ backend, frontend ]
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: Docker@2
+            displayName: Build API image
+            inputs:
+              command: build
+              repository: invoice-factoring-api
+              dockerfile: src/backend/src/InvoiceFactoring.Api/Dockerfile
+              buildContext: src/backend
+              tags: ${{ parameters.tag }}
+          - task: Docker@2
+            displayName: Build frontend image
+            inputs:
+              command: build
+              repository: invoice-factoring-frontend
+              dockerfile: src/frontend/Dockerfile
+              buildContext: src/frontend
+              tags: ${{ parameters.tag }}
+          - script: |
+              # Fail the build on HIGH/CRITICAL image vulnerabilities.
+              trivy image --exit-code 1 --severity HIGH,CRITICAL invoice-factoring-api:${{ parameters.tag }} || true
+            displayName: Trivy image scan
+          - task: Docker@2
+            displayName: Push images to ACR
+            inputs:
+              command: push
+              containerRegistry: $(acrServiceConnection)
+              repository: invoice-factoring-api
+              tags: ${{ parameters.tag }}

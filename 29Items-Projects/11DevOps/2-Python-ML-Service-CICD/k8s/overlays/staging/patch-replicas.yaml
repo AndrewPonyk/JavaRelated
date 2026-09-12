@@ -1,0 +1,8 @@
+# Staging: 2 replicas for the active (blue) deployment.
+# Green stays at 0 - the CD pipeline scales it during blue-green rollouts.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-api-blue
+spec:
+  replicas: 2

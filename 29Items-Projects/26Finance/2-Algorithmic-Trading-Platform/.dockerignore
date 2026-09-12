@@ -1,0 +1,17 @@
+# Keep the build context small for the Python service image (context = repo root).
+.git
+.github
+docs
+frontend
+execution-engine
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.hypothesis
+.ruff_cache
+.coverage
+htmlcov
+**/tests
+*.md
+.env
+.env.*

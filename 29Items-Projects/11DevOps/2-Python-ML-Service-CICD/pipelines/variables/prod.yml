@@ -1,0 +1,26 @@
+# Variable template: prod environment.
+variables:
+  environmentName: prod
+  resourceGroup: rg-fraud-detection-prod
+  aksCluster: fraud-aks-prod
+  aksNamespace: fraud-detection
+  imageRepository: fraud-detection-api
+  containerRegistry: frauddetectacr.azurecr.io
+  overlayPath: k8s/overlays/prod
+  # Service connection names as configured in Azure DevOps Project Settings.
+  aksServiceConnection: aks-fraud-detection-prod
+  azureServiceConnection: azure-fraud-detection-prod
+  # ADO environment used by deployment jobs - add an approval check on it.
+  adoEnvironment: fraud-detection-prod
+  # Blue-green:
+  #   activeColor = color the fraud-api Service currently selects (live traffic)
+  #   targetColor = inactive color that receives the new release
+  # NOTE: determine both at runtime by reading the Service selector, e.g.
+  #   kubectl -n fraud-detection get svc fraud-api -o jsonpath='{.spec.selector.color}'
+  # and flip them; static values are a scaffold simplification.
+  activeColor: blue
+  targetColor: green
+  # NOTE: replace with the real MLflow tracking endpoint for prod.
+  mlflowTrackingUri: http://mlflow-prod.fraud-detection.internal:5000
+  # Azure ML workspace used by retraining / drift jobs.
+  amlWorkspace: mlw-fraud-detection-prod

@@ -1,0 +1,16 @@
+# Runtime deps for the Python control-plane image (lean: no torch/zipline/TA-Lib).
+# The default predictor is NumPy and the default backtester is SimpleBacktester.
+pydantic>=2.6
+structlog>=24.1
+PyYAML>=6.0
+numpy>=1.26
+pandas>=2.2
+SQLAlchemy[asyncio]>=2.0
+greenlet>=3.0
+aiosqlite>=0.19
+asyncpg>=0.29
+redis>=5.0
+aiokafka>=0.10
+fastapi>=0.111
+uvicorn[standard]>=0.30
+PyJWT>=2.8

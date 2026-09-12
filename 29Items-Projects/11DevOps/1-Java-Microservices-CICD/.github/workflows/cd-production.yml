@@ -1,0 +1,101 @@
+# Production promotion — manual, gated, auditable.
+#
+#   1. Risk gate:  ML risk score for the promoted range must be < 0.70
+#                  (override_risk=true bypasses, and is visible in the run log).
+#   2. Human gate: GitHub environment `production` → required reviewers approve.
+#   3. Promotion:  bump values-production.yaml to a staging-proven image SHA,
+#                  commit + release tag. ArgoCD prod app is MANUAL sync by design —
+#                  an operator confirms the sync (two-key launch).
+#
+# Setup: create environment `production` with required reviewers
+#        (Settings → Environments → production).
+
+name: CD — promote to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to promote (full git SHA, already verified on staging)"
+        required: true
+        type: string
+      override_risk:
+        description: "Deploy despite a high risk score (leaves an audit trail)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  risk-gate:
+    name: Deployment risk gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Score the promotion range (current prod → candidate)
+        run: |
+          set -euo pipefail
+          CURRENT_PROD=$(yq '.image.tag' deploy/helm/order-service/values-production.yaml)
+          if git cat-file -e "$CURRENT_PROD" 2>/dev/null; then
+            BASE="$CURRENT_PROD"
+          else
+            # First deploy / placeholder tag: score the last 20 commits as a proxy.
+            BASE=$(git rev-parse "HEAD~20" 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          fi
+          THRESHOLD="0.70"
+          if [ "${{ inputs.override_risk }}" = "true" ]; then
+            echo "::warning::Risk gate OVERRIDDEN by ${{ github.actor }}"
+            THRESHOLD="1.01"
+          fi
+          python tools/risk-score/risk_score.py \
+            --base "$BASE" --head "${{ inputs.image_tag }}" \
+            --fail-above "$THRESHOLD" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  promote:
+    name: Promote to production
+    runs-on: ubuntu-latest
+    needs: [risk-gate]
+    environment: production   # ← required-reviewer approval happens here
+    permissions:
+      contents: write
+    concurrency:
+      group: gitops-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the candidate was staged first
+        run: |
+          STAGING_TAG=$(yq '.image.tag' deploy/helm/order-service/values-staging.yaml)
+          if [ "$STAGING_TAG" != "${{ inputs.image_tag }}" ]; then
+            echo "::warning::Promoting ${{ inputs.image_tag }} but staging runs $STAGING_TAG — build-once/promote-same-image is the expected flow."
+          fi
+
+      - name: Bump production image tag + release tag
+        run: |
+          set -euo pipefail
+          yq -i '.image.tag = "${{ inputs.image_tag }}"' deploy/helm/order-service/values-production.yaml
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/helm/order-service/values-production.yaml
+          SHORT_SHA=$(echo "${{ inputs.image_tag }}" | cut -c1-12)
+          git commit -m "chore(deploy): production → order-service ${SHORT_SHA} [skip ci]"
+          git tag -a "release-${SHORT_SHA}-$(date -u +%Y%m%d-%H%M)" -m "Production release ${SHORT_SHA} approved by ${{ github.actor }}"
+          git pull --rebase origin "${{ github.ref_name }}"
+          git push --follow-tags
+
+      # Prod Application is manual-sync: an operator completes the deploy following
+      # docs/runbooks/rollback.md ("Promotion procedure"):
+      #   argocd app sync order-service-production && argocd app wait order-service-production
+      #   BASE_URL=$PRODUCTION_URL bash scripts/smoke-test.sh
+      # For blue-green releases (risk >= 0.6) flip blueGreen.enabled in
+      # values-production.yaml in the SAME commit, then promote via Argo Rollouts.

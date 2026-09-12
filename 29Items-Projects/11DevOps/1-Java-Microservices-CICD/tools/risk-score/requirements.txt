@@ -1,0 +1,5 @@
+# Needed ONLY for training (train_model.py) and for scoring with a trained model.
+# risk_score.py runs stdlib-only in heuristic mode — CI needs no pip install.
+scikit-learn>=1.4
+pandas>=2.1
+joblib>=1.3

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Application layer: use cases (CQRS handlers), validation, and the abstractions
+    (ports) that Infrastructure implements. Depends only on Domain.
+  -->
+  <PropertyGroup>
+    <RootNamespace>InvoiceFactoring.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <!-- Handlers depend on ILogger<T> and IServiceCollection directly. -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InvoiceFactoring.Domain\InvoiceFactoring.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

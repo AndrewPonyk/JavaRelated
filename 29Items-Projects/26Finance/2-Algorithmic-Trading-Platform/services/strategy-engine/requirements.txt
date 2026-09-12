@@ -1,0 +1,6 @@
+# Pinned runtime deps for the strategy-engine service.
+# trading-common is installed editable from ../../shared in dev.
+-e ../../shared
+aiokafka==0.10.0
+numpy==1.26.4
+structlog==24.1.0

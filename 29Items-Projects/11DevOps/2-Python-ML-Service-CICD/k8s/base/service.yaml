@@ -1,0 +1,19 @@
+# Stable entrypoint for the fraud-detection API.
+# The `color` selector decides which deployment receives live traffic;
+# scripts/blue_green_switch.sh patches it during a blue-green switch.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraud-api
+  labels:
+    app: fraud-api
+spec:
+  type: ClusterIP
+  selector:
+    app: fraud-api
+    color: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP

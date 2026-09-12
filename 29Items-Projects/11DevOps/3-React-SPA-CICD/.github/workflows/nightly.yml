@@ -1,0 +1,80 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Nightly — the expensive checks that don't belong on every PR:
+# full cross-browser E2E matrix, dependency audit, Lighthouse trend run.
+# ══════════════════════════════════════════════════════════════════════════════
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-matrix:
+    name: E2E (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/setup-node-cache
+      - name: Generate MSW service worker
+        run: npm run msw:init
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Playwright (hermetic)
+        run: npm run test:e2e -- --project=${{ matrix.browser }}
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-e2e-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 7
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/setup-node-cache
+      - name: npm audit (production deps)
+        run: npm audit --omit=dev --audit-level=high
+      - name: npm audit (all deps — informational)
+        if: always()
+        continue-on-error: true
+        run: npm audit --audit-level=moderate
+      # Tighten later: also fail on dev-dependency criticals once the baseline is clean.
+
+  lighthouse-trend:
+    name: Lighthouse trend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: ./.github/actions/setup-node-cache
+      - name: Build production bundle
+        run: npm run build
+        env:
+          VITE_ENV_NAME: production
+          VITE_API_BASE_URL: ${{ vars.PROD_API_BASE_URL || 'https://api.example.com' }}
+          VITE_ENABLE_MSW: 'false'
+          VITE_APP_VERSION: ${{ github.sha }}
+      - name: Lighthouse CI
+        run: npm run lighthouse
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      # Extension point: point upload.target at a self-hosted LHCI server for history/trends.

@@ -1,0 +1,42 @@
+# --- Java / Maven ---
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+*.log
+hs_err_pid*
+
+# --- IDE ---
+.idea/
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Environment / secrets (never commit real values) ---
+.env
+.env.local
+*.pem
+*.p12
+
+# --- Python (tools/risk-score) ---
+__pycache__/
+*.pyc
+.venv/
+tools/risk-score/model.joblib
+
+# --- Helm ---
+deploy/helm/**/charts/
+deploy/helm/**/*.tgz
+
+# --- Local scratch ---
+*.tmp
+.sonar/

@@ -1,0 +1,7 @@
+# Backtesting lives in its OWN venv — Zipline pins old NumPy/Pandas (TECH-NOTES §3.6).
+# Do NOT merge these pins into the rest of the platform.
+-e ../../shared
+zipline-reloaded==3.0.4
+numpy==1.23.5
+pandas==1.5.3
+TA-Lib==0.4.28

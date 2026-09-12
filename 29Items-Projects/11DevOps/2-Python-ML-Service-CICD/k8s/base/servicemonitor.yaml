@@ -1,0 +1,21 @@
+# Prometheus Operator ServiceMonitor - scrapes /metrics of every pod behind
+# the fraud-api Service (both colors are also scraped directly via the
+# prometheus.io/* pod annotations for pipelines without the operator).
+# Requires the monitoring.coreos.com CRDs (kube-prometheus-stack).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fraud-api
+  labels:
+    app: fraud-api
+    # Label commonly required by kube-prometheus-stack's serviceMonitorSelector.
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: fraud-api
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s

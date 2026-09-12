@@ -1,0 +1,2 @@
+# Fast local gate: lint + format only the staged files. Full gates run in CI.
+npx lint-staged

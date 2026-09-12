@@ -1,0 +1,48 @@
+# =============================================================================
+# Azure ML v2 command job: train the fraud-detection model, log metrics and the
+# model to the workspace MLflow tracking server / registry.
+#
+# Submit (also done by pipelines/ml-retraining.yml):
+#   az ml job create --file mlops/azureml/train-job.yml \
+#     --resource-group rg-fraud-detection-dev \
+#     --workspace-name mlw-fraud-detection-dev \
+#     --stream
+# =============================================================================
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+
+display_name: fraud-detection-train
+experiment_name: fraud-detection-training
+description: >-
+  Trains the fraud detection classifier on the registered transactions data
+  asset, evaluates it, and registers the new version in the MLflow model
+  registry under the name fraud-detection (alias promotion to challenger is
+  done by the retraining pipeline after quality gates pass).
+
+# Snapshot the repository root (this file lives in mlops/azureml/).
+code: ../..
+
+command: >-
+  pip install --no-deps -e . &&
+  python -m fraud_detection.ml.train
+  --training-data ${{inputs.training_data}}
+  --model-name ${{inputs.model_name}}
+  --register-as-alias challenger
+  --test-size 0.2
+  --random-state 42
+
+inputs:
+  training_data:
+    type: uri_file
+    # NOTE: register the training data asset in the workspace first:
+    #   az ml data create --name fraud-transactions-train --type uri_file \
+    #     --path https://<storage-account>.blob.core.windows.net/data/transactions.parquet
+    path: azureml:fraud-transactions-train@latest
+  model_name: fraud-detection
+
+environment: azureml:fraud-train-env@latest
+compute: azureml:cpu-cluster
+
+tags:
+  project: fraud-detection
+  triggered_by: ml-retraining-pipeline

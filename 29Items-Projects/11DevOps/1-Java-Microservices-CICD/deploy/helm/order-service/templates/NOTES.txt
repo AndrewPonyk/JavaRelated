@@ -1,0 +1,21 @@
+{{ .Chart.Name }} {{ .Chart.Version }} deployed as release "{{ .Release.Name }}" (profile: {{ .Values.springProfile }}).
+
+Quick checks:
+
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "order-service.fullname" . }} 8080:{{ .Values.service.port }} 8081:8081
+
+Then:
+  http://localhost:8080/swagger-ui.html      – API docs (API port)
+  http://localhost:8081/actuator/health      – health (management port)
+  http://localhost:8081/actuator/prometheus  – metrics (management port)
+
+{{- if .Values.blueGreen.enabled }}
+
+Blue/green is ACTIVE (Argo Rollouts):
+  kubectl argo rollouts -n {{ .Release.Namespace }} get rollout {{ include "order-service.fullname" . }} --watch
+  # verify the green stack via {{ include "order-service.fullname" . }}-preview, then:
+  kubectl argo rollouts -n {{ .Release.Namespace }} promote {{ include "order-service.fullname" . }}
+{{- end }}
+
+Helm test: helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

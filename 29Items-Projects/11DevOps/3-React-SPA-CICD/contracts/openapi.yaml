@@ -1,0 +1,254 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Portal API contract v1 — co-owned with the backend team (see .github/CODEOWNERS).
+# This is the source of truth the SPA is built against:
+#   - zod schemas in src/api + src/features/**.api.ts must match it
+#   - MSW handlers in mocks/ must implement it
+# Roadmap (PROJECT-PLAN Phase 2): CI job diffing this file against the backend's published spec.
+# ══════════════════════════════════════════════════════════════════════════════
+openapi: 3.1.0
+info:
+  title: Customer Portal API
+  version: 1.0.0
+  description: REST API consumed by the Customer Portal SPA.
+
+servers:
+  - url: https://api.example.com
+    description: production
+  - url: https://staging-api.example.com
+    description: staging
+
+paths:
+  /v1/auth/login:
+    post:
+      summary: Exchange credentials for a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credentials' }
+            example: { email: demo@example.com, password: Password123! }
+      responses:
+        '200':
+          description: Authenticated. Also sets the httpOnly refresh cookie.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/logout:
+    post:
+      summary: Invalidate the session and clear the refresh cookie
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Logged out }
+
+  /v1/auth/me:
+    get:
+      summary: Current authenticated user
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/refresh:
+    post:
+      summary: Rotate the refresh cookie and mint a new access token
+      description: >
+        Relies on the httpOnly SameSite=Strict refresh cookie. The SPA calls this
+        transparently (single-flight) on any 401 and replays the original request —
+        see src/api/httpClient.ts.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accessToken]
+                properties:
+                  accessToken: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/dashboard/summary:
+    get:
+      summary: Account summary for the dashboard
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DashboardSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/announcements:
+    get:
+      summary: Active customer announcements
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Announcement' }
+
+  /v1/activity:
+    get:
+      summary: Recent account activity (most recent first)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum entries to return (newest first).
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ActivityEntry' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/settings/profile:
+    get:
+      summary: Current profile & notification preferences
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profile' }
+    patch:
+      summary: Partially update profile & notification preferences
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfilePatch' }
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profile' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Missing/expired credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    ValidationError:
+      description: Request body failed validation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+    Problem:
+      type: object
+      description: Error envelope used by every non-2xx response.
+      required: [code, message]
+      properties:
+        code: { type: string, examples: [VALIDATION_ERROR, INVALID_CREDENTIALS] }
+        message: { type: string }
+        details: {}
+
+    Credentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+
+    User:
+      type: object
+      required: [id, email, displayName, roles]
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        roles:
+          type: array
+          items: { type: string, enum: [customer, admin] }
+
+    LoginResponse:
+      type: object
+      required: [user, accessToken]
+      properties:
+        user: { $ref: '#/components/schemas/User' }
+        accessToken: { type: string }
+
+    DashboardSummary:
+      type: object
+      required: [balance, currency, openTickets, lastLoginAt, balanceHistory]
+      properties:
+        balance: { type: number }
+        currency: { type: string, minLength: 3, maxLength: 3 }
+        openTickets: { type: integer }
+        lastLoginAt: { type: [string, 'null'], format: date-time }
+        balanceHistory:
+          type: array
+          description: Month-end balances, oldest first (dashboard trend widget).
+          items:
+            type: object
+            required: [month, balance]
+            properties:
+              month: { type: string, examples: ['2026-07'] }
+              balance: { type: number }
+
+    ActivityEntry:
+      type: object
+      required: [id, date, description, amount, currency]
+      properties:
+        id: { type: string }
+        date: { type: string, format: date-time }
+        description: { type: string }
+        amount: { type: number, description: 'Positive = credit, negative = debit' }
+        currency: { type: string, minLength: 3, maxLength: 3 }
+
+    Announcement:
+      type: object
+      required: [id, title, body, publishedAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        body: { type: string }
+        publishedAt: { type: string, format: date-time }
+
+    Profile:
+      type: object
+      required: [displayName, marketingEmails, productUpdates]
+      properties:
+        displayName: { type: string, minLength: 1, maxLength: 80 }
+        marketingEmails: { type: boolean }
+        productUpdates: { type: boolean }
+
+    ProfilePatch:
+      type: object
+      minProperties: 1
+      properties:
+        displayName: { type: string, minLength: 1, maxLength: 80 }
+        marketingEmails: { type: boolean }
+        productUpdates: { type: boolean }

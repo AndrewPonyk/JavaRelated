@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Service — Ops Console</title>
+<!--
+  Frontend deliverable for this backend-only stack: a dependency-free console served
+  by Spring Boot itself. Demonstrates the three canonical UI states (loading / error /
+  data) against the real API. A production storefront would be a separate SPA repo.
+-->
+<style>
+  :root { --bg:#0f172a; --panel:#1e293b; --line:#334155; --text:#e2e8f0; --muted:#94a3b8;
+          --accent:#38bdf8; --ok:#4ade80; --err:#f87171; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; } h1 small { color: var(--muted); font-weight: 400; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+          padding:16px; margin-top:16px; }
+  button { background:var(--accent); color:#08243a; border:0; border-radius:8px;
+           padding:8px 14px; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  button.ghost { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  table { width:100%; border-collapse: collapse; margin-top:12px; font-size:14px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; }
+  .status { padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
+            background:#0ea5e91f; color:var(--accent); }
+  .status.DELIVERED { background:#4ade8022; color:var(--ok); }
+  .status.CANCELLED { background:#f8717122; color:var(--err); }
+  .state { padding:12px; border-radius:8px; margin-top:12px; display:none; }
+  .state.loading { display:block; color:var(--muted); }
+  .state.error { display:block; background:#f8717118; color:var(--err);
+                 border:1px solid #f8717155; white-space:pre-wrap; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  a { color: var(--accent); }
+  code { background:#0b1222; padding:2px 6px; border-radius:6px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📦 Order Service <small>ops console</small></h1>
+  <p>
+    API docs: <a href="/swagger-ui.html">Swagger UI</a> ·
+    <a href="/v3/api-docs">OpenAPI JSON</a> ·
+    <a id="link-health" href="#">health</a> ·
+    <a id="link-metrics" href="#">metrics</a>
+    <small style="color:var(--muted)">(management port :8081)</small>
+  </p>
+
+  <div class="card">
+    <div class="row">
+      <button id="refresh">Refresh orders</button>
+      <button id="create" class="ghost">Create sample order</button>
+      <span id="count" style="color:var(--muted)"></span>
+    </div>
+
+    <div id="loading" class="state loading">Loading…</div>
+    <div id="error" class="state error"></div>
+
+    <table id="orders-table" hidden>
+      <thead>
+        <tr><th>Id</th><th>Customer</th><th>Status</th><th>Total</th><th>Created</th></tr>
+      </thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  "use strict";
+  // Actuator lives on the separate management port (8081) — compute absolute links.
+  const mgmt = location.protocol + "//" + location.hostname + ":8081";
+  document.getElementById("link-health").href = mgmt + "/actuator/health";
+  document.getElementById("link-metrics").href = mgmt + "/actuator/prometheus";
+
+  const els = {
+    loading: document.getElementById("loading"),
+    error: document.getElementById("error"),
+    table: document.getElementById("orders-table"),
+    body: document.getElementById("orders-body"),
+    count: document.getElementById("count"),
+    refresh: document.getElementById("refresh"),
+    create: document.getElementById("create"),
+  };
+
+  function setState(state, message) {
+    els.loading.style.display = state === "loading" ? "block" : "none";
+    els.error.style.display = state === "error" ? "block" : "none";
+    if (state === "error") els.error.textContent = message;
+    els.refresh.disabled = els.create.disabled = state === "loading";
+  }
+
+  async function api(path, options) {
+    const response = await fetch(path, options);
+    if (!response.ok) {
+      // Backend errors are RFC-7807 problem+json — surface title/detail verbatim.
+      let detail = response.status + " " + response.statusText;
+      try {
+        const problem = await response.json();
+        detail = (problem.title || "") + "\n" + (problem.detail || "") +
+                 (problem.errors ? "\n" + JSON.stringify(problem.errors, null, 2) : "");
+      } catch (ignored) { /* non-JSON error body */ }
+      throw new Error(detail.trim());
+    }
+    return response.status === 204 ? null : response.json();
+  }
+
+  async function loadOrders() {
+    setState("loading");
+    try {
+      const page = await api("/api/v1/orders?page=0&size=20");
+      els.body.innerHTML = "";
+      for (const order of page.content) {
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><code>" + order.id.slice(0, 8) + "…</code></td>" +
+          "<td><code>" + order.customerId.slice(0, 8) + "…</code></td>" +
+          "<td><span class='status " + order.status + "'>" + order.status + "</span></td>" +
+          "<td>" + order.totalAmount + " " + order.currency + "</td>" +
+          "<td>" + new Date(order.createdAt).toLocaleString() + "</td>";
+        els.body.appendChild(tr);
+      }
+      els.table.hidden = page.content.length === 0;
+      els.count.textContent = page.totalElements + " order(s) total";
+      setState("idle");
+    } catch (e) {
+      setState("error", "Failed to load orders:\n" + e.message);
+    }
+  }
+
+  async function createSampleOrder() {
+    setState("loading");
+    try {
+      await api("/api/v1/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: crypto.randomUUID(),
+          items: [
+            { sku: "SKU-1001", productName: "Mechanical Keyboard", quantity: 1, unitPrice: 89.90 },
+            { sku: "SKU-2002", productName: "USB-C Cable", quantity: 2, unitPrice: 9.99 }
+          ]
+        })
+      });
+      await loadOrders();
+    } catch (e) {
+      setState("error", "Failed to create order:\n" + e.message);
+    }
+  }
+
+  els.refresh.addEventListener("click", loadOrders);
+  els.create.addEventListener("click", createSampleOrder);
+  loadOrders();
+</script>
+</body>
+</html>

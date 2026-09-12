@@ -1,0 +1,49 @@
+{{- if .Values.networkPolicy.enabled }}
+# Default-deny posture for the service's pods. Requires a CNI that enforces
+# NetworkPolicy (Calico / Cilium / VPC CNI with network policy enabled).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "order-service.fullname" . }}
+  labels:
+    {{- include "order-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "order-service.selectorLabels" . | nindent 6 }}
+  policyTypes: [Ingress, Egress]
+
+  ingress:
+    # API traffic (ALB targets pod IPs in target-type=ip mode; source is the ALB
+    # ENI range, which K8s NetworkPolicy cannot express by SG — restrict by port).
+    - ports:
+        - port: http
+          protocol: TCP
+    # Probes come from the kubelet (always allowed); Prometheus scrapes management.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.networkPolicy.monitoringNamespace }}
+      ports:
+        - port: management
+          protocol: TCP
+
+  egress:
+    # DNS
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # PostgreSQL (RDS)
+    - to:
+        - ipBlock:
+            cidr: {{ .Values.networkPolicy.databaseCidr }}
+      ports:
+        - port: 5432
+          protocol: TCP
+    # HTTPS egress: JWT issuer JWKS fetch, AWS APIs (via IRSA)
+    - ports:
+        - port: 443
+          protocol: TCP
+{{- end }}

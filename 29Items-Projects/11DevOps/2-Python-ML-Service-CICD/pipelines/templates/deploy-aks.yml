@@ -1,0 +1,71 @@
+# =============================================================================
+# Deployment job template: render the kustomize overlay and apply it to AKS.
+#
+# Blue-green model: the overlay contains both Deployments (fraud-api-blue and
+# fraud-api-green). This template rolls the new image out to targetColor; it
+# never touches the fraud-api Service selector - the traffic flip is done by
+# scripts/blue_green_switch.sh in the Deploy_Prod stage.
+#
+# The deployment job targets the ADO environment "fraud-detection-<env>";
+# approval checks configured on that environment gate this job.
+# =============================================================================
+parameters:
+  - name: environment
+    type: string
+  - name: overlayPath
+    type: string
+  - name: aksServiceConnection
+    type: string
+  - name: imageTag
+    type: string
+  - name: targetColor
+    type: string
+    default: blue
+  - name: namespace
+    type: string
+    default: fraud-detection
+  - name: containerRegistry
+    type: string
+    default: frauddetectacr.azurecr.io
+  - name: imageRepository
+    type: string
+    default: fraud-detection-api
+
+jobs:
+  - deployment: deploy_${{ parameters.environment }}
+    displayName: Deploy to AKS (${{ parameters.environment }})
+    environment: fraud-detection-${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - script: |
+                set -euo pipefail
+                echo "Image: ${{ parameters.containerRegistry }}/${{ parameters.imageRepository }}:${{ parameters.imageTag }}"
+                echo "Target color: ${{ parameters.targetColor }} (env: ${{ parameters.environment }})"
+                # Pin the freshly built image tag into the overlay before baking.
+                # NOTE: if the hosted agent lacks the standalone kustomize CLI,
+                #       install it here (curl -s .../install_kustomize.sh | bash).
+                cd "${{ parameters.overlayPath }}"
+                kustomize edit set image \
+                  ${{ parameters.containerRegistry }}/${{ parameters.imageRepository }}=${{ parameters.containerRegistry }}/${{ parameters.imageRepository }}:${{ parameters.imageTag }}
+              displayName: Pin image tag in kustomize overlay
+
+            - task: KubernetesManifest@1
+              name: bake
+              displayName: Bake kustomize overlay
+              inputs:
+                action: bake
+                renderType: kustomize
+                kustomizationPath: ${{ parameters.overlayPath }}
+
+            - task: KubernetesManifest@1
+              displayName: Apply manifests to AKS
+              inputs:
+                action: deploy
+                kubernetesServiceConnection: ${{ parameters.aksServiceConnection }}
+                namespace: ${{ parameters.namespace }}
+                manifests: $(bake.manifestsBundle)
+                rolloutStatusTimeout: '300'

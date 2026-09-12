@@ -1,0 +1,19 @@
+name: Setup Node & install dependencies
+description: >
+  Single source of truth for toolchain setup: Node version from .nvmrc,
+  npm cache, and a clean `npm ci`. Used by every workflow so they cannot drift.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+      env:
+        HUSKY: '0' # git hooks are pointless (and slow) in CI

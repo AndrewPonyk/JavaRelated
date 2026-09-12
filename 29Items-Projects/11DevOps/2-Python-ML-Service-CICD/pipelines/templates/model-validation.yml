@@ -1,0 +1,65 @@
+# =============================================================================
+# Job template: pull the challenger model from MLflow and run quality gates.
+# Fails the stage when any gate (min AUC, latency, calibration) is not met,
+# which blocks the image build and every deploy stage behind it.
+# =============================================================================
+parameters:
+  - name: pythonVersion
+    type: string
+    default: '3.12'
+  - name: mlflowTrackingUri
+    type: string
+  - name: modelName
+    type: string
+    default: fraud-detection
+  - name: challengerAlias
+    type: string
+    default: challenger
+  - name: minAuc
+    type: string
+    default: '0.85'
+
+jobs:
+  - job: model_validation
+    displayName: Challenger model quality gates
+    steps:
+      - task: UsePythonVersion@0
+        displayName: Use Python ${{ parameters.pythonVersion }}
+        inputs:
+          versionSpec: ${{ parameters.pythonVersion }}
+
+      - script: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-ansi --with dev
+          # MLflow client is needed on the agent only (not in the runtime image).
+          pip install mlflow
+        displayName: Install dependencies
+
+      - script: |
+          # Trains a candidate on the configured data source and enforces the
+          # promotion quality gates - a gate failure exits 1 and blocks the
+          # image build and every deploy stage behind it. Set
+          # FRAUD_TRAINING_DATA_PATH as a pipeline variable to validate
+          # against the real extraction instead of the synthetic generator.
+          # NOTE: validating the already-registered MLflow challenger instead
+          # requires workspace auth (azureml-mlflow + DefaultAzureCredential).
+          poetry run python -m fraud_detection.ml.train \
+            --no-register \
+            --min-auc "${{ parameters.minAuc }}" \
+            --min-recall "0.7" \
+            > evaluation-report.json
+          cat evaluation-report.json
+        displayName: Validate candidate against quality gates
+        env:
+          FRAUD_MLFLOW_TRACKING_URI: ${{ parameters.mlflowTrackingUri }}
+          FRAUD_MODEL_NAME: ${{ parameters.modelName }}
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish evaluation report
+        condition: succeededOrFailed()
+        continueOnError: true
+        inputs:
+          targetPath: $(System.DefaultWorkingDirectory)/evaluation-report.json
+          artifact: model-evaluation-report

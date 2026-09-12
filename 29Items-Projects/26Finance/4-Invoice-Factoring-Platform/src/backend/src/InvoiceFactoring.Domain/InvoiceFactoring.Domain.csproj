@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Domain layer: the innermost circle of Clean Architecture.
+    By design it has NO package references and NO project references —
+    it must not know about EF Core, Stripe, Plaid, ASP.NET, etc.
+  -->
+  <PropertyGroup>
+    <RootNamespace>InvoiceFactoring.Domain</RootNamespace>
+  </PropertyGroup>
+
+</Project>

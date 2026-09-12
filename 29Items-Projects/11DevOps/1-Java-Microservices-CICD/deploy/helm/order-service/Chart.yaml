@@ -1,0 +1,15 @@
+apiVersion: v2
+name: order-service
+description: E-commerce Order Service — Spring Boot 3 microservice (REST + PostgreSQL)
+type: application
+# Chart version: bump on template/values-structure changes (SemVer).
+version: 0.1.0
+# Default image tag when values do not pin one; deploys always pin a git SHA.
+appVersion: "0.1.0"
+keywords:
+  - ecommerce
+  - orders
+  - spring-boot
+maintainers:
+  - name: platform-team
+    email: platform@example.com

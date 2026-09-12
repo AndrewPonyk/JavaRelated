@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Shared MSBuild settings applied to every project in src/backend -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- 1591: missing XML doc comment — too noisy for a scaffold -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!--
+      Keep compiler warnings as errors (real correctness signal), but run analyzers at the
+      default tier rather than the aggressive "recommended" set. Opinionated advisory rules
+      (e.g. CA1848 LoggerMessage source-gen, CA1711 naming) shouldn't break every build;
+      specific opt-outs live in .editorconfig.
+    -->
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Default</AnalysisMode>
+  </PropertyGroup>
+
+</Project>

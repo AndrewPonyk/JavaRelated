@@ -1,0 +1,34 @@
+# Pre-commit hooks for the Fraud Detection API.
+# Install with: pre-commit install
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: ^k8s/.*$ # k8s manifests may use custom tags / templating
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        files: ^src/
+        args: [--ignore-missing-imports]
+        additional_dependencies:
+          - pydantic>=2.8
+          - pydantic-settings>=2.4
+          - sqlalchemy>=2.0
+          - types-requests

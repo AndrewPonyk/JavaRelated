@@ -1,0 +1,74 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.0.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1000000-0000-0000-0000-000000000001}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A1000000-0000-0000-0000-000000000002}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.Domain", "src\InvoiceFactoring.Domain\InvoiceFactoring.Domain.csproj", "{D0000000-0000-0000-0000-000000000001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.Application", "src\InvoiceFactoring.Application\InvoiceFactoring.Application.csproj", "{D0000000-0000-0000-0000-000000000002}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.Infrastructure", "src\InvoiceFactoring.Infrastructure\InvoiceFactoring.Infrastructure.csproj", "{D0000000-0000-0000-0000-000000000003}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.ML", "src\InvoiceFactoring.ML\InvoiceFactoring.ML.csproj", "{D0000000-0000-0000-0000-000000000004}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.Api", "src\InvoiceFactoring.Api\InvoiceFactoring.Api.csproj", "{D0000000-0000-0000-0000-000000000005}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.Domain.UnitTests", "tests\InvoiceFactoring.Domain.UnitTests\InvoiceFactoring.Domain.UnitTests.csproj", "{T0000000-0000-0000-0000-000000000001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceFactoring.IntegrationTests", "tests\InvoiceFactoring.IntegrationTests\InvoiceFactoring.IntegrationTests.csproj", "{T0000000-0000-0000-0000-000000000002}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceFactoring.Application.UnitTests", "tests\InvoiceFactoring.Application.UnitTests\InvoiceFactoring.Application.UnitTests.csproj", "{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0000000-0000-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0000000-0000-0000-0000-000000000005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0000000-0000-0000-0000-000000000005}.Release|Any CPU.Build.0 = Release|Any CPU
+		{T0000000-0000-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{T0000000-0000-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{T0000000-0000-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{T0000000-0000-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{T0000000-0000-0000-0000-000000000002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{T0000000-0000-0000-0000-000000000002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{T0000000-0000-0000-0000-000000000002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{T0000000-0000-0000-0000-000000000002}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D0000000-0000-0000-0000-000000000001} = {A1000000-0000-0000-0000-000000000001}
+		{D0000000-0000-0000-0000-000000000002} = {A1000000-0000-0000-0000-000000000001}
+		{D0000000-0000-0000-0000-000000000003} = {A1000000-0000-0000-0000-000000000001}
+		{D0000000-0000-0000-0000-000000000004} = {A1000000-0000-0000-0000-000000000001}
+		{D0000000-0000-0000-0000-000000000005} = {A1000000-0000-0000-0000-000000000001}
+		{T0000000-0000-0000-0000-000000000001} = {A1000000-0000-0000-0000-000000000002}
+		{T0000000-0000-0000-0000-000000000002} = {A1000000-0000-0000-0000-000000000002}
+		{AA07912F-D3D0-487A-BBCA-2AA17C1B9D52} = {A1000000-0000-0000-0000-000000000002}
+	EndGlobalSection
+EndGlobal

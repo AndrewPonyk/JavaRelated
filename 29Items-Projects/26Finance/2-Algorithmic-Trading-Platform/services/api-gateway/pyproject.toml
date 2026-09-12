@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-gateway"
+version = "0.1.0"
+description = "FastAPI backend-for-frontend for the Algorithmic Trading Platform"
+requires-python = ">=3.11"
+dependencies = [
+    "trading-common",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "asyncpg>=0.29",
+    "redis>=5.0",
+    "aiokafka>=0.10",
+    "PyJWT>=2.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27", "mypy>=1.10", "ruff>=0.5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

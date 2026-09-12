@@ -1,0 +1,17 @@
+# Non-secret configuration for STAGING (prod-like; trades a broker PAPER account).
+log_level: INFO
+
+kafka_bootstrap_servers: kafka-staging-1:9092,kafka-staging-2:9092,kafka-staging-3:9092
+kafka_consumer_group: staging
+
+cors_allowed_origins:
+  - https://trading-staging.internal
+
+risk:
+  max_position_qty: 5000
+  max_order_notional: 100000
+  max_daily_loss: 25000
+  kill_switch: false
+
+market_data:
+  feed: live              # real feed, but orders route to the broker paper account

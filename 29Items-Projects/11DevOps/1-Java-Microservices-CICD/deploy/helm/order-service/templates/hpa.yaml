@@ -1,0 +1,23 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "order-service.fullname" . }}
+  labels:
+    {{- include "order-service.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    # Targets the Rollout when blue/green is active, the Deployment otherwise.
+    apiVersion: {{ ternary "argoproj.io/v1alpha1" "apps/v1" .Values.blueGreen.enabled }}
+    kind: {{ ternary "Rollout" "Deployment" .Values.blueGreen.enabled }}
+    name: {{ include "order-service.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

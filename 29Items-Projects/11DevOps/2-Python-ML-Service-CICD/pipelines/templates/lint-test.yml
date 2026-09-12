@@ -1,0 +1,70 @@
+# =============================================================================
+# Job template: Poetry install, ruff (lint + format), mypy, pytest + coverage.
+# Included by azure-pipelines.yml stage Lint_Test.
+# =============================================================================
+parameters:
+  - name: pythonVersion
+    type: string
+    default: '3.12'
+
+jobs:
+  - job: lint_test
+    displayName: Lint, type-check and test
+    steps:
+      - task: UsePythonVersion@0
+        displayName: Use Python ${{ parameters.pythonVersion }}
+        inputs:
+          versionSpec: ${{ parameters.pythonVersion }}
+
+      - script: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-ansi --with dev
+        displayName: Install dependencies (Poetry)
+
+      - script: poetry run ruff check src tests
+        displayName: Ruff lint
+
+      - script: poetry run ruff format --check src tests
+        displayName: Ruff format check
+
+      - script: poetry run mypy src
+        displayName: Mypy type check
+
+      - script: >-
+          poetry run pytest
+          --cov=fraud_detection
+          --cov-report=xml:coverage.xml
+          --cov-report=term
+          --cov-fail-under=70
+          --junitxml=junit/test-results.xml
+        displayName: Pytest with coverage (gate 70%)
+
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: junit/test-results.xml
+          testRunTitle: fraud-detection-api unit tests
+
+      - task: PublishCodeCoverageResults@2
+        displayName: Publish code coverage
+        condition: succeededOrFailed()
+        inputs:
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage.xml
+
+  - job: dashboard_build
+    displayName: Dashboard build (tsc strict + vite)
+    steps:
+      - task: NodeTool@0
+        displayName: Use Node 20
+        inputs:
+          versionSpec: '20.x'
+
+      - script: |
+          cd dashboard
+          npm ci
+          npm run build
+        displayName: npm ci && npm run build

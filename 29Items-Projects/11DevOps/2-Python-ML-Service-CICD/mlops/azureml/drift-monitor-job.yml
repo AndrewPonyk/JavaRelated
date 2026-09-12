@@ -1,0 +1,49 @@
+# =============================================================================
+# Azure ML v2 schedule: daily drift check (PSI) over recent scoring traffic.
+#
+# Create/update:
+#   az ml schedule create --file mlops/azureml/drift-monitor-job.yml \
+#     --resource-group rg-fraud-detection-dev \
+#     --workspace-name mlw-fraud-detection-dev
+#
+# Behavior: the job computes PSI per feature between the training reference
+# window and the latest production window (predictions table). When any PSI
+# exceeds the threshold it POSTs to the Azure DevOps Runs API webhook, which
+# starts pipelines/ml-retraining.yml (see that file's header for the payload).
+#
+# NOTE (webhook wiring):
+#   * Replace YOUR_ORG / YOUR_PROJECT / RETRAIN_PIPELINE_ID below.
+#   * The webhook needs a PAT (Build read & execute). Do NOT inline it here -
+#     store it in the workspace Key Vault and read it inside the drift script
+#     (DefaultAzureCredential + SecretClient).
+# =============================================================================
+$schema: https://azuremlschemas.azureedge.net/latest/schedule.schema.json
+name: fraud-drift-monitor-daily
+display_name: Daily fraud feature drift monitor (PSI)
+
+trigger:
+  type: cron
+  # Every day at 02:00 UTC.
+  expression: "0 2 * * *"
+  time_zone: UTC
+
+create_job:
+  type: command
+  display_name: fraud-drift-check
+  experiment_name: fraud-detection-drift
+  code: ../..
+  # NOTE: adjust the module path if the drift entrypoint lands elsewhere in
+  #       src/fraud_detection/ml/.
+  command: >-
+    pip install --no-deps -e . &&
+    python -m fraud_detection.ml.drift_check
+    --reference-data ${{inputs.reference_data}}
+    --psi-threshold 0.2
+    --retrain-webhook-url ${{inputs.retrain_webhook_url}}
+  inputs:
+    reference_data:
+      type: uri_file
+      path: azureml:fraud-transactions-train@latest
+    retrain_webhook_url: https://dev.azure.com/YOUR_ORG/YOUR_PROJECT/_apis/pipelines/RETRAIN_PIPELINE_ID/runs?api-version=7.1
+  environment: azureml:fraud-train-env@latest
+  compute: azureml:cpu-cluster

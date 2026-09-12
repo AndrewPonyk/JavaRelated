@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Infrastructure layer: concrete adapters for the Application ports — EF Core (SQL
+    Server), Stripe, Plaid, Azure Service Bus, Redis, and the ML.NET scoring adapter.
+    Depends on Application (ports), Domain, and the ML library.
+  -->
+  <PropertyGroup>
+    <RootNamespace>InvoiceFactoring.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Stripe.net" />
+    <PackageReference Include="Going.Plaid" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="Microsoft.Extensions.ML" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InvoiceFactoring.Domain\InvoiceFactoring.Domain.csproj" />
+    <ProjectReference Include="..\InvoiceFactoring.Application\InvoiceFactoring.Application.csproj" />
+    <ProjectReference Include="..\InvoiceFactoring.ML\InvoiceFactoring.ML.csproj" />
+  </ItemGroup>
+
+</Project>

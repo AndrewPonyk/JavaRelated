@@ -1,0 +1,112 @@
+# Baked-in defaults for every environment. Environment deltas arrive as env vars
+# (ConfigMap/Secret via Helm) or the profile documents at the bottom of this file.
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orders}
+    username: ${SPRING_DATASOURCE_USERNAME:orders}
+    # Local-dev default only (matches docker-compose); staging/production inject the
+    # real value from AWS Secrets Manager via ExternalSecrets — never from Git.
+    password: ${SPRING_DATASOURCE_PASSWORD:orders-local-pw}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: 5000
+      validation-timeout: 3000
+
+  jpa:
+    # Flyway owns the schema; Hibernate only validates it. Never ddl-auto: update.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+  flyway:
+    locations: classpath:db/migration
+
+  data:
+    web:
+      pageable:
+        max-page-size: 100   # hard cap — clients cannot request unbounded pages
+
+  lifecycle:
+    # Upper bound for draining in-flight work on SIGTERM; pair with the pod's
+    # terminationGracePeriodSeconds (60s) and the preStop sleep in the chart.
+    timeout-per-shutdown-phase: 30s
+
+  # JWT enforcement switches ON when an issuer is configured (per environment via
+  # the Helm ConfigMap). Unset => open fallback chain (local dev, compose, tests).
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         issuer-uri: https://idp.example.com/realms/orders
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: application/json,application/problem+json,text/html,text/plain
+    min-response-size: 1024
+
+management:
+  server:
+    # Management on its own port: probes and Prometheus scrape pods/Service
+    # cluster-internally, while the ALB ingress only routes the API port (8080)
+    # — actuator is never internet-reachable.
+    port: ${MANAGEMENT_SERVER_PORT:8081}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true          # /actuator/health/{liveness,readiness} for K8s
+      show-details: never
+      group:
+        readiness:
+          # DB in readiness (not liveness): if PostgreSQL is unreachable every request
+          # fails anyway — better to stop receiving traffic and recover automatically
+          # than to serve 500s. Pods stay alive; no restart storm.
+          include: readinessState,db
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true   # enables p95/p99 in Grafana
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+logging:
+  level:
+    com.example.orderservice: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+
+logging:
+  # Spring Boot native structured logging: ECS-JSON to stdout → CloudWatch/Loki.
+  structured:
+    format:
+      console: ecs
+  level:
+    com.example.orderservice: INFO

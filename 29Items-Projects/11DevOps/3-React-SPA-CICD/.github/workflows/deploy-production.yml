@@ -1,0 +1,77 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Deploy Production — triggered by publishing a GitHub Release (tag vX.Y.Z) or
+# manually. Gated by the 'production' GitHub Environment (required reviewers).
+# Rollback: DigitalOcean previous-deployment rollback, or revert + re-release.
+# Docs: docs/TECH-NOTES.md §3.3, §3.5.
+# ══════════════════════════════════════════════════════════════════════════════
+name: Deploy Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type "deploy-production" to confirm a manual production deploy
+        required: true
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    name: Validate trigger
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check manual confirmation phrase
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ inputs.confirm }}" != "deploy-production" ]; then
+            echo "::error::Manual deploys require typing 'deploy-production'."
+            exit 1
+          fi
+
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [guard]
+    environment:
+      name: production # configure required reviewers on this environment
+      url: ${{ vars.PRODUCTION_URL || 'https://portal.example.com' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy app spec to DigitalOcean
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app_spec_location: infra/digitalocean/app.yaml
+
+  smoke:
+    name: Smoke tests vs production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [deploy]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run @smoke suite against production (read-only specs)
+        run: npm run test:e2e:smoke -- --project=chromium
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ vars.PRODUCTION_URL || 'https://portal.example.com' }}
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-report
+          path: playwright-report/
+          retention-days: 14
+      # Extension points: create an error-reporter release + upload sourcemaps keyed to
+      # the tag (see registerErrorTransport in src/lib/logger.ts); notify the release channel.

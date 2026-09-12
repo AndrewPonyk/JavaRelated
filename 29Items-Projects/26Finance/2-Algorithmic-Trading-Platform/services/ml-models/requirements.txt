@@ -1,0 +1,6 @@
+-e ../../shared
+torch==2.3.1
+numpy==1.26.4
+pandas==2.2.2
+onnxruntime==1.18.0
+aiokafka==0.10.0

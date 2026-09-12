@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pnl-projector"
+version = "0.1.0"
+description = "Folds fills into positions and PnL (Postgres + Redis projection)"
+requires-python = ">=3.11"
+dependencies = [
+    "trading-common",
+    "SQLAlchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "redis>=5.0",
+    "aiokafka>=0.10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "aiosqlite>=0.19"]
+
+[project.scripts]
+pnl-projector = "pnl_projector.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

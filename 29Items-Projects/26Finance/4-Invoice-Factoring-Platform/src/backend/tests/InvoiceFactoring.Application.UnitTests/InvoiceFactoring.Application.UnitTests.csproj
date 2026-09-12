@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Handlers are tested against mocked ports; the Infrastructure ref is only for the
+         dependency-free HeuristicCreditScoringService. -->
+    <ProjectReference Include="..\..\src\InvoiceFactoring.Application\InvoiceFactoring.Application.csproj" />
+    <ProjectReference Include="..\..\src\InvoiceFactoring.Infrastructure\InvoiceFactoring.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

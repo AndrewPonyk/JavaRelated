@@ -1,0 +1,107 @@
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --error: #f87171;
+  --success: #4ade80;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+.muted {
+  color: var(--muted);
+}
+
+.invoice-form {
+  display: grid;
+  gap: 0.75rem;
+  background: var(--panel);
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+.field {
+  display: grid;
+  gap: 0.25rem;
+}
+.field span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.field input {
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0b1220;
+  color: var(--text);
+}
+.field__error {
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+button {
+  justify-self: start;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #04283a;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.invoice-table th,
+.invoice-table td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid #334155;
+  font-size: 0.92rem;
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: #334155;
+}
+.badge--approved { background: #14532d; }
+.badge--declined { background: #7f1d1d; }
+.badge--outstanding { background: #1e3a8a; }
+.badge--repaid { background: #134e4a; }
+
+.state {
+  padding: 1rem;
+  color: var(--muted);
+}
+.state--error {
+  color: var(--error);
+}
+.state--success {
+  color: var(--success);
+}

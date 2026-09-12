@@ -1,0 +1,75 @@
+# Alerting rules for the fraud-detection API and its ML model.
+
+groups:
+  - name: fraud-api.rules
+    rules:
+      - alert: FraudApiDown
+        expr: up{job="fraud-api"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: fraud-detection-api
+        annotations:
+          summary: "Fraud API instance {{ $labels.instance }} is down"
+          description: >-
+            Prometheus has not been able to scrape {{ $labels.instance }}
+            (job fraud-api) for 5 minutes.
+
+      - alert: HighErrorRate
+        expr: >-
+          sum(rate(http_requests_total{job="fraud-api", status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="fraud-api"}[5m]))
+          > 0.05
+        for: 10m
+        labels:
+          severity: critical
+          service: fraud-detection-api
+        annotations:
+          summary: "Fraud API 5xx error rate above 5%"
+          description: >-
+            More than 5% of HTTP requests to the fraud API have returned a 5xx
+            status over the last 10 minutes ({{ $value | humanizePercentage }}).
+
+      - alert: HighLatencyP99
+        expr: >-
+          histogram_quantile(
+            0.99,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="fraud-api"}[5m]))
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+          service: fraud-detection-api
+        annotations:
+          summary: "Fraud API p99 latency above 1s"
+          description: >-
+            The 99th percentile HTTP request duration has exceeded 1 second
+            for 10 minutes (current: {{ $value }}s).
+
+      - alert: ModelDriftDetected
+        expr: fraud_drift_psi > 0.2
+        for: 15m
+        labels:
+          severity: warning
+          service: fraud-detection-api
+          team: ml-platform
+        annotations:
+          summary: "Feature drift detected: {{ $labels.feature }} (PSI {{ $value }})"
+          description: >-
+            PSI for feature {{ $labels.feature }} has been above the 0.2
+            threshold for 15 minutes. NOTE: this alert triggers the automated
+            retraining pipeline webhook (Azure ML) via Alertmanager receiver.
+
+      - alert: ModelFallbackActive
+        expr: increase(fraud_model_fallback_total[10m]) > 0
+        labels:
+          severity: warning
+          service: fraud-detection-api
+          team: ml-platform
+        annotations:
+          summary: "Fraud model fallback in use"
+          description: >-
+            The API served predictions from the fallback model/heuristic in the
+            last 10 minutes ({{ $value }} occurrences). Check MLflow model
+            registry availability and model load errors.

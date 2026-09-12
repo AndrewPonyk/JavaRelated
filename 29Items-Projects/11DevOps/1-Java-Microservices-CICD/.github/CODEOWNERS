@@ -1,0 +1,10 @@
+# Review routing. Replace the placeholder teams with real GitHub teams.
+# Order matters: the last matching pattern wins.
+
+*                           @your-org/platform-team
+/services/order-service/    @your-org/orders-team
+/deploy/                    @your-org/platform-team
+/.github/workflows/         @your-org/platform-team
+/observability/             @your-org/platform-team @your-org/sre
+/docs/                      @your-org/orders-team @your-org/platform-team
+/tools/risk-score/          @your-org/platform-team

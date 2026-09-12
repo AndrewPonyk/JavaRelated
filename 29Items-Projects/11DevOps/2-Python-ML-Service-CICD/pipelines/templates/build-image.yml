@@ -1,0 +1,48 @@
+# =============================================================================
+# Job template: multi-stage Docker build, tag with the commit SHA + latest,
+# push to ACR (frauddetectacr) via a Docker registry service connection.
+# The push step is skipped on PR builds - the build itself still validates
+# the Dockerfile.
+# =============================================================================
+parameters:
+  - name: dockerServiceConnection
+    type: string
+    default: acr-frauddetectacr
+  - name: imageRepository
+    type: string
+    default: fraud-detection-api
+  - name: imageTag
+    type: string
+  - name: dockerfilePath
+    type: string
+    default: Dockerfile
+  - name: buildContext
+    type: string
+    default: .
+
+jobs:
+  - job: build_and_push
+    displayName: Build and push Docker image
+    steps:
+      - task: Docker@2
+        displayName: Build multi-stage image
+        inputs:
+          command: build
+          containerRegistry: ${{ parameters.dockerServiceConnection }}
+          repository: ${{ parameters.imageRepository }}
+          Dockerfile: ${{ parameters.dockerfilePath }}
+          buildContext: ${{ parameters.buildContext }}
+          tags: |
+            ${{ parameters.imageTag }}
+            latest
+
+      - task: Docker@2
+        displayName: Push image tags to ACR
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+        inputs:
+          command: push
+          containerRegistry: ${{ parameters.dockerServiceConnection }}
+          repository: ${{ parameters.imageRepository }}
+          tags: |
+            ${{ parameters.imageTag }}
+            latest

@@ -1,0 +1,81 @@
+# Local development stack: Postgres + Redis + migrations + API + worker + web.
+# Quickstart:  docker compose up --build
+# Seed demo data:  docker compose exec api python -m app.seed
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: portfolio
+      POSTGRES_DB: portfolio
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  # One-shot migration runner: brings the schema to head, then exits.
+  migrate:
+    build: ./backend
+    environment:
+      SECRET_KEY: dev-secret-key-not-for-production-1234567890
+      POSTGRES_HOST: db
+    depends_on:
+      db: { condition: service_healthy }
+    command: alembic upgrade head
+    volumes: ["./backend:/app"]
+
+  api:
+    build: ./backend
+    environment:
+      APP_ENV: development
+      SECRET_KEY: dev-secret-key-not-for-production-1234567890
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      CELERY_TASK_ALWAYS_EAGER: "false" # real worker handles Monte Carlo jobs
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+      migrate: { condition: service_completed_successfully }
+    ports: ["8000:8000"]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes: ["./backend:/app"]
+
+  worker:
+    build: ./backend
+    environment:
+      APP_ENV: development
+      SECRET_KEY: dev-secret-key-not-for-production-1234567890
+      POSTGRES_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+      migrate: { condition: service_completed_successfully }
+    command: celery -A app.workers.tasks.celery_app worker --loglevel=info
+    volumes: ["./backend:/app"]
+    # The worker has no HTTP server, so use a Celery ping instead of the
+    # image's default (API) HTTP healthcheck.
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.workers.tasks.celery_app", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  web:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:

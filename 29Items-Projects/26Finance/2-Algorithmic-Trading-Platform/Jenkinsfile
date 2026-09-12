@@ -1,0 +1,163 @@
+// Declarative pipeline for the Algorithmic Trading Platform.
+// Polyglot: Python control plane, C++ execution engine, React frontend.
+// See docs/TECH-NOTES.md §3.1 for the design rationale.
+
+pipeline {
+    agent none
+
+    options {
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timestamps()
+    }
+
+    environment {
+        REGISTRY_PY  = 'https://pypi.internal/simple'
+        ARTIFACTS    = "artifacts/${env.GIT_COMMIT}"
+        VERSION      = "${env.GIT_COMMIT?.take(8)}"
+    }
+
+    stages {
+
+        stage('Lint & Static Analysis') {
+            parallel {
+                stage('python') {
+                    agent { label 'python' }
+                    steps {
+                        sh 'pip install -e shared -e "services/api-gateway[dev]"'
+                        sh 'ruff check shared services'
+                        sh 'black --check shared services'
+                        sh 'mypy shared services'
+                    }
+                }
+                stage('cpp') {
+                    agent { label 'cpp' }
+                    steps {
+                        sh 'clang-format --dry-run --Werror execution-engine/src/*.cpp execution-engine/include/execution/*.hpp'
+                        sh 'cmake -S execution-engine -B execution-engine/build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+                        sh 'clang-tidy -p execution-engine/build execution-engine/src/*.cpp'
+                    }
+                }
+                stage('frontend') {
+                    agent { label 'node' }
+                    steps {
+                        dir('frontend') {
+                            sh 'npm ci'
+                            sh 'npm run lint'
+                            sh 'npx tsc --noEmit'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            parallel {
+                stage('pytest') {
+                    agent { label 'python' }
+                    steps { sh 'pytest --cov --cov-report=xml --junitxml=reports/pytest.xml' }
+                    post { always { junit 'reports/pytest.xml' } }
+                }
+                stage('ctest') {
+                    agent { label 'cpp' }
+                    steps {
+                        sh 'cmake --build execution-engine/build --config Release -j'
+                        sh 'ctest --test-dir execution-engine/build --output-on-failure'
+                    }
+                }
+                stage('vitest') {
+                    agent { label 'node' }
+                    steps { dir('frontend') { sh 'npm run test -- --run --coverage' } }
+                }
+            }
+        }
+
+        stage('Build Artifacts') {
+            parallel {
+                stage('wheels') {
+                    agent { label 'python' }
+                    steps {
+                        sh 'python -m build shared services/api-gateway services/strategy-engine'
+                        archiveArtifacts artifacts: 'dist/*.whl', fingerprint: true
+                    }
+                }
+                stage('exec-binary') {
+                    agent { label 'cpp' }
+                    steps {
+                        sh 'cmake -S execution-engine -B build-rel -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=ON'
+                        sh 'cmake --build build-rel -j'
+                        archiveArtifacts artifacts: 'build-rel/execution_engine', fingerprint: true
+                    }
+                }
+                stage('web-bundle') {
+                    agent { label 'node' }
+                    steps {
+                        dir('frontend') { sh 'npm run build' }
+                        archiveArtifacts artifacts: 'frontend/dist/**', fingerprint: true
+                    }
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            agent { label 'docker' }
+            steps {
+                // Testcontainers brings up postgres + redis + kafka
+                sh 'pytest -m integration --junitxml=reports/integration.xml'
+            }
+            post { always { junit 'reports/integration.xml' } }
+        }
+
+        stage('Deploy DEV') {
+            when { branch 'develop' }
+            agent { label 'deployer' }
+            steps {
+                withVault(vaultSecrets: [[path: 'secret/trading/dev', secretValues: []]]) {
+                    sh 'ansible-playbook -i infra/ansible/inventories/dev infra/ansible/site.yml -e version=${VERSION}'
+                }
+            }
+        }
+
+        stage('Deploy STAGING + Parity Gate') {
+            when { branch pattern: 'release/.*', comparator: 'REGEXP' }
+            agent { label 'deployer' }
+            steps {
+                sh 'ansible-playbook -i infra/ansible/inventories/staging infra/ansible/site.yml -e version=${VERSION}'
+                // Hard gate: backtest⇄live signal parity must hold before prod is allowed
+                sh 'pytest -m parity --junitxml=reports/parity.xml'
+            }
+            post { always { junit 'reports/parity.xml' } }
+        }
+
+        stage('Approve PROD') {
+            when { branch pattern: 'release/.*', comparator: 'REGEXP' }
+            steps {
+                timeout(time: 24, unit: 'HOURS') {
+                    input message: 'Deploy to PRODUCTION (live trading)?',
+                          submitter: 'risk-team,release-managers'
+                }
+            }
+        }
+
+        stage('Deploy PROD (blue-green)') {
+            when { branch pattern: 'release/.*', comparator: 'REGEXP' }
+            agent { label 'deployer' }
+            steps {
+                withVault(vaultSecrets: [[path: 'secret/trading/prod', secretValues: []]]) {
+                    sh 'ansible-playbook -i infra/ansible/inventories/prod infra/ansible/site.yml -e version=${VERSION} -e strategy=blue_green'
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            // Notify on red builds; page on prod-deploy failure.
+            echo 'Build failed — notifying #trading-platform-ci'
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

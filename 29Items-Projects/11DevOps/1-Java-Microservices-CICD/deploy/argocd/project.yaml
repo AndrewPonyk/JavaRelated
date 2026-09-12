@@ -1,0 +1,29 @@
+# ArgoCD AppProject: blast-radius boundary for the e-commerce services.
+# Apply once per cluster:  kubectl apply -n argocd -f deploy/argocd/
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ecommerce
+  namespace: argocd
+spec:
+  description: E-commerce microservices (order-service and future siblings)
+
+  sourceRepos:
+    - https://github.com/your-org/java-microservices-cicd.git   # TODO: real repo URL
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: orders-staging
+    - server: https://kubernetes.default.svc
+      namespace: orders-production
+
+  # Namespaced apps only — no cluster-scoped resources from this project.
+  clusterResourceWhitelist: []
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+
+  orphanedResources:
+    warn: true

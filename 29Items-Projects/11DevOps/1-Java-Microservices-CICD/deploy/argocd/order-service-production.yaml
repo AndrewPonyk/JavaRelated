@@ -1,0 +1,46 @@
+# Production: desired state is still Git, but the sync itself is MANUAL —
+# cd-production.yml commits the promotion (risk gate + approval), then an
+# operator confirms:  argocd app sync order-service-production
+# This is the deliberate "two keys" for prod. Flip to automated once the
+# team trusts the gates (tracked in PROJECT-PLAN Phase 3).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: order-service-production
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ecommerce
+
+  source:
+    repoURL: https://github.com/your-org/java-microservices-cicd.git   # TODO: real repo URL
+    targetRevision: main
+    path: deploy/helm/order-service
+    helm:
+      releaseName: order-service
+      valueFiles:
+        - values.yaml
+        - values-production.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: orders-production
+
+  # No `automated` block: manual sync only.
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: argoproj.io
+      kind: Rollout
+      jsonPointers:
+        - /spec/replicas
+
+  revisionHistoryLimit: 10

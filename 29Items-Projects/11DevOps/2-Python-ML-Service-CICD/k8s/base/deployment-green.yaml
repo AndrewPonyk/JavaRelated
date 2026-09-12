@@ -1,0 +1,78 @@
+# Green deployment - the standby color for blue-green rollouts.
+# Starts at 0 replicas; the CD pipeline scales it up with the new image,
+# waits for readiness, smoke-tests it, then flips the Service selector
+# (scripts/blue_green_switch.sh). Identical to deployment-blue.yaml apart
+# from name/color/replicas.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-api-green
+  labels:
+    app: fraud-api
+    color: green
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: fraud-api
+      color: green
+  template:
+    metadata:
+      labels:
+        app: fraud-api
+        color: green
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: fraud-api
+          image: frauddetectacr.azurecr.io/fraud-detection-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: fraud-api-config
+            - secretRef:
+                # Created out-of-band (Azure Key Vault / pipeline); never committed.
+                name: fraud-api-secrets
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

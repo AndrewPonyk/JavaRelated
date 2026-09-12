@@ -1,0 +1,232 @@
+# =============================================================================
+# Fraud Detection API - main CI/CD pipeline (Azure DevOps)
+#
+# Flow:
+#   Lint_Test -> Model_Validation -> Build -> Deploy_Dev -> Deploy_Staging
+#     -> Deploy_Prod (blue-green: deploy inactive color, smoke test,
+#        manual validation, flip Service selector, rollback on failure)
+#
+# One-time setup in Azure DevOps Project Settings:
+#   * Docker registry service connection "acr-frauddetectacr"
+#     -> frauddetectacr.azurecr.io
+#   * ARM service connections: azure-fraud-detection-{dev,staging,prod}
+#   * Kubernetes service connections: aks-fraud-detection-{dev,staging,prod}
+#   * Environments: fraud-detection-{dev,staging,prod}. Add approval checks on
+#     fraud-detection-staging and fraud-detection-prod - those checks are what
+#     gate the Deploy_Staging and Deploy_Prod deployment jobs.
+#
+# Infrastructure (Terraform) runs in a dedicated pipeline that consumes
+# pipelines/templates/terraform.yml. Model retraining is a separate pipeline:
+# pipelines/ml-retraining.yml.
+# =============================================================================
+
+trigger:
+  branches:
+    include:
+      - master
+
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  pythonVersion: '3.12'
+  imageRepository: fraud-detection-api
+  containerRegistry: frauddetectacr.azurecr.io
+  dockerServiceConnection: acr-frauddetectacr
+
+stages:
+  # ---------------------------------------------------------------------------
+  # 1. Lint + type-check + tests with coverage.
+  # ---------------------------------------------------------------------------
+  - stage: Lint_Test
+    displayName: Lint and test
+    jobs:
+      - template: pipelines/templates/lint-test.yml
+        parameters:
+          pythonVersion: '3.12'
+
+  # ---------------------------------------------------------------------------
+  # 2. Pull the challenger model from MLflow and enforce quality gates.
+  # ---------------------------------------------------------------------------
+  - stage: Model_Validation
+    displayName: Model quality gates
+    dependsOn: Lint_Test
+    variables:
+      - template: pipelines/variables/dev.yml
+    jobs:
+      - template: pipelines/templates/model-validation.yml
+        parameters:
+          mlflowTrackingUri: $(mlflowTrackingUri)
+          modelName: fraud-detection
+
+  # ---------------------------------------------------------------------------
+  # 3. Multi-stage Docker build; push to ACR on master only (build still runs
+  #    on PRs to validate the Dockerfile).
+  # ---------------------------------------------------------------------------
+  - stage: Build
+    displayName: Build and push image
+    dependsOn: Model_Validation
+    jobs:
+      - template: pipelines/templates/build-image.yml
+        parameters:
+          dockerServiceConnection: acr-frauddetectacr
+          imageRepository: fraud-detection-api
+          imageTag: $(Build.SourceVersion)
+
+  # ---------------------------------------------------------------------------
+  # 4. Deploy to dev automatically on master.
+  # ---------------------------------------------------------------------------
+  - stage: Deploy_Dev
+    displayName: Deploy to dev
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    variables:
+      - template: pipelines/variables/dev.yml
+    jobs:
+      - template: pipelines/templates/deploy-aks.yml
+        parameters:
+          environment: dev
+          overlayPath: $(overlayPath)
+          aksServiceConnection: $(aksServiceConnection)
+          imageTag: $(Build.SourceVersion)
+          targetColor: $(targetColor)
+
+  # ---------------------------------------------------------------------------
+  # 5. Deploy to staging. Gate: approval check configured on the ADO
+  #    environment "fraud-detection-staging" (Environments > Approvals).
+  # ---------------------------------------------------------------------------
+  - stage: Deploy_Staging
+    displayName: Deploy to staging (approval gated)
+    dependsOn: Deploy_Dev
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    variables:
+      - template: pipelines/variables/staging.yml
+    jobs:
+      - template: pipelines/templates/deploy-aks.yml
+        parameters:
+          environment: staging
+          overlayPath: $(overlayPath)
+          aksServiceConnection: $(aksServiceConnection)
+          imageTag: $(Build.SourceVersion)
+          targetColor: $(targetColor)
+
+  # ---------------------------------------------------------------------------
+  # 6. Blue-green production deploy:
+  #      a) deploy the INACTIVE color (targetColor from prod variables),
+  #      b) smoke test it directly (port-forward, no live traffic touched),
+  #      c) manual validation (Grafana dashboards, error budget),
+  #      d) flip the Service selector via scripts/blue_green_switch.sh,
+  #      e) on any failure, re-point the selector back to activeColor.
+  # ---------------------------------------------------------------------------
+  - stage: Deploy_Prod
+    displayName: Deploy to prod (blue-green)
+    dependsOn: Deploy_Staging
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    variables:
+      - template: pipelines/variables/prod.yml
+    jobs:
+      - template: pipelines/templates/deploy-aks.yml
+        parameters:
+          environment: prod
+          overlayPath: $(overlayPath)
+          aksServiceConnection: $(aksServiceConnection)
+          imageTag: $(Build.SourceVersion)
+          targetColor: $(targetColor)
+
+      - job: smoke_test
+        displayName: Smoke test inactive color
+        dependsOn: deploy_prod
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.12'
+          - task: AzureCLI@2
+            displayName: Run smoke tests against the target color
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                az aks get-credentials \
+                  --resource-group $(resourceGroup) \
+                  --name $(aksCluster) \
+                  --overwrite-existing
+                kubectl -n $(aksNamespace) rollout status \
+                  deployment/fraud-api-$(targetColor) --timeout=300s
+                # Port-forward straight to the inactive Deployment - it is not
+                # yet selected by the fraud-api Service, so no live traffic.
+                kubectl -n $(aksNamespace) port-forward \
+                  deployment/fraud-api-$(targetColor) 8000:8000 &
+                PF_PID=$!
+                sleep 5
+                pip install httpx
+                python scripts/smoke_test.py --base-url http://127.0.0.1:8000
+                kill "$PF_PID"
+
+      - job: manual_validation
+        displayName: Manual validation before traffic switch
+        dependsOn: smoke_test
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              # NOTE: set notifyUsers to the on-call / release group.
+              instructions: >-
+                Verify the freshly deployed color in Grafana (fraud_predictions_total,
+                fraud_prediction_latency_seconds, fraud_model_fallback_total) and the
+                smoke test artifacts, then Resume to flip the fraud-api Service
+                selector to the new color. Reject to abort and keep current traffic.
+              onTimeout: reject
+
+      - job: switch_traffic
+        displayName: Flip Service selector to target color
+        dependsOn: manual_validation
+        steps:
+          - task: AzureCLI@2
+            displayName: blue_green_switch.sh to target color
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                az aks get-credentials \
+                  --resource-group $(resourceGroup) \
+                  --name $(aksCluster) \
+                  --overwrite-existing
+                # Patches Service fraud-api selector to {app: fraud-api, color: <target>}.
+                bash scripts/blue_green_switch.sh $(targetColor) $(aksNamespace)
+
+      - job: rollback
+        displayName: Rollback - re-point Service to previous color
+        dependsOn:
+          - deploy_prod
+          - smoke_test
+          - manual_validation
+          - switch_traffic
+        condition: failed()
+        steps:
+          - task: AzureCLI@2
+            displayName: Restore Service selector to active color
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                az aks get-credentials \
+                  --resource-group $(resourceGroup) \
+                  --name $(aksCluster) \
+                  --overwrite-existing
+                # Equivalent of:
+                # kubectl -n fraud-detection patch service fraud-api \
+                #   -p '{"spec":{"selector":{"app":"fraud-api","color":"blue"}}}'
+                bash scripts/blue_green_switch.sh $(activeColor) $(aksNamespace)

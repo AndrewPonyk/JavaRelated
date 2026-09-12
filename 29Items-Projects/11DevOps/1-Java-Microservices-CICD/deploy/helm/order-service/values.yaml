@@ -1,0 +1,131 @@
+# Default values for order-service — safe baseline; environment deltas belong in
+# values-staging.yaml / values-production.yaml (kept minimal and reviewable).
+
+replicaCount: 2
+
+image:
+  # TODO: replace with the real ECR registry once provisioned.
+  repository: 000000000000.dkr.ecr.eu-central-1.amazonaws.com/order-service
+  tag: ""              # empty → .Chart.appVersion; environments pin an immutable git SHA
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Spring profile: local | staging | production (selects logging format, log levels)
+springProfile: local
+
+serviceAccount:
+  create: true
+  name: ""
+  # IRSA — scoped AWS access for the pod, set per environment:
+  # eks.amazonaws.com/role-arn: arn:aws:iam::<account>:role/order-service-<env>
+  annotations: {}
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true   # /tmp is an emptyDir mount (Tomcat needs it writable)
+  capabilities:
+    drop: ["ALL"]
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: alb
+  annotations: {}
+  hosts: []
+  tls: []
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    # No CPU limit on purpose — CFS throttling causes latency spikes; the request
+    # still guarantees scheduling capacity (see TECH-NOTES.md §3.6).
+    memory: 1Gi
+
+# Rolling update tuning (ignored when blueGreen.enabled=true)
+strategy:
+  maxSurge: 25%
+  maxUnavailable: 0
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# Blue/green via Argo Rollouts. Flip per release for high-risk deploys
+# (deployment risk score >= 0.6). Requires the Argo Rollouts controller.
+# NOTE: switching Deployment <-> Rollout replaces the workload object; flip at a
+# release boundary only (see TECH-NOTES.md §3.3).
+blueGreen:
+  enabled: false
+  autoPromotionEnabled: false
+  scaleDownDelaySeconds: 300
+
+# Graceful shutdown chain: preStop sleep >= LB deregistration delay,
+# then SIGTERM → Spring drains (30s), all inside the grace period.
+terminationGracePeriodSeconds: 60
+preStopSleepSeconds: 5
+
+# Non-secret environment → ConfigMap (envFrom)
+config:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/orders
+  DB_POOL_SIZE: "10"
+
+# Secret material — production path: ExternalSecrets -> AWS Secrets Manager.
+# The referenced key must contain SPRING_DATASOURCE_USERNAME / SPRING_DATASOURCE_PASSWORD.
+externalSecrets:
+  enabled: false
+  secretStore: aws-secrets-manager    # ClusterSecretStore name
+  refreshInterval: 1h
+  dataKey: orders/local/db
+
+# Dev-only fallback (kind/minikube). Never commit real credentials.
+secret:
+  create: false
+  data: {}
+    # SPRING_DATASOURCE_USERNAME: orders
+    # SPRING_DATASOURCE_PASSWORD: CHANGEME
+
+# Use a pre-created Secret instead of the generated/external one
+existingSecret: ""
+
+metrics:
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    # Must match the Prometheus Operator's serviceMonitorSelector
+    additionalLabels:
+      release: kube-prometheus-stack
+
+# Default-deny NetworkPolicy (enable where the CNI enforces it — see template).
+networkPolicy:
+  enabled: false
+  monitoringNamespace: monitoring
+  databaseCidr: 10.0.0.0/16   # VPC/subnet CIDR of the RDS instance
+
+extraEnv: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []

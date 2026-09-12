@@ -1,0 +1,132 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# CI — quality gates for every PR and for main.
+# Stage graph: (quality | unit) → build → (e2e | lighthouse)
+# These five job names are the required checks for branch protection.
+# Docs: docs/TECH-NOTES.md §3.1
+# ══════════════════════════════════════════════════════════════════════════════
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: ESLint
+        run: npm run lint
+      - name: Prettier
+        run: npm run format:check
+      - name: TypeScript
+        run: npm run typecheck
+
+  unit:
+    name: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Jest (with coverage thresholds)
+        run: npm run test:coverage -- --ci
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+      # Extension point: upload lcov to Codecov/SonarQube here for PR annotations.
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [quality, unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Validate build environment
+        run: npm run check:env
+        env:
+          VITE_ENV_NAME: production
+          VITE_API_BASE_URL: ${{ vars.PROD_API_BASE_URL || 'https://api.example.com' }}
+      - name: Production build
+        run: npm run build
+        env:
+          VITE_ENV_NAME: production
+          VITE_API_BASE_URL: ${{ vars.PROD_API_BASE_URL || 'https://api.example.com' }}
+          VITE_ENABLE_MSW: 'false'
+          VITE_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID || '' }}
+          VITE_APP_VERSION: ${{ github.sha }}
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Generate MSW service worker
+        run: npm run msw:init
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      # Builds its own hermetic bundle (--mode e2e → MSW on) via playwright webServer.
+      # PRs run chromium only; the full browser matrix runs nightly.
+      - name: Playwright (chromium, hermetic)
+        run: npm run test:e2e -- --project=chromium
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  lighthouse:
+    name: lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-cache
+      - name: Download production dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Lighthouse CI (budgets in .lighthouserc.json)
+        run: npm run lighthouse
+        env:
+          # Optional: install the Lighthouse CI GitHub App for status-check links.
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 7

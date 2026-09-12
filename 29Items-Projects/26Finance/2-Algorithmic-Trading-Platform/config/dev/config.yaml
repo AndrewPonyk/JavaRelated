@@ -1,0 +1,19 @@
+# Non-secret configuration for DEV. Secrets come from the environment (Vault in
+# staging/prod). Loaded by trading_common.utils.config.load_settings().
+log_level: DEBUG
+
+kafka_bootstrap_servers: localhost:9092
+kafka_consumer_group: dev
+
+cors_allowed_origins:
+  - http://localhost:5173
+
+# Risk defaults for dev/paper (authoritative caps live in risk-engine config).
+risk:
+  max_position_qty: 10000
+  max_order_notional: 250000
+  max_daily_loss: 50000
+  kill_switch: false
+
+market_data:
+  feed: simulated        # dev uses the SimulatedFeed (no live market connection)

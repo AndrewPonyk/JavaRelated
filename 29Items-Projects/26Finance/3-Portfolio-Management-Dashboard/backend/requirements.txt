@@ -1,0 +1,32 @@
+# Runtime dependencies (pinned for reproducible builds).
+# fastapi 0.116.x pulls a patched starlette (>=0.47.2, fixes CVE-2025-54121).
+fastapi==0.116.1
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+email-validator==2.2.0
+
+# Database
+SQLAlchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+
+# Quant / data
+numpy==2.2.1
+pandas==2.2.3
+scipy==1.15.0
+
+# HTTP client (market-data provider)
+httpx==0.28.1
+
+# Auth
+PyJWT==2.13.0
+passlib==1.7.4
+# Pin bcrypt: passlib 1.7.4 is incompatible with bcrypt >= 4.1 (backend
+# self-test raises on >72-byte input). 4.0.1 is the last compatible release.
+bcrypt==4.0.1
+python-multipart==0.0.32
+
+# Async compute
+celery[redis]==5.4.0
+redis==5.2.1

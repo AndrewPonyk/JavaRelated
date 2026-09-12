@@ -1,0 +1,63 @@
+# ---- Secrets / env ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+vault-token
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+*.so
+
+# ---- C++ / execution-engine ----
+execution-engine/build/
+execution-engine/cmake-build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+*.out
+CMakeCache.txt
+CMakeFiles/
+
+# ---- Node / frontend ----
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-error.log*
+
+# ---- Data / models (do not commit large artifacts) ----
+data/
+*.parquet
+*.h5
+*.onnx
+*.pt
+*.ckpt
+backtest-results/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Logs ----
+logs/
+*.log

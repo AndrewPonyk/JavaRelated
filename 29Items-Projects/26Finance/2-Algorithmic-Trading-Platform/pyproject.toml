@@ -1,0 +1,91 @@
+# Repo-wide Python tooling config (shared by all services).
+# Each service has its own package metadata; this file centralizes quality tools.
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["shared", "services"]
+extend-exclude = ["services/backtesting"]  # Zipline island pins older deps
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "S", "C4", "SIM", "RUF"]
+# S = flake8-bandit (security); ASYNC = async pitfalls
+ignore = ["S101"]  # allow asserts in tests (see per-file below)
+
+[tool.ruff.lint.per-file-ignores]
+# asserts & dummy secrets in tests; ASYNC109: test helpers take an explicit timeout
+"**/tests/**" = ["S101", "S105", "S106", "ASYNC109"]
+# B008: FastAPI's Depends()/Header() in argument defaults is the intended idiom.
+"services/api-gateway/src/api_gateway/routers/*" = ["B008"]
+"services/api-gateway/src/api_gateway/dependencies.py" = ["B008"]
+# S104: binding 0.0.0.0 is intentional inside containers.
+"services/api-gateway/src/api_gateway/asgi.py" = ["S104"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+exclude = "services/backtesting"
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --strict-markers --import-mode=importlib --cov --cov-report=term-missing"
+testpaths = ["services", "shared"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    # Verified false-positive in pydantic 2.13: the `class` alias on the strategy
+    # schemas IS effective — exercised and asserted in api-gateway tests
+    # (test_strategies.py: input key "class" accepted, output key "class" returned).
+    "ignore::pydantic.warnings.UnsupportedFieldAttributeWarning",
+]
+# Make every package importable in tests without `pip install` (pytest >= 7).
+pythonpath = [
+    "shared",
+    "services/strategy-engine/src",
+    "services/api-gateway/src",
+    "services/risk-engine/src",
+    "services/market-data/src",
+    "services/ml-models/src",
+    "services/backtesting/src",
+    "services/pnl-projector/src",
+    "services/orchestrator/src",
+]
+markers = [
+    "integration: spans multiple services (in-process bus)",
+    "parity: backtest vs live signal parity checks",
+    "slow: long-running",
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+    "trading_common",
+    "strategy_engine",
+    "api_gateway",
+    "risk_engine",
+    "market_data",
+    "ml_models",
+    "backtesting",
+    "pnl_projector",
+    "orchestrator",
+]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+    # I/O wiring & heavy backends exercised only in a full integration environment:
+    "*/messaging/kafka_bus.py",        # needs a live Kafka broker
+    "*/ml_models/transformers/*",      # heavy torch model (trained offline)
+    "*/backtesting/runner.py",         # optional heavy Zipline backend
+    "*/api_gateway/asgi.py",           # uvicorn entrypoint
+    "*/*/main.py",                     # process entrypoints (signal loop, uvicorn)
+]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true

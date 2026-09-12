@@ -1,0 +1,40 @@
+# Bare-metal provisioning + deploy entry point (TECH-NOTES §3.3).
+#   ansible-playbook -i inventories/<env> site.yml -e version=<git-sha>
+---
+- name: Tune execution hosts for low latency
+  hosts: execution
+  become: true
+  vars:
+    isolated_cpus: "2-7"
+  tasks:
+    # TODO: set isolcpus/nohz_full kernel args, tuned profile latency-performance,
+    #       hugepages, NIC tuning. Reboot-gated; run in a market-closed window.
+    - name: Apply latency tuned profile
+      ansible.builtin.command: tuned-adm profile latency-performance
+      changed_when: false
+
+    - name: Deploy execution-engine binary (blue-green)
+      ansible.builtin.debug:
+        msg: "TODO copy build artifact {{ version }} + reconcile positions before enabling order flow"
+
+- name: Deploy Python control-plane services
+  hosts: control_plane
+  become: true
+  vars:
+    services:
+      - strategy-engine
+      - market-data
+      - risk-engine
+      - api-gateway
+  tasks:
+    - name: Fetch secrets from Vault (agent writes EnvironmentFile)
+      ansible.builtin.debug:
+        msg: "TODO vault agent template -> /run/secrets/<svc>.env"
+
+    - name: Install service venv + wheel {{ version }}
+      ansible.builtin.debug:
+        msg: "TODO pip install pinned wheels into /opt/trading/<svc>/.venv"
+
+    - name: Install systemd units and (re)start
+      ansible.builtin.debug:
+        msg: "TODO copy infra/systemd/*.service -> /etc/systemd/system, daemon-reload, restart"

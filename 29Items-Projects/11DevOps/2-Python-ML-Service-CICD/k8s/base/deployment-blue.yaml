@@ -1,0 +1,76 @@
+# Blue deployment - the initially active color.
+# The Service (service.yaml) selects app=fraud-api + color=<active>;
+# blue-green switch = patch the Service selector (scripts/blue_green_switch.sh).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-api-blue
+  labels:
+    app: fraud-api
+    color: blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fraud-api
+      color: blue
+  template:
+    metadata:
+      labels:
+        app: fraud-api
+        color: blue
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: fraud-api
+          image: frauddetectacr.azurecr.io/fraud-detection-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: fraud-api-config
+            - secretRef:
+                # Created out-of-band (Azure Key Vault / pipeline); never committed.
+                name: fraud-api-secrets
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

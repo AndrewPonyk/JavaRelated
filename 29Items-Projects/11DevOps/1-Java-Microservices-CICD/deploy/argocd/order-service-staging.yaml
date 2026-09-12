@@ -1,0 +1,52 @@
+# Staging: fully automated GitOps — every values-staging.yaml bump (pushed by CI)
+# is synced, pruned and self-healed without human involvement.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: order-service-staging
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: ecommerce
+
+  source:
+    repoURL: https://github.com/your-org/java-microservices-cicd.git   # TODO: real repo URL
+    targetRevision: main
+    path: deploy/helm/order-service
+    helm:
+      releaseName: order-service
+      valueFiles:
+        - values.yaml
+        - values-staging.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: orders-staging
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
+
+  # The HPA owns replica counts — don't report drift for them.
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: argoproj.io
+      kind: Rollout
+      jsonPointers:
+        - /spec/replicas
+
+  revisionHistoryLimit: 10

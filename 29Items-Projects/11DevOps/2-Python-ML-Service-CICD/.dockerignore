@@ -1,0 +1,45 @@
+# VCS
+.git/
+.gitignore
+
+# Tests and docs (not needed in the runtime image)
+tests/
+docs/
+
+# Deployment / infra / observability configs (mounted or applied separately)
+k8s/
+infra/
+azure-pipelines/
+monitoring/
+dashboard/
+
+# Local environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets / local config
+.env
+.env.*
+
+# ML artifacts
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Build leftovers
+build/
+dist/
+*.egg-info/
+node_modules/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store

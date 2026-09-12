@@ -1,0 +1,13 @@
+{
+  /* Playwright transpiles specs itself; this config exists for editor/type support.
+     E2E specs are excluded from the app's `npm run typecheck` on purpose. */
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["**/*.ts"]
+}

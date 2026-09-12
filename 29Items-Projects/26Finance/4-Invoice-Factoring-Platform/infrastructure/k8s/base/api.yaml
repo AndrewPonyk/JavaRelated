@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels: { app: invoice-factoring, component: api }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: invoice-factoring, component: api }
+  template:
+    metadata:
+      labels: { app: invoice-factoring, component: api }
+    spec:
+      serviceAccountName: workload-identity-sa   # bound to Key Vault via CSI + workload identity
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+        - name: api
+          image: invfactacr.azurecr.io/invoice-factoring-api:latest # overlay patches the tag (git sha)
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            # Secrets are synced from Key Vault into the `platform-secrets` k8s Secret by the
+            # SecretProviderClass; __ maps to nested .NET config keys.
+            - name: ConnectionStrings__SqlServer
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: sql-connection-string } }
+            - name: ConnectionStrings__Redis
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: redis-connection-string } }
+            - name: ServiceBus__ConnectionString
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: servicebus-connection-string } }
+            - name: Stripe__SecretKey
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: stripe-secret-key } }
+            - name: Stripe__WebhookSecret
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: stripe-webhook-secret } }
+            - name: Plaid__Secret
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: plaid-secret } }
+            - name: ApplicationInsights__ConnectionString
+              valueFrom: { secretKeyRef: { name: platform-secrets, key: appinsights-connection-string } }
+          resources:
+            requests: { cpu: "250m", memory: "256Mi" }
+            limits:   { cpu: "1",    memory: "512Mi" }
+          livenessProbe:
+            httpGet: { path: /health/live, port: 8080 }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet: { path: /health/ready, port: 8080 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes: { secretProviderClass: platform-kv }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels: { app: invoice-factoring, component: api }
+spec:
+  selector: { app: invoice-factoring, component: api }
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 70 }

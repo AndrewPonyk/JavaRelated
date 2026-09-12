@@ -1,0 +1,12 @@
+# Review routing. TODO: replace with real team handles.
+*               @your-org/frontend-team
+
+# Delivery machinery needs platform eyes.
+/.github/       @your-org/platform-team
+/infra/         @your-org/platform-team
+/scripts/       @your-org/platform-team
+
+# The API contract is co-owned with the backend team.
+/contracts/     @your-org/frontend-team @your-org/backend-team
+
+/docs/          @your-org/frontend-team @your-org/platform-team

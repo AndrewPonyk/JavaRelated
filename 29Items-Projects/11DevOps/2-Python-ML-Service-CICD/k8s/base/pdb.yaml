@@ -1,0 +1,13 @@
+# PodDisruptionBudget - keep at least one fraud-api pod (of any color)
+# available during voluntary disruptions (node drains, AKS upgrades).
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fraud-api
+  labels:
+    app: fraud-api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: fraud-api

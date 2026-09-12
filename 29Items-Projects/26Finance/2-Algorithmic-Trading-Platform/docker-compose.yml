@@ -1,0 +1,83 @@
+# Full-stack demo: `docker compose up --build`
+#
+#   postgres ──▶ migrate ──▶ api-gateway ──▶ frontend (nginx :5173)
+#                    └──────▶ orchestrator (runs a paper-trading session,
+#                                            persists positions/PnL to postgres)
+#
+# The orchestrator runs the whole control plane in one process over the in-memory
+# bus (no Kafka needed for the demo). The production topology runs each service
+# separately over Kafka using the SAME image with a different `command` and
+# KAFKA_BOOTSTRAP_SERVERS set — see docs/ARCHITECTURE.md Appendix B.
+name: trading-platform
+
+# Credentials default to dev values but can be overridden via a .env file or the
+# environment (docker compose auto-reads ./.env). Never commit real secrets.
+x-db-url: &db_url postgresql://${POSTGRES_USER:-trader}:${POSTGRES_PASSWORD:-trader}@postgres:5432/${POSTGRES_DB:-trading}
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-trader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trader}
+      POSTGRES_DB: ${POSTGRES_DB:-trading}
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trader -d trading"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    command: ["python", "scripts/migrate.py"]
+    environment:
+      DATABASE_URL: *db_url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    command: ["uvicorn", "api_gateway.asgi:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      ENV: dev
+      SERVICE_NAME: api-gateway
+      DATABASE_URL: *db_url
+      AUTH_ENABLED: ${AUTH_ENABLED:-false}
+      JWT_SECRET: ${JWT_SECRET:-}
+    ports: ["8000:8000"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile
+    command: ["python", "-m", "orchestrator.main"]
+    environment:
+      ENV: dev
+      SERVICE_NAME: orchestrator
+      DATABASE_URL: *db_url
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+
+  frontend:
+    build:
+      context: ./frontend
+    ports: ["5173:80"]
+    depends_on:
+      - api-gateway
+
+volumes:
+  pgdata:

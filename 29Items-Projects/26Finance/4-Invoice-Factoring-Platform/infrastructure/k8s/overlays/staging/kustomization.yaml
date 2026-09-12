@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: invoice-factoring-staging
+
+resources:
+  - ../../base
+
+images:
+  - name: invfactacr.azurecr.io/invoice-factoring-api
+    newTag: staging-latest
+  - name: invfactacr.azurecr.io/invoice-factoring-frontend
+    newTag: staging-latest
+
+replicas:
+  - name: api
+    count: 2
+  - name: frontend
+    count: 2

@@ -1,0 +1,6 @@
+# EF Core scaffolds these files — treat them as generated code and exempt them from our
+# hand-written style rules (file-scoped namespaces, unused usings, etc.).
+[*.cs]
+generated_code = true
+dotnet_diagnostic.IDE0161.severity = none
+dotnet_diagnostic.IDE0005.severity = none

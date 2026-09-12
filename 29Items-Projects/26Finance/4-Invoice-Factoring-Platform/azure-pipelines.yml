@@ -1,0 +1,28 @@
+# =============================================================================
+#  Root Azure DevOps pipeline. Build once (CI), then promote the same image
+#  SHA through dev → staging → prod (CD). See TECH-NOTES §3.1.
+# =============================================================================
+trigger:
+  branches:
+    include: [ main ]
+pr:
+  branches:
+    include: [ main ]
+
+variables:
+  - group: platform-cicd          # ACR name, AKS cluster, service-connection names, etc.
+  - name: buildConfiguration
+    value: Release
+  - name: tag
+    value: '$(Build.SourceVersion)' # immutable git SHA — never "latest" for deploys
+
+stages:
+  - template: .azuredevops/pipelines/ci.yml
+    parameters:
+      tag: $(tag)
+
+  # CD only runs for builds of main (not PR validation).
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    - template: .azuredevops/pipelines/cd.yml
+      parameters:
+        tag: $(tag)

@@ -1,0 +1,52 @@
+# Reusable deployment job: run DB migrations, then apply the env's Kustomize overlay
+# pinned to the built image SHA. Bound to an Azure DevOps Environment for approvals.
+parameters:
+  - name: environment
+    type: string
+  - name: overlay
+    type: string
+  - name: tag
+    type: string
+
+jobs:
+  - deployment: deploy_${{ parameters.environment }}
+    displayName: Deploy ${{ parameters.environment }}
+    pool: { vmImage: ubuntu-latest }
+    environment: invoice-factoring-${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            # 1. Apply EF Core migrations as a pre-deploy step (expand/contract, idempotent).
+            - task: UseDotNet@2
+              inputs: { packageType: sdk, version: 8.0.x }
+            - script: |
+                dotnet tool install --global dotnet-ef
+                dotnet ef database update \
+                  -p src/backend/src/InvoiceFactoring.Infrastructure \
+                  -s src/backend/src/InvoiceFactoring.Api \
+                  --connection "$(sqlConnectionString)"
+              displayName: Apply database migrations
+
+            # 2. Pin the image tag in the overlay and apply.
+            - script: |
+                cd ${{ parameters.overlay }}
+                kustomize edit set image \
+                  invfactacr.azurecr.io/invoice-factoring-api=invfactacr.azurecr.io/invoice-factoring-api:${{ parameters.tag }} \
+                  invfactacr.azurecr.io/invoice-factoring-frontend=invfactacr.azurecr.io/invoice-factoring-frontend:${{ parameters.tag }}
+              displayName: Set image tags
+
+            - task: KubernetesManifest@1
+              displayName: Deploy to AKS
+              inputs:
+                action: deploy
+                connectionType: kubernetesServiceConnection
+                kubernetesServiceConnection: $(aksServiceConnection-${{ parameters.environment }})
+                kustomizationPath: ${{ parameters.overlay }}
+
+            # 3. Smoke test readiness before marking the stage successful.
+            - script: |
+                kubectl rollout status deployment/api -n invoice-factoring-${{ parameters.environment }} --timeout=120s
+              displayName: Verify rollout

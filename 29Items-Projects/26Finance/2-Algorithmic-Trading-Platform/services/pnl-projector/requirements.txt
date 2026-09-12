@@ -1,0 +1,4 @@
+-e ../../shared
+asyncpg==0.29.0
+redis==5.0.7
+aiokafka==0.10.0
