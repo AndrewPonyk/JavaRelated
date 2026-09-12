@@ -1,0 +1,27 @@
+target/
+dist/
+dumps/
+out/
+
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# Secrets and local overrides — only .env.example is committed
+.env
+.env.local
+*.local.properties
+
+# Runtime output
+*.log
+logs/
+output/
+*.csv
+*.jfr
+hs_err_pid*
+replay_pid*

@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Parallel Image Processor — parent / aggregator POM.
+
+  Module dependency direction (no cycles); read "A <= B" as "B depends on A":
+
+      pip-core  <=  pip-persistence  ═╗
+         ^                            ║
+         ^      <=  pip-native       ═╬═>  pip-app
+         ^                            ║
+         ^      <=  pip-ui           ═╝
+
+  (XML comments may not contain a double hyphen, hence the box-drawing arrows.)
+
+  pip-core deliberately has NO external runtime dependencies. That is the
+  enforcement mechanism for the hexagonal boundary described in
+  docs/ARCHITECTURE.md §2.1 — not a convention, a compile error.
+
+  JDK 21 is enforced via maven-toolchains-plugin (see the <build>/<plugins> section below),
+  which reads ~/.m2/toolchains.xml. Copy docs/toolchains.xml.example there and point the
+  <jdkHome> at your JDK 21 install; otherwise `mvn` fails fast at the validate phase instead
+  of failing cryptically later at maven.compiler.release=21.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.parallelimage</groupId>
+  <artifactId>pip-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Parallel Image Processor</name>
+  <description>
+    Divide-and-conquer batch image processing on a ForkJoinPool, with a JavaFX desktop UI,
+    StampedLock-guarded metadata, and optional OpenCV enhancement over JNI.
+  </description>
+
+  <modules>
+    <module>pip-core</module>
+    <module>pip-persistence</module>
+    <module>pip-native</module>
+    <module>pip-ui</module>
+    <module>pip-app</module>
+    <module>benchmarks</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+
+    <!-- Dependency versions -->
+    <junit.version>5.11.4</junit.version>
+    <sqlite.version>3.45.1.0</sqlite.version>
+    <javafx.version>21.0.5</javafx.version>
+
+    <!-- Plugin versions (pinned: never inherit a floating plugin version) -->
+    <compiler.plugin.version>3.13.0</compiler.plugin.version>
+    <surefire.plugin.version>3.5.2</surefire.plugin.version>
+    <failsafe.plugin.version>3.5.3</failsafe.plugin.version>
+    <jar.plugin.version>3.4.2</jar.plugin.version>
+    <resources.plugin.version>3.3.1</resources.plugin.version>
+    <dependency.plugin.version>3.8.1</dependency.plugin.version>
+    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
+    <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
+    <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
+    <pmd.plugin.version>3.26.0</pmd.plugin.version>
+    <toolchains.plugin.version>3.2.0</toolchains.plugin.version>
+
+    <!-- benchmarks/ module -->
+    <jmh.version>1.37</jmh.version>
+    <shade.plugin.version>3.6.0</shade.plugin.version>
+
+    <!-- Coverage floors; see docs/TECH-NOTES.md §3.2 -->
+    <coverage.line.min>0.80</coverage.line.min>
+    <coverage.branch.min>0.70</coverage.branch.min>
+
+    <!-- Default so surefire's @{jacoco.argLine} still resolves when the
+         JaCoCo agent is skipped (e.g. -Djacoco.skip=true). -->
+    <jacoco.argLine/>
+
+    <!-- Empty by default; CI's native-build workflow sets this to -Xcheck:jni so a
+         native-path test that corrupts the JVM boundary is caught as a fast, loud
+         JNI warning instead of a silent heap scribble. Local builds never pay for
+         the extra JNI validation, since only that one workflow has a native library
+         to actually exercise. See native/README.md "CI and -Xcheck:jni". -->
+    <pip.surefire.extraArgs/>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-jdbc</artifactId>
+        <version>${sqlite.version}</version>
+      </dependency>
+
+      <!-- JavaFX: ${javafx.platform} is set by the OS-activated profiles below.
+           Hardcoding a classifier breaks cross-platform CI. -->
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-base</artifactId>
+        <version>${javafx.version}</version>
+        <classifier>${javafx.platform}</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-graphics</artifactId>
+        <version>${javafx.version}</version>
+        <classifier>${javafx.platform}</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-controls</artifactId>
+        <version>${javafx.version}</version>
+        <classifier>${javafx.platform}</classifier>
+      </dependency>
+      <!-- javafx-swing provides SwingFXUtils: BufferedImage <-> JavaFX Image -->
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-swing</artifactId>
+        <version>${javafx.version}</version>
+        <classifier>${javafx.platform}</classifier>
+      </dependency>
+
+      <!-- Internal modules -->
+      <dependency>
+        <groupId>com.parallelimage</groupId>
+        <artifactId>pip-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.parallelimage</groupId>
+        <artifactId>pip-persistence</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.parallelimage</groupId>
+        <artifactId>pip-native</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.parallelimage</groupId>
+        <artifactId>pip-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <!-- Every module gets JUnit 5. -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${compiler.plugin.version}</version>
+          <configuration>
+            <release>${maven.compiler.release}</release>
+            <compilerArgs>
+              <arg>-Xlint:all,-serial,-processing</arg>
+              <!-- Keep parameter names for diagnostics and future reflection-based tooling -->
+              <arg>-parameters</arg>
+            </compilerArgs>
+            <showDeprecation>true</showDeprecation>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.plugin.version}</version>
+          <configuration>
+            <!-- headless: Graphics2D/ImageIO work fine; a stray AWT window would hang CI -->
+            <argLine>@{jacoco.argLine} -Djava.awt.headless=true -ea -Xmx2g ${pip.surefire.extraArgs}</argLine>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/*IT.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${failsafe.plugin.version}</version>
+          <configuration>
+            <argLine>-Djava.awt.headless=true -ea -Xmx2g</argLine>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${jar.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${resources.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${dependency.plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${checkstyle.plugin.version}</version>
+          <configuration>
+            <configLocation>${maven.multiModuleProjectDirectory}/config/checkstyle/checkstyle.xml</configLocation>
+            <suppressionsLocation>${maven.multiModuleProjectDirectory}/config/checkstyle/suppressions.xml</suppressionsLocation>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+            <violationSeverity>warning</violationSeverity>
+            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${spotbugs.plugin.version}</version>
+          <configuration>
+            <effort>Max</effort>
+            <threshold>Medium</threshold>
+            <excludeFilterFile>${maven.multiModuleProjectDirectory}/config/spotbugs/exclude.xml</excludeFilterFile>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${pmd.plugin.version}</version>
+          <configuration>
+            <rulesets>
+              <ruleset>${maven.multiModuleProjectDirectory}/config/pmd/ruleset.xml</ruleset>
+            </rulesets>
+            <printFailingErrors>true</printFailingErrors>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <!-- Fails fast at the validate phase with a clear message when no JDK 21 toolchain is
+           configured, instead of a cryptic maven.compiler.release=21 error later in compile.
+           See ~/.m2/toolchains.xml / docs/toolchains.xml.example. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <version>${toolchains.plugin.version}</version>
+        <executions>
+          <execution>
+            <goals><goal>toolchain</goal></goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <jdk>
+              <version>21</version>
+            </jdk>
+          </toolchains>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+
+      <!-- Coverage always measured; only *enforced* under -Pquality (see profile). -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+            <configuration>
+              <propertyName>jacoco.argLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals><goal>report</goal></goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- ==================== JavaFX platform classifier ==================== -->
+    <profile>
+      <id>javafx-win</id>
+      <activation><os><family>windows</family></os></activation>
+      <properties><javafx.platform>win</javafx.platform></properties>
+    </profile>
+    <profile>
+      <id>javafx-linux</id>
+      <activation><os><family>unix</family><name>linux</name></os></activation>
+      <properties><javafx.platform>linux</javafx.platform></properties>
+    </profile>
+    <profile>
+      <id>javafx-mac-intel</id>
+      <activation><os><family>mac</family><arch>x86_64</arch></os></activation>
+      <properties><javafx.platform>mac</javafx.platform></properties>
+    </profile>
+    <profile>
+      <id>javafx-mac-aarch64</id>
+      <activation><os><family>mac</family><arch>aarch64</arch></os></activation>
+      <properties><javafx.platform>mac-aarch64</javafx.platform></properties>
+    </profile>
+
+    <!-- ==================== Integration tests (*IT) ==================== -->
+    <profile>
+      <id>integration</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- ==================== Static analysis + coverage gate ====================
+         Kept out of the default build so a plain `mvn verify` stays fast and
+         dependency-light. CI runs `mvn -Pquality verify`. -->
+    <profile>
+      <id>quality</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>checkstyle-check</id>
+                <phase>verify</phase>
+                <goals><goal>check</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>spotbugs-check</id>
+                <phase>verify</phase>
+                <goals><goal>check</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>pmd-check</id>
+                <phase>verify</phase>
+                <goals><goal>check</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- coverage.line.min / coverage.branch.min are measured everywhere (see the report
+               execution above) but only enforced here, under -Pquality, so a plain `mvn verify`
+               stays fast. Per-module override: a module with a legitimate reason to sit below the
+               floor (e.g. thin JNI-declaration or wiring classes) sets its own coverage.line.min/
+               coverage.branch.min in its own pom rather than weakening this default everywhere. -->
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jacoco-check</id>
+                <phase>verify</phase>
+                <goals><goal>check</goal></goals>
+                <configuration>
+                  <rules>
+                    <rule>
+                      <element>BUNDLE</element>
+                      <limits>
+                        <limit>
+                          <counter>LINE</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${coverage.line.min}</minimum>
+                        </limit>
+                        <limit>
+                          <counter>BRANCH</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${coverage.branch.min}</minimum>
+                        </limit>
+                      </limits>
+                    </rule>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

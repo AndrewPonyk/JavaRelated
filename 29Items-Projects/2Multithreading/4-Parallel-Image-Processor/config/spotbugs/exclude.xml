@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Every entry below is a documented false positive, decided on its own merits after running
+  SpotBugs inside a full `package spotbugs:check` (a standalone `spotbugs:check` cannot resolve the
+  reactor's sibling modules and silently skips analysis of anything that depends on them). Findings
+  that were real defects were fixed at the point of use instead of excluded here; see
+  ImageDiscovery.hasAcceptedExtension, ImageSink.write/targetFor, and
+  BatchProcessingTask's writeObject/readObject.
+-->
+<FindBugsFilter>
+
+  <!--
+    DLS_DEAD_LOCAL_STORE on pattern-match switch bindings.
+
+    `switch (outcome) { case Success s -> ...; case Failure f -> ...; }` binds s/f/c as pattern
+    variables even when the arrow body never reads them: javac still emits a local store for the
+    binding. SpotBugs 4.8.2's analysis of this bytecode is incomplete for this JDK (it reports
+    "missing classes: java.lang.Record, java.lang.MatchException,
+    java.lang.runtime.ObjectMethods, java.lang.runtime.SwitchBootstraps" for every one of these
+    methods), so it reads the pattern binding as an ordinary dead store. The switches themselves are
+    deliberately exhaustive over a sealed type for compile-time safety, not because the bound value
+    is needed.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.fork.BatchProcessingTask"/>
+    <Method name="publish"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.core.model.JobOutcome"/>
+    <Method name="toStatus"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.core.pipeline.PipelineFormat"/>
+    <Method name="renderOne"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.core.pipeline.OperationPipeline"/>
+    <Method name="applyOne"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.persistence.repository.SqliteJobRepository"/>
+    <Method name="recordOutcome"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+
+  <!--
+    JobRequestValidator.Result.problems() returns the `problems` field directly, but the record's
+    compact constructor defensively copies via List.copyOf before any Result instance exists, so the
+    returned list is genuinely immutable. Same situation as OperationPipeline.operations() above:
+    SpotBugs cannot see through List.copyOf's return type.
+  -->
+  <Match>
+    <Class name="com.parallelimage.app.api.JobRequestValidator$Result"/>
+    <Method name="problems"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+
+  <!--
+    CliRunner's constructor stores the caller's PrintStreams for `out`/`err` on purpose: the class
+    javadoc's "Output discipline" section is the entire reason a PrintStream is a constructor
+    parameter rather than a hard-coded System.out/System.err: it is what lets a test capture output
+    and what lets Main route progress to stderr and results to stdout. Copying a PrintStream makes no
+    sense (it is a sink, not data to protect), and would silently break that redirection.
+  -->
+  <Match>
+    <Class name="com.parallelimage.app.cli.CliRunner"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!--
+    JsonLogHandler stores the caller's PrintStream for the same reason as CliRunner above: the
+    class javadoc's close() note explains why the target is configurable rather than hard-coded to
+    System.out, and the no-arg constructor's System.out default is exactly the case this exclusion
+    covers. A PrintStream is a sink, not data to protect, so a defensive copy would be meaningless.
+  -->
+  <Match>
+    <Class name="com.parallelimage.app.logging.JsonLogHandler"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!--
+    AppConfig.loadClasspathDefaults uses try-with-resources with an early return inside the try block
+    (`if (in == null) return;`). javac's synthesized close-on-exception bytecode re-checks `in` for
+    null before closing it, and SpotBugs's dataflow analysis of that synthesized check, not of
+    anything this method's source actually does, is what reports a "known null" load and a
+    redundant null check. This is a documented SpotBugs/javac interaction with try-with-resources, not
+    a defect in this method.
+  -->
+  <Match>
+    <Class name="com.parallelimage.app.config.AppConfig"/>
+    <Method name="loadClasspathDefaults"/>
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE,RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"/>
+  </Match>
+
+  <!--
+    JavaFX property/observable-list accessors on a ViewModel. Returning the live Property (or
+    ObservableList) instead of a snapshot is not an accident: it is the entire point of the
+    Property pattern: a View binds to the object this method returns, and a copy would silently
+    break every binding while giving the false impression that the app still works. Every accessor
+    below is a `xxxProperty()`/observable-list getter, not a plain field getter.
+  -->
+  <Match>
+    <Class name="com.parallelimage.ui.viewmodel.BatchViewModel"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+
+  <!--
+    EI_EXPOSE_REP / EI_EXPOSE_REP2 on deliberately shared, mutable collaborators.
+
+    MetadataStore is injected via Builder and returned by ImageProcessingEngine.metadata() on
+    purpose: the class javadoc says it is "built for exactly this contention pattern" so that
+    stats() and a test double can observe the *same* live instance, not a snapshot. Copying it would
+    break exactly the sharing the design relies on.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.engine.ImageProcessingEngine"/>
+    <Method name="metadata"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.core.engine.ImageProcessingEngine$Builder"/>
+    <Method name="metadataStore"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <!--
+      Builder.pool(ForkJoinPool) stores an externally-owned pool on purpose: its javadoc says
+      "Supplies an external pool; the engine will not shut it down," and the constructor branches on
+      builder.pool to set ownsPool=false precisely so close() never shuts down a pool it does not own.
+      Copying or wrapping the reference would defeat the whole point of letting callers share a pool.
+    -->
+    <Class name="com.parallelimage.core.engine.ImageProcessingEngine$Builder"/>
+    <Method name="pool"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!--
+    ImageLoader.Decoded is a record whose accessors hand back the raw BufferedImage/args by
+    reference on purpose: OperationPipeline's whole design (see its class javadoc) is one source
+    buffer and one destination buffer per stage, precisely to avoid an extra full-image copy per
+    operation. A defensive copy here would double allocation and copy cost on every decode.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.io.ImageLoader$Decoded"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!--
+    OperationPipeline.operations() returns the `operations` field directly, but the constructor
+    (line 62) sets it via List.copyOf, so the returned list is genuinely immutable; there is no
+    internal representation to expose. SpotBugs cannot see through List.copyOf's return type.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.pipeline.OperationPipeline"/>
+    <Method name="operations"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+
+  <!--
+    ProcessingOptions.Builder.operations(List) stores the caller's reference, but every path that
+    turns a Builder into a ProcessingOptions goes through the record's compact constructor, which
+    unconditionally defensively copies via List.copyOf before the value becomes part of the
+    immutable record. The mutable reference never actually escapes.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.model.ProcessingOptions$Builder"/>
+    <Method name="operations"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!--
+    URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD on jdk.jfr.Event subclasses' public fields.
+
+    BatchProcessingEvent/TileProcessingEvent follow the JFR-mandated shape: public fields set
+    between begin()/end() and read by event.commit(). The read happens inside the JFR native agent
+    via bytecode instrumentation woven into the class at class-load time, never through an
+    ordinary Java getter SpotBugs's dataflow analysis can see, so every field on an Event
+    subclass reads as "written, never read" no matter how it is used.
+  -->
+  <Match>
+    <Class name="com.parallelimage.core.jfr.BatchProcessingEvent"/>
+    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+  </Match>
+  <Match>
+    <Class name="com.parallelimage.core.jfr.TileProcessingEvent"/>
+    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+  </Match>
+
+</FindBugsFilter>

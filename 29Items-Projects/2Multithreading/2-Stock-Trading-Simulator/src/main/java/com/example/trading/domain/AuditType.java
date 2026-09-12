@@ -1,0 +1,14 @@
+package com.example.trading.domain;
+
+public enum AuditType {
+    PORTFOLIO_CREATED,
+    PORTFOLIO_UPDATED,
+    PORTFOLIO_DELETED,
+    ORDER_PLACED,
+    ORDER_PARTIALLY_FILLED,
+    ORDER_FILLED,
+    ORDER_CANCELLED,
+    TRADE_EXECUTED,
+    PRICE_UPDATED,
+    PRICE_DELETED
+}

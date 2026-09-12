@@ -1,0 +1,19 @@
+# ServiceLoader registration for the always-available fallback enhancer.
+#
+# Why this file exists at all, given that ImageEnhancer.discover() already ends with
+# `.orElseGet(PassthroughEnhancer::new)`:
+#
+#   * The fallback in discover() is a safety net for the case where the classpath is genuinely empty --
+#     which is what pip-core's own test asserts, and why PassthroughEnhancer is NOT registered in
+#     pip-core/src/main/resources (see the comment in pip-native's copy of this descriptor).
+#   * In an assembled application, "which providers are on the classpath" should be answerable by reading
+#     these descriptors rather than by reading discover()'s last line. Registering the fallback here makes
+#     the full candidate set visible in one place, and makes a DEBUG-level ServiceLoader trace show the
+#     selection actually happening instead of a silent orElseGet.
+#
+# Priority keeps this harmless: PassthroughEnhancer#priority() returns Integer.MIN_VALUE, so any real
+# provider -- NativeImageEnhancer, or a future one -- outranks it whenever it reports isAvailable().
+#
+# ServiceLoader merges descriptors across the classpath, so this file and pip-native's are both read; it
+# does not override anything.
+com.parallelimage.core.spi.PassthroughEnhancer

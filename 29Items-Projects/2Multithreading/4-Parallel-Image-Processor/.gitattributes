@@ -1,0 +1,115 @@
+# Line-ending policy, and the one place where it is load-bearing rather than cosmetic.
+#
+# Read the fixture section below before changing anything here. This file is not
+# housekeeping: without it, `git add` on a machine with core.autocrlf=true silently
+# destroys a test fixture in a way that leaves the test passing.
+
+# ---------------------------------------------------------------------------
+#  Default
+# ---------------------------------------------------------------------------
+# LF in the repository and in the working tree, on every platform. Windows tools
+# in this stack all accept LF (javac, Maven, PowerShell, modern Notepad), and the
+# alternative -- letting each clone decide -- produces review diffs in which every
+# line of an untouched file is marked changed, which is how a real one-line change
+# gets approved without being read.
+* text=auto eol=lf
+
+# ---------------------------------------------------------------------------
+#  SQL: pinned to LF explicitly
+# ---------------------------------------------------------------------------
+# /migrations/*.sql are the shipped schema, copied into pip-persistence's resources
+# by its pom. MigrationRunner checksums them with CRLF normalised to LF and any BOM
+# removed, so the checksum already survives a mixed-platform checkout -- this line
+# is defence in depth, not the mechanism. It is here so that a future change to that
+# normalisation cannot turn every user's schema_version table into a tamper report.
+*.sql text eol=lf
+
+# ---------------------------------------------------------------------------
+#  The fixtures that must NOT be normalised
+# ---------------------------------------------------------------------------
+# db/fixture-lf and db/fixture-crlf hold the same migration twice: 239 bytes with LF
+# and no BOM, 245 bytes with CRLF and a UTF-8 BOM. Their only purpose is to be
+# byte-different while normalising to identical text, which is what proves
+# MigrationRunnerTest.checksumIgnoresLineEndings actually tests something.
+#
+# Any normalisation applied to these two paths -- the `* text=auto` above included --
+# rewrites one of them so that both end up with the same terminators. The pair then
+# differs only by the BOM, and the CRLF half of the assertion silently tests nothing.
+# The test still passes. That is the failure mode this rule exists to prevent, and it
+# is why the guard assertion in checksumIgnoresLineEndings compares file sizes: if
+# these two lines are ever deleted, something fails loudly instead of going quiet.
+#
+# -text (not `binary`) disables end-of-line conversion while keeping textual diffs,
+# which is what you want the day one of these fixtures needs to be read in a review.
+#
+# `!eol` unspecifies the eol=lf inherited from the `*` line above. Git documents that
+# eol has no effect once text is unset, so -text alone is already sufficient -- but
+# these are the two files in the repository where relying on an interaction between
+# two attributes, rather than stating the intent, is not worth the saved characters.
+pip-persistence/src/test/resources/db/fixture-lf/**   -text !eol
+pip-persistence/src/test/resources/db/fixture-crlf/** -text !eol
+
+# ---------------------------------------------------------------------------
+#  Scripts
+# ---------------------------------------------------------------------------
+# cmd.exe is the one consumer in this repo that genuinely cares. A .cmd file with
+# LF-only terminators mostly works, but `goto`/label resolution and a trailing line
+# without CRLF are long-standing sources of "works on my machine": force CRLF.
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+# Shell scripts must stay LF even in a Windows checkout, or bash reports
+# `\r: command not found` on the shebang line.
+*.sh   text eol=lf
+
+# ---------------------------------------------------------------------------
+#  Binary: never diffed, never normalised
+# ---------------------------------------------------------------------------
+# Sample images live under samples/ and are the inputs to the smoke runs. A single
+# CRLF substitution inside a PNG's zlib stream corrupts it, and the error surfaces
+# as an ImageIO decode failure far from the cause.
+#
+# `binary` is a built-in macro for `-diff -merge -text`; the `!eol` is added for the
+# same reason as on the fixtures above -- an inherited eol should not even be present
+# on a path where a substituted byte is silent corruption.
+*.png  binary !eol
+*.jpg  binary !eol
+*.jpeg binary !eol
+*.webp binary !eol
+*.bmp  binary !eol
+*.gif  binary !eol
+*.tif  binary !eol
+*.tiff binary !eol
+*.ico  binary !eol
+
+# SQLite databases and native artefacts
+*.db     binary !eol
+*.db-wal binary !eol
+*.db-shm binary !eol
+*.dll    binary !eol
+*.so     binary !eol
+*.dylib  binary !eol
+*.jar    binary !eol
+*.zip    binary !eol
+*.exe    binary !eol
+
+# ---------------------------------------------------------------------------
+#  Diff and merge behaviour
+# ---------------------------------------------------------------------------
+# Language-aware hunk headers, so a diff says which method changed.
+*.java   text diff=java
+*.xml    text diff=html
+*.html   text diff=html
+*.md     text diff=markdown
+*.css    text
+*.properties text
+*.yml    text
+*.yaml   text
+*.cpp    text diff=cpp
+*.h      text diff=cpp
+*.cmake  text
+CMakeLists.txt text
+
+# Generated reports and lock-like files: exclude from language statistics and
+# collapse them in review, where they are noise.
+docs/diagrams/*.svg  text linguist-generated=true
+*.vmoptions text

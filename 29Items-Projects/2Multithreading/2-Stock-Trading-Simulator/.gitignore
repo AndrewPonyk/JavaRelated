@@ -1,0 +1,9 @@
+target/
+.idea/
+.vscode/
+*.iml
+*.log
+.env
+hs_err_pid*
+replay_pid*
+*.jfr

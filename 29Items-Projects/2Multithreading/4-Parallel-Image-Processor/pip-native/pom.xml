@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pip-native — JNI bridge to the OpenCV-based enhancer.
+
+  This module has no Maven dependency on OpenCV: the C++ shim in /native links
+  against OpenCV and is built out-of-band by CMake (see native/README.md and
+  .github/workflows/native-build.yml). The resulting shared library is dropped
+  into src/main/resources/native/<os>-<arch>/ and packaged into this jar.
+
+  The Java side MUST work when that library is absent — pip-core's
+  PassthroughEnhancer is the always-available fallback.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.parallelimage</groupId>
+    <artifactId>pip-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>pip-native</artifactId>
+  <name>PIP :: Native (OpenCV via JNI)</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-core</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Regenerate the JNI header from the Java declarations so the C++ side can
+           never drift out of sync with the mangled names (see TECH-NOTES §3.6 F6).
+           Activated with -Pjni-headers to keep the default build fast. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArgs>
+            <arg>-Xlint:all,-serial,-processing</arg>
+            <arg>-parameters</arg>
+            <arg>-h</arg>
+            <arg>${project.basedir}/../native/include</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

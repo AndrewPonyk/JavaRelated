@@ -1,0 +1,228 @@
+/* ============================================================================
+ *  app.css — the whole look of Parallel Image Processor.
+ *
+ *  Two rules govern this file:
+ *
+ *  1. NO COLOUR IS SET IN JAVA CODE. Views add style classes; this file decides
+ *     what they mean. That is what makes "make the failed rows less shouty" a
+ *     one-line change rather than a hunt through view constructors.
+ *
+ *  2. Everything derives from -fx-base and -fx-accent. JavaFX's Modena stylesheet
+ *     computes text, border, and hover colours from those two via ladder()
+ *     functions, so overriding them recolours the entire control set consistently
+ *     -- including the controls this file never mentions. Hard-coding a hex value
+ *     on a Label is how you end up with black text on a dark background the day
+ *     someone flips the theme.
+ * ========================================================================== */
+
+.root {
+    -fx-base: #f4f5f7;
+    -fx-accent: #2f6fed;
+    -fx-focus-color: -fx-accent;
+    -fx-faint-focus-color: #2f6fed22;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", "DejaVu Sans", sans-serif;
+    -fx-font-size: 13px;
+
+    /* Semantic aliases. Referenced below rather than repeated, so a palette change
+       is one edit and every use of "the failure colour" agrees.
+       WCAG-AA checked: -pip-muted on white/#f4f5f7/derive(-fx-base,-4%) and
+       -pip-danger on white/-pip-danger-bg all clear 4.5:1 (measured 5.3-6.5:1) --
+       re-check contrast before darkening the background or lightening either colour. */
+    -pip-danger: #b3261e;
+    -pip-danger-bg: #fdecea;
+    -pip-muted: #5f6672;
+    -pip-hairline: #dcdfe4;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Header
+ * ------------------------------------------------------------------------- */
+
+.header {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent -pip-hairline transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.app-subtitle {
+    -fx-text-fill: -pip-muted;
+    /* Baseline-aligned with the title by the HBox; the padding just stops the two
+       from touching when the window is narrow. */
+    -fx-padding: 2 0 0 4;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Form
+ * ------------------------------------------------------------------------- */
+
+.form .label {
+    -fx-text-fill: -pip-muted;
+}
+
+/* Disabled-while-running must still be readable. JavaFX's default 0.4 opacity on a
+   disabled container makes the whole form ghostly, and a user watching a batch run
+   cannot check which pipeline they typed. */
+.form:disabled {
+    -fx-opacity: 0.75;
+}
+
+.text-field {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Progress row
+ * ------------------------------------------------------------------------- */
+
+.progress-row {
+    -fx-padding: 4 0 4 0;
+}
+
+.progress-bar {
+    -fx-pref-height: 18px;
+}
+
+/* min-width, not pref-width: the bar is the node that grows, and a wide button
+   next to it would steal that space. Equal minimums keep Start and Cancel the same
+   size so the row does not shift when one of them is disabled. */
+.progress-row .button {
+    -fx-min-width: 92px;
+}
+
+.button.primary {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button.primary:hover {
+    -fx-background-color: derive(-fx-accent, -12%);
+}
+
+.button.primary:disabled {
+    /* Explicit, because the -fx-text-fill: white above survives the default
+       disabled treatment and white-on-pale-blue is unreadable. */
+    -fx-background-color: derive(-fx-accent, 55%);
+    -fx-text-fill: derive(white, -25%);
+}
+
+/* ---------------------------------------------------------------------------
+ *  Result panes
+ * ------------------------------------------------------------------------- */
+
+.results {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-border-color: -pip-hairline;
+    -fx-border-radius: 6;
+}
+
+.pane {
+    -fx-padding: 12;
+}
+
+.heading {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.heading.error {
+    -fx-text-fill: -pip-danger;
+}
+
+.error-pane {
+    -fx-background-color: -pip-danger-bg;
+    -fx-background-radius: 6;
+}
+
+.error-detail {
+    -fx-text-fill: -pip-danger;
+    /* Wrapped in code; this only stops a long InvalidPathException message from
+       pressing against the pane border. */
+    -fx-padding: 0 8 8 0;
+}
+
+.idle-pane .label,
+.empty-pane .label {
+    -fx-text-fill: -pip-muted;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Tables and lists
+ * ------------------------------------------------------------------------- */
+
+.table-view,
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -pip-hairline;
+    -fx-border-radius: 4;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: derive(-fx-base, -3%);
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -pip-muted;
+}
+
+/* Set by BatchProcessorView's row factory. A left bar plus a tinted background
+   rather than red text: red text on a selected (blue) row is close to invisible,
+   and the bar survives selection. */
+.table-row-cell.failed-row {
+    -fx-background-color: -pip-danger-bg;
+    -fx-border-color: -pip-danger transparent transparent transparent;
+    -fx-border-width: 0 0 0 3;
+}
+
+.table-row-cell.failed-row:selected {
+    -fx-background-color: -fx-accent;
+}
+
+.failure-list {
+    -fx-font-family: "Consolas", "Menlo", "DejaVu Sans Mono", monospace;
+    -fx-font-size: 12px;
+}
+
+/* ---------------------------------------------------------------------------
+ *  Status bar
+ * ------------------------------------------------------------------------- */
+
+.status-bar {
+    -fx-background-color: derive(-fx-base, -4%);
+    -fx-border-color: -pip-hairline transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-message {
+    -fx-text-fill: -pip-muted;
+}
+
+/* Monospaced because these digits update twice a second. In a proportional font the
+   line changes width on every sample and reads as flicker. */
+.status-stats {
+    -fx-font-family: "Consolas", "Menlo", "DejaVu Sans Mono", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: -pip-muted;
+}
+
+.engine-stats-panel {
+    -fx-alignment: center-left;
+}
+
+.engine-stats-caption {
+    -fx-font-size: 9px;
+    -fx-text-fill: -pip-muted;
+}
+
+.engine-stats-value {
+    -fx-font-family: "Consolas", "Menlo", "DejaVu Sans Mono", monospace;
+    -fx-font-size: 11px;
+}

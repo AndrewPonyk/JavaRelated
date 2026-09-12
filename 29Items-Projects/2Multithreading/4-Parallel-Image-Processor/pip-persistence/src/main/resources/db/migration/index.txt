@@ -1,0 +1,22 @@
+# Migration manifest, read by MigrationRunner.
+#
+# Why this file exists: a classpath directory cannot be listed portably. Inside a
+# packaged jar there is no directory entry to walk, and the JDK offers no supported
+# way to enumerate resources under a prefix. Every framework that appears to do it
+# (Spring's PathMatchingResourcePatternResolver, Flyway's scanner) is opening the jar
+# and reading its central directory by hand. An explicit manifest is six lines and
+# has one failure mode: forgetting to add a line, which the runner reports as a
+# missing resource on the next start rather than as a schema that silently stopped
+# being migrated.
+#
+# Order is significant — files are applied top to bottom. The V-numbers must agree
+# with that order; MigrationRunner asserts it rather than trusting this file.
+#
+# The .sql files themselves live in /migrations at the repo root and are copied here
+# by pip-persistence/pom.xml. Do not add copies under src/main/resources.
+#
+# Blank lines and lines starting with '#' are ignored.
+
+V001__init_schema.sql
+V002__watermark_presets.sql
+V003__indexes_and_views.sql

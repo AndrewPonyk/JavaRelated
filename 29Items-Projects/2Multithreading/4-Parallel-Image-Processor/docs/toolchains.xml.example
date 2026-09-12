@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Example ~/.m2/toolchains.xml for building this project.
+
+  maven-toolchains-plugin (bound at the validate phase in the root pom.xml) requires a JDK 21
+  toolchain to be declared here, regardless of what `java`/`mvn` resolve to on PATH. Copy this
+  file to ~/.m2/toolchains.xml and point <jdkHome> at your own JDK 21 install.
+-->
+<toolchains>
+  <toolchain>
+    <type>jdk</type>
+    <provides>
+      <version>21</version>
+    </provides>
+    <configuration>
+      <jdkHome>C:/Programs/jdk-21.0.2</jdkHome>
+    </configuration>
+  </toolchain>
+</toolchains>

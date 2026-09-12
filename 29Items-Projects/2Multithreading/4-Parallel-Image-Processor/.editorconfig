@@ -1,0 +1,141 @@
+# EditorConfig -- https://editorconfig.org
+#
+# These values are not preferences invented here; they are measured from the code
+# that already exists, so that an editor which honours this file and the Checkstyle
+# rules in config/checkstyle/checkstyle.xml cannot disagree. If you change a limit
+# here, change it there too -- the two are kept in sync deliberately.
+
+root = true
+
+# ---------------------------------------------------------------------------
+#  Everything
+# ---------------------------------------------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+#  Java
+# ---------------------------------------------------------------------------
+[*.java]
+indent_size = 4
+continuation_indent_size = 8
+max_line_length = 120
+
+# 120, not 100. The longest main-source line in this repository is 113 characters,
+# so 120 is a limit the code already meets with headroom rather than one that would
+# require reflowing 900 lines of javadoc on the day it was introduced. It is also
+# the point past which two files stop fitting side by side in a review.
+#
+# Note for anyone measuring this with grep or awk: several separator comments use
+# box-drawing characters, which are three bytes each in UTF-8. Byte-counting tools
+# report those lines as over 200; Checkstyle counts characters, and so does this.
+
+# IntelliJ-specific hints, ignored by other editors. Named explicitly because the
+# import order below is what Checkstyle's CustomImportOrder rule enforces: static
+# imports first, then everything else in one alphabetical block, no wildcards.
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999
+ij_java_imports_layout = $*,|,*
+ij_java_use_single_class_imports = true
+ij_java_doc_add_blank_line_after_description = true
+ij_java_keep_blank_lines_in_code = 1
+
+# ---------------------------------------------------------------------------
+#  Build and configuration files
+# ---------------------------------------------------------------------------
+# The poms in this project are written with two-space indentation; matching it here
+# keeps an editor from reformatting a file it merely opened.
+[*.{xml,xsd,pom}]
+indent_size = 2
+max_line_length = 120
+
+[pom.xml]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+# YAML forbids tabs outright, and a workflow that fails to parse is reported by
+# GitHub as a missing workflow rather than as a syntax error.
+indent_style = space
+
+[*.json]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+#  Properties: trailing whitespace is significant here
+# ---------------------------------------------------------------------------
+# Properties.load keeps trailing whitespace in a value, so `output.quality=0.5   `
+# arrives as the string "0.5   ". AppConfig.merge trims every value precisely
+# because of that -- but a properties file used by anything else is not so lucky,
+# and an editor silently deleting it would mask the difference. Left on for safety
+# is the wrong default when the trimming is the documented behaviour: trimming
+# stays enabled, and this comment records why the question came up.
+[*.properties]
+indent_size = 4
+trim_trailing_whitespace = true
+
+# ---------------------------------------------------------------------------
+#  SQL migrations
+# ---------------------------------------------------------------------------
+# MigrationRunner checksums these with line endings normalised and any BOM removed,
+# so an editor that adds a BOM will not break the checksum -- but it will produce a
+# one-byte diff that reviewers cannot see. utf-8 (not utf-8-bom) everywhere.
+[*.sql]
+indent_size = 2
+charset = utf-8
+max_line_length = 100
+
+# ---------------------------------------------------------------------------
+#  Scripts
+# ---------------------------------------------------------------------------
+# CRLF for cmd.exe, matching the *.cmd rule in .gitattributes. A batch file with
+# LF-only terminators can mis-resolve labels, which presents as a script that skips
+# a step rather than one that fails.
+[*.{cmd,bat}]
+end_of_line = crlf
+indent_size = 2
+
+[*.sh]
+end_of_line = lf
+indent_size = 2
+# shellcheck's default, and what makes a heredoc-heavy script readable.
+max_line_length = 120
+
+# ---------------------------------------------------------------------------
+#  Native (C++ / CMake)
+# ---------------------------------------------------------------------------
+[*.{c,cpp,h,hpp}]
+indent_size = 4
+max_line_length = 100
+
+[{CMakeLists.txt,*.cmake}]
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+#  Documentation
+# ---------------------------------------------------------------------------
+# Trailing whitespace is off here and only here: two trailing spaces are Markdown's
+# hard line break, and stripping them silently rewraps a table or a note block.
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+max_line_length = off
+
+# ---------------------------------------------------------------------------
+#  Fixtures whose bytes are the test
+# ---------------------------------------------------------------------------
+# db/fixture-crlf holds a CRLF file with a UTF-8 BOM and db/fixture-lf its LF twin
+# with neither; the 6-byte difference between them is what makes
+# MigrationRunnerTest.checksumIgnoresLineEndings a real test. An editor applying the
+# rules above to either file destroys that difference, and the test keeps passing.
+# See the matching -text entries in .gitattributes.
+[pip-persistence/src/test/resources/db/fixture-*/**]
+end_of_line = unset
+charset = unset
+insert_final_newline = unset
+trim_trailing_whitespace = false

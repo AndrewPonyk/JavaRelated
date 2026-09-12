@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+    Deliberately small rule set: it must never be the reason a correct change is
+    blocked, but it does catch the two things that cause real review noise
+    (star imports, dead imports) and the one thing that breaks diffs (tabs).
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+
+    <module name="FileTabCharacter"/>
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf_cr_crlf"/>
+    </module>
+
+    <module name="TreeWalker">
+        <module name="AvoidStarImport"/>
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+        <module name="OuterTypeFilename"/>
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignored"/>
+        </module>
+        <module name="MissingSwitchDefault">
+            <!-- Off: sealed-type switches must NOT have a default, or the
+                 compiler stops enforcing exhaustiveness for us. -->
+            <property name="severity" value="ignore"/>
+        </module>
+    </module>
+</module>

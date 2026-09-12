@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  benchmarks — JMH microbenchmark harness.
+
+  Isolated from pip-core/pip-native's production code paths: nothing here is invoked by the
+  running application. It exists to answer calibration/design questions (tile threshold, Vector
+  API vs. scalar, JNI vs. FFM call overhead) with numbers instead of guesses — see
+  docs/PERFORMANCE.md and docs/adr/.
+
+  Run: mvn -pl benchmarks -am package -DskipTests
+       java -jar benchmarks/target/benchmarks.jar -f 1 -wi 3 -i 5
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.parallelimage</groupId>
+    <artifactId>pip-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>benchmarks</artifactId>
+  <name>PIP :: Benchmarks (JMH)</name>
+
+  <properties>
+    <!-- JMH's own annotation processor and reflective harness code trip these gates for no
+         benefit; this module is dev tooling, not shipped production code. -->
+    <checkstyle.skip>true</checkstyle.skip>
+    <pmd.skip>true</pmd.skip>
+    <spotbugs.skip>true</spotbugs.skip>
+    <jacoco.skip>true</jacoco.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-native</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>${jmh.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>${jmh.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>benchmarks</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- jdk.incubator.vector backs VectorApiScalarBenchmark; incubator modules aren't
+               resolved by the release flag alone and need an explicit add-modules flag at compile
+               time. java.lang.foreign (FFM) backs JniVsFfmCallOverheadBenchmark; it's still a
+               preview API on JDK 21 (finalized in JDK 22), so an enable-preview flag is required
+               at compile and run time (see that benchmark's javadoc for the runtime flags). -->
+          <compilerArgs>
+            <arg>--add-modules</arg>
+            <arg>jdk.incubator.vector</arg>
+            <arg>--enable-preview</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.openjdk.jmh</groupId>
+              <artifactId>jmh-generator-annprocess</artifactId>
+              <version>${jmh.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${shade.plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.openjdk.jmh.Main</mainClass>
+                </transformer>
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

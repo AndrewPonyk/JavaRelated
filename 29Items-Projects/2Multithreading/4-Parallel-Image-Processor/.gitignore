@@ -1,0 +1,132 @@
+# ===========================================================================
+#  Build output
+# ===========================================================================
+target/
+*.class
+
+# JaCoCo writes to the aggregator's target/ as well as each module's.
+*.exec
+
+# ===========================================================================
+#  Native build (CMake + OpenCV)
+# ===========================================================================
+# native/README.md documents `cmake -S native -B native/build`, so the build tree
+# is inside the source tree and must be ignored explicitly.
+native/build/
+native/out/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+compile_commands.json
+
+# The built shim, installed by `cmake --install native/build` into a *source*
+# directory: pip-native/src/main/resources/native/<os>-<arch>/. That path is where
+# NativeLibraryLoader looks for the packaged copy, so the install target has to put
+# it there -- but it is build output, it is platform-specific, and the application
+# runs correctly without it (PassthroughEnhancer takes over). Committing one
+# developer's pip_enhance.dll would ship a binary that silently wins over the
+# loader's higher-priority system lookup on every other machine.
+#
+# Anyone producing a release artefact builds the native library on the target
+# platform first; see .github/workflows/native-build.yml.
+pip-native/src/main/resources/native/**/*.dll
+pip-native/src/main/resources/native/**/*.so
+pip-native/src/main/resources/native/**/*.dylib
+pip-native/src/main/resources/native/**/*.pdb
+
+# The super-resolution model is a ~50 MB download, not source.
+*.pb
+*.onnx
+*.caffemodel
+
+# ===========================================================================
+#  Runtime state
+# ===========================================================================
+# The history database lives in ~/.pip by default, but --no-history off plus a
+# relative db.path puts it in the working directory.
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+.pip/
+
+# Sample *inputs* are committed (the smoke runs need them); outputs are not.
+samples/output/*
+!samples/output/.gitkeep
+
+# JMH results
+benchmarks/results/
+*.jfr
+*.hprof
+hs_err_pid*.log
+replay_pid*.log
+
+# ===========================================================================
+#  Local configuration -- the reason config/application.properties is NOT here
+# ===========================================================================
+# config/application.properties *is* committed, with every setting present but
+# commented out. AppConfig reads it as the third of four layers, so a file whose
+# every line is a comment contributes nothing and the compiled-in defaults stand:
+# it is documentation that happens to be in the right place to edit.
+#
+# A developer overriding one value for one run uses -Dpip.x=y or a PIP_X variable,
+# both of which outrank the file, so no one needs to make a local edit that then
+# shows up in every diff. If you do need a machine-specific file, name it
+# application.local.properties and pass it explicitly -- that name is ignored here.
+config/application.local.properties
+.env
+.env.local
+
+# ===========================================================================
+#  IDEs and editors
+# ===========================================================================
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+.vscode/
+!.vscode/settings.json.example
+
+.classpath
+.project
+.settings/
+bin/
+
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================================================================
+#  Maven
+# ===========================================================================
+# .mvn/ is committed (jvm.config and maven.config are part of the build contract);
+# only the wrapper's downloaded jar is not.
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/jvm.config
+!.mvn/maven.config
+
+dependency-reduced-pom.xml
+release.properties
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.tag
+pom.xml.next
+buildNumber.properties
+
+# ===========================================================================
+#  Logs and scratch
+# ===========================================================================
+*.log
+logs/
+tmp/
+.tmp/

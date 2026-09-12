@@ -1,0 +1,4 @@
+# Deliberately malformed: this class does not exist. Exercises the
+# java.util.ServiceConfigurationError catch branch in ImageEnhancer.discover(),
+# so a broken provider descriptor cannot prevent the PassthroughEnhancer fallback.
+com.parallelimage.core.spi.NoSuchEnhancerProvider

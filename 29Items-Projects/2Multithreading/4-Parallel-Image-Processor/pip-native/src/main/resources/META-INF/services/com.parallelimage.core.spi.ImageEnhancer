@@ -1,0 +1,10 @@
+# ServiceLoader registration for the OpenCV/JNI enhancer.
+#
+# Listing a provider here only makes it *discoverable*. ImageEnhancer.discover() still calls
+# isAvailable() on it, which returns false when pip_enhance is not loadable -- so shipping this file
+# on a machine with no OpenCV is harmless and produces one WARNING line, not a failure.
+#
+# PassthroughEnhancer is deliberately NOT registered in pip-core's own resources: a test there must be
+# able to prove that discovery falls back correctly when the classpath is empty. Its registration
+# lives in pip-app, the module that assembles a running application.
+com.parallelimage.nativebridge.NativeImageEnhancer

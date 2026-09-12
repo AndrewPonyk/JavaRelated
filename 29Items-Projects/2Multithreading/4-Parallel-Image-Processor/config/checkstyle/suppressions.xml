@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!--
+  Suppressions are exceptions, and an exception with no reason attached becomes
+  permanent. Every entry here must say what is suppressed and why the rule is wrong
+  *at that place* rather than wrong in general. "Too noisy" is not a reason to add an
+  entry here: it is a reason to change the rule in checkstyle.xml, where the decision
+  is visible to everyone instead of hidden behind a path pattern.
+
+  The file is deliberately almost empty. The rules in checkstyle.xml were chosen by
+  running them and keeping the ones the code already satisfied, so there was very little
+  to excuse: two entries below, each naming one check and one file. Where a rule fired on
+  a whole class of correct code instead of one place, it was removed from checkstyle.xml
+  with its reasoning rather than hidden here. If you find yourself adding a fourth entry,
+  the honest move is usually to fix the code.
+
+  Paths are regular expressions matched against the file name, so [/\\] covers both
+  separators and the same file works on Windows and Linux.
+-->
+<suppressions>
+
+  <!-- Generated and build-output trees. The plugin is pointed at src/main/java, so
+       nothing under target/ is scanned today; this entry is what keeps that true for
+       a module that later generates sources into target/generated-sources. -->
+  <suppress files="[/\\]target[/\\]" checks=".*"/>
+
+  <!-- The JNI declaration block in NativeImageEnhancer is six `private static native`
+       methods, each with a one-line javadoc, written as a table:
+
+           /** @return the ABI version the loaded library implements ... */
+           private static native int nativeApiVersion();
+
+       SingleLineJavadoc wants each of those expanded to three lines. The reason not to
+       is specific to this file: these signatures generate
+       native/include/com_parallelimage_nativebridge_NativeImageEnhancer.h, and the way
+       anyone verifies the two sides still agree is to put the header next to this block
+       and read down. Tripling the height of the block to satisfy a formatting
+       preference makes the one review that matters here harder.
+
+       Scoped to the one check and the one file, so a genuinely undocumented method in
+       this file is still reported by MissingJavadocType/JavadocStyle. -->
+  <suppress files="[/\\]NativeImageEnhancer\.java$" checks="SingleLineJavadoc"/>
+
+  <!-- CliOptions.parse walks argv with an index that doubles as the parse cursor: a flag that
+       takes a value reads args[i + 1] and advances past it, six times, identically.
+       ModifiedControlVariable is not wrong in general — a loop index changed halfway through a
+       body is usually a bug — but in an argv parser advancing the cursor *is* the loop's job, and
+       the alternatives are worse. A while loop with a manual `i += takesValue(arg) ? 2 : 1` would
+       split "which flags take a value" across the switch and a second list, where the two can
+       disagree silently; a `consumed = 2` assignment in each arrow case is the same duplication
+       written six times. The loop carries a comment explaining the increment, which is the part a
+       reader actually needs.
+
+       Scoped to the one check and the one file: a genuinely accidental index mutation anywhere
+       else, including elsewhere in pip-app, is still reported. -->
+  <suppress files="[/\\]CliOptions\.java$" checks="ModifiedControlVariable"/>
+
+  <!-- Also honours @SuppressWarnings("checkstyle:RuleName") at the point of use, via
+       the SuppressWarningsFilter in checkstyle.xml. Prefer that: an annotation sits
+       next to the code it excuses and disappears when that code does, whereas an
+       entry in this file outlives the line it was written for. -->
+
+</suppressions>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pip-ui — JavaFX presentation layer.
+
+  JavaFX 21 is NOT part of the JDK and is modular. This module compiles against the
+  jars on the classpath, but LAUNCHING requires an explicit module path plus
+  add-modules (spelled out in the run scripts; XML comments cannot contain the
+  double-hyphen flag prefix); see
+  scripts/run-ui.{cmd,sh}. A bare `java -jar` will fail with
+  "JavaFX runtime components are missing" — that is expected, not a bug.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.parallelimage</groupId>
+    <artifactId>pip-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>pip-ui</artifactId>
+  <name>PIP :: UI (JavaFX)</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-core</artifactId>
+    </dependency>
+
+    <!-- The classifier must be repeated here, not only in the parent's
+         dependencyManagement: Maven's management key is
+         groupId:artifactId:type:classifier, so a declaration without the
+         classifier does not match the managed entry and the version silently
+         goes missing. ${javafx.platform} comes from the OS-activated profiles
+         in the parent POM. -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-swing</artifactId>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Writes the resolved JavaFX classpath to target/javafx.classpath so the
+           run scripts can build the module path without hardcoding ~/.m2 paths. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>javafx-module-path</id>
+            <phase>package</phase>
+            <goals><goal>build-classpath</goal></goals>
+            <configuration>
+              <includeGroupIds>org.openjfx</includeGroupIds>
+              <outputFile>${project.build.directory}/javafx.classpath</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

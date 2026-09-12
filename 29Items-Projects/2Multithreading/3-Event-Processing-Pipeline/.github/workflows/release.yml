@@ -1,0 +1,287 @@
+# ===========================================================================
+# Release -- turn a tag into a downloadable, verifiable jar.
+#
+# What "release" means for this project: ONE self-contained jar plus a
+# checksum. No container image (docs/TECH-NOTES.md 3.3 -- the deployment unit
+# is a jar and a JDK), no Maven Central publish (the artifact is a runnable
+# application, not a library anybody depends on), no changelog generator (a
+# hand-written release note is worth more than 40 auto-listed commit
+# subjects).
+#
+# The interesting part of this file is the version gate. A tag is a permanent,
+# public claim about what the code is; a jar named 1.0.0-SNAPSHOT attached to a
+# tag called v1.0.0 makes that claim a lie, and nothing else in the toolchain
+# will catch it. So the first job compares them and refuses to continue.
+#
+# To cut a release:
+#   1. mvn versions:set -DnewVersion=1.0.0   (or edit <version> by hand)
+#   2. commit, then: git tag -a v1.0.0 -m 'v1.0.0' && git push --follow-tags
+#   3. bump to 1.1.0-SNAPSHOT on master afterwards
+# ===========================================================================
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  # Dry run: everything except creating the GitHub release, so the gate and
+  # the build can be exercised without burning a tag.
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag or ref to build (dry run -- publishes nothing)'
+        required: true
+
+# Read by default; the publish job widens this to `contents: write` for itself
+# alone. A workflow-wide write permission would hand every step in every job
+# the ability to push to the repository, which none of them need.
+permissions:
+  contents: read
+
+env:
+  MAVEN_ARGS: -B -ntp
+
+jobs:
+  # -------------------------------------------------------------------------
+  # The gate. Cheap, and it is the only thing standing between a typo and a
+  # permanently mislabelled artifact.
+  # -------------------------------------------------------------------------
+  verify-version:
+    name: Tag matches pom version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compare tag with project.version
+        id: check
+        run: |
+          # help:evaluate rather than parsing the XML: it resolves properties
+          # and inheritance, which grep cannot.
+          pom_version=$(mvn $MAVEN_ARGS -q -DforceStdout \
+            help:evaluate -Dexpression=project.version)
+          echo "pom=$pom_version"
+
+          case "$pom_version" in
+            *-SNAPSHOT)
+              echo "::error::project.version is $pom_version; a release must not be a SNAPSHOT"
+              exit 1 ;;
+          esac
+
+          # On workflow_dispatch there is no tag to compare against, so the
+          # SNAPSHOT check above is the whole gate.
+          if [ "${{ github.event_name }}" = 'push' ]; then
+            tag_version="${GITHUB_REF_NAME#v}"
+            if [ "$tag_version" != "$pom_version" ]; then
+              echo "::error::tag $GITHUB_REF_NAME implies $tag_version but pom says $pom_version"
+              exit 1
+            fi
+          fi
+
+          echo "version=$pom_version" >> "$GITHUB_OUTPUT"
+
+  # -------------------------------------------------------------------------
+  # Full verification on all three schedulers before anything is published.
+  #
+  # This duplicates ci.yml on purpose. A tag can point at a commit that CI
+  # never ran (an old commit, a force-pushed branch, a tag created in the web
+  # UI), and "it passed on master once" is not the same statement as "this
+  # exact tree passes".
+  # -------------------------------------------------------------------------
+  verify:
+    name: Verify (${{ matrix.os }})
+    needs: verify-version
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build, test and cover
+        run: mvn $MAVEN_ARGS verify
+        shell: bash
+
+      - name: Upload surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-surefire-${{ matrix.os }}
+          path: target/surefire-reports/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # -------------------------------------------------------------------------
+  # Build the artifact that will actually be published, and smoke it.
+  #
+  # Separate from `verify` so exactly one jar exists: if all three matrix legs
+  # produced a candidate, "which jar did we ship" would be answered by
+  # whichever upload happened to win.
+  # -------------------------------------------------------------------------
+  package:
+    name: Package and smoke
+    needs: [verify-version, verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERSION: ${{ needs.verify-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Tests already passed on three platforms in `verify`; running them a
+      # fourth time here would add minutes and no information.
+      - name: Package
+        run: mvn $MAVEN_ARGS -DskipTests package
+
+      # The last chance to notice that the jar cannot start -- a broken
+      # manifest or a resource missing from the jar is invisible to `mvn test`
+      # and fatal to whoever downloads this.
+      - name: Smoke the packaged jar
+        # pipefail, for the same reason as in ci.yml and with more at stake: the
+        # default shell is `bash -e`, where the exit code of `java | tee` is tee's,
+        # so a jar that printed `reconciled=true` and *then* exited 1 on the
+        # reporting edge would satisfy both the pipeline and the grep below, and
+        # get published. The grep checks the counters; this checks the exit code.
+        shell: bash
+        run: |
+          jar="target/event-processing-pipeline-$VERSION.jar"
+          test -f "$jar" || { echo "::error::$jar was not produced"; ls -l target; exit 1; }
+
+          java -jar "$jar" --help >/dev/null
+
+          java -jar "$jar" \
+            --pipeline.event.count=50000 \
+            --pipeline.events.per.second=0 \
+            --pipeline.dashboard.enabled=false \
+            --pipeline.output.dir=./output/release \
+            | tee release-smoke.log
+          grep -q 'reconciled=true' release-smoke.log || {
+            echo '::error::released jar does not reconcile'; tail -n 30 release-smoke.log; exit 1; }
+
+      # Checksums, not signatures. A signature needs a key, and a key in
+      # repository secrets protects against roughly nothing that matters here;
+      # a checksum lets a downloader detect a truncated or tampered download,
+      # which is the actual failure mode.
+      - name: Stage the release files
+        run: |
+          mkdir -p dist
+          cp "target/event-processing-pipeline-$VERSION.jar" dist/
+          cp README.md docs/ARCHITECTURE.md docs/TECH-NOTES.md .env.example dist/
+          cd dist
+          sha256sum ./* > SHA256SUMS
+          cat SHA256SUMS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # Publish. Skipped on workflow_dispatch, which is what makes the dispatch a
+  # genuine dry run rather than a release with a different trigger.
+  # -------------------------------------------------------------------------
+  publish:
+    name: Publish GitHub release
+    if: github.event_name == 'push'
+    needs: [verify-version, package]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.verify-version.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist
+
+      # Hand-written notes, not `--generate-notes`: a list of commit subjects
+      # tells a downloader nothing about how to run the thing. Written to a
+      # file in its own step so the `gh` invocation below stays a single
+      # readable line-per-flag command.
+      #
+      # The YAML block scalar strips this file's indentation before the shell
+      # sees it, so the heredoc terminator lines up at column 0 as bash
+      # requires -- which is also why the note text below can be indented at
+      # all.
+      - name: Compose the release notes
+        run: |
+          cat > notes.md <<'NOTES'
+          ## Run it
+
+          Requires a JDK 21+ and nothing else -- no container, no database, no broker.
+
+              java -jar event-processing-pipeline-VERSION.jar --help
+              java -jar event-processing-pipeline-VERSION.jar --pipeline.event.count=1000000
+
+          ## Verify the download
+
+              sha256sum -c SHA256SUMS
+
+          ## Exit codes
+
+          | Code | Meaning |
+          | --- | --- |
+          | 0 | completed, counters reconcile |
+          | 1 | run failed, or events were lost |
+          | 2 | invalid configuration -- nothing was started |
+          | 130 | interrupted (Ctrl+C) after a clean drain |
+
+          See `ARCHITECTURE.md` for the design and `TECH-NOTES.md` for
+          configuration, tuning and the known pitfalls.
+          NOTES
+          # The heredoc is quoted ('NOTES'), so nothing inside it was expanded
+          # -- the backticks and $ in the note text stay literal. That leaves
+          # the version placeholder to substitute here.
+          sed -i "s/VERSION/$VERSION/g" notes.md
+          cat notes.md
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # gh needs the repository when there is no checkout to infer it from.
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # --verify-tag: fail rather than silently creating a tag if the ref
+          # somehow does not exist. Pre-releases are anything with a suffix
+          # (1.0.0-rc1), detected by the presence of a '-'.
+          prerelease=''
+          case "$VERSION" in *-*) prerelease='--prerelease' ;; esac
+
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "Event Processing Pipeline $VERSION" \
+            --verify-tag \
+            --notes-file notes.md \
+            $prerelease

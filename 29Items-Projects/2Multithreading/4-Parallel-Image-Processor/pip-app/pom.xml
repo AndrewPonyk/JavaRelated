@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  pip-app — the assembly point: config, manual DI wiring, CLI, local control API, main().
+
+  This is the ONLY module allowed to depend on every other module, and the only place
+  System.getenv() is called (via AppConfig).
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.parallelimage</groupId>
+    <artifactId>pip-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>pip-app</artifactId>
+  <name>PIP :: App (launcher, CLI, local control API)</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-persistence</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-native</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.parallelimage</groupId>
+      <artifactId>pip-ui</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>pip-app</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.parallelimage.app.Main</mainClass>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>lib/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Collect every runtime dependency into target/lib so the manifest
+           classpath works and the run scripts / jlink have a single input dir.
+           No shade/uber-jar: shading JavaFX breaks its native library loading. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-runtime-deps</id>
+            <phase>package</phase>
+            <goals><goal>copy-dependencies</goal></goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+              <overWriteReleases>false</overWriteReleases>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

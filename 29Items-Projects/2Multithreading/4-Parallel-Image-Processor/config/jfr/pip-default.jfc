@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Settings overlay for the Parallel Image Processor's custom JFR events
+  (com.parallelimage.core.jfr.BatchProcessingEvent / TileProcessingEvent).
+
+  This file intentionally does NOT redefine JDK-builtin events (GC, execution samples, etc.) —
+  a .jfc passed to -XX:StartFlightRecording accepts a comma-separated settings list, and later
+  files in that list override earlier ones, so this overlay is meant to be layered on top of the
+  JDK's own "default" or "profile" settings rather than replace them:
+
+    java -XX:StartFlightRecording=filename=recording.jfr,settings=default,config/jfr/pip-default.jfc ...
+
+  TileProcessingEvent is deliberately given a non-zero threshold: a large panorama can produce
+  thousands of leaf tiles per batch, and recording every single one is rarely worth the overhead.
+  BatchProcessingEvent has no threshold since batches are comparatively rare and always
+  interesting.
+-->
+<configuration version="2.0" label="Parallel Image Processor" description="Custom events for batch- and tile-level processing" provider="com.parallelimage">
+  <event name="com.parallelimage.core.jfr.BatchProcessingEvent">
+    <setting name="enabled">true</setting>
+    <setting name="stackTrace">false</setting>
+    <setting name="threshold">0 ms</setting>
+  </event>
+  <event name="com.parallelimage.core.jfr.TileProcessingEvent">
+    <setting name="enabled">true</setting>
+    <setting name="stackTrace">false</setting>
+    <setting name="threshold">1 ms</setting>
+  </event>
+</configuration>

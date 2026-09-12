@@ -1,0 +1,74 @@
+# ===========================================================================
+# Dependabot.
+#
+# There is very little to update here, and that is the point: the project has
+# exactly one declared dependency (JUnit, test-scoped) plus the build plugins.
+# See docs/ARCHITECTURE.md 2.6 -- zero runtime dependencies is a design
+# constraint, not an accident, so this file mostly guards the *build*.
+#
+# Two ecosystems only. No `docker` ecosystem, because there is no Dockerfile
+# (! no docker needed at all), and no `npm`, because there is no frontend.
+# ===========================================================================
+version: 2
+
+updates:
+  # -------------------------------------------------------------------------
+  # Maven: the JUnit dependency and every build plugin (compiler, surefire,
+  # jar, checkstyle, jacoco).
+  #
+  # Plugin updates are the ones that actually matter. A stale surefire is how
+  # a project ends up unable to run tests on a new JDK, and a stale checkstyle
+  # is how it ends up unable to parse a new language feature.
+  # -------------------------------------------------------------------------
+  - package-ecosystem: maven
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Kyiv
+    # Small on purpose. Five simultaneous PRs against a one-dependency project
+    # means five CI matrix runs (3 OSes each) to review a version bump.
+    open-pull-requests-limit: 3
+    labels: [dependencies, build]
+    commit-message:
+      prefix: 'build(deps)'
+      include: scope
+    groups:
+      # One PR for all the plugins that only affect the build. They are
+      # reviewed the same way -- "did CI stay green" -- so splitting them into
+      # separate PRs multiplies the CI cost without adding a decision.
+      maven-build-plugins:
+        patterns:
+          - 'org.apache.maven.plugins:*'
+          - 'com.puppycrawl.tools:checkstyle'
+          - 'org.jacoco:*'
+        update-types: [minor, patch]
+    ignore:
+      # The language level is pinned by maven.compiler.release=21 and the
+      # README's "requires a JDK 21+" claim. A major plugin bump can quietly
+      # raise the minimum JDK of the *build*, which is a deliberate decision,
+      # not a dependency update -- so those arrive as an explicit human change.
+      - dependency-name: 'org.apache.maven.plugins:*'
+        update-types: [version-update:semver-major]
+
+  # -------------------------------------------------------------------------
+  # GitHub Actions: checkout, setup-java, upload-artifact, download-artifact.
+  #
+  # Worth automating precisely because it is easy to forget. Actions get
+  # deprecated on a schedule GitHub sets, not one this repository controls, and
+  # the failure mode is a workflow that stops running rather than one that
+  # fails loudly.
+  # -------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    labels: [dependencies, ci]
+    commit-message:
+      prefix: 'ci(deps)'
+    groups:
+      # These are always bumped together in practice; one PR, one CI run.
+      actions:
+        patterns: ['*']

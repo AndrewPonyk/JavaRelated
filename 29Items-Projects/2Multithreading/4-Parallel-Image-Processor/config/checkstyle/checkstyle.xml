@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Checkstyle rules for Parallel Image Processor.
+
+  The root pom runs this with violationSeverity=warning, which means every rule here
+  fails the build. That is the whole reason the file is shaped the way it is: each
+  rule was switched on, run against src/main/java, and kept only if the existing code
+  already passed it. A rule that needed the code changed to pass was either applied to
+  the code or left out with a note saying why — never left in at severity=info, which
+  is the state in which a rule stops being a rule and becomes a comment.
+
+  Consequences worth knowing before editing:
+
+    * Tests are not checked (includeTestSourceDirectory=false in the pom). That is a
+      deliberate scope choice, not an oversight: the tests use long descriptive method
+      names, deep assertion nesting, and multi-paragraph javadoc explaining why a test
+      exists, and none of those are worth arguing with a formatter about. Test code is
+      reviewed, not linted.
+
+    * LineLength is 120 and .editorconfig says the same. Change one and change both.
+
+    * Checkstyle counts characters, not bytes. Several separator comments in
+      pip-core use box-drawing characters; byte-counting tools report those lines as
+      over 200 characters long and they are not.
+-->
+<module name="Checker">
+  <property name="charset" value="UTF-8"/>
+  <property name="severity" value="warning"/>
+  <property name="fileExtensions" value="java, properties, xml"/>
+
+  <!-- ===================================================================
+       Filters
+       =================================================================== -->
+  <module name="SuppressionFilter">
+    <!-- checkstyle.suppressions.file is the property the maven plugin fills in from
+         <suppressionsLocation>. Naming it here rather than hardcoding a path is what
+         lets the same config work from the reactor root and from a single module: a
+         relative path would resolve against whichever module is being built. -->
+    <property name="file" value="${checkstyle.suppressions.file}"/>
+    <property name="optional" value="false"/>
+  </module>
+
+  <!-- Lets @SuppressWarnings("checkstyle:LineLength") work at the point of use.
+       Preferred over an entry in suppressions.xml, because it is visible in the file
+       it affects and it disappears with the code it excuses. -->
+  <module name="SuppressWarningsFilter"/>
+
+  <!-- ===================================================================
+       Whole-file checks
+       =================================================================== -->
+  <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf_cr_crlf"/>
+  </module>
+
+  <!-- Tabs, not indentation width: .editorconfig sets indent_style=space, and a tab
+       that slips through renders differently in every tool that shows the diff. -->
+  <module name="FileTabCharacter">
+    <property name="eachLine" value="true"/>
+  </module>
+
+  <module name="LineLength">
+    <property name="max" value="120"/>
+    <!-- A URL or a fully-qualified name in javadoc cannot be wrapped without breaking
+         the link, and wrapping an import does not compile. -->
+    <property name="ignorePattern" value="^package.*|^import.*|^ *\* *https?://|@see|@link"/>
+  </module>
+
+  <module name="RegexpSingleline">
+    <property name="format" value="\s+$"/>
+    <property name="message" value="Trailing whitespace."/>
+  </module>
+
+  <!-- ===================================================================
+       Rules that need the parse tree
+       =================================================================== -->
+  <module name="TreeWalker">
+
+    <!-- Collects @SuppressWarnings for the filter above. -->
+    <module name="SuppressWarningsHolder"/>
+
+    <!-- ===== Imports ===== -->
+    <module name="AvoidStarImport"/>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports">
+      <property name="processJavadoc" value="true"/>
+    </module>
+    <module name="IllegalImport">
+      <!-- Internal JDK packages only. An earlier draft also listed javafx.* here to
+           keep the UI toolkit out of the domain, which was a mistake twice over: it
+           reported sixteen violations in pip-ui, whose entire job is JavaFX, and the
+           boundary it was trying to protect is already enforced by something far
+           stronger than a lint rule. pip-core declares an empty <dependencies> block,
+           so a JavaFX import there does not produce a warning — it fails to compile.
+           A rule that can only restate what javac already refuses is not worth the
+           per-module exception list it would need.
+
+           com.sun.net.httpserver is excluded, and the exclusion is not a concession:
+           that package is the exported API of the supported `jdk.httpserver` module,
+           and it is the whole reason BatchJobController needs no web framework. The
+           package name is a historical accident, not a marker of internal API. Written
+           as a lookahead rather than a suppression so that the rest of com.sun — the
+           genuinely internal half — stays banned in pip-app too. -->
+      <property name="illegalPkgs" value="sun, com\.sun(?!\.net\.httpserver)"/>
+      <property name="regexp" value="true"/>
+    </module>
+    <module name="CustomImportOrder">
+      <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
+      <property name="sortImportsInGroupAlphabetically" value="true"/>
+      <property name="separateLineBetweenGroups" value="true"/>
+    </module>
+
+    <!-- ===== Naming ===== -->
+    <module name="PackageName">
+      <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+    </module>
+    <module name="TypeName"/>
+    <module name="MethodName"/>
+    <module name="MemberName"/>
+    <module name="ParameterName"/>
+    <module name="LocalVariableName"/>
+    <module name="LocalFinalVariableName"/>
+    <module name="StaticVariableName"/>
+    <module name="ConstantName"/>
+    <module name="RecordComponentName"/>
+    <module name="LambdaParameterName"/>
+    <module name="PatternVariableName"/>
+    <module name="CatchParameterName">
+      <!-- `t` is used deliberately where a Throwable is caught at a thread or task
+           boundary; `e` everywhere else. -->
+      <property name="format" value="^(e|t|ex|[a-z][a-zA-Z0-9]+)$"/>
+    </module>
+
+    <!-- ===== Structure and modifiers ===== -->
+    <module name="OuterTypeFilename"/>
+    <module name="OneTopLevelClass"/>
+    <module name="PackageDeclaration"/>
+    <module name="ModifierOrder"/>
+    <module name="RedundantModifier"/>
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
+    <module name="InterfaceIsType"/>
+    <module name="OneStatementPerLine"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="ArrayTypeStyle"/>
+    <module name="UpperEll"/>
+    <module name="NoFinalizer"/>
+    <module name="ExplicitInitialization">
+      <!-- Restricted to reference fields. ProcessingOptions.Builder declares its
+           defaults as a block of field initializers, and that block is where a reader
+           looks to find out what happens if they set nothing:
+
+               private boolean stripMetadata = true;
+               private boolean overwriteExisting = false;
+
+           Forbidding the redundant `= false` would leave one field in that table with
+           no visible default, so the rule would be making the code less clear to save
+           a token. `= null` on a reference is different: it states a default that is
+           already unavoidable and tells the reader nothing. -->
+      <property name="onlyObjectReferences" value="true"/>
+    </module>
+    <module name="DefaultComesLast"/>
+    <module name="FallThrough"/>
+    <module name="MissingOverride"/>
+    <module name="CovariantEquals"/>
+    <module name="EqualsHashCode"/>
+    <module name="StringLiteralEquality"/>
+
+    <!-- EqualsAvoidNull is NOT enabled. It flags every `subject.equals("literal")` and its
+         only remedy is to invert it: `"POST".equals(method)`. It reported ten violations,
+         and the receiver at all ten is provably non-null — `exchange.getRequestMethod()`,
+         which the HttpExchange contract guarantees; `raw.trim()`, whose result cannot be
+         null; and two private helpers reached only from validated call sites. The rule has
+         no "nullable receivers only" mode, so keeping it would buy ten inverted comparisons
+         and no null-safety this codebase does not already have from validating at its
+         edges. StringLiteralEquality above stays: `==` on strings is always a bug. -->
+
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="NoClone"/>
+    <module name="ModifiedControlVariable"/>
+
+    <!-- An empty catch is how a swallowed failure looks. Allowed only when the
+         variable is named `ignored`/`expected` or the block carries a comment saying
+         why nothing is done — both of which force the decision to be stated. -->
+    <module name="EmptyCatchBlock">
+      <property name="exceptionVariableName" value="ignored|expected"/>
+      <property name="commentFormat" value=".*"/>
+    </module>
+
+    <!-- ===== Braces and blocks ===== -->
+    <module name="NeedBraces"/>
+    <module name="LeftCurly"/>
+    <module name="RightCurly">
+      <property name="option" value="same"/>
+    </module>
+    <module name="EmptyBlock">
+      <property name="option" value="text"/>
+      <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE,
+          LITERAL_FOR, LITERAL_WHILE, LITERAL_DO, INSTANCE_INIT, STATIC_INIT"/>
+    </module>
+
+    <!-- ===== Whitespace ===== -->
+    <module name="WhitespaceAfter"/>
+    <module name="WhitespaceAround">
+      <property name="allowEmptyConstructors" value="true"/>
+      <property name="allowEmptyMethods" value="true"/>
+      <property name="allowEmptyTypes" value="true"/>
+      <property name="allowEmptyLambdas" value="true"/>
+      <property name="allowEmptyCatches" value="true"/>
+    </module>
+    <module name="NoWhitespaceBefore"/>
+    <module name="ParenPad"/>
+    <module name="MethodParamPad"/>
+    <module name="GenericWhitespace"/>
+    <module name="TypecastParenPad"/>
+    <module name="NoLineWrap"/>
+
+    <!-- ===== Javadoc ===== -->
+    <!-- Public API only, and structure only. Whether a class is *well* documented is
+         a review question; whether a public type has any documentation at all is
+         mechanical, and this project's docs lean on the source comments being there. -->
+    <module name="MissingJavadocType">
+      <property name="scope" value="public"/>
+      <property name="excludeScope" value="nothing"/>
+    </module>
+    <module name="JavadocType">
+      <property name="scope" value="public"/>
+      <!-- Records are the reason for this. JavadocType wants an @param tag in the
+           *type* javadoc for every record component, which for JobOutcome.Failure
+           means five tags restating what five self-describing component names already
+           say, and for JobRepository.JobRecord ten. This codebase documents a record
+           by explaining what it means and when it is produced, which is the part a
+           reader cannot deduce; MissingJavadocType above still requires that the
+           documentation exist. Tags on *methods* are unaffected: this property only
+           relaxes the type-level requirement. -->
+      <property name="allowMissingParamTags" value="true"/>
+    </module>
+    <module name="JavadocStyle">
+      <property name="scope" value="public"/>
+      <property name="checkFirstSentence" value="true"/>
+      <property name="checkEmptyJavadoc" value="true"/>
+      <property name="checkHtml" value="true"/>
+    </module>
+    <module name="NonEmptyAtclauseDescription"/>
+    <module name="AtclauseOrder">
+      <property name="tagOrder" value="@param, @return, @throws, @exception, @see, @since,
+          @deprecated, @serial, @serialField, @serialData"/>
+    </module>
+    <module name="InvalidJavadocPosition"/>
+    <module name="SingleLineJavadoc"/>
+
+    <!-- ===== Size ===== -->
+    <!-- These are runaway detectors, not style limits. They are set above the largest
+         thing in the codebase today so that they fire on a change of kind (a method
+         that grew a second responsibility) rather than on a change of degree. -->
+    <module name="MethodLength">
+      <property name="max" value="150"/>
+      <property name="countEmpty" value="false"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="max" value="9"/>
+      <!-- A record's canonical constructor is generated from its components; the
+           argument against many parameters does not apply to it. -->
+      <property name="ignoreOverriddenMethods" value="true"/>
+    </module>
+    <module name="OuterTypeNumber"/>
+
+    <!-- ===== Concurrency ===== -->
+    <!-- The reason this project exists is a ForkJoinPool, so the rules about locking
+         and shared state are the ones that pay for themselves. -->
+    <module name="IllegalThrows"/>
+
+    <!-- IllegalCatch is NOT enabled, and this is the most considered omission in the
+         file. It was switched on and produced eleven violations, every one of them on
+         a line that exists because of a deliberate decision documented in
+         ARCHITECTURE §2.6: an engine whose contract is "one unreadable image must not
+         end a 4000-image batch" has to catch RuntimeException at the job boundary and
+         turn it into a JobOutcome.Failure.
+
+         The clearest case against the rule is BatchProcessingTask, where the ladder
+         reads `catch (Error e) { throw e; }` immediately above a Throwable catch. That
+         line is there so an OutOfMemoryError is *not* swallowed by the clause below
+         it — it is the fix for exactly the problem IllegalCatch is meant to find, and
+         the rule flags it. Eleven warnings on correct code is how a team learns to
+         stop reading warnings, so the rule is absent rather than suppressed eleven
+         times. What actually guards this area is the review rule in ARCHITECTURE and
+         the tests that assert a failing image yields a Failure outcome. -->
+
+
+    <!-- There is no Checkstyle rule for broken double-checked locking; the check that
+         finds it is SpotBugs' DC_DOUBLECHECK, which runs in the same profile. Noted
+         here because this is the section where someone would look for it. -->
+
+  </module>
+</module>

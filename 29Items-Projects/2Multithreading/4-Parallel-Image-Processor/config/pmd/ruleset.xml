@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="parallel-image-processor"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+        https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>
+    PMD rules for Parallel Image Processor (PMD 7, via maven-pmd-plugin 3.26.0).
+
+    PMD overlaps Checkstyle in about a third of its rules and disagrees with it in a few.
+    Where they overlap, the rule lives in exactly one of the two files, and the one that
+    owns it is the one that reports it better: Checkstyle owns everything about how the
+    source *looks* (naming, imports, braces, javadoc structure, line length), and this
+    file owns everything about what the code *does*. That is why the codestyle category
+    is almost absent below and why the multithreading, errorprone and design categories
+    carry the weight.
+
+    Like config/checkstyle/checkstyle.xml, every rule here was switched on, run against
+    src/main/java, and kept only if the code already passed it or the code was wrong and
+    got fixed. Rules that fired on deliberate design are excluded *with the reason*, not
+    silenced with a priority bump — a rule at a priority the build ignores is a comment
+    with XML syntax.
+  </description>
+
+  <!-- Tests are excluded here as well as in the pom, for the same reason: a test that
+       spins up a pool, asserts on a race, and names its methods in prose is not code
+       PMD's design rules can usefully judge. -->
+  <exclude-pattern>.*[/\\]src[/\\]test[/\\].*</exclude-pattern>
+  <exclude-pattern>.*[/\\]target[/\\].*</exclude-pattern>
+
+  <!-- ===================================================================
+       Concurrency
+
+       The reason this project exists. This is the one category taken almost whole,
+       because a false positive here costs a comment and a missed true positive costs
+       a heisenbug that reproduces once a fortnight on someone else's machine.
+       =================================================================== -->
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="DoNotUseThreads"/>
+    <exclude name="AvoidSynchronizedStatement"/>
+    <exclude name="AvoidSynchronizedAtMethodLevel"/>
+    <exclude name="UseConcurrentHashMap"/>
+    <exclude name="AvoidUsingVolatile"/>
+  </rule>
+
+  <!-- DoNotUseThreads is a Jakarta EE rule: in a managed container the application
+       server owns thread creation, so `new Thread(...)` is a violation of the platform
+       contract. This is a local desktop and CLI application that owns its own process
+       and whose entire subject is a ForkJoinPool it constructs itself. The rule would
+       fire on ImagePoolFactory, on the JavaFX shutdown hook, and on the daemon thread
+       that drains progress events — three places where creating a thread is the design.
+
+       AvoidSynchronizedStatement / AvoidSynchronizedAtMethodLevel argue for a
+       java.util.concurrent.locks.Lock over intrinsic locking. That is good advice where
+       a lock needs a timeout, a fairness policy, or tryLock, and it is exactly what
+       ImageMetadataCache does — it holds a StampedLock precisely because optimistic
+       reads matter there. Everywhere else the locking is a two-line critical section
+       guarding one field, where `synchronized` is shorter, cannot leak a held lock past
+       an early return, and needs no finally block to be correct. Swapping those for
+       ReentrantLock would add the failure mode the rules exist to prevent.
+
+       UseConcurrentHashMap fires on every HashMap regardless of whether it is shared,
+       including the local maps built inside a single method and the immutable ones
+       returned by Map.copyOf. What matters is publication, not the implementation
+       class, and publication is what the multithreading rules kept below actually check.
+
+       AvoidUsingVolatile is the odd one out: it is not merely noisy here, it is advice
+       this project cannot take. It fired on ImageProcessingEngine.closed, a flag written
+       by whichever thread calls close() and read by every submit() that must refuse work
+       afterwards. The rule's suggested alternative — a synchronized block — would put a
+       lock acquisition on the hot path to protect a single boolean, and volatile is
+       precisely the primitive the memory model provides for that case. Cancellation and
+       shutdown flags are the textbook correct use of volatile, and this engine has both. -->
+
+  <!-- ===================================================================
+       Error-prone constructs
+       =================================================================== -->
+  <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop"/>
+  <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
+  <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>
+  <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues"/>
+  <rule ref="category/java/errorprone.xml/BrokenNullCheck"/>
+  <rule ref="category/java/errorprone.xml/CheckSkipResult"/>
+  <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
+  <rule ref="category/java/errorprone.xml/CloseResource">
+    <properties>
+      <!-- The JDBC types are the point: pip-persistence hands out Connections from a
+           Database facade, and a leaked Connection under SQLite is not a slow leak but
+           an immediate "database is locked" for the next writer. -->
+      <property name="types"
+          value="java.sql.Connection,java.sql.Statement,java.sql.PreparedStatement,java.sql.ResultSet,java.io.InputStream,java.io.OutputStream"/>
+      <property name="closeAsDefaultTarget" value="true"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals"/>
+  <rule ref="category/java/errorprone.xml/ConstructorCallsOverridableMethod"/>
+  <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices"/>
+  <rule ref="category/java/errorprone.xml/EmptyCatchBlock">
+    <properties>
+      <!-- Same contract as Checkstyle's EmptyCatchBlock: a comment or a variable named
+           `ignored` is what turns a swallowed failure into a stated decision. -->
+      <property name="allowCommentedBlocks" value="true"/>
+      <property name="allowExceptionNameRegex" value="^(ignored|expected)$"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/errorprone.xml/EqualsNull"/>
+  <rule ref="category/java/errorprone.xml/IdempotentOperations"/>
+  <rule ref="category/java/errorprone.xml/InstantiationToGetClass"/>
+  <rule ref="category/java/errorprone.xml/JumbledIncrementer"/>
+  <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
+  <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
+  <rule ref="category/java/errorprone.xml/ReturnEmptyCollectionRatherThanNull"/>
+  <rule ref="category/java/errorprone.xml/SuspiciousOctalEscape"/>
+  <rule ref="category/java/errorprone.xml/UnconditionalIfStatement"/>
+  <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary"/>
+  <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals"/>
+  <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable"/>
+
+  <!-- AvoidCatchingThrowable is deliberately absent, for the reason IllegalCatch is
+       absent from checkstyle.xml: BatchProcessingTask catches Throwable at the task
+       boundary so that one unreadable image cannot end a 4000-image batch, and the
+       `catch (Error e) { throw e; }` clause immediately above it is what keeps an
+       OutOfMemoryError from being swallowed. That ladder is the fix for the problem the
+       rule looks for, and the rule cannot tell the difference. ARCHITECTURE §2.6 and the
+       tests that assert a failing image yields a Failure outcome are what guard it.
+
+       AvoidLiteralsInIfCondition is absent because it flags `if (radius == 0)` and
+       `if (exitCode != 0)`, where naming the literal would obscure it.
+
+       MissingSerialVersionUID is absent because nothing here is Serializable except
+       RecursiveTask/RecursiveAction subclasses, which inherit serialisability from
+       ForkJoinTask and are never actually serialised; a UID on them would be cargo. -->
+
+  <!-- ===================================================================
+       Best practices
+       =================================================================== -->
+  <rule ref="category/java/bestpractices.xml/AvoidReassigningCatchVariables"/>
+  <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables">
+    <properties>
+      <!-- `skip` allows the argv-parser idiom in CliOptions.parse, where the loop index
+           is the parse cursor and a flag that takes a value must advance past it. The
+           same decision as the ModifiedControlVariable entry in the Checkstyle
+           suppressions file, expressed here as configuration because PMD offers it. -->
+      <property name="foreachReassign" value="deny"/>
+      <property name="forReassign" value="skip"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP"/>
+  <rule ref="category/java/bestpractices.xml/CheckResultSet">
+    <properties>
+      <!-- The rule looks for rs.next() in the condition of an `if` or a `while` and reports it
+           otherwise. Database.applyPragmas checks it in a ternary instead —
+
+               String mode = rs.next() ? rs.getString(1) : "unknown";
+
+           — which checks the result just as thoroughly and keeps `mode` final-by-shape rather
+           than a mutable variable pre-seeded with a default. Being the condition of a ternary
+           is what the XPath asserts, so this cannot silently excuse an unchecked next(). -->
+      <property name="violationSuppressXPath" value="./ancestor::ConditionalExpression"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
+  <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
+  <rule ref="category/java/bestpractices.xml/MissingOverride"/>
+  <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
+  <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
+  <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
+  <rule ref="category/java/bestpractices.xml/UnusedAssignment">
+    <properties>
+      <!-- Suppressed inside a record's compact constructor, where PMD 7.7.0 reports a
+           false positive that is dangerous to act on. In
+
+               public ImageMetadata {
+                   exif = exif == null ? Map.of() : Map.copyOf(exif);
+               }
+
+           the assignment looks dead — nothing reads `exif` afterwards — but the compiler
+           emits `this.exif = exif` for every component at the end of the block, so that
+           line *is* the defensive copy. "Fixing" the warning by deleting it would publish
+           a caller's mutable map into a value type shared across a batch. Two records are
+           affected today (ImageMetadata, ProgressEvent) and every future one that
+           normalises a component would be too, so the exception is expressed by AST
+           location rather than by naming files. The rule keeps working everywhere else,
+           which is where it earns its place: a value computed and then overwritten in a
+           long method is exactly the bug it finds. -->
+      <property name="violationSuppressXPath"
+          value="./ancestor::CompactConstructorDeclaration"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedFormalParameter">
+    <properties>
+      <!-- BatchProcessingTask and TileProcessingAction each add a writeObject(ObjectOutputStream)/
+           readObject(ObjectInputStream) pair that unconditionally throws NotSerializableException,
+           refusing serialisation outright rather than silently handing back a broken task (see each
+           class's own javadoc). Java's serialization mechanism finds these methods by reflection on
+           an exact private method signature — the parameter has to be there and has to keep that
+           type for the JVM to recognise the hook at all, so "unused" here is not a sign the parameter
+           can be dropped. -->
+      <property name="violationSuppressXPath"
+          value="./ancestor::MethodDeclaration[@Name='writeObject' or @Name='readObject']"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+  <rule ref="category/java/bestpractices.xml/UseCollectionIsEmpty"/>
+  <rule ref="category/java/bestpractices.xml/UseStandardCharsets"/>
+  <rule ref="category/java/bestpractices.xml/UseTryWithResources"/>
+  <rule ref="category/java/bestpractices.xml/WhileLoopWithLiteralBoolean"/>
+
+  <!-- LiteralsFirstInComparisons is absent, and it has to be, because it is PMD's name for the rule
+       checkstyle.xml turns off as EqualsAvoidNull. Enabling one and disabling the other would mean the
+       build's opinion on `method.equals("POST")` depended on which of the two tools happened to reach
+       the file first — and this rule is what proved that had already happened: pip-app was invisible to
+       PMD until pmd:check was run inside a lifecycle build that could resolve its sibling modules, so
+       ten sites in it went unreported while the Checkstyle twin had been switched off for the same ten.
+
+       The reasoning is the one written out in checkstyle.xml and it holds here without change. Every
+       receiver PMD flagged is provably non-null: HttpExchange.getRequestMethod(), whose contract says
+       so; the result of raw.trim(); a key drawn from ENV_ALIASES.keySet(); and a format string a
+       validator has already matched against a fixed list. Neither rule has a "nullable receivers only"
+       mode, so the yield of keeping it is ten inverted comparisons that read backwards and no null
+       safety that validating at the edges does not already provide. StringLiteralEquality in
+       checkstyle.xml stays on, and it is the half of this territory that finds real bugs: `==` between
+       strings is never right. -->
+
+  <!-- GuardLogStatement is absent, and this is a case where the codebase already does
+       better than the rule asks. The rule wants `if (LOG.isLoggable(DEBUG))` around any
+       log call that builds a string. Every log call here passes a Supplier<String> to
+       System.Logger instead, so the string is never built unless the level is enabled —
+       the same saving without the guard. PMD does not model that, and reports the
+       lambda form as unguarded. -->
+
+  <!-- ===================================================================
+       Design
+
+       Thresholds, like the Checkstyle size rules, are set above the largest thing in
+       the codebase so they fire on a change of kind rather than a change of degree.
+       =================================================================== -->
+  <rule ref="category/java/design.xml/CollapsibleIfStatements"/>
+  <rule ref="category/java/design.xml/SimplifiedTernary"/>
+  <rule ref="category/java/design.xml/SimplifyBooleanReturns"/>
+  <rule ref="category/java/design.xml/SwitchDensity"/>
+  <rule ref="category/java/design.xml/UselessOverridingMethod"/>
+  <rule ref="category/java/design.xml/CyclomaticComplexity">
+    <properties>
+      <property name="classReportLevel" value="120"/>
+      <property name="methodReportLevel" value="20"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/design.xml/NPathComplexity">
+    <properties>
+      <property name="reportLevel" value="400"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/design.xml/ExcessiveParameterList">
+    <properties>
+      <property name="minimum" value="10"/>
+    </properties>
+  </rule>
+
+  <!-- LawOfDemeter is absent. It reports a violation for nearly every fluent call in
+       existence, including the builder chains this codebase uses on purpose.
+
+       ExcessiveImports, TooManyMethods, TooManyFields and ExcessiveClassLength are
+       absent because they measure size without regard to cohesion, and the two largest
+       classes here — AppConfig and BatchJobController — are large because they are
+       exhaustive about their input, which is the property that makes them worth having.
+       CyclomaticComplexity above catches the thing those rules are proxies for. -->
+
+  <!-- ===================================================================
+       Performance
+
+       Only the rules that describe a real cost in a per-pixel loop. Most of this
+       category is folklore from JDK 1.4 and the JIT has since made it wrong.
+       =================================================================== -->
+  <rule ref="category/java/performance.xml/AddEmptyString"/>
+  <rule ref="category/java/performance.xml/AppendCharacterWithChar"/>
+  <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
+  <rule ref="category/java/performance.xml/ConsecutiveAppendsShouldReuse"/>
+  <rule ref="category/java/performance.xml/ConsecutiveLiteralAppends"/>
+  <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
+  <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
+  <rule ref="category/java/performance.xml/InsufficientStringBufferDeclaration"/>
+  <rule ref="category/java/performance.xml/StringInstantiation"/>
+  <rule ref="category/java/performance.xml/StringToString"/>
+  <rule ref="category/java/performance.xml/UseArraysAsList"/>
+  <rule ref="category/java/performance.xml/UseIndexOfChar"/>
+  <rule ref="category/java/performance.xml/UselessStringValueOf"/>
+
+  <!-- AvoidInstantiatingObjectsInLoops is absent, which for an image processor may look
+       backwards. It is not: the rule cannot distinguish an allocation in a hot per-pixel
+       loop from one in a loop over a list of jobs, and the allocations it would find here
+       are all of the second kind — a Path per file, a JobOutcome per image. The per-pixel
+       loops allocate nothing at all, and what keeps them that way is the JMH benchmarks
+       in benchmarks/, not a lint rule that would be firing on the other loops so often
+       that nobody reads it. -->
+
+  <!-- ===================================================================
+       Security
+       =================================================================== -->
+  <rule ref="category/java/security.xml"/>
+
+  <!-- ===================================================================
+       Code style — one rule only
+
+       Checkstyle owns this territory. UnnecessaryImport is here rather than there
+       only because PMD's version also understands static imports of nested types,
+       which is where the Checkstyle equivalent has a blind spot.
+       =================================================================== -->
+  <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
+
+</ruleset>
