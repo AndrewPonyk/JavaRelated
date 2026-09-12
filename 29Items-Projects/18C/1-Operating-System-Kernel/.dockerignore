@@ -1,0 +1,18 @@
+# Keep the Docker build context small & the image clean.
+# (We mount source at runtime, so build artifacts must never leak into context.)
+build/
+*.o
+*.elf
+*.iso
+*.map
+.git/
+.env
+*.log
+serial.out
+qemu.log
+*.gcda
+*.gcno
+*.gcov
+coverage/
+.vscode/
+.idea/

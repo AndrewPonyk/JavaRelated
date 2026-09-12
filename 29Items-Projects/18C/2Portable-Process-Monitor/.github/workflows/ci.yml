@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test:
+    name: build & test (${{ matrix.config }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [ Debug, Release ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- lint: formatting (skips gracefully if clang-format is unavailable) ---
+      - name: clang-format check
+        shell: pwsh
+        run: |
+          if (-not (Get-Command clang-format -ErrorAction SilentlyContinue)) {
+            Write-Host "::warning::clang-format not found on runner; skipping format check"
+            exit 0
+          }
+          $files = Get-ChildItem -Recurse -Include *.c,*.h -Path src,include,tests
+          if ($files) { clang-format --dry-run --Werror $files.FullName }
+
+      # --- configure ---
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+      # --- build (warnings are errors via /W4 /WX) ---
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }} --parallel
+
+      # --- test ---
+      - name: Test
+        run: ctest --test-dir build -C ${{ matrix.config }} --output-on-failure
+
+      # --- package (Release only) ---
+      - name: Package
+        if: matrix.config == 'Release'
+        run: cmake --build build --config Release --target package
+
+      - name: Upload artifact
+        if: matrix.config == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ppmon-portable
+          path: build/ppmon-*.zip
+
+  release:
+    name: release
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ppmon-portable
+          path: dist
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip

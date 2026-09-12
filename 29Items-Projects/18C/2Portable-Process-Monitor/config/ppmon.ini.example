@@ -1,0 +1,33 @@
+; ppmon.ini.example — copy to ppmon.ini next to the executable.
+; Precedence: built-in defaults < this file < command-line flags.
+
+[polling]
+; Sampling interval in milliseconds (50..600000).
+interval_ms = 1000
+; Number of processes shown in the console table.
+top_n = 15
+
+[output]
+; Write a CSV time-series? (true/false)
+csv_enabled = false
+; Output path (relative to the working directory).
+csv_path = ppmon-metrics.csv
+
+[alerts]
+; CPU% high/low watermarks (hysteresis). Alert raises at high, clears below low.
+cpu_alert_high = 85.0
+cpu_alert_low  = 70.0
+; Working-set alert threshold in bytes (default 2 GiB).
+mem_alert_high_bytes = 2147483648
+
+[network]
+; Enable the read-only WinSock2 metric stream.
+net_enabled = false
+listen_addr = 127.0.0.1
+listen_port = 9555
+
+[runtime]
+; Request SeDebugPrivilege for full cross-user process visibility.
+want_privilege = false
+; Log level: 0=TRACE 1=DEBUG 2=INFO 3=WARN 4=ERROR 5=OFF
+log_level = 2

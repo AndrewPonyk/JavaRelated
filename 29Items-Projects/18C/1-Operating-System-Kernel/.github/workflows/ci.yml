@@ -1,0 +1,83 @@
+# CI — lint -> test -> build -> smoke-boot (see TECH-NOTES §3.1)
+name: kernel-ci
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    # Style is advisory: a formatting nit reports here but does not block the
+    # build/test/boot pipeline. Run `make format` to auto-fix.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: Style check
+        run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build toolchain
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+      - name: Run host unit tests
+        run: make test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [ lint, test ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cross toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential nasm grub-pc-bin grub-common xorriso
+      - name: Build kernel
+        run: make BUILD=rel
+      - name: Build ISO
+        run: make iso BUILD=rel
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-image
+          path: |
+            build/kernel.elf
+            build/os.iso
+
+  smoke-boot:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install QEMU + toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential nasm qemu-system-x86 \
+            grub-pc-bin grub-common xorriso
+      - name: Build bootable ISO
+        run: make iso BUILD=debug
+      - name: Boot in QEMU and assert success (exit code + serial markers)
+        run: |
+          set -uo pipefail
+          # The kernel writes 0x10 to the isa-debug-exit port on success, so QEMU
+          # exits with code (0x10 << 1) | 1 = 33 — a deterministic pass signal.
+          set +e
+          timeout 40s qemu-system-x86_64 \
+            -cdrom build/os.iso -serial file:serial.out \
+            -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+            -display none -no-reboot -m 128M
+          code=$?
+          set -e
+          echo "---- serial output ----"; cat serial.out
+          echo "---- qemu exit code: $code (expect 33) ----"
+          test "$code" = "33"
+          grep -q "boot complete"        serial.out
+          grep -q "SELFTEST: ALL PASSED" serial.out
+          grep -q "DEMO COMPLETE"        serial.out
+          grep -q "KERNEL: HALT"         serial.out
+          ! grep -qi "PANIC" serial.out

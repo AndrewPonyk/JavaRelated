@@ -1,0 +1,34 @@
+# clang-format style for npa — LLVM base, tuned for readable systems C.
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+Standard:        c++11          # closest token model clang-format has for C11
+
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+ColumnLimit:     88
+
+# Braces & spacing
+BreakBeforeBraces: Attach
+SpaceBeforeParens: ControlStatements
+PointerAlignment:  Right        # `u8 *p`, matches the codebase
+
+# Keep short constructs compact but readable
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# Alignment that helps tabular struct/enum/decode code
+AlignConsecutiveAssignments:   true
+AlignConsecutiveDeclarations:  true
+AlignTrailingComments:         true
+AlignEscapedNewlines:          Right
+
+# Includes: keep our "module/header.h" groups tidy
+SortIncludes:    true
+IncludeBlocks:   Preserve
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1

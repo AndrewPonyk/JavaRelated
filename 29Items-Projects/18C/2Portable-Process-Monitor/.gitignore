@@ -1,0 +1,33 @@
+# Build output
+/build/
+/out/
+/cmake-build-*/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.zip
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+
+# IDE / editor
+.vs/
+.vscode/
+.idea/
+*.user
+
+# Local config / secrets (only the .example variants are committed)
+.env
+ppmon.ini
+*.csv
+
+# OS noise
+Thumbs.db
+desktop.ini

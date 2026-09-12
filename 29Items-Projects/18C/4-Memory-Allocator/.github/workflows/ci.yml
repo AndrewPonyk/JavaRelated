@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+# Linear quality gate: format -> build -> test -> sanitizers -> valgrind -> lint.
+# Memory bugs are silent, so each dynamic-analysis stage is a hard gate.
+jobs:
+  # ---- Linux: full pipeline incl. Valgrind (the authoritative build) -------
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential gcc make valgrind clang-format clang-tidy
+
+      - name: Format check
+        run: make format-check
+
+      - name: Build (debug)
+        run: make clean && make debug
+
+      - name: Unit tests
+        run: make test
+
+      - name: AddressSanitizer + UBSan
+        run: make clean && make asan
+
+      - name: Valgrind (leak check)
+        run: make clean && make valgrind
+
+      - name: Release build
+        run: make clean && make release
+
+      - name: Static analysis (advisory)
+        run: make lint || true
+
+  # ---- Windows: native MSVC build + tests via CMake ------------------------
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure (MSVC)
+        run: cmake -S . -B build -DMEMALLOC_DEBUG=ON
+
+      - name: Build
+        run: cmake --build build --config Debug
+
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure --build-config Debug

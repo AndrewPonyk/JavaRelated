@@ -1,0 +1,15 @@
+#!/bin/sh
+# Grant capture capabilities so npa can sniff without running as root.
+set -e
+
+case "$1" in
+    configure)
+        if command -v setcap >/dev/null 2>&1; then
+            setcap cap_net_raw,cap_net_admin+eip /usr/bin/npa || \
+                echo "npa: could not setcap (run live capture with sudo)" >&2
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+exit 0

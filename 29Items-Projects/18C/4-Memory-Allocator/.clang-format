@@ -1,0 +1,20 @@
+# Code style for the Memory Allocator project.
+# Based on LLVM, tuned for readable systems C.
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+ColumnLimit:     90
+PointerAlignment: Right
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments:  true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Attach
+SpaceAfterCStyleCast: true
+SortIncludes:    false
+KeepEmptyLinesAtTheStartOfBlocks: false
+IndentCaseLabels: true

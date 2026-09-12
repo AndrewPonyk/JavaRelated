@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]   # e.g. v0.1.0
+
+permissions:
+  contents: write       # needed to create the GitHub Release
+
+jobs:
+  release:
+    name: Build & publish release artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libpcap-dev libncursesw5-dev
+
+      - name: Build optimized binary
+        run: make STRICT=1 OPT=-O3
+
+      # TODO: produce a fully static build (musl + static libpcap/ncurses) for
+      #       "scp and run" portability. For now ship the dynamic binary.
+      - name: Stage artifacts
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          PKG="npa-${VERSION}-linux-x86_64"
+          mkdir -p "dist/${PKG}"
+          cp build/bin/npa "dist/${PKG}/"
+          cp README.md LICENSE config/npa.conf.example config/patterns.rules "dist/${PKG}/"
+          tar -C dist -czf "dist/${PKG}.tar.gz" "${PKG}"
+          ( cd dist && sha256sum "${PKG}.tar.gz" > "${PKG}.tar.gz.sha256" )
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256
+          generate_release_notes: true

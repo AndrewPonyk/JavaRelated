@@ -1,0 +1,15 @@
+# LLVM-derived style tuned for this C codebase.
+BasedOnStyle: LLVM
+Language: Cpp
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 95
+PointerAlignment: Right
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BreakBeforeBraces: Attach
+SortIncludes: false
+SpaceAfterCStyleCast: false

@@ -1,0 +1,31 @@
+# clang-tidy configuration for npa.
+#
+# Focus: bug-prone patterns, portability, and the C-core checks that matter for
+# a packet parser (bounds, integer conversions, undefined behavior). We disable
+# noisy or C++-only checks and a few opinionated readability rules.
+---
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  misc-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-function-cognitive-complexity,
+  -bugprone-easily-swappable-parameters,
+  -misc-no-recursion,
+  -cert-err33-c,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+
+WarningsAsErrors: 'bugprone-*,clang-analyzer-*,portability-*'
+
+HeaderFilterRegex: '(src|include)/.*\.h$'
+
+CheckOptions:
+  - key:   readability-braces-around-statements.ShortStatementLines
+    value: '2'
+  - key:   bugprone-argument-comment.StrictMode
+    value: '0'

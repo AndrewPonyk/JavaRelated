@@ -1,0 +1,133 @@
+.TH NPA 1 "2026-06-17" "npa 0.1.0" "Network Packet Analyzer"
+.SH NAME
+npa \- terminal network packet analyzer with anomaly detection
+.SH SYNOPSIS
+.B npa
+.RB [ \-i
+.IR iface " | " \-r
+.IR file ]
+.RB [ \-f
+.IR bpf ]
+.RB [ \-w
+.IR file ]
+.RB [ \-\-headless ]
+.RB [ \-\-json ]
+.RB [ \-\-count
+.IR n ]
+.RB [ \-\-rules
+.IR file ]
+.RB [ options ]
+.SH DESCRIPTION
+.B npa
+is a Wireshark\-lite tool for live capture, protocol decoding (Ethernet/802.1Q,
+IPv4, IPv6, TCP, UDP, ICMP/ICMPv6), and rule\-driven anomaly detection, rendered
+in an ncurses TUI. It can also read offline pcap files and run headless for
+scripting and CI.
+.PP
+Capturing live traffic requires raw\-socket privileges. Prefer file capabilities
+over running as root:
+.PP
+.RS
+.B sudo setcap cap_net_raw,cap_net_admin+eip /usr/local/bin/npa
+.RE
+.SH OPTIONS
+.SS Source (choose one)
+.TP
+.BI \-i " iface" "\fR, \fP" \-\-interface " iface"
+Capture live on the given network interface.
+.TP
+.BI \-r " file" "\fR, \fP" \-\-read " file"
+Read packets from a pcap file instead of a live interface.
+.SS Capture
+.TP
+.BI \-f " bpf" "\fR, \fP" \-\-filter " bpf"
+Apply a Berkeley Packet Filter expression (e.g. "tcp port 443").
+.TP
+.BI \-s " n" "\fR, \fP" \-\-snaplen " n"
+Bytes captured per packet (default 65535).
+.TP
+.BR \-p ", " \-\-no\-promisc
+Disable promiscuous mode.
+.TP
+.BI \-w " file" "\fR, \fP" \-\-write " file"
+Tee every captured packet to a pcap file (full fidelity).
+.SS Pipeline
+.TP
+.BI \-\-ring\-size " n"
+Ring buffer slots, rounded up to a power of two (default 1024).
+.TP
+.B \-\-block
+Block the capture thread when the ring is full instead of dropping.
+.SS Detection / UI
+.TP
+.BI \-\-rules " file"
+Load anomaly rules from a file (merged over the built\-ins, by name).
+.TP
+.B \-\-headless
+Run without the ncurses UI (scripting / CI).
+.TP
+.B \-\-json
+Headless: emit JSON Lines (alerts + a final summary) on stdout. Implies
+.BR \-\-headless .
+.TP
+.BI \-\-count " n"
+Stop after analyzing N packets (0 = unlimited).
+.TP
+.BI \-\-stats\-interval " s"
+Headless: print a stats line every S seconds.
+.TP
+.BI \-\-log\-file " path"
+Write logs to a file (default: stderr). Logs never go to stdout.
+.TP
+.BI \-\-log\-level " level"
+One of trace, debug, info, warn, error.
+.TP
+.BR \-h ", " \-\-help
+Show usage and exit.
+.TP
+.BR \-V ", " \-\-version
+Print version and exit.
+.SH "INTERACTIVE KEYS"
+.TP
+.BR Up / Down
+Move the packet selection.
+.TP
+.BR PgUp / PgDn ", " Home / End
+Scroll the packet list.
+.TP
+.B p
+Freeze / resume the live list (stats keep updating).
+.TP
+.B /
+Prompt for a new BPF filter and apply it live.
+.TP
+.B w
+Export retained packets to a timestamped pcap.
+.TP
+.B q
+Quit.
+.SH CONFIGURATION
+Settings resolve in order (later wins): built\-in defaults,
+.IR /etc/npa/npa.conf ", " ./npa.conf ", " $NPA_* " environment variables,"
+then command\-line flags. See
+.I npa.conf.example
+and
+.IR patterns.rules .
+.SH EXAMPLES
+.TP
+Live capture on eth0, HTTPS only:
+.B npa \-i eth0 \-f "tcp port 443"
+.TP
+Offline analysis, machine\-readable:
+.B npa \-r capture.pcap \-\-headless \-\-json
+.TP
+Capture to disk while analyzing:
+.B npa \-i eth0 \-w out.pcap
+.SH EXIT STATUS
+0 on success, 2 on a usage/configuration error, 1 on a runtime failure.
+.SH SEE ALSO
+.BR tcpdump (1),
+.BR wireshark (1),
+.BR pcap (3PCAP)
+.SH AUTHORS
+Network Packet Analyzer contributors.

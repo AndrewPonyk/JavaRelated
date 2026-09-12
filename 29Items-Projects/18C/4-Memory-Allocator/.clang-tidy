@@ -1,0 +1,22 @@
+# Static analysis configuration for the Memory Allocator.
+# Pointer/lifetime/UB checks matter most for a manual allocator.
+Checks: >
+  clang-analyzer-*,
+  bugprone-*,
+  cert-*,
+  performance-*,
+  readability-*,
+  misc-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -bugprone-easily-swappable-parameters,
+  -cert-err33-c,
+  -misc-no-recursion
+
+WarningsAsErrors: ''
+HeaderFilterRegex: '(src|include)/.*\.h$'
+FormatStyle: file
+
+CheckOptions:
+  - key:   readability-braces-around-statements.ShortStatementLines
+    value: '0'

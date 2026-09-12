@@ -1,0 +1,39 @@
+# Build output
+build/
+*.o
+*.d
+*.a
+*.so
+*.exe
+npa
+
+# Coverage
+*.gcda
+*.gcno
+*.gcov
+coverage/
+*.info
+
+# Local runtime config / secrets (commit only the *.example versions)
+.env
+npa.conf
+/etc/npa/
+
+# Captures & logs (may contain sensitive payloads)
+*.pcap
+*.pcapng
+*.log
+!tests/fixtures/*.pcap   # curated test fixtures are intentionally tracked
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+compile_commands.json
+
+# Sanitizer / debug dumps
+core
+core.*
+vgcore.*

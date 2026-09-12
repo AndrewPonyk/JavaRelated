@@ -1,0 +1,19 @@
+# .clang-format — kernel C style (Linux-derived, 4-space indent).
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+ColumnLimit:     90
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+PointerAlignment: Right
+SpaceBeforeParens: ControlStatements
+SortIncludes:    false
+KeepEmptyLinesAtTheStartOfBlocks: false
+IndentCaseLabels: false

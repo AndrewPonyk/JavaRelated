@@ -1,0 +1,35 @@
+# patterns.rules — anomaly detection rules for npa
+#
+# One rule per line. Blank lines and '#' comments are ignored. Fields are
+# `key=value` pairs separated by ';'. Unspecified match operands are wildcards.
+# Loaded by analysis/patterns.c::patterns_load_file.
+#
+# Fields:
+#   name   = short unique identifier (no spaces)
+#   sev    = info | low | medium | high | critical
+#   match  = comma-list of: tcp_flags, l4_port, ip_ttl_lt, byte_sig, malformed, bad_checksum
+#   mask   = TCP flags mask  (hex, for match=tcp_flags)
+#   value  = TCP flags value (hex, for match=tcp_flags); matches (flags & mask)==value
+#   port   = L4 port (for match=l4_port; matches src OR dst)
+#   ttl    = threshold (for match=ip_ttl_lt; fires when ttl < this)
+#   sig    = quoted byte/ASCII signature (for match=byte_sig)
+#   msg    = human-readable alert text
+#
+# TCP flag bits: FIN=0x01 SYN=0x02 RST=0x04 PSH=0x08 ACK=0x10 URG=0x20
+
+# --- Scan signatures (mirror the compiled-in built-ins; tune freely) -------
+name=tcp-null-scan; sev=medium; match=tcp_flags; mask=0xFF; value=0x00; msg=TCP NULL scan (no flags)
+name=tcp-xmas-scan; sev=medium; match=tcp_flags; mask=0x29; value=0x29; msg=TCP XMAS scan (FIN+PSH+URG)
+name=tcp-syn-fin;   sev=high;   match=tcp_flags; mask=0x03; value=0x03; msg=Illegal SYN+FIN
+name=ip-low-ttl;    sev=low;    match=ip_ttl_lt; ttl=5;                  msg=Unusually low IPv4 TTL
+
+# --- Cleartext-credential heuristics (byte-signature on payload) -----------
+name=ftp-cleartext-pass; sev=high; match=byte_sig,l4_port; port=21; sig="PASS "; msg=Cleartext FTP password
+name=http-basic-auth;    sev=medium; match=byte_sig; sig="Authorization: Basic"; msg=HTTP Basic auth (base64 creds)
+
+# --- Malformed traffic -----------------------------------------------------
+name=malformed-packet; sev=low; match=malformed; msg=Malformed/partial packet
+
+# --- Examples you might enable (commented) ---------------------------------
+# name=telnet-traffic;   sev=low;  match=l4_port; port=23; msg=Legacy cleartext Telnet
+# name=dns-large-txt;    sev=info; match=l4_port; port=53; msg=DNS traffic (inspect for tunneling)

@@ -1,0 +1,20 @@
+Source: npa
+Section: net
+Priority: optional
+Maintainer: Network Packet Analyzer contributors <npa@example.com>
+Build-Depends: debhelper-compat (= 13), libpcap-dev, libncursesw5-dev
+Standards-Version: 4.6.2
+Homepage: https://example.com/npa
+Rules-Requires-Root: no
+
+Package: npa
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: terminal network packet analyzer with anomaly detection
+ npa is a Wireshark-lite tool for live capture, protocol decoding
+ (Ethernet/802.1Q, IPv4, IPv6, TCP, UDP, ICMP), and rule-driven anomaly
+ detection, rendered in an ncurses TUI. It can also read offline pcap files
+ and run headless for scripting and CI.
+ .
+ Live capture requires the CAP_NET_RAW and CAP_NET_ADMIN capabilities; the
+ postinst grants them on the installed binary via setcap.

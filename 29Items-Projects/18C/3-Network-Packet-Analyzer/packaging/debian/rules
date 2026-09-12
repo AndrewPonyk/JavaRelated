@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# Debian packaging rules for npa. Build with: dpkg-buildpackage -us -uc -b
+export DEB_BUILD_MAINTAINER_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) STRICT=1 OPT=-O2
+
+override_dh_auto_test:
+	$(MAKE) test
+
+override_dh_auto_install:
+	install -D -m0755 build/bin/npa debian/npa/usr/bin/npa
+	install -D -m0644 docs/npa.1 debian/npa/usr/share/man/man1/npa.1
+	install -D -m0644 config/patterns.rules debian/npa/usr/share/npa/patterns.rules
+	install -D -m0644 config/npa.conf.example debian/npa/usr/share/npa/npa.conf.example
+
+override_dh_auto_clean:
+	$(MAKE) clean

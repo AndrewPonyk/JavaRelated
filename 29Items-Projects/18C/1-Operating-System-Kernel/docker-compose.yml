@@ -1,0 +1,39 @@
+# docker-compose.yml — run the full kernel "stack" with one command.
+#
+#   docker compose up kernel     build the ISO and boot it in QEMU (serial->stdout)
+#   docker compose up test       compile & run the host unit tests
+#   docker compose run shell     interactive toolchain shell
+#
+# All services share the same toolchain image (Dockerfile) and bind-mount the
+# source, so edits on the host are picked up without rebuilding the image.
+
+services:
+  kernel:
+    build: .
+    image: oskernel-dev
+    volumes:
+      - .:/src
+    working_dir: /src
+    # Boot headless; serial console is forwarded to your terminal.
+    command: >
+      bash -c "make iso BUILD=debug &&
+               qemu-system-x86_64 -cdrom build/os.iso
+               -serial stdio -display none -no-reboot -m 128M"
+
+  test:
+    build: .
+    image: oskernel-dev
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: make test
+
+  shell:
+    build: .
+    image: oskernel-dev
+    volumes:
+      - .:/src
+    working_dir: /src
+    stdin_open: true
+    tty: true
+    command: bash

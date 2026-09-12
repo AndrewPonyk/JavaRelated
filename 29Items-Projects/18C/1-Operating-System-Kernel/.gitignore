@@ -1,0 +1,28 @@
+# Build output
+build/
+*.o
+*.elf
+*.iso
+*.bin
+*.map
+
+# Local environment (never commit secrets/config)
+.env
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Debug artifacts
+*.log
+serial.out
+qemu.log
+
+# Coverage
+*.gcda
+*.gcno
+*.gcov
+coverage/

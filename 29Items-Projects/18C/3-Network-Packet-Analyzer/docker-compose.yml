@@ -1,0 +1,44 @@
+# docker-compose.yml — run npa in containers.
+#
+#   docker compose up demo                  # end-to-end: replay bundled pcap (JSON)
+#   docker compose run --rm npa -i eth0 -f "tcp port 443"   # live capture
+#   docker compose run --rm ci              # build + run the unit test suite
+#
+# Live capture needs host networking + raw-socket caps (set on the npa service).
+# The demo/offline paths need no special privileges.
+
+services:
+  # Zero-config end-to-end demo: replays the generated sample.pcap headless and
+  # prints JSONL alerts + a summary. Great for `docker compose up demo`.
+  demo:
+    build:
+      context: .
+      target: runtime
+    image: npa:latest
+    command: ["-r", "/opt/npa/sample.pcap", "--headless", "--json"]
+
+  # Interactive live capture (needs host net + raw caps).
+  npa:
+    build:
+      context: .
+      target: runtime
+    image: npa:latest
+    network_mode: host
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./:/data:ro          # read .pcap files / rules from the cwd
+    command: ["--help"]
+    stdin_open: true          # ncurses TUI needs an interactive terminal
+    tty: true
+
+  # Reproducible build + test in the toolchain image (no host deps needed).
+  ci:
+    build:
+      context: .
+      target: build
+    image: npa-build:latest
+    command: ["make", "test"]
+    volumes:
+      - ./:/src

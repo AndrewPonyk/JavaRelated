@@ -1,0 +1,33 @@
+# npa.conf — Network Packet Analyzer runtime configuration (EXAMPLE)
+#
+# Copy to ./npa.conf or /etc/npa/npa.conf and edit. Values here are overridden
+# by $NPA_* environment variables, which are in turn overridden by CLI flags.
+# Lines starting with '#' are comments; format is `key = value`.
+#
+# This file documents every supported key and mirrors the built-in defaults.
+
+# ---- Source (set exactly one of interface / pcap_file) --------------------
+interface       = eth0            # NIC to capture on
+# pcap_file     = capture.pcap    # ...or replay an offline capture instead
+bpf_filter      =                 # BPF expression, e.g. "tcp port 443 or udp port 53"
+snaplen         = 65535           # bytes captured per packet (1..65535)
+promiscuous     = true            # put the NIC in promiscuous mode
+
+# ---- Pipeline -------------------------------------------------------------
+ring_size       = 1024            # ring buffer slots (rounded up to power of two)
+ring_full_policy = drop           # drop | block  (drop = never stall capture)
+workers         = 1               # analyzer threads (Phase 3 supports > 1)
+
+# ---- Detection ------------------------------------------------------------
+rules_file      = config/patterns.rules   # anomaly rules (omit for built-ins only)
+
+# ---- Capture-to-disk ------------------------------------------------------
+# write_file    = capture.pcap    # tee every captured packet to a pcap (full fidelity)
+
+# ---- UI / logging ---------------------------------------------------------
+headless        = false           # true = no ncurses (scripting / CI)
+json            = false           # headless: emit JSON Lines on stdout
+stats_interval  = 0               # headless: seconds between stats lines (0 = only final)
+refresh_hz      = 30              # UI redraw cap
+log_level       = info            # trace | debug | info | warn | error
+log_file        =                # empty = stderr; logs NEVER go to stdout
