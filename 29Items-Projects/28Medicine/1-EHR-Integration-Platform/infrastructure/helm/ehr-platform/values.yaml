@@ -1,0 +1,42 @@
+# Default values for the ehr-platform chart. Override per environment.
+global:
+  imageRegistry: ECR_REGISTRY
+  imagePullPolicy: IfNotPresent
+  environment: dev
+
+services:
+  fhirGateway:
+    enabled: true
+    image: ehr/fhir-gateway-service
+    tag: latest
+    replicas: 2
+    port: 8081
+  hl7Ingestion:
+    enabled: true
+    image: ehr/hl7v2-ingestion-service
+    tag: latest
+    replicas: 2
+    mllpPort: 2575
+  eventStreaming:
+    enabled: true
+    image: ehr/event-streaming-service
+    tag: latest
+    replicas: 2
+  entityLinking:
+    enabled: true
+    image: ehr/entity-linking-service
+    tag: latest
+    replicas: 2
+
+# External managed dependencies (provisioned by Terraform, referenced here).
+externalSecrets:
+  enabled: true
+  secretStore: aws-secrets-manager
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 2Gi

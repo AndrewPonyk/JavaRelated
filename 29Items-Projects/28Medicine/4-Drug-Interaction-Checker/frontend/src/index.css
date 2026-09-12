@@ -1,0 +1,219 @@
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #687078;
+  --border: #d9dee4;
+  --primary: #2563eb;
+  --primary-contrast: #ffffff;
+  --error: #c0392b;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.interaction-checker header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+}
+
+/* --- drug search --- */
+.drug-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.drug-search__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.drug-search input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+button.primary {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border-color: var(--primary);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.suggestion {
+  align-self: flex-start;
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+/* --- selected drugs --- */
+.selected-drugs {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+}
+
+.chip button {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.3rem;
+  color: var(--muted);
+}
+
+/* --- controls --- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* --- results --- */
+.severity-banner {
+  border-left: 5px solid var(--border);
+  background: var(--card);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.interaction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.interaction-item {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.severity-badge {
+  flex-shrink: 0;
+  align-self: flex-start;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.interaction-body strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.interaction-body p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.confidence {
+  color: var(--muted);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.warning {
+  color: #9a6700;
+  background: #fff8e1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls button.primary {
+    width: 100%;
+  }
+}

@@ -1,0 +1,50 @@
+# ── Secrets / env ────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+*.egg-info/
+
+# ── Node / frontend ──────────────────────────────────────────
+node_modules/
+frontend/dist/
+*.local
+
+# ── Terraform ────────────────────────────────────────────────
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# ── ML artifacts (weights pulled from S3) ────────────────────
+ml/models/*.pt
+ml/models/*.pth
+ml/models/*.onnx
+
+# ── DICOM / PHI — never commit patient data ──────────────────
+*.dcm
+data/
+phi/
+
+# ── Local run artifacts ──────────────────────────────────────
+*.db
+dev_run.db
+
+# ── Editor / OS ──────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

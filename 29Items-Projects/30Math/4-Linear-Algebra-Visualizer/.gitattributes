@@ -1,0 +1,6 @@
+# Normalize line endings to LF in the repo (Windows checkouts included) —
+# keeps Prettier/CI byte-identical across platforms. See TECH-NOTES §3.6 pitfall 9.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.woff2 binary

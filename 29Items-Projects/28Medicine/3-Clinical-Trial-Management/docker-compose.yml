@@ -1,0 +1,86 @@
+# Local development stack: web + worker + beat + postgres + redis.
+# Mirrors the deployed topology (TECH-NOTES §3.3) so dev/prod parity holds.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ctms
+      POSTGRES_PASSWORD: ctms
+      POSTGRES_DB: ctms
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ctms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  web:
+    build: ./backend
+    # Apply migrations and seed demo data, then serve.
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_demo &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DATABASE_URL: postgres://ctms:ctms@db:5432/ctms
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      DJANGO_SECRET_KEY: dev-only-insecure-secret-key-min-32-bytes-for-jwt
+      FIELD_ENCRYPTION_KEY: dev-only-insecure-encryption-key
+    volumes: ["./backend:/app"]
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+
+  worker:
+    build: ./backend
+    command: celery -A config worker -Q default,ml,notifications,reports -l info
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DATABASE_URL: postgres://ctms:ctms@db:5432/ctms
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      DJANGO_SECRET_KEY: dev-only-insecure-secret-key-min-32-bytes-for-jwt
+      # MUST match web's key — the worker decrypts PHI notes the web encrypted.
+      FIELD_ENCRYPTION_KEY: dev-only-insecure-encryption-key
+    volumes: ["./backend:/app"]
+    depends_on: [db, redis]
+    # Override the image's HTTP healthcheck — Celery workers have no HTTP server.
+    healthcheck:
+      test: ["CMD", "celery", "-A", "config", "inspect", "ping", "-t", "10"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 40s
+
+  beat:
+    build: ./backend
+    command: celery -A config beat -l info
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DATABASE_URL: postgres://ctms:ctms@db:5432/ctms
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      DJANGO_SECRET_KEY: dev-only-insecure-secret-key-min-32-bytes-for-jwt
+      FIELD_ENCRYPTION_KEY: dev-only-insecure-encryption-key
+    volumes: ["./backend:/app"]
+    depends_on: [db, redis]
+    # beat is a scheduler with no service endpoint; orchestrators restart on exit.
+    healthcheck:
+      disable: true
+
+  frontend:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [web]
+
+volumes:
+  pgdata:

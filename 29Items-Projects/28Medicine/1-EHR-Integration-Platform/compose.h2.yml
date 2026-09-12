@@ -1,0 +1,13 @@
+# Demo override: run the FHIR gateway on in-memory H2, skipping Oracle's slow
+# first-boot. The Oracle service stays defined for the real setup; this just
+# removes the gateway's dependency on it and flips the profile.
+#
+#   docker compose -f docker-compose.yml -f compose.h2.yml up -d --build
+services:
+  fhir-gateway-service:
+    depends_on: !override
+      kafka:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev,h2
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092

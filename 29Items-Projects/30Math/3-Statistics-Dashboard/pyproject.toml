@@ -1,0 +1,57 @@
+# Tool configuration. Runtime dependencies intentionally live in requirements.txt
+# (that's the file Streamlit Cloud installs from) — do not duplicate them here.
+
+[project]
+name = "statistics-dashboard"
+version = "0.1.0"
+description = "Self-service statistical analysis: hypothesis testing with automated test selection, regression, distribution fitting, A/B tests."
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # bugbear
+  "UP",  # pyupgrade
+  "SIM", # simplify
+  "C4",  # comprehensions
+  "RUF", # ruff-specific
+]
+ignore = [
+  "E501",   # long lines are the formatter's job
+  "RUF001", # α, −, ² etc. are intentional in a statistics app's strings…
+  "RUF002", # …docstrings…
+  "RUF003", # …and comments
+]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["app"]
+ignore_missing_imports = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "integration: needs a real PostgreSQL (set TEST_DATABASE_URL; see docker/docker-compose.yml)",
+  "e2e: drives the full Streamlit app headlessly via AppTest",
+]
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.coverage.report]
+show_missing = true
+# The 75% gate is enforced via --cov-fail-under=75 in CI (ci.yml, test job).

@@ -1,0 +1,65 @@
+name: CD
+
+# Progressive delivery to EKS: dev → staging → (manual gate) → prod.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag (git SHA) to deploy'
+        required: true
+
+permissions:
+  contents: read
+  id-token: write   # OIDC to AWS
+
+concurrency:
+  group: cd-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy-dev:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ehr-dev --region ${{ vars.AWS_REGION }}
+      - name: Deploy (Kustomize)
+        run: kubectl apply -k infrastructure/k8s/overlays/prod   # TODO: per-env overlays
+      - name: Smoke + e2e
+        run: echo "TODO(P2-9): run smoke + Playwright e2e against dev"
+
+  deploy-staging:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy + load test
+        run: echo "TODO(P2-9): deploy staging, run k6 load test, validate SLOs"
+
+  deploy-prod:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production   # GitHub environment protection rule = manual approval gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ehr-prod --region ${{ vars.AWS_REGION }}
+      - name: Canary rollout (Argo Rollouts)
+        run: echo "TODO(P2-9): kubectl argo rollouts set image ... + watch analysis"
+      - name: Verify & auto-rollback guard
+        run: echo "TODO(P3-3): assert SLOs; rollback on breach"

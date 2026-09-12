@@ -1,0 +1,45 @@
+# Multi-stage build: compile the wheel with a full toolchain, ship a slim runtime.
+
+# --- Stage 1: build the quantfinlib wheel (C++ extension included) ------------
+FROM python:3.12-slim AS builder
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential cmake ninja-build \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+COPY pyproject.toml CMakeLists.txt LICENSE README.md ./
+COPY cpp ./cpp
+COPY python ./python
+RUN pip wheel --no-deps -w /wheels .
+
+# --- Stage 2: runtime -----------------------------------------------------------
+FROM python:3.12-slim
+LABEL org.opencontainers.image.source="https://github.com/example-org/quantfinlib"
+
+# Non-root user (ARCHITECTURE.md §2.5)
+RUN useradd --create-home --uid 10001 quantfin
+WORKDIR /srv
+
+# Install the wheel with its extras resolved from /tmp/wheels ([postgres] pulls
+# asyncpg for the app and psycopg2 for Alembic's sync migration runs).
+COPY --from=builder /wheels /tmp/wheels
+RUN pip install --no-cache-dir --find-links /tmp/wheels "quantfinlib[api,postgres]" && \
+    rm -rf /tmp/wheels
+
+COPY api/app ./app
+COPY web ./web
+COPY migrations ./migrations
+
+ENV QF_ENV=prod \
+    QF_REQUIRE_NATIVE=1 \
+    QF_HOST=0.0.0.0 \
+    QF_PORT=8000
+
+USER quantfin
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD python -c "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health/live')"
+
+# --proxy-headers: trust X-Forwarded-* from the TLS-terminating ingress so
+# request.url.scheme and client IPs are correct behind the load balancer.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--proxy-headers", "--forwarded-allow-ips", "*"]

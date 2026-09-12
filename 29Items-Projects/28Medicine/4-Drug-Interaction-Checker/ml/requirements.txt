@@ -1,0 +1,10 @@
+# Offline training dependencies (heavier than the serving image)
+neo4j==5.22.0
+scikit-learn==1.5.0
+numpy==1.26.4
+pandas==2.2.2
+joblib==1.4.2
+boto3==1.34.131
+# Optional graph ML:
+# torch==2.3.1
+# torch-geometric==2.5.3

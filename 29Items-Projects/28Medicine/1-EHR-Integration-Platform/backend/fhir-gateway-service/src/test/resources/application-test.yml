@@ -1,0 +1,26 @@
+# Test profile: in-memory H2 (Oracle DDL not required), schema from JPA entities,
+# Flyway + Kafka + outbox relay disabled. Lets `mvn test` run with no Docker.
+spring:
+  datasource:
+    url: jdbc:h2:mem:ehrtest;DB_CLOSE_DELAY=-1;MODE=LEGACY
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+ehr:
+  outbox:
+    enabled: false
+
+logging:
+  level:
+    com.ehrplatform: DEBUG
+    org.springframework.web: WARN

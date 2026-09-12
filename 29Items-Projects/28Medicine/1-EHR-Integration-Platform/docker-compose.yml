@@ -1,0 +1,115 @@
+# Full local stack: infra (Oracle, Kafka) + the four backend services + frontend.
+#
+#   docker compose up --build         # build & run everything (first build is slow)
+#   docker compose up oracle kafka    # infra only (then run services from your IDE)
+#
+# Services run with the non-prod (dev) profile → open security, so no IdP needed.
+name: ehr-platform
+
+services:
+  oracle:
+    image: gvenzl/oracle-xe:11-slim   # Oracle XE 11.2 — small image, fast boot (SID/service = XE)
+    environment:
+      ORACLE_PASSWORD: change-me-locally
+      APP_USER: ehr_app
+      APP_USER_PASSWORD: change-me-locally
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata   # persist DB → inits ONCE, then boots in ~30-60s
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      # XE 11.2 first boot is ~1-2 min (no multi-GB seed unpack); the volume
+      # above persists it so later starts are seconds.
+      start_period: 120s
+
+  kafka:
+    image: apache/kafka:3.8.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    ports:
+      - "9092:9092"
+
+  fhir-gateway-service:
+    build:
+      context: ./backend
+      dockerfile: fhir-gateway-service/Dockerfile
+    depends_on:
+      oracle:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      ORACLE_JDBC_URL: jdbc:oracle:thin:@//oracle:1521/XE
+      ORACLE_USERNAME: ehr_app
+      ORACLE_PASSWORD: change-me-locally
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # Oracle 11.2's timezone files don't recognize the JVM's region name →
+      # ORA-01882. Tell the driver to send a UTC offset instead.
+      JAVA_OPTS: "-Doracle.jdbc.timezoneAsRegion=false -Duser.timezone=UTC -XX:MaxRAMPercentage=75.0"
+    ports:
+      - "8081:8081"
+
+  hl7v2-ingestion-service:
+    build:
+      context: ./backend
+      dockerfile: hl7v2-ingestion-service/Dockerfile
+    depends_on:
+      fhir-gateway-service:
+        condition: service_started
+    environment:
+      FHIR_BASE_URL: http://fhir-gateway-service:8081/fhir
+      HL7_MLLP_PORT: "2575"
+    ports:
+      - "8082:8082"
+      - "2575:2575"
+
+  event-streaming-service:
+    build:
+      context: ./backend
+      dockerfile: event-streaming-service/Dockerfile
+    depends_on:
+      kafka:
+        condition: service_started
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8083:8083"
+
+  entity-linking-service:
+    build:
+      context: ./backend
+      dockerfile: entity-linking-service/Dockerfile
+    ports:
+      - "8084:8084"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      fhir-gateway-service:
+        condition: service_started
+      entity-linking-service:
+        condition: service_started
+    ports:
+      - "8080:8080"
+
+volumes:
+  oracle-data:
+

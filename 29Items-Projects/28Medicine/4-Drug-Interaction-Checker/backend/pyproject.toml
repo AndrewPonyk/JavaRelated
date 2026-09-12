@@ -1,0 +1,44 @@
+[project]
+name = "drug-interaction-checker"
+version = "0.1.0"
+description = "Neo4j-backed drug-drug interaction checker with RxNorm normalization and ML severity prediction."
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "C4", "SIM"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra -q"
+testpaths = ["tests"]
+markers = [
+    "integration: tests requiring external services (Neo4j, RxNorm)",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70

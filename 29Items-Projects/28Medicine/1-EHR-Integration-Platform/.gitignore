@@ -1,0 +1,39 @@
+# --- Secrets / env (NEVER commit) -------------------------------------------
+.env
+*.env
+!.env.example
+*.pem
+*.key
+
+# --- Java / Maven -----------------------------------------------------------
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# --- Node / frontend --------------------------------------------------------
+node_modules/
+dist/
+.vite/
+*.local
+
+# --- Terraform --------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!*.tfvars.example
+
+# --- IDE / OS ---------------------------------------------------------------
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# --- Logs / coverage --------------------------------------------------------
+*.log
+coverage/
+.nyc_output/

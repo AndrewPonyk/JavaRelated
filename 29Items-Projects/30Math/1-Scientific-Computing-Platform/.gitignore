@@ -1,0 +1,41 @@
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage*.xml
+htmlcov/
+.hypothesis/
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+frontend/coverage/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- ML artifacts & data (S3 is the source of truth) ---
+ml/data/*
+!ml/data/.gitkeep
+*.joblib
+*.onnx
+
+# --- Local artifact store (plots written by the worker) ---
+artifacts/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

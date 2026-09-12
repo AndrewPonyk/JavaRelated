@@ -1,0 +1,95 @@
+# Local development stack: Neo4j + migrations + API + ML service + frontend.
+# Usage: docker compose up --build   (the `migrate` service seeds Neo4j once)
+
+services:
+  neo4j:
+    image: neo4j:5.22-community
+    container_name: dic-neo4j
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/password
+      NEO4J_PLUGINS: '["apoc", "graph-data-science"]'
+      NEO4J_dbms_security_procedures_unrestricted: gds.*,apoc.*
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # One-shot: applies constraints/indexes + seed data, then exits.
+  migrate:
+    build: ./backend
+    container_name: dic-migrate
+    working_dir: /work
+    command: python scripts/seed_neo4j.py
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+    volumes:
+      - ./scripts:/work/scripts:ro
+      - ./migrations:/work/migrations:ro
+    restart: "no"
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    container_name: dic-backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: development
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+      ML_SERVICE_URL: http://ml:8001
+      ML_ENABLED: "true"
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  ml:
+    build: ./backend
+    container_name: dic-ml
+    command: uvicorn app.ml_main:app --host 0.0.0.0 --port 8001 --reload
+    # Override the image's API-specific HEALTHCHECK (it probes :8000); ML serves :8001.
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8001/health').status==200 else 1)\""]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    ports:
+      - "8001:8001"
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+      ML_MODEL_ARTIFACT_URI: s3://dic-models/severity/latest
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: dic-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  neo4j-data:

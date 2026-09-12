@@ -1,0 +1,227 @@
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light dark;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f6f8fa;
+  color: #1f2328;
+}
+
+.muted {
+  color: #656d76;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+/* Header + tabs */
+.app__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #d0d7de;
+  background: #ffffff;
+}
+
+.app__header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tabs__tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.tabs__tab--active {
+  background: #0969da;
+  color: #fff;
+  border-color: #0969da;
+}
+
+/* Layout */
+.app__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+.app__body--single {
+  grid-template-columns: minmax(0, 560px);
+}
+
+@media (max-width: 720px) {
+  .app__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards */
+.card,
+.patient-detail {
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background: #fff;
+}
+
+/* Forms */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field > span:first-child {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea,
+.patient-list__search input {
+  padding: 0.5rem;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font: inherit;
+  width: 100%;
+}
+
+.field__error,
+.error {
+  color: #cf222e;
+  font-size: 0.85rem;
+}
+
+.success {
+  color: #1a7f37;
+  font-size: 0.9rem;
+}
+
+button[type='submit'] {
+  align-self: flex-start;
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 6px;
+  background: #1f883d;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button[type='submit']:disabled {
+  background: #94d3a2;
+  cursor: not-allowed;
+}
+
+/* Patient list */
+.patient-list__search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.patient-list__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.patient-list__results button {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.patient-list__meta {
+  color: #656d76;
+  font-size: 0.85rem;
+}
+
+/* Risk result */
+.risk-result {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.badge--low {
+  background: #1a7f37;
+}
+
+.badge--moderate {
+  background: #bf8700;
+}
+
+.badge--high {
+  background: #cf222e;
+}
+
+.risk-score {
+  font-variant-numeric: tabular-nums;
+  color: #656d76;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+}
+
+dt {
+  font-weight: 600;
+  color: #656d76;
+}
+
+dd {
+  margin: 0;
+}

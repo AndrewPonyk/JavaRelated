@@ -1,0 +1,60 @@
+name: CD — Production (AWS GovCloud)
+
+# Gated deploy: runs only after CI succeeds on main. The `production` GitHub
+# Environment enforces required reviewers + a linked change ticket
+# (TECH-NOTES §3.1, §3.5). Auth uses OIDC — NO long-lived AWS keys.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  id-token: write # OIDC token for AWS AssumeRole
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production # <- manual approval gate lives here
+    env:
+      AWS_REGION: us-gov-west-1
+      ECR_REPO: ctms-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC → GovCloud)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }} # arn:aws-us-gov:iam::...
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag (by SHA) and push image
+        run: |
+          IMAGE="$ECR_REGISTRY/$ECR_REPO:${GITHUB_SHA::12}"
+          docker build -t "$IMAGE" backend/
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+
+      - name: Run DB migrations (one-off ECS task)
+        run: |
+          echo "TODO run 'manage.py migrate' as a one-off ECS RunTask (expand/contract)."
+
+      - name: Deploy ECS services (blue/green)
+        run: |
+          echo "TODO update web/worker/beat task definitions; CodeDeploy blue/green with rollback."
+
+      - name: Smoke test
+        run: |
+          echo "TODO curl /healthz on the new target group before shifting traffic."
+
+      - name: Tag release
+        run: |
+          echo "TODO create immutable release tag mapped to ${GITHUB_SHA::12} for the audit trail."

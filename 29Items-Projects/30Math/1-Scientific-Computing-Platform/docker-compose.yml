@@ -1,0 +1,120 @@
+# Local development stack. Everything the platform needs on one laptop:
+#   docker compose up -d db redis          # just the data stores (fast loop)
+#   docker compose up --build              # the whole platform
+# Settings come from .env (copy .env.example first).
+
+name: scp
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: scp
+      POSTGRES_PASSWORD: scp
+      POSTGRES_DB: scp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scp"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    image: scp-backend:local
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://scp:scp@db:5432/scp
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    # The single build definition — worker and migrate reuse this exact image,
+    # so the three services can never run divergent code.
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: scp-backend:local
+    env_file:
+      - path: .env
+        required: false   # ships as .env.example; compose defaults below suffice
+    environment:
+      DATABASE_URL: postgresql+psycopg://scp:scp@db:5432/scp
+      REDIS_URL: redis://redis:6379/0
+      ARTIFACTS_DIR: /data/artifacts
+    ports:
+      - "8000:8000"
+    volumes:
+      - artifacts:/data/artifacts   # shared with the worker: it writes, api serves
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    image: scp-backend:local
+    # threads pool: the heavy math runs in the sciengine sandbox subprocess
+    # anyway, and prefork's daemonized children cannot spawn it.
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "-Q", "compute", "--pool=threads", "--concurrency=4"]
+    env_file:
+      - path: .env
+        required: false   # ships as .env.example; compose defaults below suffice
+    environment:
+      DATABASE_URL: postgresql+psycopg://scp:scp@db:5432/scp
+      REDIS_URL: redis://redis:6379/0
+      ARTIFACTS_DIR: /data/artifacts
+      OMP_NUM_THREADS: "1"
+    volumes:
+      - artifacts:/data/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # mask the host's node_modules (native binaries differ)
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: "http://localhost:8000"
+
+  jupyter:
+    image: quay.io/jupyter/scipy-notebook:python-3.12
+    # Installs sciengine editable so notebooks import the live working copy.
+    # Token disabled for LOCAL use only — never expose this port.
+    command: >
+      bash -lc "pip install -e /home/jovyan/work/libs/sciengine &&
+                start-notebook.py --IdentityProvider.token=''"
+    volumes:
+      - .:/home/jovyan/work
+    ports:
+      - "8888:8888"
+
+volumes:
+  pg_data:
+  artifacts:

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>quantfinlib — demo console</title>
+<style>
+  /* Deliberately framework-free: this page demos the API, it is not a product UI. */
+  :root { font-family: system-ui, sans-serif; color-scheme: light dark; }
+  body { max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  nav { display: flex; gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  nav button { padding: .45rem .9rem; font: inherit; cursor: pointer; border: 1px solid #8886;
+               background: transparent; border-radius: .4rem; }
+  nav button[aria-selected="true"] { background: #4363d820; border-color: #4363d8; }
+  section[hidden] { display: none; }
+  form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+         gap: .75rem 1rem; }
+  label { display: flex; flex-direction: column; font-size: .85rem; gap: .25rem; }
+  input, select, textarea { padding: .4rem; font: inherit; }
+  textarea { font-family: ui-monospace, monospace; font-size: .8rem; }
+  form > button { grid-column: 1 / -1; padding: .6rem; font: inherit; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: wait; }
+  .status { margin-top: .8rem; min-height: 1.4rem; font-size: .9rem; }
+  .error { color: #b00020; }
+  table { border-collapse: collapse; margin-top: .5rem; width: 100%; }
+  td, th { border: 1px solid #8884; padding: .35rem .6rem; text-align: right; }
+  .apikey { margin-bottom: 1rem; display: flex; gap: .5rem; align-items: center;
+            font-size: .85rem; }
+  .apikey input { flex: 1; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem;
+       margin-top: .5rem; font-size: .9rem; }
+  dt { font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>quantfinlib console</h1>
+
+<div class="apikey">
+  <label for="apikey" style="flex-direction:row;align-items:center;gap:.5rem">API key
+    <input id="apikey" type="password" placeholder="empty = dev anonymous"></label>
+</div>
+
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-tab="pricer">Pricer</button>
+  <button role="tab" aria-selected="false" data-tab="mc">Monte Carlo</button>
+  <button role="tab" aria-selected="false" data-tab="risk">VaR</button>
+  <button role="tab" aria-selected="false" data-tab="surface">Vol surface</button>
+</nav>
+
+<!-- ============================== Pricer ================================== -->
+<section id="tab-pricer">
+  <p>Prices a strike chain via <code>POST /v1/options/price</code>.</p>
+  <form id="pricer">
+    <label>Spot <input name="spot" type="number" step="any" value="100" required></label>
+    <label>Strikes (comma-sep) <input name="strikes" value="90, 95, 100, 105, 110" required></label>
+    <label>Volatility <input name="vol" type="number" step="any" value="0.2" required></label>
+    <label>Rate <input name="rate" type="number" step="any" value="0.05" required></label>
+    <label>Expiry (years) <input name="expiry" type="number" step="any" value="1.0" required></label>
+    <label>Type
+      <select name="kind"><option value="call">Call</option><option value="put">Put</option></select>
+    </label>
+    <button type="submit">Price</button>
+  </form>
+  <div class="status" id="pricer-status" role="status"></div>
+  <div id="pricer-result"></div>
+</section>
+
+<!-- ============================ Monte Carlo ================================ -->
+<section id="tab-mc" hidden>
+  <p>Seeded Monte Carlo via <code>POST /v1/options/mc-price</code> — the echoed seed
+     makes the number reproducible.</p>
+  <form id="mc">
+    <label>Spot <input name="spot" type="number" step="any" value="100" required></label>
+    <label>Strike <input name="strike" type="number" step="any" value="100" required></label>
+    <label>Volatility <input name="vol" type="number" step="any" value="0.2" required></label>
+    <label>Rate <input name="rate" type="number" step="any" value="0.05" required></label>
+    <label>Expiry (years) <input name="expiry" type="number" step="any" value="1.0" required></label>
+    <label>Type
+      <select name="kind"><option value="call">Call</option><option value="put">Put</option></select>
+    </label>
+    <label>Paths <input name="n_paths" type="number" value="100000" min="1" required></label>
+    <label>Seed <input name="seed" type="number" value="42" required></label>
+    <button type="submit">Simulate</button>
+  </form>
+  <div class="status" id="mc-status" role="status"></div>
+  <div id="mc-result"></div>
+</section>
+
+<!-- =============================== Risk ==================================== -->
+<section id="tab-risk" hidden>
+  <p>Historical / parametric VaR via <code>POST /v1/risk/var</code>.</p>
+  <form id="risk">
+    <label style="grid-column:1/-1">Returns (comma or newline separated)
+      <textarea name="returns" rows="5">0.012, -0.008, 0.004, -0.021, 0.009, -0.013, 0.007, -0.002, 0.015, -0.019, 0.003, -0.006, 0.011, -0.016, 0.005, -0.009, 0.008, -0.004, 0.013, -0.011</textarea>
+    </label>
+    <label>Confidence <input name="confidence" type="number" step="0.001" min="0.5" max="0.999" value="0.99"></label>
+    <label>Method
+      <select name="method"><option>historical</option><option>parametric</option></select>
+    </label>
+    <button type="submit">Compute VaR</button>
+  </form>
+  <div class="status" id="risk-status" role="status"></div>
+  <div id="risk-result"></div>
+</section>
+
+<!-- ============================ Vol surface ================================= -->
+<section id="tab-surface" hidden>
+  <p>Long-running fit: <code>POST /v1/vol-surface/fit</code> → 202 + job id → poll →
+     query σ(K, T). Sample quotes are generated client-side from a synthetic smile.</p>
+  <form id="surface-fit">
+    <label>Forward <input name="forward" type="number" step="any" value="100" required></label>
+    <label>Epochs <input name="epochs" type="number" value="800" min="1" required></label>
+    <label>Seed <input name="seed" type="number" value="0" required></label>
+    <button type="submit">Generate sample quotes &amp; fit</button>
+  </form>
+  <div class="status" id="surface-status" role="status"></div>
+  <form id="surface-query" hidden>
+    <label>Strike <input name="strike" type="number" step="any" value="105" required></label>
+    <label>Expiry <input name="expiry" type="number" step="any" value="0.5" required></label>
+    <button type="submit">Query σ(K, T)</button>
+  </form>
+  <div class="status" id="query-status" role="status"></div>
+</section>
+
+<script>
+"use strict";
+
+// --- tabs --------------------------------------------------------------------
+document.querySelector("nav").addEventListener("click", (event) => {
+  const tab = event.target.dataset.tab;
+  if (!tab) return;
+  for (const b of document.querySelectorAll("nav [role=tab]"))
+    b.setAttribute("aria-selected", String(b.dataset.tab === tab));
+  for (const s of document.querySelectorAll("section"))
+    s.hidden = s.id !== `tab-${tab}`;
+});
+
+// --- shared fetch helper: loading state, RFC 7807 errors -----------------------
+async function api(path, options = {}) {
+  const headers = { "Content-Type": "application/json", ...(options.headers ?? {}) };
+  const key = document.getElementById("apikey").value.trim();
+  if (key) headers["X-API-Key"] = key;
+  const resp = await fetch(path, { ...options, headers });
+  const payload = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(payload.detail ?? payload.title ?? `HTTP ${resp.status}`);
+  return payload;
+}
+
+function runForm(formId, statusId, handler) {
+  const form = document.getElementById(formId);
+  const statusEl = document.getElementById(statusId);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button");
+    button.disabled = true;
+    statusEl.textContent = "Working…";
+    statusEl.className = "status";
+    try {
+      await handler(Object.fromEntries(new FormData(form)), statusEl);
+    } catch (err) {
+      statusEl.textContent = `Error: ${err.message}`;
+      statusEl.className = "status error";
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+// --- pricer ---------------------------------------------------------------------
+runForm("pricer", "pricer-status", async (data, statusEl) => {
+  const strikes = data.strikes.split(",").map(s => Number(s.trim())).filter(Number.isFinite);
+  if (!strikes.length) throw new Error("enter at least one numeric strike");
+  const payload = await api("/v1/options/price", {
+    method: "POST",
+    body: JSON.stringify({ spot: +data.spot, strikes, vol: +data.vol, rate: +data.rate,
+                           expiry: +data.expiry, kind: data.kind }),
+  });
+  statusEl.textContent = `OK — request ${payload.request_id}`;
+  const rows = strikes.map((k, i) =>
+    `<tr><td>${k}</td><td>${payload.prices[i].toFixed(4)}</td></tr>`).join("");
+  document.getElementById("pricer-result").innerHTML =
+    `<table><thead><tr><th>Strike</th><th>Price</th></tr></thead><tbody>${rows}</tbody></table>`;
+});
+
+// --- monte carlo -------------------------------------------------------------------
+runForm("mc", "mc-status", async (data, statusEl) => {
+  const p = await api("/v1/options/mc-price", {
+    method: "POST",
+    body: JSON.stringify({ spot: +data.spot, strike: +data.strike, vol: +data.vol,
+                           rate: +data.rate, expiry: +data.expiry, kind: data.kind,
+                           n_paths: +data.n_paths, seed: +data.seed }),
+  });
+  statusEl.textContent = `OK — request ${p.request_id}`;
+  document.getElementById("mc-result").innerHTML = `<dl>
+    <dt>Price</dt><dd>${p.price.toFixed(4)} ± ${p.std_error.toFixed(4)}</dd>
+    <dt>95% CI</dt><dd>[${p.ci_low.toFixed(4)}, ${p.ci_high.toFixed(4)}]</dd>
+    <dt>Paths / seed</dt><dd>${p.n_paths.toLocaleString()} / ${p.seed}</dd></dl>`;
+});
+
+// --- risk ------------------------------------------------------------------------
+runForm("risk", "risk-status", async (data, statusEl) => {
+  const returns = data.returns.split(/[\s,]+/).map(Number).filter(Number.isFinite);
+  if (returns.length < 2) throw new Error("enter at least two numeric returns");
+  const p = await api("/v1/risk/var", {
+    method: "POST",
+    body: JSON.stringify({ returns, confidence: +data.confidence, method: data.method }),
+  });
+  statusEl.textContent = `OK — request ${p.request_id}`;
+  document.getElementById("risk-result").innerHTML = `<dl>
+    <dt>VaR (${(p.confidence * 100).toFixed(1)}%)</dt><dd>${(p.var * 100).toFixed(3)}%</dd>
+    <dt>Expected shortfall</dt><dd>${(p.expected_shortfall * 100).toFixed(3)}%</dd>
+    <dt>Method / observations</dt><dd>${p.method} / ${p.n_observations}</dd></dl>`;
+});
+
+// --- vol surface: fit -> poll -> query ------------------------------------------------
+let surfaceId = null;
+
+function sampleQuotes(forward) {
+  const quotes = [];
+  for (const expiry of [0.25, 0.5, 1.0, 2.0])
+    for (let strike = 0.8 * forward; strike <= 1.2 * forward + 1e-9; strike += 0.05 * forward) {
+      const k = Math.log(strike / forward);
+      quotes.push({ strike, expiry, implied_vol: 0.2 + 0.3 * k * k + 0.02 * expiry });
+    }
+  return quotes;
+}
+
+runForm("surface-fit", "surface-status", async (data, statusEl) => {
+  document.getElementById("surface-query").hidden = true;
+  surfaceId = null;
+  const job = await api("/v1/vol-surface/fit", {
+    method: "POST",
+    body: JSON.stringify({ forward: +data.forward, quotes: sampleQuotes(+data.forward),
+                           epochs: +data.epochs, seed: +data.seed }),
+  });
+  statusEl.textContent = `Job ${job.job_id} submitted — training…`;
+
+  for (let attempt = 0; attempt < 600; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const state = await api(`/v1/vol-surface/jobs/${job.job_id}`);
+    if (state.status === "DONE") {
+      surfaceId = state.result_url.split("/").pop();
+      const info = await api(`/v1/vol-surface/${surfaceId}/info`);
+      statusEl.textContent =
+        `Fitted: surface ${surfaceId} (MSE ${info.mse.toExponential(2)}, ${info.n_quotes} quotes)`;
+      document.getElementById("surface-query").hidden = false;
+      return;
+    }
+    if (state.status === "FAILED") throw new Error(state.detail ?? "fit failed");
+    statusEl.textContent = `Job ${job.job_id}: ${state.status}…`;
+  }
+  throw new Error("timed out waiting for the fit");
+});
+
+runForm("surface-query", "query-status", async (data, statusEl) => {
+  if (!surfaceId) throw new Error("fit a surface first");
+  const p = await api(`/v1/vol-surface/${surfaceId}?strike=${+data.strike}&expiry=${+data.expiry}`);
+  statusEl.textContent =
+    `σ(${p.strike}, ${p.expiry}) = ${(p.implied_vol * 100).toFixed(2)}%`;
+});
+</script>
+</body>
+</html>

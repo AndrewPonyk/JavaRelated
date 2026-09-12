@@ -1,0 +1,54 @@
+name: backend-ci
+
+on:
+  pull_request:
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+  push:
+    branches: [main]
+    paths: ["backend/**"]
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Format check (black)
+        run: black --check .
+
+      - name: Type-check (mypy)
+        run: mypy app
+
+      - name: Unit + integration tests
+        run: pytest         # coverage gate (>=80%) enforced via pyproject
+
+      - name: Dependency audit
+        run: pip-audit -r requirements.txt || true   # report; don't block on transitive advisories
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: CodeQL init
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+      - name: CodeQL analyze
+        uses: github/codeql-action/analyze@v3

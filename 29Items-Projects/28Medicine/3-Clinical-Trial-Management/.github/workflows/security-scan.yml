@@ -1,0 +1,55 @@
+name: Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # weekly Monday 06:00 UTC
+
+permissions:
+  contents: read
+  security-events: write # required to upload SARIF / CodeQL results
+
+jobs:
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pip-audit
+      - name: pip-audit (backend)
+        run: pip-audit -r backend/requirements/base.txt
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: npm audit (frontend)
+        working-directory: frontend
+        run: npm audit --audit-level=high || true # report; gate in a hardened run
+
+  sast:
+    name: Static analysis (CodeQL)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
+
+  containers:
+    name: Image & filesystem scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          severity: HIGH,CRITICAL
+          exit-code: "1" # fail the build on High/Critical findings
+          ignore-unfixed: true

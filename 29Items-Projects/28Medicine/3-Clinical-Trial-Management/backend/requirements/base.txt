@@ -1,0 +1,21 @@
+# Runtime dependencies. Minimum pins include known security fixes
+# (verified with pip-audit — see TECH-NOTES §3.1 security stage).
+Django>=5.2.8,<5.3                          # 5.2 LTS; floor includes CVE fixes
+djangorestframework>=3.16,<3.18
+djangorestframework-simplejwt>=5.4,<5.6     # JWT auth + refresh rotation/blacklist
+PyJWT>=2.13.0                               # transitive of simplejwt; pinned for CVE fixes
+drf-spectacular>=0.28,<0.30
+django-environ>=0.11,<0.15
+django-cors-headers>=4.6,<5.0
+cryptography>=44.0                          # Fernet field-level PHI encryption
+psycopg[binary]>=3.1,<4.0                   # PostgreSQL driver
+celery>=5.3,<5.5
+redis>=5.0,<6.0                             # broker + result backend client
+
+# ML / NLP (eligibility screening). The shipped pipeline is rule-based and needs
+# none of these; uncomment to swap in a clinical NLP model behind the same
+# EligibilityScreener interface (ARCHITECTURE §2.1).
+# spacy>=3.7
+# scispacy
+# medspacy
+# boto3   # SageMaker + Secrets Manager (GovCloud)

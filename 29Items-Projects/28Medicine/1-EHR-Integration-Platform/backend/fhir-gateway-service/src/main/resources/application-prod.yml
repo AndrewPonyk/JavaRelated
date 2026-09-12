@@ -1,0 +1,12 @@
+# Production overrides. Activated with SPRING_PROFILES_ACTIVE=prod.
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # SMART-on-FHIR / OIDC issuer; validated on every request.
+          issuer-uri: ${OAUTH2_ISSUER_URI}
+
+logging:
+  level:
+    com.ehrplatform: INFO

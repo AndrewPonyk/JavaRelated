@@ -1,0 +1,30 @@
+name: Post-deploy smoke
+
+# Streamlit Cloud auto-deploys on push to main; this verifies the deploy became healthy.
+# Configure the repo *variable* STREAMLIT_APP_URL
+# (Settings → Secrets and variables → Actions → Variables), e.g.
+#   https://your-app.streamlit.app
+# The workflow skips gracefully while the variable is unset.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    if: vars.STREAMLIT_APP_URL != ''
+    steps:
+      - name: Poll health endpoint (up to 10 min — sleeping Cloud apps wake slowly)
+        run: |
+          url="${{ vars.STREAMLIT_APP_URL }}/_stcore/health"
+          for i in $(seq 1 20); do
+            if curl -fsS --max-time 10 "$url" > /dev/null; then
+              echo "Healthy after $i attempt(s)."
+              exit 0
+            fi
+            echo "Attempt $i/20 failed — retrying in 30s…"
+            sleep 30
+          done
+          echo "::error::App never became healthy at $url"
+          exit 1

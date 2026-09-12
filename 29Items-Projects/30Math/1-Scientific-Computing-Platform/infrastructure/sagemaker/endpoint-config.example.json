@@ -1,0 +1,14 @@
+{
+  "EndpointConfigName": "scp-equation-recognizer-serverless",
+  "ProductionVariants": [
+    {
+      "VariantName": "AllTraffic",
+      "ModelName": "REPLACED_BY_PROMOTION_SCRIPT",
+      "ServerlessConfig": {
+        "MemorySizeInMB": 2048,
+        "MaxConcurrency": 20
+      }
+    }
+  ],
+  "_comment": "Serverless absorbs bursty classroom traffic with scale-to-zero. Promote to a provisioned variant with autoscaling only if p95 cold-start latency breaks the SLO (docs/ARCHITECTURE.md 2.4)."
+}

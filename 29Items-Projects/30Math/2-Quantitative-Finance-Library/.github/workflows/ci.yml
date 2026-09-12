@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:  # reused as the verify gate in release.yml
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lint tooling
+        run: pip install ruff mypy numpy pandas-stubs
+      - run: ruff check .
+      - run: ruff format --check .
+      - name: clang-format check
+        uses: jidicula/clang-format-action@v4.13.0
+        with:
+          clang-format-version: "18"
+          check-path: cpp
+      - name: mypy
+        run: mypy
+
+  cpp-tests:
+    name: C++ tests (${{ matrix.os }})
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DQFCORE_BUILD_BINDINGS=OFF -DQFCORE_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Test
+        run: ctest --test-dir build --output-on-failure -C Release
+
+  python-tests:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.13"]   # oldest + newest; full range covered at release
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Build & install (compiles the C++ extension)
+        run: pip install -v ".[api,ml,dev]"
+      - name: Unit + integration tests (coverage gate ≥ 70%)
+        run: pytest tests -q --cov --cov-report=xml
+      - name: Database migrations apply cleanly and match the models
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          QF_DATABASE_URL: sqlite:///./migration_check.db
+        run: |
+          alembic -c migrations/alembic.ini upgrade head
+          alembic -c migrations/alembic.ini check
+      - name: Benchmarks (smoke only — no timing gates in PRs)
+        run: pytest benchmarks -q --benchmark-disable
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+
+  audit:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: pip-audit (blocking — known vulns fail the build)
+        run: |
+          pip install pip-audit
+          pip-audit .

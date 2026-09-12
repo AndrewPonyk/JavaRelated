@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - fhir-gateway-deployment.yaml
+  # TODO(P2-9): add hl7v2-ingestion, event-streaming, entity-linking, ingress, networkpolicy.
+
+commonLabels:
+  app.kubernetes.io/part-of: ehr-integration-platform

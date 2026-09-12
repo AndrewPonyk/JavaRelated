@@ -1,0 +1,83 @@
+{
+  "name": "linear-algebra-visualizer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Educational 2D visualizer for vector spaces, linear transformations and eigenvalues — WebGL animations, MathJax notation, adaptive auto-generated exercises.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:full": "npx vercel dev",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "overrides": {
+    "@vercel/node": {
+      "undici": "^6.26.1",
+      "path-to-regexp": "^6.3.0",
+      "@vercel/static-config": {
+        "ajv": "^8.20.0"
+      },
+      "@vercel/build-utils": {
+        "minimatch": "^10.2.5",
+        "js-yaml": "^4.1.2",
+        "smol-toml": "^1.6.1"
+      },
+      "@vercel/nft": {
+        "minimatch": "^10.2.5"
+      }
+    }
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.172.0",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@playwright/test": "^1.49.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.4",
+    "@types/react-dom": "^19.0.2",
+    "@types/three": "^0.172.0",
+    "@vercel/node": "^5.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.0.4",
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.4.2",
+    "prisma": "^6.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.19.1",
+    "vite": "^6.0.7",
+    "vitest": "^3.0.4"
+  }
+}

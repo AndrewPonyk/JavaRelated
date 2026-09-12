@@ -1,0 +1,236 @@
+/* Base styles. Small, dependency-free, responsive. */
+
+:root {
+  --color-text: #1a1d23;
+  --color-muted: #64707d;
+  --color-accent: #2557a7;
+  --color-error-bg: #fdecec;
+  --color-error-text: #a4262c;
+  --color-info-bg: #eaf2fd;
+  --color-info-text: #1d4e94;
+  --color-card: #ffffff;
+  --color-bg: #f4f6f8;
+  --color-border: #c8cfd6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.app-shell {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--color-card);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+  overflow-wrap: anywhere;
+}
+
+/* --- navigation --- */
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.tab-active {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* --- forms --- */
+
+.solver-form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 28rem;
+}
+
+.solver-form input,
+.solver-form select {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.variable-input {
+  width: 6rem;
+}
+
+button {
+  justify-self: start;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  padding: 0;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button.danger {
+  color: var(--color-error-text);
+}
+
+/* --- banners & status --- */
+
+.muted {
+  color: var(--color-muted);
+}
+
+.error-banner {
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+}
+
+.info-banner {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+}
+
+/* --- results --- */
+
+.results ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.steps {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.solution-chip {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.plot-image {
+  max-width: 100%;
+  margin-top: 1rem;
+}
+
+/* --- computation list --- */
+
+.computation-list {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.computation-item {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.computation-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.computation-header .link-button {
+  margin-left: auto;
+}
+
+.status {
+  font-size: 0.8rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-queued,
+.status-running {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+}
+
+.status-succeeded {
+  background: #e8f6ec;
+  color: #1e7d3c;
+}
+
+.status-failed {
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+/* --- responsive --- */
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding: 1rem 0.75rem 3rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .solver-form {
+    max-width: 100%;
+  }
+
+  .computation-header .link-button {
+    margin-left: 0;
+  }
+}

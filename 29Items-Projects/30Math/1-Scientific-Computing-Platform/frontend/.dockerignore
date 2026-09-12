@@ -1,0 +1,7 @@
+# Build context hygiene: `COPY . .` must never pull in host artifacts —
+# node_modules contains platform-specific binaries (Windows host → Linux image).
+node_modules
+dist
+coverage
+.env
+.env.*

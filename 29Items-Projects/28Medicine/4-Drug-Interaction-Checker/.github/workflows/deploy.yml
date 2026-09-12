@@ -1,0 +1,74 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+
+permissions:
+  id-token: write   # required for AWS OIDC
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER: dic-eks
+  K8S_NAMESPACE: drug-interaction-checker
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push images
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        run: |
+          docker build -t "$REGISTRY/dic-backend:$TAG" backend
+          docker build -t "$REGISTRY/dic-frontend:$TAG" frontend
+          docker push "$REGISTRY/dic-backend:$TAG"
+          docker push "$REGISTRY/dic-frontend:$TAG"
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name "$EKS_CLUSTER" --region "$AWS_REGION"
+
+      - name: Deploy (kustomize)
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+        run: |
+          cd infra/k8s/overlays/$ENVIRONMENT
+          kubectl kustomize . > /dev/null  # validate
+          kustomize edit set image \
+            ghcr.io/OWNER/dic-backend="$REGISTRY/dic-backend:$TAG" \
+            ghcr.io/OWNER/dic-frontend="$REGISTRY/dic-frontend:$TAG"
+          kubectl apply -k .
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/${ENVIRONMENT}-backend --timeout=180s
+          kubectl -n "$K8S_NAMESPACE" rollout status deployment/${ENVIRONMENT}-ml-severity --timeout=180s

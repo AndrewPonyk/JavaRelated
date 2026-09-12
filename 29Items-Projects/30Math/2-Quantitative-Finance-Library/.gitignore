@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+wheelhouse/
+.venv/
+venv/
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.benchmarks/
+
+# C++ / CMake
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+*.obj
+*.o
+*.so
+*.pyd
+*.dll
+*.lib
+*.exp
+compile_commands.json
+_skbuild/
+
+# Environment & secrets — never commit real config
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.db
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ML artifacts
+*.pt
+*.onnx
+runs/

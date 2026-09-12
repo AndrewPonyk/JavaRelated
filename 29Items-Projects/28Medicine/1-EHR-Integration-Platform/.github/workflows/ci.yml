@@ -1,0 +1,109 @@
+name: CI
+
+# Lint → test → build → security scan → image. Runs on every push & PR.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write   # upload SARIF
+  id-token: write          # OIDC to AWS (no static keys)
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (lint • test • build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Checkstyle
+        run: mvn -B checkstyle:check
+      - name: Test (unit + Testcontainers integration)
+        run: mvn -B verify
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/**/target/site/jacoco/
+
+  frontend:
+    name: Frontend (lint • test • build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # `npm install` (not `npm ci`) so CI works without a committed lockfile;
+      # commit package-lock.json later and switch to `npm ci` + caching.
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+
+  security:
+    name: Security scans (SAST • deps • secrets • IaC)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+      - name: Dependency & filesystem scan (Trivy)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+      - name: SAST (CodeQL)
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin, javascript-typescript
+      - uses: github/codeql-action/analyze@v3
+
+  image:
+    name: Build & push images
+    needs: [backend, frontend, security]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - fhir-gateway-service
+          - hl7v2-ingestion-service
+          - event-streaming-service
+          - entity-linking-service
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ECR_PUSH_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr
+      - name: Build, scan, sign & push
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/ehr/${{ matrix.service }}:${{ github.sha }}"
+          docker build -f backend/${{ matrix.service }}/Dockerfile -t "$IMAGE" backend
+          # TODO(P1-6): trivy image "$IMAGE" --exit-code 1 --severity HIGH,CRITICAL
+          # TODO(P1-6): cosign sign --yes "$IMAGE"
+          docker push "$IMAGE"

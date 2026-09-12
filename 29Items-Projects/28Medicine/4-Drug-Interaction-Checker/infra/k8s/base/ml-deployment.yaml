@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-severity
+  labels:
+    app: ml-severity
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-severity
+  template:
+    metadata:
+      labels:
+        app: ml-severity
+    spec:
+      # Pods assume an IAM role (IRSA) to read the model artifact from S3.
+      serviceAccountName: ml-severity
+      containers:
+        - name: ml-severity
+          image: ghcr.io/OWNER/dic-backend:latest
+          command: ["uvicorn", "app.ml_main:app", "--host", "0.0.0.0", "--port", "8001"]
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: dic-config
+            - secretRef:
+                name: dic-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi

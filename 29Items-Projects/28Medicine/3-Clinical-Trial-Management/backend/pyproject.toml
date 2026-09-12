@@ -1,0 +1,64 @@
+[project]
+name = "ctms-backend"
+version = "1.0.0"
+description = "Clinical Trial Management System — Django backend"
+requires-python = ">=3.12"
+
+# Tooling configuration for ruff (lint+format), black, mypy and pytest.
+# See TECH-NOTES.md §3.1 (CI stages) and §3.2 (testing).
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["."]
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ", "S", "C4", "SIM"]
+# DJ = flake8-django, S = bandit security rules.
+ignore = ["S101"]  # allow asserts in tests
+
+[tool.ruff.lint.per-file-ignores]
+# Test/seed credentials are intentional; long assert lines are acceptable in tests.
+"**/tests/**" = ["S105", "S106", "S107", "E501"]
+"**/tests.py" = ["S105", "S106", "S107", "E501"]
+"conftest.py" = ["S105", "S106", "S107", "E501"]
+"**/management/commands/*" = ["S105", "S106", "S107"]
+# Dev binds 0.0.0.0 deliberately; settings star-imports are by design.
+"**/settings/*" = ["F403", "F405", "S104"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "migrations"
+
+[tool.mypy]
+python_version = "3.12"
+warn_redundant_casts = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+# Django/DRF-aware type checking (resolves Manager/QuerySet/serializer typing).
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+exclude = ["migrations/", "tests/", "conftest.py"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
+
+[[tool.mypy.overrides]]
+module = ["celery.*", "environ.*", "drf_spectacular.*", "factory.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# drf-stubs cannot infer relational-field generics on serializer class attrs;
+# annotating each would be pure noise. Scoped to serializer modules only.
+module = ["apps.*.serializers"]
+disable_error_code = ["var-annotated"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "tests.py"]
+addopts = "-ra --strict-markers --cov=apps --cov=ml --cov-report=term-missing"
+testpaths = ["apps", "tests"]
+
+[tool.coverage.run]
+omit = ["*/migrations/*", "*/tests/*", "config/*"]

@@ -1,0 +1,38 @@
+# ── Secrets / env ──────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Python ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+*.sqlite3
+openapi-schema.yml
+server.log
+.pytest_cache/
+.coverage
+htmlcov/
+staticfiles/
+
+# ── Node / frontend ────────────────────────────
+node_modules/
+frontend/dist/
+*.local
+
+# ── ML artifacts (track via DVC, not git) ──────
+backend/ml/models/*.bin
+backend/ml/models/*.pt
+backend/ml/models/*.onnx
+
+# ── IDE / OS ───────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

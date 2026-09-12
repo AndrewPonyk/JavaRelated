@@ -1,0 +1,9 @@
+apiVersion: v2
+name: ehr-platform
+description: Umbrella Helm chart for the EHR Integration Platform services.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Platform Engineering
+# TODO(P3): add subcharts/dependencies (e.g. kube-prometheus-stack) as needed.

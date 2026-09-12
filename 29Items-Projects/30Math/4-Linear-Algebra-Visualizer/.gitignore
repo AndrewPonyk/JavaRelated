@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Environment — .env.example is the only committed env file
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Editor/OS noise
+.DS_Store
+*.local
+.idea/
+.vscode/*
+!.vscode/extensions.json

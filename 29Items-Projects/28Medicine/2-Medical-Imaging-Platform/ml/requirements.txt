@@ -1,0 +1,13 @@
+# ML inference service deps. Kept separate from the API so the (large) ML stack
+# and GPU runtime never bloat the API image.
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+numpy==1.26.4
+pydicom==2.4.4
+pillow==10.3.0
+boto3==1.34.131
+
+# Model runtime — pin to the CUDA/CPU build that matches the target image.
+# torch==2.3.1
+# torchvision==0.18.1

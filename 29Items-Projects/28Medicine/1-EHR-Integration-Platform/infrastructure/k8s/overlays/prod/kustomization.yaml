@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Production overlay — patches the base with prod-grade scale and image tags.
+namespace: ehr-platform
+
+resources:
+  - ../../base
+
+replicas:
+  - name: fhir-gateway-service
+    count: 4
+
+images:
+  - name: ECR_REGISTRY/ehr/fhir-gateway-service
+    newName: ECR_REGISTRY/ehr/fhir-gateway-service
+    newTag: latest   # CD overwrites with the released git SHA
+
+# TODO(P2-9): prod patches — PodDisruptionBudget, topologySpreadConstraints,
+#  resource bumps, and stricter NetworkPolicies.

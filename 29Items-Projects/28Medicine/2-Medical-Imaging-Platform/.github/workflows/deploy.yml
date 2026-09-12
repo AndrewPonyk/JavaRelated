@@ -1,0 +1,70 @@
+name: deploy
+
+# Build images and deploy to ECS. Auth uses GitHub OIDC -> AWS IAM role
+# (no long-lived access keys stored in GitHub).
+
+on:
+  push:
+    tags: ["v*.*.*"]          # release by tagging main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+
+permissions:
+  id-token: write             # required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [backend, frontend, ml]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, scan, and push image
+        run: |
+          IMAGE="$ECR_REGISTRY/medimaging-${{ matrix.component }}:${GITHUB_SHA::8}"
+          docker build -t "$IMAGE" ./${{ matrix.component }}
+          # TODO: trivy image --exit-code 1 --severity CRITICAL "$IMAGE"
+          docker push "$IMAGE"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'staging' }}   # gated approval for prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run DB migrations (one-off ECS task)
+        run: echo "TODO - aws ecs run-task --task-definition medimaging-migrate"
+
+      - name: Deploy services (blue/green via CodeDeploy)
+        run: echo "TODO - update ECS services api/worker/ml; CodeDeploy shifts traffic"
+
+      - name: Smoke test
+        run: echo "TODO - curl health endpoints + minimal QIDO/WADO check"

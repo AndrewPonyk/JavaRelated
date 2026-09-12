@@ -1,0 +1,97 @@
+# Local dev stack: mirrors prod topology (API, worker, ML, Postgres, MinIO, web)
+# so "works locally" ≈ "works in staging". Not for production.
+#
+# Run:  docker compose up --build
+#   API docs   → http://localhost:8000/docs
+#   Frontend   → http://localhost:5173
+#   MinIO UI   → http://localhost:9001  (minioadmin / minioadmin)
+name: medimaging
+
+x-backend-env: &backend-env
+  APP_ENV: development
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: medimaging
+  POSTGRES_USER: medimaging
+  POSTGRES_PASSWORD: change-me
+  S3_ENDPOINT_URL: http://minio:9000
+  S3_ACCESS_KEY: minioadmin
+  S3_SECRET_KEY: minioadmin
+  S3_BUCKET_DICOM: dicom-archive
+  S3_BUCKET_STAGING: dicom-staging
+  ML_ENABLED: "true"
+  ML_INLINE: "true"
+  ML_SERVICE_URL: http://ml:8001
+  INGEST_INLINE: "true"
+  JWT_SECRET_KEY: dev-only-change-in-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: medimaging
+      POSTGRES_USER: medimaging
+      POSTGRES_PASSWORD: change-me
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medimaging"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["miniodata:/data"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment:
+      <<: *backend-env
+      RUN_MIGRATIONS: "true"   # the API container owns schema migration
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      minio: {condition: service_healthy}
+
+  worker:
+    build: ./backend
+    command: ["python", "-m", "app.workers.ingestion_worker"]
+    environment:
+      <<: *backend-env
+      # Worker is active in queue mode (set QUEUE_URL to an SQS queue). In the
+      # default inline dev setup the API ingests synchronously and this idles.
+    depends_on:
+      postgres: {condition: service_healthy}
+      minio: {condition: service_healthy}
+      api: {condition: service_started}
+
+  ml:
+    build: ./ml
+    environment:
+      S3_ENDPOINT_URL: http://minio:9000
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_BUCKET_DICOM: dicom-archive
+    ports: ["8001:8001"]
+    depends_on:
+      minio: {condition: service_healthy}
+
+  frontend:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:
+  miniodata:

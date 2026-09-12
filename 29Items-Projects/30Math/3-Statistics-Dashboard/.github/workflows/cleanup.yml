@@ -1,0 +1,30 @@
+name: Data retention cleanup
+
+# Weekly deletion of saved datasets that are >90 days old and referenced by no
+# analysis run (scripts/cleanup_stale_datasets.py). Requires the DATABASE_URL
+# repository secret; the job exits cleanly while it is unset.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Delete stale datasets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret not configured — skipping."
+            exit 0
+          fi
+          python scripts/cleanup_stale_datasets.py --apply

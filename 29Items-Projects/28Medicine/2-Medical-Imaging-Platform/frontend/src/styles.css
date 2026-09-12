@@ -1,0 +1,164 @@
+:root {
+  --bg: #0f1419;
+  --panel: #1a212b;
+  --panel-2: #232c38;
+  --border: #2e3a48;
+  --text: #e6edf3;
+  --muted: #8b98a5;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --danger: #ef4444;
+  --ok: #22c55e;
+  --flag: #f59e0b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+button:hover:not(:disabled) { background: var(--accent-hover); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+input, select {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* ── App shell ─────────────────────────────────────────── */
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.app__header h1 { font-size: 1.15rem; margin: 0; }
+.app__logout { background: transparent; border: 1px solid var(--border); }
+
+/* ── Layout ────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 38%) 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: start;
+}
+.layout__worklist, .layout__viewer {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+.layout__worklist h2 { margin-top: 0; font-size: 1rem; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* ── Filter bar ────────────────────────────────────────── */
+.filterbar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+.filterbar input { flex: 1; }
+
+/* ── Worklist table ────────────────────────────────────── */
+.worklist { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.worklist th, .worklist td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.worklist th { color: var(--muted); font-weight: 600; }
+.worklist__row { cursor: pointer; }
+.worklist__row:hover { background: var(--panel-2); }
+.worklist__row.is-selected { background: rgba(59, 130, 246, 0.18); }
+.worklist tfoot td { color: var(--muted); font-size: 0.78rem; }
+
+/* ── Viewer ────────────────────────────────────────────── */
+.viewer__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.viewer__viewport {
+  width: 100%;
+  height: 60vh;
+  min-height: 360px;
+  background: #000;
+  border-radius: 8px;
+}
+.viewer__hint { color: var(--muted); font-size: 0.78rem; margin: 0.5rem 0 0; }
+.muted { color: var(--muted); }
+
+/* ── ML panel ──────────────────────────────────────────── */
+.ml-panel {
+  margin-top: 1rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.ml-panel h3 { margin: 0; font-size: 0.95rem; }
+.ml-panel small { color: var(--muted); }
+.ml-panel--error { color: var(--danger); }
+.ml-panel__findings { list-style: none; margin: 0.75rem 0 0; padding: 0; }
+.ml-panel__findings li {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+.ml-panel__findings li.is-flagged .ml-panel__label { color: var(--flag); font-weight: 600; }
+.ml-panel__score { font-variant-numeric: tabular-nums; color: var(--muted); }
+progress { width: 100%; height: 8px; }
+
+/* ── States ────────────────────────────────────────────── */
+.state { padding: 1rem; border-radius: 8px; font-size: 0.9rem; }
+.state--loading { color: var(--muted); }
+.state--empty { color: var(--muted); }
+.state--error { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
+
+/* ── Login ─────────────────────────────────────────────── */
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.login__card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.login__card h1 { font-size: 1.25rem; margin: 0 0 0.25rem; }
+.login__subtitle { color: var(--muted); margin: 0 0 1rem; font-size: 0.9rem; }
+.login__card label { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+.login__card button { margin-top: 1rem; }
+.login__hint { color: var(--muted); font-size: 0.75rem; margin-top: 1rem; text-align: center; }
+.login__hint code { background: var(--panel-2); padding: 0.1rem 0.3rem; border-radius: 4px; }
+.field-error { color: var(--danger); font-size: 0.75rem; }

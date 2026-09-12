@@ -1,0 +1,124 @@
+# CI: lint → typecheck → test → build check.
+# NOTE: GitHub only runs workflows from the REPOSITORY root .github/. This
+# project currently lives in a subdirectory of a monorepo — when it is split
+# into its own repository, this folder becomes the root one (docs/TECH-NOTES.md §3.1).
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint & typecheck (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --all-packages
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy backend/app libs/sciengine/src
+
+  test-python:
+    name: Python tests (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: scp
+          POSTGRES_PASSWORD: scp
+          POSTGRES_DB: scp_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U scp" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+    env:
+      # The backend suite runs against the real Postgres service in CI
+      # (locally it uses per-test SQLite files — see backend/tests/conftest.py).
+      TEST_DATABASE_URL: postgresql+psycopg://scp:scp@localhost:5432/scp_test
+      TEST_REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --all-packages
+      - name: sciengine tests (coverage gate 90%)
+        run: >
+          uv run pytest libs/sciengine/tests
+          --cov=sciengine --cov-report=xml:coverage-sciengine.xml --cov-fail-under=90
+      - name: backend tests (coverage gate 80%)
+        run: >
+          uv run pytest backend/tests
+          --cov=app --cov-report=xml:coverage-backend.xml --cov-fail-under=80
+      - name: notebook smoke tests (teaching material must not rot)
+        run: uv run pytest --nbmake notebooks/ --nbmake-timeout=300
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage-*.xml
+
+  test-frontend:
+    name: Frontend lint, test, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  docker-build:
+    name: Docker build check
+    runs-on: ubuntu-latest
+    needs: [lint, test-python]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image (no push — deploy.yml owns pushing)
+        run: docker build -f backend/Dockerfile -t scp-backend:${{ github.sha }} .
+
+  security-audit:
+    # Advisory for now; the Phase 3 hardening pass (docs/PROJECT-PLAN.md)
+    # removes continue-on-error to make this a merge gate.
+    name: Dependency audit (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-packages
+      - run: uvx pip-audit

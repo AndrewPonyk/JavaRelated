@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: hl7v2-ingestion-service
+
+ehr:
+  hl7:
+    mllp:
+      enabled: ${HL7_MLLP_ENABLED:true}
+      port: ${HL7_MLLP_PORT:2575}      # standard HL7 MLLP port
+  gateway:
+    base-url: ${FHIR_BASE_URL:http://fhir-gateway-service:8081/fhir}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.ehrplatform: DEBUG

@@ -1,0 +1,29 @@
+# Local development database ONLY. The application itself is not containerized —
+# it deploys as a Vercel static SPA + serverless functions (docs/TECH-NOTES.md §3.3).
+#
+#   docker compose up -d          # start Postgres
+#   npx prisma migrate deploy     # apply committed migrations
+#   npm run db:seed               # optional demo data
+#   npm run dev:full              # vercel dev — SPA + /api against this DB
+#
+# Credentials match the defaults in .env.example.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: linalg-viz-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: linalg_viz
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d linalg_viz']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:

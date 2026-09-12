@@ -1,0 +1,71 @@
+# ML lifecycle: weekly (and on-demand) SageMaker Pipeline runs; endpoint
+# promotion is a separate job gated by the `ml-prod` GitHub environment
+# (required reviewers = human approval — docs/ARCHITECTURE.md §2.3).
+
+name: ML Pipeline
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # Mondays 03:00 UTC — weekly retrain candidate
+  workflow_dispatch:
+    inputs:
+      execute:
+        description: Start a pipeline execution (not just upsert)
+        type: boolean
+        default: true
+      promote:
+        description: Promote latest approved model to the endpoint
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  run-pipeline:
+    name: Upsert / execute SageMaker pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r ml/requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ML_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upsert (and optionally execute) the pipeline
+        run: |
+          FLAGS="--upsert"
+          if [ "${{ inputs.execute || 'true' }}" = "true" ]; then FLAGS="$FLAGS --execute"; fi
+          python ml/pipelines/sagemaker_pipeline.py $FLAGS
+        env:
+          SAGEMAKER_EXECUTION_ROLE_ARN: ${{ secrets.SAGEMAKER_EXECUTION_ROLE_ARN }}
+          ML_ARTIFACTS_BUCKET: ${{ vars.ML_ARTIFACTS_BUCKET }}
+
+  promote-endpoint:
+    name: Promote model → serverless endpoint
+    runs-on: ubuntu-latest
+    needs: run-pipeline
+    if: inputs.promote == true
+    environment: ml-prod   # required reviewers gate real endpoint changes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install boto3
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ML_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Promote latest Approved package (blue/green UpdateEndpoint)
+        run: python ml/pipelines/promote_endpoint.py
+        env:
+          ML_ENDPOINT_NAME: scp-equation-recognizer
+          SAGEMAKER_EXECUTION_ROLE_ARN: ${{ secrets.SAGEMAKER_EXECUTION_ROLE_ARN }}

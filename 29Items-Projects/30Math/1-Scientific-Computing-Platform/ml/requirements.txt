@@ -1,0 +1,11 @@
+# Dependencies for SageMaker training/inference containers and the pipeline
+# definition script. Keep numpy/scikit-learn pinned in lockstep with the
+# platform's uv.lock (training/serving skew — docs/TECH-NOTES.md §3.6).
+
+scikit-learn>=1.5,<2
+joblib>=1.4
+numpy>=1.26,<3
+sympy>=1.13          # featurization parity via sciengine
+sagemaker>=2.200     # pipeline definition (not needed inside containers)
+boto3>=1.34
+# TODO(phase-2): skops for non-pickle model artifacts

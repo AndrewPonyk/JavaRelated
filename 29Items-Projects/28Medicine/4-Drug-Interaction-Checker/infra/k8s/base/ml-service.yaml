@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-severity
+  labels:
+    app: ml-severity
+spec:
+  selector:
+    app: ml-severity
+  ports:
+    - name: http
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ml-severity
+  # TODO: annotate with the IRSA role ARN that grants read access to the
+  # model artifact S3 bucket, e.g.:
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::<account>:role/dic-ml-s3-read

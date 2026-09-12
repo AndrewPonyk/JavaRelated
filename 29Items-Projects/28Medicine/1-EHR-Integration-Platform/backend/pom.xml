@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Parent POM for the EHR Integration Platform backend.
+      Centralizes dependency + plugin management for all service modules.
+      TODO(P1-1): pin transitive versions via a BOM import as the tree grows.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.ehrplatform</groupId>
+    <artifactId>ehr-platform-backend</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>EHR Integration Platform :: Backend</name>
+
+    <modules>
+        <module>common</module>
+        <module>fhir-gateway-service</module>
+        <module>hl7v2-ingestion-service</module>
+        <module>event-streaming-service</module>
+        <module>entity-linking-service</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Library versions -->
+        <spring-boot.version>3.3.4</spring-boot.version>
+        <hapi-fhir.version>7.4.0</hapi-fhir.version>
+        <!-- ojdbc8 (not ojdbc11): the ojdbc8 line still talks to Oracle 11.2 (XE).
+             If ORA-28040 appears vs XE 11.2.0.2, drop to ojdbc8 19.x/18.x. -->
+        <ojdbc.version>21.11.0.0</ojdbc.version>
+        <flyway.version>10.17.0</flyway.version>
+        <testcontainers.version>1.20.1</testcontainers.version>
+        <mapstruct.version>1.6.2</mapstruct.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Internal shared library -->
+            <dependency>
+                <groupId>com.ehrplatform</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--
+              NOTE: the HAPI FHIR BOM is intentionally NOT imported here. It pins
+              Spring Framework / assertj / mockito to versions older than the ones
+              Spring Boot 3.3 curates, which would skew every module. Instead it is
+              imported only in the HAPI-using modules (fhir-gateway, hl7-ingestion),
+              after spring-boot-dependencies, so Boot's versions win for shared libs.
+            -->
+
+            <!-- Oracle JDBC (ojdbc8 for Oracle 11.2 compatibility) -->
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${ojdbc.version}</version>
+            </dependency>
+
+            <!-- Testcontainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Static analysis: shared Checkstyle ruleset -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.5.0</version>
+                    <configuration>
+                        <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Exclude Docker-dependent tests (tag "oracle") from the default run. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludedGroups>oracle</excludedGroups>
+                </configuration>
+            </plugin>
+
+            <!-- Code coverage: agent + report on every `test` run. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

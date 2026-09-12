@@ -1,0 +1,34 @@
+-- V3: ML entity-linking results (owned by entity-linking-service).
+-- Demonstrates relationships: each link references a PATIENT_INDEX row, and a
+-- link is supported by zero or more similar-note evidence rows (1-to-many).
+
+-- A candidate/confirmed link between two patient records believed to be the
+-- same real-world person (record linkage / deduplication).
+CREATE TABLE ENTITY_LINK (
+    LINK_ID            VARCHAR2(64)  NOT NULL,
+    SOURCE_PATIENT_ID  VARCHAR2(64)  NOT NULL,
+    TARGET_PATIENT_ID  VARCHAR2(64)  NOT NULL,
+    CONFIDENCE         NUMBER(5,4)   NOT NULL,   -- model score in [0,1]
+    STATUS             VARCHAR2(16)  DEFAULT 'CANDIDATE' NOT NULL, -- CANDIDATE|CONFIRMED|REJECTED
+    MODEL_VERSION      VARCHAR2(64)  NOT NULL,
+    CREATED_AT         TIMESTAMP     NOT NULL,
+    REVIEWED_BY        VARCHAR2(256),            -- human-in-the-loop reviewer (P3-6)
+    CONSTRAINT PK_ENTITY_LINK PRIMARY KEY (LINK_ID),
+    CONSTRAINT FK_LINK_SOURCE FOREIGN KEY (SOURCE_PATIENT_ID) REFERENCES PATIENT_INDEX (FHIR_ID),
+    CONSTRAINT FK_LINK_TARGET FOREIGN KEY (TARGET_PATIENT_ID) REFERENCES PATIENT_INDEX (FHIR_ID),
+    CONSTRAINT CK_LINK_STATUS CHECK (STATUS IN ('CANDIDATE', 'CONFIRMED', 'REJECTED'))
+);
+CREATE INDEX IX_LINK_SOURCE ON ENTITY_LINK (SOURCE_PATIENT_ID);
+CREATE INDEX IX_LINK_STATUS ON ENTITY_LINK (STATUS, CONFIDENCE);
+
+-- Evidence: the similar notes (by embedding kNN) that justify a link/score.
+CREATE TABLE LINK_EVIDENCE (
+    EVIDENCE_ID    VARCHAR2(64)  NOT NULL,
+    LINK_ID        VARCHAR2(64)  NOT NULL,
+    NOTE_REF       VARCHAR2(128) NOT NULL,       -- FHIR DocumentReference id
+    SIMILARITY     NUMBER(5,4)   NOT NULL,
+    CONSTRAINT PK_LINK_EVIDENCE PRIMARY KEY (EVIDENCE_ID),
+    CONSTRAINT FK_EVIDENCE_LINK FOREIGN KEY (LINK_ID)
+        REFERENCES ENTITY_LINK (LINK_ID) ON DELETE CASCADE
+);
+CREATE INDEX IX_EVIDENCE_LINK ON LINK_EVIDENCE (LINK_ID);

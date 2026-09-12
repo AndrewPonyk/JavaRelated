@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ehr-platform
+  labels:
+    app.kubernetes.io/part-of: ehr-integration-platform
+    # Enforce a restricted Pod Security Standard for PHI workloads.
+    pod-security.kubernetes.io/enforce: restricted

@@ -1,0 +1,67 @@
+// Linear Algebra Visualizer — persistence schema.
+// Deliberately small: anonymous users keyed by deviceId, their attempts,
+// and a per-topic mastery snapshot. See docs/ARCHITECTURE.md §2.3/§2.5.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled — serverless functions
+  directUrl = env("DIRECT_DATABASE_URL") // direct — `prisma migrate` only
+}
+
+enum Topic {
+  VECTORS
+  LINEAR_COMBINATIONS
+  TRANSFORMATIONS
+  DETERMINANT
+  EIGENVALUES
+}
+
+model User {
+  id        String   @id @default(cuid())
+  /// Anonymous identity: UUID minted by the browser, stored in localStorage.
+  deviceId  String   @unique
+  createdAt DateTime @default(now())
+
+  attempts ExerciseAttempt[]
+  progress TopicProgress[]
+
+  // Roadmap (PROJECT-PLAN Phase 3): optional auth identity (email / OAuth
+  // subject) links here without reshaping the model — deviceId history migrates.
+}
+
+model ExerciseAttempt {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic           Topic
+  difficulty      Int      @db.SmallInt
+  /// PRNG seed — the exact exercise is reproducible from (topic, difficulty, seed).
+  seed            Int
+  correct         Boolean
+  durationMs      Int
+  /// Client-generated idempotency key: the offline retry queue delivers
+  /// at-least-once, so replays after a lost response must not double-count.
+  /// Nullable only for rows predating the key.
+  clientAttemptId String?  @unique
+  createdAt       DateTime @default(now())
+
+  @@index([userId, topic, createdAt])
+}
+
+model TopicProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic         Topic
+  /// 0 (novice) … 1 (mastered). Recomputed SERVER-SIDE per attempt inside a
+  /// transaction (api/_lib/mastery.ts) — never accepted from the client.
+  mastery       Float    @default(0)
+  attemptsCount Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, topic])
+}

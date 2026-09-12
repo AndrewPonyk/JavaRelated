@@ -1,0 +1,54 @@
+# Production deploy to Vercel on push to master.
+#
+# ── SIMPLER ALTERNATIVE ─────────────────────────────────────────────────────
+# Vercel's GitHub integration gives preview-per-PR + production-on-merge with
+# zero workflow code. If you enable it, DELETE this file. Keep this workflow
+# only when deploys must be gated by CI or use build-once/deploy-same-artifact.
+# ────────────────────────────────────────────────────────────────────────────
+#
+# Required repository secrets:
+#   VERCEL_TOKEN       — vercel.com/account/tokens
+#   VERCEL_ORG_ID      — from `vercel link` → .vercel/project.json
+#   VERCEL_PROJECT_ID  — from `vercel link` → .vercel/project.json
+name: Deploy (production)
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    name: Build & deploy to Vercel
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Pull Vercel environment
+        run: npx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build with Vercel
+        run: npx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # Once the production database exists, run migrations BEFORE promoting the
+      # deploy that depends on them (needs DATABASE_URL/DIRECT_DATABASE_URL in
+      # the pulled Vercel env). Uncomment:
+      # - name: Apply database migrations
+      #   run: npx prisma migrate deploy
+
+      - name: Deploy prebuilt artifact
+        run: npx vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

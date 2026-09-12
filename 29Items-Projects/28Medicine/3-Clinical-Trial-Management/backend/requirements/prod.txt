@@ -1,0 +1,10 @@
+-r base.txt
+
+# Production server + observability
+gunicorn>=23.0               # 23.x includes request-smuggling fixes
+uvicorn[standard]>=0.30      # ASGI worker (async views / websockets)
+django-storages[boto3]>=1.14 # S3 (GovCloud) for static/media
+urllib3>=2.5.0               # transitive (boto3/requests); security floor
+sentry-sdk>=2.8
+opentelemetry-distro>=0.46
+opentelemetry-exporter-otlp>=1.25

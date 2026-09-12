@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Interactive 2D visualizer for vector spaces, linear transformations and eigenvalues."
+    />
+    <title>Linear Algebra Visualizer</title>
+    <script>
+      // Configure MathJax BEFORE the library loads. `typeset: false` because the app
+      // typesets changed subtrees manually after React commits (src/hooks/useMathJax.ts) —
+      // see docs/TECH-NOTES.md §3.6 pitfall 4.
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)']],
+          displayMath: [['\\[', '\\]']],
+        },
+        svg: { fontCache: 'global' },
+        startup: { typeset: false },
+      };
+    </script>
+    <!-- CDN-hosted (cached across sites); the app degrades to raw TeX text if
+         it fails to load. Self-hosting is the supply-chain hardening option. -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

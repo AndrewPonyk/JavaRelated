@@ -1,0 +1,59 @@
+[project]
+name = "medimaging-backend"
+version = "0.1.0"
+description = "HIPAA-aligned PACS backend: DICOM ingestion, archive, DICOMweb, ML assist."
+requires-python = ">=3.12"
+readme = "../README.md"
+
+# Runtime/dev deps are pinned in requirements*.txt (used by Docker + CI).
+# pyproject here is the single source of truth for tooling configuration.
+
+# ── Ruff (lint + import sort) ────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "C4", "SIM"]
+# S101: assert in tests. S105/S106: non-secret string defaults ("bearer",
+# dev-only placeholder creds that are overridden by env in real deployments).
+ignore = ["S101", "S105", "S106"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]   # hard-coded test tokens are acceptable
+
+# ── Black ────────────────────────────────────────────────────
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+# ── mypy ─────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true    # pydicom / pylibjpeg ship partial stubs
+# jose / passlib / boto3 / SQLAlchemy result rows are typed as Any at the
+# boundary; we coerce/annotate our own returns explicitly instead.
+warn_return_any = false
+
+# ── pytest ───────────────────────────────────────────────────
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --cov=app --cov-report=term-missing --cov-fail-under=80"
+markers = [
+    "integration: requires Docker (Postgres + MinIO via Testcontainers)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:jose.*",
+    "ignore:.*Invalid value for VR UI.*:UserWarning",
+    "ignore:.*utcnow.*:DeprecationWarning",
+]
+
+[tool.coverage.run]
+omit = ["app/main.py", "migrations/*", "tests/*"]

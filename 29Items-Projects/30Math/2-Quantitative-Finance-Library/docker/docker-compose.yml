@@ -1,0 +1,54 @@
+# Local development stack: API + Postgres.
+# Run from repo root:  docker compose -f docker/docker-compose.yml up --build
+
+services:
+  # One-shot migration job: runs `alembic upgrade head` before the API rolls
+  # (TECH-NOTES §3.3 — migrations never run in-app).
+  migrate:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    command: ["alembic", "-c", "migrations/alembic.ini", "upgrade", "head"]
+    environment:
+      QF_DATABASE_URL: postgresql+asyncpg://quantfin:${QF_DB_PASSWORD:-quantfin-dev}@db:5432/quantfin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      QF_ENV: dev
+      QF_REQUIRE_NATIVE: "1"
+      QF_DATABASE_URL: postgresql+asyncpg://quantfin:${QF_DB_PASSWORD:-quantfin-dev}@db:5432/quantfin
+      QF_CORS_ORIGINS: http://localhost:8000
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: quantfin
+      # Default is for local dev only; override via QF_DB_PASSWORD (real
+      # deployments inject credentials from a secret store instead).
+      POSTGRES_PASSWORD: ${QF_DB_PASSWORD:-quantfin-dev}
+      POSTGRES_DB: quantfin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quantfin"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

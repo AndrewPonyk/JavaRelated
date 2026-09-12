@@ -1,0 +1,2 @@
+# Model weights are pulled from S3 (ML_MODEL_S3_URI) at deploy time.
+# Do not commit weights to git.

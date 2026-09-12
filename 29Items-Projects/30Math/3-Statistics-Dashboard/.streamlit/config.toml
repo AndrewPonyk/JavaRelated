@@ -1,0 +1,17 @@
+# Streamlit app configuration (checked in — secrets never go here).
+# Theme colors come from the validated chart palette (app/ui/components/charts.py)
+# so app chrome and data marks read as one system.
+
+[theme]
+base = "light"
+primaryColor = "#2a78d6"            # categorical slot 1 (blue)
+backgroundColor = "#fcfcfb"         # chart surface
+secondaryBackgroundColor = "#f9f9f7" # page plane
+textColor = "#0b0b0b"               # primary ink
+
+[server]
+maxUploadSize = 25                  # MB — keep in sync with MAX_UPLOAD_MB
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
