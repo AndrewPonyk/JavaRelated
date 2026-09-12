@@ -1,0 +1,109 @@
+name: CD
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml # the full CI pipeline is the deploy gate
+
+  build-push:
+    runs-on: ubuntu-latest
+    needs: test
+    # CD is opt-in: set repository variable DEPLOY_ENABLED=true (plus the
+    # environment secrets below) to activate; otherwise this workflow only
+    # proves the release pipeline is green.
+    if: vars.DEPLOY_ENABLED == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: backend image (tag + sha)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-backend:${{ github.ref_name }}
+            ${{ env.IMAGE_PREFIX }}-backend:sha-${{ github.sha }}
+          cache-from: type=gha
+      - name: frontend image (tag + sha)
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-frontend:${{ github.ref_name }}
+            ${{ env.IMAGE_PREFIX }}-frontend:sha-${{ github.sha }}
+          cache-from: type=gha
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: vars.DEPLOY_ENABLED == 'true'
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: deploy over SSH (single VM, compose reference stack)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/webappsec-scanner
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+      - name: ZAP baseline self-scan of staging (dogfood gate)
+        # We scan ourselves before shipping. Runs with -I: WARN-level findings
+        # are reported but non-blocking; FAIL-level (per tools/zap/policies/
+        # baseline-policy.xml — e.g. a lost CSP header) fail the release.
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+        run: |
+          mkdir -p tmp/zap
+          cp tools/zap/policies/baseline-policy.xml tmp/zap/
+          docker run --rm --network host -v "$PWD/tmp/zap:/zap/wrk" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "$STAGING_URL" -c baseline-policy.xml \
+            -r baseline-report.html -I
+      - name: Upload ZAP baseline report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: tmp/zap/baseline-report.html
+          if-no-files-found: ignore
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: vars.DEPLOY_ENABLED == 'true'
+    environment:
+      name: production # manual approval lives in the environment protection
+      # rules: Settings → Environments → production → required reviewers
+    steps:
+      - name: deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/webappsec-scanner
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            # rollback = re-deploy the previous immutable vX.Y.Z tag

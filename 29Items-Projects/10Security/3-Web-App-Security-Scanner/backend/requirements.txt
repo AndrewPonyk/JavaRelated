@@ -1,0 +1,13 @@
+# Runtime dependencies — pinned majors; patch bumps via dependabot
+# Auth is deliberately stdlib-only (HS256 JWT + PBKDF2 in app/core/security.py).
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+pydantic>=2.8,<3
+pydantic-settings>=2.4,<3
+sqlalchemy[asyncio]>=2.0.30,<2.1
+asyncpg>=0.29,<1
+alembic>=1.13,<2
+httpx>=0.27,<1
+jinja2>=3.1,<4                  # HTML report templates (autoescaped)
+scikit-learn>=1.5,<2            # ML severity classifier
+joblib>=1.4,<2                  # model artifact persistence

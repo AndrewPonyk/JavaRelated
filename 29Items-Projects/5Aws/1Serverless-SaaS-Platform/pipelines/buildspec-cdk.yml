@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing AWS CDK CLI and infrastructure dependencies..."
+      - npm install -g aws-cdk
+      - cd infrastructure
+      - npm ci
+
+  build:
+    commands:
+      - echo "Synthesizing CloudFormation templates..."
+      - npx cdk synth --all --output cdk.out
+      - echo "Checking CDK diff against target environment..."
+      - npx cdk diff || true
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: infrastructure/cdk.out

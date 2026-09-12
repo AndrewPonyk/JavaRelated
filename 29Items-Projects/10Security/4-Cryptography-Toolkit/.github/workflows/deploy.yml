@@ -1,0 +1,106 @@
+name: Deploy
+
+# Trunk-based flow (TECH-NOTES §3.5): tag vX.Y.Z on master → build images →
+# SSH rollout (docker compose pull + up) → health wait → smoke gate, first to
+# staging, then to production (manual approval via GitHub environments).
+#
+# Required repository secrets (host setup in docker-compose.deploy.yml header):
+#   STAGING_HOST, PRODUCTION_HOST   — deploy target hostname/IP
+#   DEPLOY_USER                     — ssh user (needs docker group on the host)
+#   DEPLOY_SSH_KEY                  — private key for that user
+#   DEPLOY_PATH                     — dir containing docker-compose.deploy.yml + nginx/tls/
+#   STAGING_URL, PRODUCTION_URL     — public base URL for the smoke gate
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/backend:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}/backend:sha-${{ github.sha }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/frontend:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}/frontend:sha-${{ github.sha }}
+
+  staging:
+    runs-on: ubuntu-latest
+    needs: images
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Roll out to staging (docker compose)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -eu
+            cd "${{ secrets.DEPLOY_PATH }}"
+            export REGISTRY="ghcr.io/${{ github.repository }}" IMAGE_TAG="${{ github.ref_name }}"
+            docker compose -f docker-compose.deploy.yml pull
+            docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+            # Apply SQL migrations (idempotent: IF NOT EXISTS) from inside the image
+            docker compose -f docker-compose.deploy.yml run --rm --no-deps backend python -c \
+              "import glob,os,sqlite3; c=sqlite3.connect(os.environ['DATABASE_URL'].split('sqlite:///')[-1]); [c.executescript(open(f).read()) or print('applied', f) for f in sorted(glob.glob('/app/migrations/*.sql'))]; c.commit()"
+      - name: Wait for health (max 60s)
+        run: |
+          for i in $(seq 1 12); do
+            curl -sf "${{ secrets.STAGING_URL }}/api/health" && break
+            sleep 5
+          done
+          curl -sf "${{ secrets.STAGING_URL }}/api/health"
+      - name: Smoke gate
+        run: BASE="${{ secrets.STAGING_URL }}" ./scripts/smoke_test.sh
+
+  production:
+    runs-on: ubuntu-latest
+    needs: staging
+    environment: production  # requires manual approval in repo settings
+    steps:
+      - uses: actions/checkout@v4
+      - name: Roll out to production (docker compose)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -eu
+            cd "${{ secrets.DEPLOY_PATH }}"
+            export REGISTRY="ghcr.io/${{ github.repository }}" IMAGE_TAG="${{ github.ref_name }}"
+            docker compose -f docker-compose.deploy.yml pull
+            docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+            docker compose -f docker-compose.deploy.yml run --rm --no-deps backend python -c \
+              "import glob,os,sqlite3; c=sqlite3.connect(os.environ['DATABASE_URL'].split('sqlite:///')[-1]); [c.executescript(open(f).read()) or print('applied', f) for f in sorted(glob.glob('/app/migrations/*.sql'))]; c.commit()"
+      - name: Wait for health (max 60s)
+        run: |
+          for i in $(seq 1 12); do
+            curl -sf "${{ secrets.PRODUCTION_URL }}/api/health" && break
+            sleep 5
+          done
+          curl -sf "${{ secrets.PRODUCTION_URL }}/api/health"
+      - name: Smoke gate
+        run: BASE="${{ secrets.PRODUCTION_URL }}" ./scripts/smoke_test.sh

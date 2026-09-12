@@ -1,0 +1,17 @@
+version: 0.1
+
+default:
+  deploy:
+    parameters:
+      stack_name: file-pipeline
+      region: us-east-1
+      resolve_s3: true
+      capabilities: CAPABILITY_IAM
+      confirm_changeset: false
+      fail_on_empty_changeset: false
+      # LocalStack endpoints
+      s3_endpoint_url: http://localhost:4566
+      endpoint_url: http://localhost:4566
+  local_start_api:
+    parameters:
+      docker_network: 3-file-processing-pipeline_default

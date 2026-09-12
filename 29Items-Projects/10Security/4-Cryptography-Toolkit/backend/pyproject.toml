@@ -1,0 +1,28 @@
+[project]
+name = "crypto-toolkit-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S"]
+ignore = ["S324"]  # hashlib/md5 discussed in lessons deliberately
+
+[tool.ruff.lint.per-file-ignores]
+# tests: asserts are the point; fixture passwords are demo literals, not credentials
+"tests/*" = ["S101", "S105", "S106", "S107"]
+
+[tool.black]
+line-length = 110
+target-version = ["py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=crypto_toolkit --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["crypto_toolkit"]
+omit = ["crypto_toolkit/__init__.py"]

@@ -1,0 +1,52 @@
+[project]
+name = "web-app-security-scanner-backend"
+version = "0.1.0"
+description = "Automated DAST platform backend: ZAP + SQLMap + custom XSS + ML severity"
+requires-python = ">=3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",      # pycodestyle / pyflakes
+    "I",                # import sorting
+    "B",                # bugbear
+    "UP",               # pyupgrade
+    "SIM",              # simplification
+    "RUF",              # ruff-specific
+]
+ignore = [
+    "B008",  # FastAPI Depends() in defaults is idiomatic
+]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*" = ["E501"]
+
+# pytest lives in pytest.ini (it takes precedence anyway — one source of truth)
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/main.py", "*/tests/*"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+# Strictness rolled out per-module; tighten as code stabilizes
+[[tool.mypy.overrides]]
+module = "app.services.*"
+disallow_untyped_defs = true
+
+# joblib ships no inline types (py.typed); its load() returns Any by design
+[[tool.mypy.overrides]]
+module = "joblib"
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "alembic"]
+# S608 (SQL injection fuzz strings) trips on scanner fixtures by design
+skips = ["B608"]

@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing frontend dependencies..."
+      - cd frontend
+      - npm ci
+
+  pre_build:
+    commands:
+      - echo "Running frontend linters and typechecks..."
+      - npm run lint
+      - npm run typecheck
+      - echo "Running frontend unit tests..."
+      - npm test -- --run
+
+  build:
+    commands:
+      - echo "Building production static bundle with Vite..."
+      - npm run build
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: frontend/dist

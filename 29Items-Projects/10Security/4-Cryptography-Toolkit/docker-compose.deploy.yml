@@ -1,0 +1,41 @@
+# Deploy-host stack: pulls the CI-pushed GHCR images instead of building.
+# Used by .github/workflows/deploy.yml (SSH rollout). One-time host setup:
+#   mkdir -p /opt/crypto-toolkit/nginx/tls && cp docker-compose.deploy.yml /opt/crypto-toolkit/
+#   cp nginx/tls/edge.conf /opt/crypto-toolkit/nginx/tls/
+#   cp server.crt server.key /opt/crypto-toolkit/nginx/tls/   # real certs on the host
+#   printf 'SECRET_KEY=%s\n' "$(openssl rand -hex 32)" > /opt/crypto-toolkit/.env
+# Rollout (CI does exactly this):
+#   REGISTRY=ghcr.io/OWNER/REPO IMAGE_TAG=vX.Y.Z docker compose -f docker-compose.deploy.yml pull
+#   REGISTRY=ghcr.io/OWNER/REPO IMAGE_TAG=vX.Y.Z docker compose -f docker-compose.deploy.yml up -d
+
+services:
+  backend:
+    image: ${REGISTRY:-ghcr.io/OWNER/REPO}/backend:${IMAGE_TAG:-latest}
+    env_file: # created during one-time host setup (header above); optional so the
+      - path: .env # file validates off-host. ProductionConfig refuses to boot
+        required: false # without a real SECRET_KEY — no silent insecure fallback.
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: sqlite:////app/data/crypto_toolkit.db
+    volumes:
+      - db-data:/app/data
+    expose: ["5000"]
+
+  frontend:
+    image: ${REGISTRY:-ghcr.io/OWNER/REPO}/frontend:${IMAGE_TAG:-latest}
+    depends_on: [backend]
+    expose: ["80"]
+
+  edge:
+    image: nginx:alpine
+    depends_on: [frontend, backend]
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/tls/edge.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/tls/server.crt:/etc/nginx/tls/server.crt:ro
+      - ./nginx/tls/server.key:/etc/nginx/tls/server.key:ro
+
+volumes:
+  db-data:

@@ -1,4 +1,5 @@
 boto3==1.28.62
+pdfplumber==0.10.3
 pytest==7.4.2
 pytest-mock==3.11.1
 moto==4.2.5

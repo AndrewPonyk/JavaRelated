@@ -3,16 +3,80 @@ import json
 import boto3
 import logging
 from decimal import Decimal
+from botocore.exceptions import ClientError, EndpointConnectionError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource('dynamodb')
+s3 = boto3.client('s3')
 textract = boto3.client('textract')
 comprehend = boto3.client('comprehend')
 
 table_name = os.environ.get('TABLE_NAME', 'DocumentsTable')
 table = dynamodb.Table(table_name)
+
+IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.tiff', '.tif', '.bmp'}
+
+
+def extract_text_with_textract(bucket_name, object_key):
+    """Extract text using AWS Textract."""
+    logger.info(f"Calling Textract for {object_key}")
+    response = textract.detect_document_text(
+        Document={'S3Object': {'Bucket': bucket_name, 'Name': object_key}}
+    )
+    text_blocks = [
+        block.get('Text', '')
+        for block in response.get('Blocks', [])
+        if block.get('BlockType') == 'LINE'
+    ]
+    return " ".join(text_blocks)
+
+
+def extract_text_with_pdfplumber(bucket_name, object_key):
+    """Fallback: extract text using pdfplumber (text-based PDFs only)."""
+    import pdfplumber
+
+    ext = os.path.splitext(object_key)[1].lower()
+    if ext in IMAGE_EXTENSIONS:
+        logger.warning(
+            f"Cannot OCR image file {object_key} without Textract. "
+            "pdfplumber only supports text-based PDFs."
+        )
+        return ""
+
+    local_path = f"/tmp/{os.path.basename(object_key)}"
+    try:
+        logger.info(f"Downloading {object_key} from S3 for pdfplumber fallback")
+        s3.download_file(bucket_name, object_key, local_path)
+
+        text_parts = []
+        with pdfplumber.open(local_path) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text_parts.append(page_text)
+
+        return " ".join(text_parts)
+    finally:
+        if os.path.exists(local_path):
+            os.remove(local_path)
+
+
+def extract_text(bucket_name, object_key):
+    """Try Textract first, fall back to pdfplumber if Textract is unavailable."""
+    try:
+        return extract_text_with_textract(bucket_name, object_key)
+    except (ClientError, EndpointConnectionError) as e:
+        error_code = getattr(e, 'response', {}).get('Error', {}).get('Code', '')
+        if error_code in ('AccessDeniedException', 'UnrecognizedClientException') \
+                or isinstance(e, EndpointConnectionError):
+            logger.warning(
+                f"Textract unavailable ({type(e).__name__}: {e}). "
+                "Falling back to pdfplumber."
+            )
+            return extract_text_with_pdfplumber(bucket_name, object_key)
+        raise
 
 def update_status(document_id, status, error=None, extra_attrs=None):
     update_expr = "SET #st = :status"
@@ -63,16 +127,8 @@ def lambda_handler(event, context):
             # Update status to processing
             update_status(document_id, "PROCESSING")
             
-            logger.info(f"Calling Textract for {object_key}")
-            # Call Textract
-            response = textract.detect_document_text(
-                Document={'S3Object': {'Bucket': bucket_name, 'Name': object_key}}
-            )
-            
-            # Extract Text
-            text_blocks = [block.get('Text', '') for block in response.get('Blocks', []) if block.get('BlockType') == 'LINE']
-            full_text = " ".join(text_blocks)
-            
+            # Extract text (Textract with pdfplumber fallback)
+            full_text = extract_text(bucket_name, object_key)
             logger.info(f"Extracted {len(full_text)} characters.")
             
             # Call Comprehend

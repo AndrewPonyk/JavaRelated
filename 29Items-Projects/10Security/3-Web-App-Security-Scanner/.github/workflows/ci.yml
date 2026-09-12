@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_call: {} # lets cd.yml reuse this whole pipeline as its deploy gate
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-lint-type:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install ruff mypy -r backend/requirements.txt
+      - name: ruff (lint + format check)
+        working-directory: backend
+        run: |
+          ruff check app tests
+          ruff format --check app tests
+      - name: mypy
+        working-directory: backend
+        run: mypy app/services  # strict island first (see pyproject overrides)
+
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r backend/requirements-dev.txt
+      - name: "pytest with coverage (gate: 70%)"
+        working-directory: backend
+        run: pytest --cov=app --cov-report=term --cov-fail-under=70
+      - name: pip-audit (pinned-list CVE gate; transitive deps audited in the image build)
+        working-directory: backend
+        run: pip-audit --no-deps -r requirements.txt
+
+  frontend-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - working-directory: frontend
+        run: npm ci || npm install
+      - working-directory: frontend
+        run: npm run lint
+      - working-directory: frontend
+        run: npm test
+      - working-directory: frontend
+        run: npm run build
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend-lint-type, backend-test, frontend-build-test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: build backend image (no push on CI; bakes the ML model)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          tags: webappsec-scanner/backend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: build frontend image (no push on CI)
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: false
+          tags: webappsec-scanner/frontend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

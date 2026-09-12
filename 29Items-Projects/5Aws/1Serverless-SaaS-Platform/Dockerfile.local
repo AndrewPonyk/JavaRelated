@@ -1,0 +1,25 @@
+# Multi-stage local development & testing container
+FROM python:3.12-slim AS base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# Install system utilities
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python backend dependencies
+COPY backend/requirements.txt backend/requirements-dev.txt ./backend/
+RUN pip install --upgrade pip && \
+    pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+COPY backend/ /app/backend/
+WORKDIR /app/backend
+
+# Default command: run test suite
+CMD ["pytest", "--cov=src", "tests/unit"]

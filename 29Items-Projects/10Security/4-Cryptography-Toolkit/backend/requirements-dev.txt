@@ -1,0 +1,7 @@
+-r requirements.txt
+pytest==9.1.1
+pytest-cov==6.0.0
+ruff==0.8.6
+black==23.12.1
+pre-commit==3.8.0
+pip-audit==2.10.1

@@ -1,0 +1,88 @@
+# Local development stack — `docker compose up --build`
+# The scanner sidecars are pinned images driven over their REST APIs only.
+name: web-app-security-scanner
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-secscanner}
+      POSTGRES_USER: ${POSTGRES_USER:-secscanner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secscanner}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-secscanner}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5432:5432"   # exposed for dev only; removed in prod override
+
+  # One-shot migration runner — backend waits for it (service_completed_successfully)
+  migrate:
+    build: ./backend
+    command: ["alembic", "upgrade", "head"]
+    environment: &backend_env
+      ENV: development
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173","http://localhost:8090"]}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@scanner.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-admin}
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB:-secscanner}
+      POSTGRES_USER: ${POSTGRES_USER:-secscanner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secscanner}
+      ZAP_BASE_URL: http://zap:8080
+      ZAP_API_KEY: ${ZAP_API_KEY:-dev-zap-key}
+      SQLMAP_BASE_URL: http://sqlmap:8775
+      SQLMAP_USERNAME: ${SQLMAP_USERNAME:-sqlmap}
+      SQLMAP_PASSWORD: ${SQLMAP_PASSWORD:-dev-sqlmap-pass}
+      SCAN_TIMEOUT_MINUTES: ${SCAN_TIMEOUT_MINUTES:-45}
+      MAX_CONCURRENT_SCANS: ${MAX_CONCURRENT_SCANS:-3}
+      ALLOW_PRIVATE_TARGETS: ${ALLOW_PRIVATE_TARGETS:-true}
+      SCAN_WEBHOOK_URL: ${SCAN_WEBHOOK_URL:-}
+      EVIDENCE_RETENTION_DAYS: ${EVIDENCE_RETENTION_DAYS:-90}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    environment: *backend_env
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    command: "zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.key=${ZAP_API_KEY:-dev-zap-key} -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true"
+    # NOTE: api.addrs open in dev network only; prod override restricts to backend alias
+    volumes:
+      - ./tools/zap/policies:/zap/policies:ro
+    ports:
+      - "8080:8080"   # dev convenience (ZAP UI reaches it via this port)
+
+  sqlmap:
+    build: ./tools/sqlmap        # no official image — built from official repo
+    ports:
+      - "8775:8775"   # dev convenience
+
+  # Deliberately vulnerable target — e2e profile only, never in the default stack
+  vuln-lab:
+    build: ./tools/vuln-lab
+    profiles: ["e2e"]
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8090:80"
+
+volumes:
+  pgdata:

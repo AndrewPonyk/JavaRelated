@@ -1,0 +1,76 @@
+{
+  "TableName": "saas_platform_core",
+  "BillingMode": "PAY_PER_REQUEST",
+  "KeySchema": [
+    { "AttributeName": "PK", "KeyType": "HASH" },
+    { "AttributeName": "SK", "KeyType": "RANGE" }
+  ],
+  "AttributeDefinitions": [
+    { "AttributeName": "PK", "AttributeType": "S" },
+    { "AttributeName": "SK", "AttributeType": "S" },
+    { "AttributeName": "GSI1PK", "AttributeType": "S" },
+    { "AttributeName": "GSI1SK", "AttributeType": "S" },
+    { "AttributeName": "GSI2PK", "AttributeType": "S" },
+    { "AttributeName": "GSI2SK", "AttributeType": "S" }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GSI1",
+      "KeySchema": [
+        { "AttributeName": "GSI1PK", "KeyType": "HASH" },
+        { "AttributeName": "GSI1SK", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" }
+    },
+    {
+      "IndexName": "GSI2",
+      "KeySchema": [
+        { "AttributeName": "GSI2PK", "KeyType": "HASH" },
+        { "AttributeName": "GSI2SK", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" }
+    }
+  ],
+  "EntityAccessPatterns": [
+    {
+      "Entity": "TenantMetadata",
+      "PK": "TENANT#<tenant_id>",
+      "SK": "METADATA",
+      "GSI1PK": "STATUS#<status>",
+      "GSI1SK": "PLAN#<tier>",
+      "Description": "Stores tenant profile, status, allowed countries, and billing tier"
+    },
+    {
+      "Entity": "TenantUser",
+      "PK": "TENANT#<tenant_id>",
+      "SK": "USER#<user_id>",
+      "GSI1PK": "USER#EMAIL",
+      "GSI1SK": "<email>",
+      "Description": "Stores tenant user profiles and roles"
+    },
+    {
+      "Entity": "UsageCounter",
+      "PK": "TENANT#<tenant_id>",
+      "SK": "USAGE#<metric>#<YYYY-MM>",
+      "GSI1PK": "METRIC#<metric>",
+      "GSI1SK": "VAL#<count>",
+      "Description": "Aggregated monthly counter incremented atomically via SQS consumer"
+    },
+    {
+      "Entity": "UsageEvent",
+      "PK": "TENANT#<tenant_id>",
+      "SK": "EVENT#<timestamp>#<uuid>",
+      "GSI2PK": "TENANT#<tenant_id>#USAGE",
+      "GSI2SK": "DATE#<YYYY-MM-DD>",
+      "Description": "Audit trail of raw metered events"
+    },
+    {
+      "Entity": "CapacityPrediction",
+      "PK": "TENANT#<tenant_id>",
+      "SK": "PREDICTION#<metric>",
+      "GSI1PK": "PREDICTION",
+      "GSI1SK": "<timestamp>",
+      "Description": "Cached output from SageMaker serverless inference model"
+    }
+  ]
+}

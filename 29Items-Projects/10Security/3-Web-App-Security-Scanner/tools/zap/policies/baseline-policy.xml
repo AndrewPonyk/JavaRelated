@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- zap-baseline.py `-c` rules config for the CD self-scan gate (we scan
+     ourselves before shipping). Levels: IGNORE = never reported, WARN =
+     reported in the artifact but non-blocking (baseline runs with -I),
+     FAIL = blocks the release. Tuned for this stack: nginx-served SPA
+     (frontend/nginx.conf) + FastAPI JSON API behind /api/.
+     ZAP alert ids: 10038 = Content-Security-Policy missing, 10096 = timestamp
+     disclosure, 10097 = hash disclosure. Extend per target as new passive
+     rules fire: triage once, then pin the level here. -->
+<config>
+  <!-- Our nginx ships CSP; a regression that drops it must stop the release. -->
+  <scanner>
+    <id>10038</id>
+    <level>FAIL</level>
+  </scanner>
+  <!-- Informational noise inherent to Vite-hashed SPA assets and API
+       timestamps — reviewed and accepted. -->
+  <scanner>
+    <id>10096</id>
+    <level>IGNORE</level>
+  </scanner>
+  <scanner>
+    <id>10097</id>
+    <level>IGNORE</level>
+  </scanner>
+</config>

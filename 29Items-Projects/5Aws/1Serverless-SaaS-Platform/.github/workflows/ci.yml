@@ -1,0 +1,102 @@
+name: Continuous Integration & Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-lint-and-test:
+    name: Backend Lint & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run Ruff Linter
+        run: |
+          cd backend
+          ruff check src tests
+
+      - name: Run Black Code Formatter Check
+        run: |
+          cd backend
+          black --check src tests
+
+      - name: Run Mypy Type Checker
+        run: |
+          cd backend
+          mypy src
+
+      - name: Run Tests with Coverage
+        run: |
+          cd backend
+          pytest --cov=src --cov-fail-under=80 tests/
+
+  frontend-lint-and-test:
+    name: Frontend Lint & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run Lint and Type Check
+        run: |
+          cd frontend
+          npm run lint
+          npm run typecheck
+
+      - name: Run Frontend Tests
+        run: |
+          cd frontend
+          npm test -- --run
+
+  cdk-synth-and-validate:
+    name: CDK Synth & Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: infrastructure/package-lock.json
+
+      - name: Install CDK Dependencies
+        run: |
+          cd infrastructure
+          npm ci
+
+      - name: CDK Synth Check
+        run: |
+          cd infrastructure
+          npx cdk synth --all

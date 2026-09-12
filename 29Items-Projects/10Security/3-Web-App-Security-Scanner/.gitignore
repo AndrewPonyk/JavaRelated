@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node
+node_modules/
+frontend/dist/
+npm-debug.log*
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# production TLS material mounted into the frontend container
+deploy/certs/
+
+# ML artifacts
+backend/ml/*.joblib
+
+# Tooling state
+tools/zap/session/
+tools/sqlmap/.sqlmap/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local compose data
+pgdata/

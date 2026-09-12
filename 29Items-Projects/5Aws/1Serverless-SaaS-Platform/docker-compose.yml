@@ -1,0 +1,49 @@
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: saas-dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    ports:
+      - "8002:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "[ -e /proc/1 ] || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: saas-backend-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=local
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - DYNAMODB_ENDPOINT_URL=http://dynamodb-local:8000
+      - DYNAMODB_TABLE_NAME=saas_platform_core_dev
+      - ENFORCE_GEOLOCATION=true
+      - POWERTOOLS_SERVICE_NAME=saas-platform-local
+      - LOG_LEVEL=INFO
+    depends_on:
+      - dynamodb-local
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: saas-frontend-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend

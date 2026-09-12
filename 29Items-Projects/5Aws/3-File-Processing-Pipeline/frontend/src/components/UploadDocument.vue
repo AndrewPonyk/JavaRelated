@@ -78,9 +78,10 @@ const uploadFile = async () => {
     });
     
     // 2. Upload to S3 using the URL directly with PUT
+    // Use the exact contentType from the presigned URL to avoid signature mismatch
     await axios.put(data.uploadUrl, selectedFile.value, {
       headers: {
-        'Content-Type': selectedFile.value.type || 'application/octet-stream' // fallback
+        'Content-Type': data.contentType
       }
     });
 

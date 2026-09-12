@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - echo "Installing backend dependencies..."
+      - cd backend
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      - pip install -r requirements-dev.txt
+
+  pre_build:
+    commands:
+      - echo "Running backend linters and type checkers..."
+      - ruff check src tests
+      - black --check src tests
+      - mypy src
+
+  build:
+    commands:
+      - echo "Running backend unit tests with coverage enforcement..."
+      - pytest --cov=src --cov-fail-under=80 tests/
+      - echo "Packaging Lambda distribution artifacts..."
+      - mkdir -p ../dist/lambda
+      - pip install -r requirements.txt -t ../dist/lambda/python
+      - cp -r src ../dist/lambda/
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist/lambda

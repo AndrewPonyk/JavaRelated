@@ -1,0 +1,45 @@
+# Node & CDK
+node_modules/
+dist/
+cdk.out/
+.npm/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environment and Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# IDEs & OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

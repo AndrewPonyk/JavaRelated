@@ -76,7 +76,8 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'uploadUrl': presigned_url,
                 'documentId': document_id,
-                'objectKey': object_key
+                'objectKey': object_key,
+                'contentType': content_type
             })
         }
     except json.JSONDecodeError:

